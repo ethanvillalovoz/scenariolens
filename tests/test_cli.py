@@ -174,6 +174,35 @@ class CliTest(unittest.TestCase):
             self.assertIn("Ingested 1 normalized Waymo Motion scenario(s)", result.stdout)
             self.assertIn("waymo_like", output_path.read_text())
 
+    def test_portfolio_report_command_writes_report_and_assets(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            output = root / "portfolio.md"
+            assets = root / "assets"
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "portfolio-report",
+                    "--output",
+                    str(output),
+                    "--assets-dir",
+                    str(assets),
+                    "--top",
+                    "1",
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertIn("Generated portfolio report", result.stdout)
+            self.assertIn("ScenarioLens Portfolio Report", output.read_text())
+            self.assertGreaterEqual(len(tuple(assets.glob("*.svg"))), 1)
+
     def test_render_single_scenario_to_file(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             output = Path(tmpdir) / "scenario.svg"

@@ -11,6 +11,7 @@ from scenariolens.ingest.waymo_motion import (
     save_normalized_motion_csv_as_scenarios,
 )
 from scenariolens.io import load_scenarios, save_scenarios
+from scenariolens.portfolio import generate_portfolio_report
 from scenariolens.report import json_report, markdown_report, ranked_scores
 from scenariolens.samples import synthetic_scenarios
 from scenariolens.schema import Scenario
@@ -81,6 +82,22 @@ def ingest_waymo_motion_command(
     except NotImplementedError as exc:
         print(str(exc), file=sys.stderr)
         return 2
+    return 0
+
+
+def portfolio_report(
+    output_path: str,
+    assets_dir: str,
+    waymo_normalized_path: str,
+    top_n: int,
+) -> int:
+    generate_portfolio_report(
+        output_path=output_path,
+        assets_dir=assets_dir,
+        waymo_normalized_path=waymo_normalized_path,
+        top_n=top_n,
+    )
+    print(f"Generated portfolio report at {output_path}")
     return 0
 
 
@@ -238,6 +255,31 @@ def main() -> int:
         default=None,
         help="Optional path to write instead of printing to stdout.",
     )
+    portfolio_parser = subparsers.add_parser(
+        "portfolio-report",
+        help="Generate the checked-in ScenarioLens portfolio report.",
+    )
+    portfolio_parser.add_argument(
+        "--output",
+        default="docs/reports/portfolio_report.md",
+        help="Markdown report path to write.",
+    )
+    portfolio_parser.add_argument(
+        "--assets-dir",
+        default="docs/reports/assets",
+        help="Directory for generated SVG assets.",
+    )
+    portfolio_parser.add_argument(
+        "--waymo-normalized",
+        default="docs/examples/waymo_motion_normalized.csv",
+        help="Normalized Waymo Motion-shaped CSV fixture.",
+    )
+    portfolio_parser.add_argument(
+        "--top",
+        type=int,
+        default=3,
+        help="Number of top scenarios per section.",
+    )
     render_parser = subparsers.add_parser(
         "render",
         help="Render scenarios as SVG trajectory views.",
@@ -291,6 +333,13 @@ def main() -> int:
             limit=args.limit,
             output_path=args.output,
             input_path=args.input,
+        )
+    if args.command == "portfolio-report":
+        return portfolio_report(
+            output_path=args.output,
+            assets_dir=args.assets_dir,
+            waymo_normalized_path=args.waymo_normalized,
+            top_n=args.top,
         )
     if args.command == "render":
         return render(
