@@ -64,6 +64,17 @@ scenario records. The current prototype can:
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
 
+## Example Gallery
+
+The current top-ranked synthetic scenarios are checked in under
+[docs/examples/top_scenarios](docs/examples/top_scenarios).
+
+![Dense intersection VRU scenario](docs/examples/top_scenarios/synthetic_dense_intersection_vru.svg)
+
+![Occluded pedestrian scenario](docs/examples/top_scenarios/synthetic_occluded_pedestrian.svg)
+
+![Unprotected left turn scenario](docs/examples/top_scenarios/synthetic_unprotected_left_turn.svg)
+
 ## Local Commands
 
 Run the starter demo without installing the package:
