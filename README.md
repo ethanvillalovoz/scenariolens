@@ -57,6 +57,7 @@ scenario records. The current prototype can:
 - compute lightweight risk/interaction features,
 - normalize and infer scenario taxonomy tags,
 - rank 10 synthetic scenarios by evaluation value,
+- save/load ScenarioLens scenario JSON,
 - export Markdown or JSON reports,
 - render 2D SVG trajectory views,
 - run without external dependencies.
@@ -93,6 +94,21 @@ Generate a machine-readable JSON report:
 
 ```bash
 PYTHONPATH=src python3 -m scenariolens.cli report --format json --limit 5
+```
+
+Export the synthetic corpus as ScenarioLens JSON:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli export-synthetic --output data/processed/synthetic_scenarios.json
+```
+
+Run a report from a scenario JSON file:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli report \
+  --input data/processed/synthetic_scenarios.json \
+  --format markdown \
+  --limit 5
 ```
 
 Render one scenario as SVG:
@@ -132,3 +148,7 @@ The first taxonomy covers high-signal autonomy-evaluation cases:
 - low-interaction baselines.
 
 See [docs/scenario_taxonomy.md](docs/scenario_taxonomy.md).
+
+## Data Format
+
+ScenarioLens JSON is documented in [docs/data_format.md](docs/data_format.md).

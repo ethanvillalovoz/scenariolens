@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Run unit tests
+        env:
+          PYTHONPATH: src
+        run: python -m unittest discover
+
+      - name: Smoke test scenario export and report
+        env:
+          PYTHONPATH: src
+        run: |
+          python -m scenariolens.cli export-synthetic --output /tmp/scenariolens-synthetic.json
+          python -m scenariolens.cli report --input /tmp/scenariolens-synthetic.json --format markdown --limit 3
+
+      - name: Smoke test SVG rendering
+        env:
+          PYTHONPATH: src
+        run: |
+          python -m scenariolens.cli render --input /tmp/scenariolens-synthetic.json --top 3 --output-dir /tmp/scenariolens-gallery
+          test -f /tmp/scenariolens-gallery/synthetic_dense_intersection_vru.svg
+

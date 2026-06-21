@@ -6,6 +6,12 @@ Begin with small synthetic scenario records. This lets us validate schema,
 metrics, ranking logic, tests, and reporting without waiting on large downloads
 or dataset access.
 
+The synthetic corpus can now be exported to ScenarioLens JSON:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli export-synthetic --output data/processed/synthetic_scenarios.json
+```
+
 ## Phase 1: Curated Public Data Slice
 
 Move to a small subset of public autonomous-driving data. The most relevant
@@ -62,4 +68,3 @@ The final artifact should export small scenario sets for downstream use:
 - `low_visibility_when_available`.
 
 Each set should include the ranking rationale and summary statistics.
-

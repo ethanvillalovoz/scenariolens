@@ -14,8 +14,8 @@ Goal: a complete local prototype with synthetic scenarios.
 
 Status: implemented for the first synthetic corpus. ScenarioLens now includes
 taxonomy scoring, ranked Markdown/JSON reports, and dependency-free SVG
-trajectory rendering. Remaining polish before moving to real data: optional
-README screenshots and a small rendered gallery checked into docs.
+trajectory rendering. Scenario JSON export/load and GitHub Actions CI are now
+part of the bridge toward real data.
 
 ## Milestone 2: Small Real Data Slice
 
