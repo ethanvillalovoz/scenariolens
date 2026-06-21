@@ -19,6 +19,8 @@ class ReportTest(unittest.TestCase):
 
         self.assertIn("# ScenarioLens Scenario Report", report)
         self.assertIn("Why it matters", report)
+        self.assertIn("Component scores", report)
+        self.assertIn("Min VRU distance", report)
         self.assertIn("synthetic_dense_intersection_vru", report)
 
     def test_json_report_is_machine_readable(self) -> None:
@@ -27,6 +29,7 @@ class ReportTest(unittest.TestCase):
         self.assertEqual(payload["reported_count"], 2)
         self.assertGreaterEqual(payload["scenario_count"], 10)
         self.assertIn("reasons", payload["scenarios"][0])
+        self.assertIn("component_scores", payload["scenarios"][0])
 
     def test_score_reasons_falls_back_for_baseline(self) -> None:
         baseline = ranked_scores(synthetic_scenarios())[-1]

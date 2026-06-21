@@ -25,6 +25,7 @@ class PortfolioTest(unittest.TestCase):
         self.assertIn("## Normalized Waymo-Shaped Fixture Results", markdown)
         self.assertIn("## Limitations", markdown)
         self.assertIn("## Next Work", markdown)
+        self.assertIn("Component scores", markdown)
 
     def test_generate_portfolio_report_writes_markdown_and_assets(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -54,4 +55,3 @@ class PortfolioTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

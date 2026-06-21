@@ -68,8 +68,8 @@ def portfolio_markdown(
         "ScenarioLens is a laptop-friendly autonomous-driving evaluation project "
         "for discovering and explaining long-tail driving scenarios. It ranks "
         "scenarios using lightweight interaction metrics, ODD-relevant taxonomy "
-        "tags, vulnerable-road-user counts, closest-agent distance, and a simple "
-        "constant-velocity time-to-collision proxy.",
+        "tags, vulnerable-road-user counts, same-timestep proximity, path-conflict "
+        "proximity, dynamics, and a simple constant-velocity time-to-collision proxy.",
         "",
         "The current pipeline supports synthetic scenarios, ScenarioLens JSON, "
         "row-wise CSV ingestion, and a normalized Waymo Motion-shaped fixture. "
@@ -144,10 +144,18 @@ def _score_section(scores: tuple[ScenarioScore, ...], asset_prefix: Path) -> lis
                 f"- Agents: {score.agent_count}",
                 f"- Vulnerable road users: {score.vulnerable_road_user_count}",
                 f"- Min distance: {_format_optional(score.min_pairwise_distance_m, 'm')}",
+                f"- Min VRU distance: {_format_optional(score.min_vru_distance_m, 'm')}",
+                f"- Min path distance: {_format_optional(score.min_path_distance_m, 'm')}",
                 f"- Min TTC proxy: {_format_optional(score.min_time_to_collision_s, 's')}",
-                "- Why it matters:",
+                f"- Max speed: {_format_optional(score.max_speed_mps, 'm/s')}",
+                f"- Ego max speed: {_format_optional(score.ego_max_speed_mps, 'm/s')}",
+                f"- Max deceleration: {_format_optional(score.max_deceleration_mps2, 'm/s^2')}",
+                "- Component scores:",
             ]
         )
+        for name, value in score.component_scores.items():
+            lines.append(f"  - {name}: {value:.3f}")
+        lines.append("- Why it matters:")
         for reason in score_reasons(score):
             lines.append(f"  - {reason}")
         lines.append("")
@@ -159,4 +167,3 @@ def _format_optional(value: float | None, unit: str) -> str:
     if value is None:
         return "n/a"
     return f"{value:.3f} {unit}"
-
