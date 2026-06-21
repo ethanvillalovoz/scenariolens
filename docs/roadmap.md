@@ -35,10 +35,13 @@ scenarios to keep the portfolio story visual and understandable.
 
 Goal: make the project immediately understandable.
 
+- generate a portfolio report with top-ranked scenarios and SVG assets,
 - build a dashboard or lightweight web app,
 - add scenario filtering and ranking views,
 - visualize trajectories on a 2D map/canvas,
 - show why each scenario was ranked highly.
+
+Status: portfolio report implemented in `docs/reports/portfolio_report.md`.
 
 ## Milestone 4: Portfolio Polish
 

@@ -9,6 +9,9 @@ The top-ranked SVG gallery was generated with:
 PYTHONPATH=src python3 -m scenariolens.cli render --top 3 --output-dir docs/examples/top_scenarios
 ```
 
+The broader generated portfolio report lives at
+[`docs/reports/portfolio_report.md`](../reports/portfolio_report.md).
+
 ## Included Scenarios
 
 - `synthetic_dense_intersection_vru`: dense multi-agent intersection with both

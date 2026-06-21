@@ -65,6 +65,13 @@ scenario records. The current prototype can:
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
 
+## Portfolio Report
+
+For a quick project overview, see the generated
+[ScenarioLens Portfolio Report](docs/reports/portfolio_report.md). It summarizes
+the ranking pipeline, top synthetic scenarios, normalized Waymo-shaped fixture
+results, limitations, and next work.
+
 ## Example Gallery
 
 The current top-ranked synthetic scenarios are checked in under
@@ -140,6 +147,15 @@ Render a top-ranked scenario gallery:
 
 ```bash
 PYTHONPATH=src python3 -m scenariolens.cli render --top 3 --output-dir /tmp/scenariolens-gallery
+```
+
+Regenerate the checked-in portfolio report:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli portfolio-report \
+  --output docs/reports/portfolio_report.md \
+  --assets-dir docs/reports/assets \
+  --top 3
 ```
 
 Run tests with only the Python standard library:
