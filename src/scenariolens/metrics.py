@@ -4,6 +4,7 @@ from itertools import combinations
 from math import hypot, inf
 
 from scenariolens.schema import AgentTrack, Scenario, ScenarioScore, State
+from scenariolens.taxonomy import infer_tags, tag_weight
 
 
 def distance(a: State, b: State) -> float:
@@ -71,12 +72,14 @@ def interaction_score(
     min_ttc_s: float | None,
     vru_count: int,
     agent_count: int,
+    taxonomy_score: float = 0.0,
 ) -> float:
     """Rank scenarios for review using lightweight interpretable features."""
 
     score = 0.0
     score += min(agent_count, 12) * 0.25
     score += vru_count * 1.5
+    score += taxonomy_score
 
     if min_distance_m is not None:
         score += max(0.0, 8.0 - min_distance_m)
@@ -91,11 +94,14 @@ def score_scenario(scenario: Scenario) -> ScenarioScore:
     min_distance = min_pairwise_distance(scenario)
     min_ttc = min_time_to_collision(scenario)
     vru_count = vulnerable_road_user_count(scenario.tracks)
+    tags = infer_tags(scenario)
+    taxonomy_score = tag_weight(tags)
     score = interaction_score(
         min_distance_m=min_distance,
         min_ttc_s=min_ttc,
         vru_count=vru_count,
         agent_count=len(scenario.tracks),
+        taxonomy_score=taxonomy_score,
     )
     return ScenarioScore(
         scenario_id=scenario.scenario_id,
@@ -103,7 +109,7 @@ def score_scenario(scenario: Scenario) -> ScenarioScore:
         vulnerable_road_user_count=vru_count,
         min_pairwise_distance_m=None if min_distance is None else round(min_distance, 3),
         min_time_to_collision_s=None if min_ttc is None else round(min_ttc, 3),
+        taxonomy_score=taxonomy_score,
         interaction_score=score,
-        tags=scenario.tags,
+        tags=tags,
     )
-

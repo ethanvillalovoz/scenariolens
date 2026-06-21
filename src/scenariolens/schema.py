@@ -46,6 +46,6 @@ class ScenarioScore:
     vulnerable_road_user_count: int
     min_pairwise_distance_m: float | None
     min_time_to_collision_s: float | None
+    taxonomy_score: float
     interaction_score: float
     tags: tuple[str, ...]
-

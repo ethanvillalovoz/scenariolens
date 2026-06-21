@@ -21,6 +21,8 @@ class MetricsTest(unittest.TestCase):
             following_score.interaction_score,
         )
         self.assertEqual(crossing_score.vulnerable_road_user_count, 1)
+        self.assertIn("pedestrian_crossing", crossing_score.tags)
+        self.assertGreater(crossing_score.taxonomy_score, 0.0)
 
 
 if __name__ == "__main__":
