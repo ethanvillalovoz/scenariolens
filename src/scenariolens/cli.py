@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
+from scenariolens.io import load_scenarios, save_scenarios
 from scenariolens.report import json_report, markdown_report, ranked_scores
 from scenariolens.samples import synthetic_scenarios
 from scenariolens.schema import Scenario
@@ -14,8 +15,25 @@ def demo() -> int:
     return 0
 
 
-def report(output_format: str, limit: int | None, output_path: str | None) -> int:
-    scenarios = synthetic_scenarios()
+def _load_or_synthetic(input_path: str | None) -> tuple[Scenario, ...]:
+    if input_path:
+        return load_scenarios(input_path)
+    return synthetic_scenarios()
+
+
+def export_synthetic(output_path: str) -> int:
+    save_scenarios(output_path, synthetic_scenarios())
+    print(f"Exported {len(synthetic_scenarios())} scenario(s) to {output_path}")
+    return 0
+
+
+def report(
+    output_format: str,
+    limit: int | None,
+    output_path: str | None,
+    input_path: str | None,
+) -> int:
+    scenarios = _load_or_synthetic(input_path)
     if output_format == "json":
         content = json_report(scenarios, limit=limit)
     else:
@@ -33,8 +51,9 @@ def render(
     top: int | None,
     output_path: str | None,
     output_dir: str | None,
+    input_path: str | None,
 ) -> int:
-    scenarios = synthetic_scenarios()
+    scenarios = _load_or_synthetic(input_path)
     scenario_by_id = {scenario.scenario_id: scenario for scenario in scenarios}
 
     if top is not None:
@@ -82,9 +101,23 @@ def main() -> int:
     )
     subparsers = parser.add_subparsers(dest="command")
     subparsers.add_parser("demo", help="Score built-in synthetic scenarios.")
+    export_parser = subparsers.add_parser(
+        "export-synthetic",
+        help="Export built-in synthetic scenarios as ScenarioLens JSON.",
+    )
+    export_parser.add_argument(
+        "--output",
+        required=True,
+        help="Scenario JSON path to write.",
+    )
     report_parser = subparsers.add_parser(
         "report",
-        help="Generate a ranked scenario report from built-in synthetic scenarios.",
+        help="Generate a ranked scenario report.",
+    )
+    report_parser.add_argument(
+        "--input",
+        default=None,
+        help="Optional ScenarioLens JSON file. Defaults to built-in synthetic scenarios.",
     )
     report_parser.add_argument(
         "--format",
@@ -105,7 +138,12 @@ def main() -> int:
     )
     render_parser = subparsers.add_parser(
         "render",
-        help="Render built-in synthetic scenarios as SVG trajectory views.",
+        help="Render scenarios as SVG trajectory views.",
+    )
+    render_parser.add_argument(
+        "--input",
+        default=None,
+        help="Optional ScenarioLens JSON file. Defaults to built-in synthetic scenarios.",
     )
     render_parser.add_argument(
         "--scenario",
@@ -132,11 +170,14 @@ def main() -> int:
 
     if args.command == "demo":
         return demo()
+    if args.command == "export-synthetic":
+        return export_synthetic(output_path=args.output)
     if args.command == "report":
         return report(
             output_format=args.format,
             limit=args.limit,
             output_path=args.output,
+            input_path=args.input,
         )
     if args.command == "render":
         return render(
@@ -144,6 +185,7 @@ def main() -> int:
             top=args.top,
             output_path=args.output,
             output_dir=args.output_dir,
+            input_path=args.input,
         )
 
     parser.print_help()
