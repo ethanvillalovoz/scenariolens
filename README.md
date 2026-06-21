@@ -38,6 +38,13 @@ This repo is intentionally scoped for an Apple Silicon laptop with 32 GB RAM and
 - Begin with motion/scenario data before heavy image/LiDAR workloads.
 - Make cloud/GPU usage optional, not required for the core demo.
 
+## Tech Stack
+
+ScenarioLens is built around a laptop-friendly subset of the public Waymo and
+autonomy ecosystem: Python, Waymo Motion `Scenario`-shaped records, optional
+Waymo/TensorFlow ingestion for binary files, and a future JAX/Waymax simulation
+path. See [docs/tech_stack.md](docs/tech_stack.md) for the full rationale.
+
 ## Initial Repo Layout
 
 ```text

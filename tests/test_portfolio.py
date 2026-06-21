@@ -23,6 +23,7 @@ class PortfolioTest(unittest.TestCase):
 
         self.assertIn("# ScenarioLens Portfolio Report", markdown)
         self.assertIn("## Executive Summary", markdown)
+        self.assertIn("## Stack Alignment", markdown)
         self.assertIn("## Top Synthetic Scenarios", markdown)
         self.assertIn("## Native Waymo Motion JSON Mini-Slice", markdown)
         self.assertIn("## Normalized Waymo-Shaped Fixture Results", markdown)

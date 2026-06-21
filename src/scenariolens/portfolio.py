@@ -96,6 +96,14 @@ def portfolio_markdown(
         "- Unit tests cover schema I/O, ranking, taxonomy, ingestion, reporting, "
         "CLI flows, and SVG rendering.",
         "",
+        "## Stack Alignment",
+        "",
+        "ScenarioLens uses a laptop-friendly subset of the public Waymo/autonomy "
+        "ecosystem: Python for data and evaluation tooling, Waymo Motion "
+        "`Scenario`-shaped records as the dataset boundary, optional "
+        "Waymo/TensorFlow dependencies for binary inputs, and JAX/Waymax as the "
+        "future simulation path.",
+        "",
         "## Top Synthetic Scenarios",
         "",
     ]

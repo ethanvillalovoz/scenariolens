@@ -17,6 +17,18 @@ taxonomy scoring, ranked Markdown/JSON reports, and dependency-free SVG
 trajectory rendering. Scenario JSON export/load and GitHub Actions CI are now
 part of the bridge toward real data.
 
+## Milestone 1A: Waymo-Aligned Stack Rationale
+
+Goal: make the technology choices explicit and recruiter-readable.
+
+- keep the default Python package dependency-free,
+- document Waymo Motion `Scenario`-shaped records as the dataset boundary,
+- explain optional Waymo/TensorFlow dependencies for binary TFRecord ingestion,
+- identify JAX/Waymax as the future simulation path,
+- keep frontend/dashboard work secondary to the autonomy data stack.
+
+Status: implemented in `docs/tech_stack.md`.
+
 ## Milestone 2: Small Real Data Slice
 
 Goal: replace synthetic records with a small public dataset slice.
