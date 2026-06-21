@@ -19,8 +19,8 @@ target is the Waymo Open Dataset, especially motion/scenario data because it is
 directly connected to interaction prediction, sim agents, and scenario
 generation.
 
-Before adding Waymo-specific parsing, ScenarioLens supports a generic row-wise
-CSV track importer. This keeps the ingestion boundary testable with tiny files:
+ScenarioLens supports a generic row-wise CSV track importer. This keeps the
+ingestion boundary testable with tiny files:
 
 ```bash
 PYTHONPATH=src python3 -m scenariolens.cli ingest-csv \
@@ -36,6 +36,19 @@ PYTHONPATH=src python3 -m scenariolens.cli ingest-waymo-motion \
   --input docs/examples/waymo_motion_normalized.csv \
   --output data/processed/waymo_motion_normalized.json
 ```
+
+The repo now also includes a tiny protobuf-shaped Waymo Motion JSON fixture.
+This exercises the native adapter path while staying dependency-free:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli ingest-waymo-motion \
+  --format native \
+  --input docs/examples/waymo_motion_native_sample.json \
+  --output data/processed/waymo_motion_native_sample.json
+```
+
+The same native adapter can read binary protobuf or TFRecord files when optional
+Waymo/TensorFlow packages are installed.
 
 The repo should support a `data/raw/` drop-in workflow:
 

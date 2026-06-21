@@ -13,8 +13,10 @@ class PortfolioTest(unittest.TestCase):
 
         markdown = portfolio_markdown(
             synthetic_count=10,
+            waymo_native_count=1,
             waymo_like_count=2,
             synthetic_scores=scores,
+            waymo_native_scores=scores,
             waymo_scores=scores,
             asset_prefix=Path("assets"),
         )
@@ -22,6 +24,7 @@ class PortfolioTest(unittest.TestCase):
         self.assertIn("# ScenarioLens Portfolio Report", markdown)
         self.assertIn("## Executive Summary", markdown)
         self.assertIn("## Top Synthetic Scenarios", markdown)
+        self.assertIn("## Native Waymo Motion JSON Mini-Slice", markdown)
         self.assertIn("## Normalized Waymo-Shaped Fixture Results", markdown)
         self.assertIn("## Limitations", markdown)
         self.assertIn("## Next Work", markdown)
@@ -30,6 +33,31 @@ class PortfolioTest(unittest.TestCase):
     def test_generate_portfolio_report_writes_markdown_and_assets(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
+            native_fixture = root / "waymo_motion_native.json"
+            native_fixture.write_text(
+                """{
+                  "scenarioId": "waymo_native_fixture",
+                  "timestampsSeconds": [0.0],
+                  "sdcTrackIndex": 0,
+                  "tracks": [
+                    {
+                      "id": 1,
+                      "objectType": "TYPE_VEHICLE",
+                      "states": [
+                        {
+                          "centerX": 0.0,
+                          "centerY": 0.0,
+                          "velocityX": 5.0,
+                          "velocityY": 0.0,
+                          "valid": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+                """,
+                encoding="utf-8",
+            )
             fixture = root / "waymo_motion_normalized.csv"
             fixture.write_text(
                 "scenario_id,track_id,object_type,timestep,center_x,center_y,"
@@ -46,6 +74,7 @@ class PortfolioTest(unittest.TestCase):
                 output_path=output,
                 assets_dir=assets,
                 waymo_normalized_path=fixture,
+                waymo_native_path=native_fixture,
                 top_n=1,
             )
 

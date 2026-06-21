@@ -112,29 +112,59 @@ class CliTest(unittest.TestCase):
         )
 
         self.assertIn("Adapter: waymo_motion", result.stdout)
-        self.assertIn("Implemented: False", result.stdout)
+        self.assertIn("Implemented: True", result.stdout)
 
-    def test_ingest_waymo_motion_returns_clear_nonzero_placeholder(self) -> None:
-        result = subprocess.run(
-            [
-                sys.executable,
-                "-m",
-                "scenariolens.cli",
-                "ingest-waymo-motion",
-                "--input",
-                "data/raw/waymo",
-                "--output",
-                "data/processed/waymo.json",
-                "--max-scenarios",
-                "1",
-            ],
-            env={"PYTHONPATH": "src"},
-            capture_output=True,
-            text=True,
-        )
+    def test_ingest_waymo_motion_native_json(self) -> None:
+        native_json = """{
+          "scenarioId": "waymo_native_cli",
+          "timestampsSeconds": [0.0, 0.1],
+          "sdcTrackIndex": 0,
+          "tracks": [
+            {
+              "id": 10,
+              "objectType": "TYPE_VEHICLE",
+              "states": [
+                {"centerX": 0.0, "centerY": 0.0, "velocityX": 5.0, "velocityY": 0.0, "valid": true},
+                {"centerX": 0.5, "centerY": 0.0, "velocityX": 5.0, "velocityY": 0.0, "valid": true}
+              ]
+            },
+            {
+              "id": 20,
+              "objectType": "TYPE_CYCLIST",
+              "states": [
+                {"centerX": 1.0, "centerY": 1.5, "velocityX": 4.0, "velocityY": 0.0, "valid": true},
+                {"centerX": 1.4, "centerY": 1.5, "velocityX": 4.0, "velocityY": 0.0, "valid": true}
+              ]
+            }
+          ]
+        }
+        """
+        with tempfile.TemporaryDirectory() as tmpdir:
+            input_path = Path(tmpdir) / "waymo_native.json"
+            output_path = Path(tmpdir) / "waymo.json"
+            input_path.write_text(native_json, encoding="utf-8")
 
-        self.assertEqual(result.returncode, 2)
-        self.assertIn("Native Waymo Motion ingestion is planned", result.stderr)
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "ingest-waymo-motion",
+                    "--input",
+                    str(input_path),
+                    "--output",
+                    str(output_path),
+                    "--max-scenarios",
+                    "1",
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertIn("Ingested 1 native Waymo Motion scenario(s)", result.stdout)
+            self.assertIn("waymo_native_cli", output_path.read_text())
 
     def test_ingest_waymo_motion_normalized_csv(self) -> None:
         csv_text = (

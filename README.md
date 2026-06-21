@@ -58,6 +58,7 @@ scenario records. The current prototype can:
 - break rankings into interpretable score components,
 - normalize and infer scenario taxonomy tags,
 - rank 10 synthetic scenarios by evaluation value,
+- ingest protobuf-shaped Waymo Motion JSON mini-slices,
 - save/load ScenarioLens scenario JSON,
 - export Markdown or JSON reports,
 - render 2D SVG trajectory views,
@@ -138,6 +139,18 @@ PYTHONPATH=src python3 -m scenariolens.cli ingest-waymo-motion \
   --input docs/examples/waymo_motion_normalized.csv \
   --output data/processed/waymo_motion_normalized.json
 ```
+
+Ingest a checked-in protobuf-shaped Waymo Motion JSON mini-slice:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli ingest-waymo-motion \
+  --format native \
+  --input docs/examples/waymo_motion_native_sample.json \
+  --output data/processed/waymo_motion_native_sample.json
+```
+
+Native JSON ingestion is dependency-free. Binary `.pb` and `.tfrecord` inputs
+are treated as optional paths that require Waymo/TensorFlow packages.
 
 Render one scenario as SVG:
 

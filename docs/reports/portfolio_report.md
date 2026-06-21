@@ -4,11 +4,12 @@
 
 ScenarioLens is a laptop-friendly autonomous-driving evaluation project for discovering and explaining long-tail driving scenarios. It ranks scenarios using lightweight interaction metrics, ODD-relevant taxonomy tags, vulnerable-road-user counts, same-timestep proximity, path-conflict proximity, dynamics, and a simple constant-velocity time-to-collision proxy.
 
-The current pipeline supports synthetic scenarios, ScenarioLens JSON, row-wise CSV ingestion, and a normalized Waymo Motion-shaped fixture. The native Waymo Motion parser is intentionally left as an optional future adapter so the core project stays dependency-free and easy to run.
+The current pipeline supports synthetic scenarios, ScenarioLens JSON, row-wise CSV ingestion, normalized Waymo Motion-shaped fixtures, and native protobuf-shaped Waymo Motion JSON mini-slices. Binary protobuf and TFRecord inputs are optional so the core project stays easy to run.
 
 ## Current Coverage
 
 - Synthetic scenarios analyzed: 10
+- Native Waymo-shaped JSON scenarios analyzed: 1
 - Normalized Waymo-shaped scenarios analyzed: 2
 - Unit tests cover schema I/O, ranking, taxonomy, ingestion, reporting, CLI flows, and SVG rendering.
 
@@ -114,9 +115,49 @@ The current pipeline supports synthetic scenarios, ScenarioLens JSON, row-wise C
   - agent paths come within 1.000 m
   - high-value taxonomy tags: Vulnerable road user, Unprotected turn, Close interaction
 
+## Native Waymo Motion JSON Mini-Slice
+
+This section uses a tiny checked-in JSON record shaped like the public Waymo Motion `Scenario` proto. It exercises native field mapping for timestamps, object types, valid states, velocities, and the SDC ego-track index without requiring a dataset download.
+
+| Rank | Scenario | Score | Tags |
+| ---: | --- | ---: | --- |
+| 1 | `waymo_native_sample_interaction` | 31.542 | vulnerable_road_user, objects_of_interest, tracks_to_predict |
+
+### 1. `waymo_native_sample_interaction`
+
+![waymo_native_sample_interaction](assets/waymo_native_sample_interaction.svg)
+
+- Score: 31.542
+- Agents: 3
+- Vulnerable road users: 1
+- Min distance: 0.863 m
+- Min VRU distance: 0.863 m
+- Min path distance: 0.863 m
+- Min TTC proxy: 0.012 s
+- Max speed: 5.000 m/s
+- Ego max speed: 5.000 m/s
+- Max deceleration: 10.000 m/s^2
+- Component scores:
+  - density: 0.750
+  - vru: 1.500
+  - taxonomy: 2.000
+  - proximity: 7.137
+  - ttc: 7.485
+  - vru_proximity: 4.602
+  - path_conflict: 2.068
+  - dynamics: 6.000
+- Why it matters:
+  - contains 1 vulnerable road user(s)
+  - minimum agent distance is 0.863 m
+  - minimum constant-velocity TTC proxy is 0.012 s
+  - closest vehicle-to-VRU distance is 0.863 m
+  - agent paths come within 0.863 m
+  - max deceleration is 10.000 m/s^2
+  - high-value taxonomy tags: Vulnerable road user
+
 ## Normalized Waymo-Shaped Fixture Results
 
-These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion extraction. The data is synthetic, but the field boundary exercises the adapter path planned for real Motion slices.
+These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion extraction. The data is synthetic, but the field boundary exercises row-wise extraction for real Motion slices.
 
 | Rank | Scenario | Score | Tags |
 | ---: | --- | ---: | --- |
@@ -184,14 +225,14 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 
 ## Limitations
 
-- Current scenario data is synthetic or normalized-fixture data, not a native Waymo slice.
-- Native Waymo Motion TFRecord/protobuf parsing is not implemented yet.
+- Checked-in Waymo examples are synthetic mini fixtures, not downloaded real validation shards.
+- Binary protobuf and TFRecord ingestion require optional packages and are not exercised in CI.
 - The TTC value is a simple constant-velocity screening proxy, not a certified safety metric.
-- The current renderer is 2D and focuses on agent trajectories, not map lanes or traffic lights.
+- The current renderer is 2D and focuses on agent trajectories, not parsed map lanes or traffic lights.
 
 ## Next Work
 
-- Add native Waymo Motion mini-slice ingestion behind the existing adapter boundary.
-- Add map/lane context once real Motion records are available.
-- Add richer interaction metrics such as deceleration, crossing conflict, and trajectory overlap.
+- Run the native adapter on a small downloaded Waymo Motion validation slice.
+- Add map/lane and traffic-light features from native Motion records.
+- Compare synthetic, native mini-slice, and downloaded-slice score distributions.
 - Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.

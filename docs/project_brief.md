@@ -51,8 +51,8 @@ The finished portfolio artifact should include:
 - a short project write-up with results and limitations.
 
 The current prototype already includes the reproducible pipeline, synthetic
-corpus, taxonomy, interaction component scoring, tests, Markdown/JSON reports,
-and 2D SVG trajectory rendering.
+corpus, native Waymo Motion JSON ingestion, taxonomy, interaction component
+scoring, tests, Markdown/JSON reports, and 2D SVG trajectory rendering.
 
 ## Representative Scenario Categories
 

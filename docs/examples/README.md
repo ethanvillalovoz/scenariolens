@@ -20,8 +20,10 @@ The broader generated portfolio report lives at
   vehicle-like obstruction.
 - `synthetic_unprotected_left_turn`: left-turn interaction with oncoming traffic
   and a pedestrian.
+- `waymo_motion_native_sample.json`: tiny protobuf-shaped Waymo Motion JSON
+  fixture for exercising native adapter ingestion without extra dependencies.
 - `waymo_motion_normalized.csv`: tiny Waymo Motion-shaped normalized fixture
-  for exercising the planned Waymo adapter path without downloading raw data.
+  for exercising extracted-row ingestion without downloading raw data.
 
 These artifacts are intentionally tiny and synthetic. They exist to make the
 evaluation pipeline visible in the GitHub repository while the project remains

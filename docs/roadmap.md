@@ -31,6 +31,20 @@ Goal: replace synthetic records with a small public dataset slice.
 Before downloading large data, use the renderer on the synthetic top-ranked
 scenarios to keep the portfolio story visual and understandable.
 
+## Milestone 2A: Native Waymo Motion Mini-Slice
+
+Goal: make the real-data adapter credible without making the repo heavy.
+
+- ingest protobuf-shaped Waymo Motion JSON records without extra dependencies,
+- preserve the optional path for binary protobuf and TFRecord inputs,
+- map `sdc_track_index` to ScenarioLens ego tracks,
+- skip invalid states and preserve timestamps, object types, and velocities,
+- document the exact field boundary and raw-data workflow.
+
+Status: implemented for native JSON mini-slices and optional binary hooks.
+Full downloaded-dataset validation, map geometry parsing, and traffic-light
+feature extraction remain next steps.
+
 ## Milestone 3: Searchable Demo
 
 Goal: make the project immediately understandable.

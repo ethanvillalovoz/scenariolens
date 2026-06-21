@@ -2,19 +2,24 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from scenariolens.ingest.waymo_motion import load_normalized_motion_csv
+from scenariolens.ingest.waymo_motion import (
+    load_normalized_motion_csv,
+    load_waymo_motion,
+)
 from scenariolens.report import ranked_scores, score_reasons
 from scenariolens.samples import synthetic_scenarios
 from scenariolens.schema import Scenario, ScenarioScore
 from scenariolens.visualize import scenario_svg
 
 DEFAULT_WAYMO_NORMALIZED_PATH = Path("docs/examples/waymo_motion_normalized.csv")
+DEFAULT_WAYMO_NATIVE_PATH = Path("docs/examples/waymo_motion_native_sample.json")
 
 
 def generate_portfolio_report(
     output_path: str | Path,
     assets_dir: str | Path,
     waymo_normalized_path: str | Path = DEFAULT_WAYMO_NORMALIZED_PATH,
+    waymo_native_path: str | Path = DEFAULT_WAYMO_NATIVE_PATH,
     top_n: int = 3,
 ) -> None:
     """Generate a checked-in portfolio report and its SVG assets."""
@@ -24,16 +29,18 @@ def generate_portfolio_report(
     assets.mkdir(parents=True, exist_ok=True)
 
     synthetic = synthetic_scenarios()
+    waymo_native = load_waymo_motion(waymo_native_path)
     waymo_like = load_normalized_motion_csv(waymo_normalized_path)
 
     synthetic_scores = ranked_scores(synthetic)[:top_n]
+    waymo_native_scores = ranked_scores(waymo_native)[:top_n]
     waymo_scores = ranked_scores(waymo_like)[:top_n]
 
     scenario_lookup = {
         scenario.scenario_id: scenario
-        for scenario in (*synthetic, *waymo_like)
+        for scenario in (*synthetic, *waymo_native, *waymo_like)
     }
-    for score in (*synthetic_scores, *waymo_scores):
+    for score in (*synthetic_scores, *waymo_native_scores, *waymo_scores):
         scenario = scenario_lookup[score.scenario_id]
         (assets / f"{score.scenario_id}.svg").write_text(
             scenario_svg(scenario),
@@ -44,8 +51,10 @@ def generate_portfolio_report(
     target.write_text(
         portfolio_markdown(
             synthetic_count=len(synthetic),
+            waymo_native_count=len(waymo_native),
             waymo_like_count=len(waymo_like),
             synthetic_scores=synthetic_scores,
+            waymo_native_scores=waymo_native_scores,
             waymo_scores=waymo_scores,
             asset_prefix=assets.relative_to(target.parent),
         ),
@@ -55,8 +64,10 @@ def generate_portfolio_report(
 
 def portfolio_markdown(
     synthetic_count: int,
+    waymo_native_count: int,
     waymo_like_count: int,
     synthetic_scores: tuple[ScenarioScore, ...],
+    waymo_native_scores: tuple[ScenarioScore, ...],
     waymo_scores: tuple[ScenarioScore, ...],
     asset_prefix: Path,
 ) -> str:
@@ -72,13 +83,14 @@ def portfolio_markdown(
         "proximity, dynamics, and a simple constant-velocity time-to-collision proxy.",
         "",
         "The current pipeline supports synthetic scenarios, ScenarioLens JSON, "
-        "row-wise CSV ingestion, and a normalized Waymo Motion-shaped fixture. "
-        "The native Waymo Motion parser is intentionally left as an optional "
-        "future adapter so the core project stays dependency-free and easy to run.",
+        "row-wise CSV ingestion, normalized Waymo Motion-shaped fixtures, and "
+        "native protobuf-shaped Waymo Motion JSON mini-slices. Binary protobuf "
+        "and TFRecord inputs are optional so the core project stays easy to run.",
         "",
         "## Current Coverage",
         "",
         f"- Synthetic scenarios analyzed: {synthetic_count}",
+        f"- Native Waymo-shaped JSON scenarios analyzed: {waymo_native_count}",
         f"- Normalized Waymo-shaped scenarios analyzed: {waymo_like_count}",
         "- Unit tests cover schema I/O, ranking, taxonomy, ingestion, reporting, "
         "CLI flows, and SVG rendering.",
@@ -90,11 +102,23 @@ def portfolio_markdown(
     lines.extend(_score_section(synthetic_scores, asset_prefix))
     lines.extend(
         [
+            "## Native Waymo Motion JSON Mini-Slice",
+            "",
+            "This section uses a tiny checked-in JSON record shaped like the "
+            "public Waymo Motion `Scenario` proto. It exercises native field "
+            "mapping for timestamps, object types, valid states, velocities, "
+            "and the SDC ego-track index without requiring a dataset download.",
+            "",
+        ]
+    )
+    lines.extend(_score_section(waymo_native_scores, asset_prefix))
+    lines.extend(
+        [
             "## Normalized Waymo-Shaped Fixture Results",
             "",
             "These examples use a tiny checked-in CSV shaped like a normalized "
             "Waymo Motion extraction. The data is synthetic, but the field "
-            "boundary exercises the adapter path planned for real Motion slices.",
+            "boundary exercises row-wise extraction for real Motion slices.",
             "",
         ]
     )
@@ -103,16 +127,16 @@ def portfolio_markdown(
         [
             "## Limitations",
             "",
-            "- Current scenario data is synthetic or normalized-fixture data, not a native Waymo slice.",
-            "- Native Waymo Motion TFRecord/protobuf parsing is not implemented yet.",
+            "- Checked-in Waymo examples are synthetic mini fixtures, not downloaded real validation shards.",
+            "- Binary protobuf and TFRecord ingestion require optional packages and are not exercised in CI.",
             "- The TTC value is a simple constant-velocity screening proxy, not a certified safety metric.",
-            "- The current renderer is 2D and focuses on agent trajectories, not map lanes or traffic lights.",
+            "- The current renderer is 2D and focuses on agent trajectories, not parsed map lanes or traffic lights.",
             "",
             "## Next Work",
             "",
-            "- Add native Waymo Motion mini-slice ingestion behind the existing adapter boundary.",
-            "- Add map/lane context once real Motion records are available.",
-            "- Add richer interaction metrics such as deceleration, crossing conflict, and trajectory overlap.",
+            "- Run the native adapter on a small downloaded Waymo Motion validation slice.",
+            "- Add map/lane and traffic-light features from native Motion records.",
+            "- Compare synthetic, native mini-slice, and downloaded-slice score distributions.",
             "- Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.",
             "",
         ]

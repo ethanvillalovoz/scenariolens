@@ -7,8 +7,8 @@ from pathlib import Path
 from scenariolens.ingest.csv_tracks import save_track_csv_as_scenarios
 from scenariolens.ingest.waymo_motion import (
     adapter_status,
-    ingest_waymo_motion,
     save_normalized_motion_csv_as_scenarios,
+    save_waymo_motion_as_scenarios,
 )
 from scenariolens.io import load_scenarios, save_scenarios
 from scenariolens.portfolio import generate_portfolio_report
@@ -74,14 +74,19 @@ def ingest_waymo_motion_command(
         return 0
 
     try:
-        ingest_waymo_motion(
+        save_waymo_motion_as_scenarios(
             input_path=input_path,
             output_path=output_path,
             max_scenarios=max_scenarios,
         )
-    except NotImplementedError as exc:
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
         print(str(exc), file=sys.stderr)
         return 2
+    scenarios = load_scenarios(output_path)
+    print(
+        f"Ingested {len(scenarios)} native Waymo Motion scenario(s) "
+        f"from {input_path} to {output_path}"
+    )
     return 0
 
 
@@ -89,12 +94,14 @@ def portfolio_report(
     output_path: str,
     assets_dir: str,
     waymo_normalized_path: str,
+    waymo_native_path: str,
     top_n: int,
 ) -> int:
     generate_portfolio_report(
         output_path=output_path,
         assets_dir=assets_dir,
         waymo_normalized_path=waymo_normalized_path,
+        waymo_native_path=waymo_native_path,
         top_n=top_n,
     )
     print(f"Generated portfolio report at {output_path}")
@@ -205,13 +212,16 @@ def main() -> int:
     waymo_status_parser.set_defaults(command="waymo-motion-status")
     waymo_parser = subparsers.add_parser(
         "ingest-waymo-motion",
-        help="Planned optional Waymo Motion Dataset ingestion adapter.",
+        help="Convert Waymo Motion records into ScenarioLens JSON.",
     )
     waymo_parser.add_argument(
         "--format",
         choices=("native", "normalized-csv"),
         default="native",
-        help="Input representation. Native parsing is planned; normalized-csv is supported.",
+        help=(
+            "Input representation. Native supports protobuf-shaped JSON "
+            "without dependencies and binary inputs with optional packages."
+        ),
     )
     waymo_parser.add_argument(
         "--input",
@@ -273,6 +283,11 @@ def main() -> int:
         "--waymo-normalized",
         default="docs/examples/waymo_motion_normalized.csv",
         help="Normalized Waymo Motion-shaped CSV fixture.",
+    )
+    portfolio_parser.add_argument(
+        "--waymo-native",
+        default="docs/examples/waymo_motion_native_sample.json",
+        help="Native protobuf-shaped Waymo Motion JSON fixture.",
     )
     portfolio_parser.add_argument(
         "--top",
@@ -339,6 +354,7 @@ def main() -> int:
             output_path=args.output,
             assets_dir=args.assets_dir,
             waymo_normalized_path=args.waymo_normalized,
+            waymo_native_path=args.waymo_native,
             top_n=args.top,
         )
     if args.command == "render":

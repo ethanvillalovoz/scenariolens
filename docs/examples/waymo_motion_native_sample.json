@@ -1,0 +1,117 @@
+{
+  "scenarioId": "waymo_native_sample_interaction",
+  "timestampsSeconds": [0.0, 0.1, 0.2, 0.3],
+  "currentTimeIndex": 1,
+  "sdcTrackIndex": 0,
+  "objectsOfInterest": [7],
+  "tracksToPredict": [
+    {
+      "trackIndex": 1,
+      "difficulty": "LEVEL_1"
+    }
+  ],
+  "tracks": [
+    {
+      "id": 42,
+      "objectType": "TYPE_VEHICLE",
+      "states": [
+        {
+          "centerX": -1.0,
+          "centerY": 0.0,
+          "velocityX": 5.0,
+          "velocityY": 0.0,
+          "valid": true
+        },
+        {
+          "centerX": -0.5,
+          "centerY": 0.0,
+          "velocityX": 5.0,
+          "velocityY": 0.0,
+          "valid": true
+        },
+        {
+          "centerX": 0.0,
+          "centerY": 0.0,
+          "velocityX": 4.0,
+          "velocityY": 0.0,
+          "valid": true
+        },
+        {
+          "centerX": 0.4,
+          "centerY": 0.0,
+          "velocityX": 4.0,
+          "velocityY": 0.0,
+          "valid": true
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "objectType": "TYPE_PEDESTRIAN",
+      "states": [
+        {
+          "centerX": 0.2,
+          "centerY": -1.2,
+          "velocityX": 0.0,
+          "velocityY": 1.2,
+          "valid": true
+        },
+        {
+          "centerX": 0.2,
+          "centerY": -1.08,
+          "velocityX": 0.0,
+          "velocityY": 1.2,
+          "valid": true
+        },
+        {
+          "centerX": 0.2,
+          "centerY": -0.96,
+          "velocityX": 0.0,
+          "velocityY": 1.2,
+          "valid": true
+        },
+        {
+          "centerX": 0.2,
+          "centerY": -0.84,
+          "velocityX": 0.0,
+          "velocityY": 1.2,
+          "valid": true
+        }
+      ]
+    },
+    {
+      "id": 99,
+      "objectType": "TYPE_VEHICLE",
+      "states": [
+        {
+          "centerX": 4.0,
+          "centerY": 2.0,
+          "velocityX": -2.0,
+          "velocityY": -0.5,
+          "valid": true
+        },
+        {
+          "centerX": 3.8,
+          "centerY": 1.95,
+          "velocityX": -2.0,
+          "velocityY": -0.5,
+          "valid": true
+        },
+        {
+          "centerX": 3.6,
+          "centerY": 1.9,
+          "velocityX": -2.0,
+          "velocityY": -0.5,
+          "valid": true
+        },
+        {
+          "centerX": 3.4,
+          "centerY": 1.85,
+          "velocityX": -2.0,
+          "velocityY": -0.5,
+          "valid": true
+        }
+      ]
+    }
+  ]
+}
