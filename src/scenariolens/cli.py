@@ -5,7 +5,11 @@ import sys
 from pathlib import Path
 
 from scenariolens.ingest.csv_tracks import save_track_csv_as_scenarios
-from scenariolens.ingest.waymo_motion import adapter_status, ingest_waymo_motion
+from scenariolens.ingest.waymo_motion import (
+    adapter_status,
+    ingest_waymo_motion,
+    save_normalized_motion_csv_as_scenarios,
+)
 from scenariolens.io import load_scenarios, save_scenarios
 from scenariolens.report import json_report, markdown_report, ranked_scores
 from scenariolens.samples import synthetic_scenarios
@@ -53,7 +57,21 @@ def ingest_waymo_motion_command(
     input_path: str,
     output_path: str,
     max_scenarios: int | None,
+    input_format: str,
 ) -> int:
+    if input_format == "normalized-csv":
+        save_normalized_motion_csv_as_scenarios(
+            input_path=input_path,
+            output_path=output_path,
+            max_scenarios=max_scenarios,
+        )
+        scenarios = load_scenarios(output_path)
+        print(
+            f"Ingested {len(scenarios)} normalized Waymo Motion scenario(s) "
+            f"from {input_path} to {output_path}"
+        )
+        return 0
+
     try:
         ingest_waymo_motion(
             input_path=input_path,
@@ -173,6 +191,12 @@ def main() -> int:
         help="Planned optional Waymo Motion Dataset ingestion adapter.",
     )
     waymo_parser.add_argument(
+        "--format",
+        choices=("native", "normalized-csv"),
+        default="native",
+        help="Input representation. Native parsing is planned; normalized-csv is supported.",
+    )
+    waymo_parser.add_argument(
         "--input",
         required=True,
         help="Input Waymo Motion dataset file or directory.",
@@ -259,6 +283,7 @@ def main() -> int:
             input_path=args.input,
             output_path=args.output,
             max_scenarios=args.max_scenarios,
+            input_format=args.format,
         )
     if args.command == "report":
         return report(
