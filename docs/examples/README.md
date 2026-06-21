@@ -17,8 +17,9 @@ PYTHONPATH=src python3 -m scenariolens.cli render --top 3 --output-dir docs/exam
   vehicle-like obstruction.
 - `synthetic_unprotected_left_turn`: left-turn interaction with oncoming traffic
   and a pedestrian.
+- `waymo_motion_normalized.csv`: tiny Waymo Motion-shaped normalized fixture
+  for exercising the planned Waymo adapter path without downloading raw data.
 
 These artifacts are intentionally tiny and synthetic. They exist to make the
 evaluation pipeline visible in the GitHub repository while the project remains
 lightweight and laptop-friendly.
-

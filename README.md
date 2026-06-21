@@ -119,6 +119,15 @@ PYTHONPATH=src python3 -m scenariolens.cli ingest-csv \
   --output data/processed/example_scenarios.json
 ```
 
+Ingest the checked-in Waymo Motion-shaped normalized fixture:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli ingest-waymo-motion \
+  --format normalized-csv \
+  --input docs/examples/waymo_motion_normalized.csv \
+  --output data/processed/waymo_motion_normalized.json
+```
+
 Render one scenario as SVG:
 
 ```bash

@@ -57,21 +57,65 @@ Optional:
 
 ## Waymo Motion Adapter
 
-The Waymo Motion adapter is intentionally a planned optional adapter right now.
-The command exists to document the boundary:
+The native Waymo Motion adapter is intentionally a planned optional adapter
+right now. The status command documents the boundary:
 
 ```bash
 PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-status
 ```
 
-The future command shape is:
+ScenarioLens currently supports a lightweight normalized CSV shape that mirrors
+key fields from a Motion extraction:
 
 ```bash
 PYTHONPATH=src python3 -m scenariolens.cli ingest-waymo-motion \
+  --format normalized-csv \
+  --input docs/examples/waymo_motion_normalized.csv \
+  --output data/processed/waymo_motion_normalized.json \
+  --max-scenarios 50
+```
+
+Then run the normal report/render flow:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli report \
+  --input data/processed/waymo_motion_normalized.json \
+  --limit 5
+```
+
+The future native command shape is:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli ingest-waymo-motion \
+  --format native \
   --input data/raw/waymo/motion \
   --output data/processed/waymo_motion_slice.json \
   --max-scenarios 50
 ```
+
+### Normalized Waymo Motion CSV Columns
+
+Required:
+
+| Column | Meaning |
+| --- | --- |
+| `scenario_id` | Waymo scenario id or derived scenario id. |
+| `track_id` | Waymo track id or stable extracted object id. |
+| `object_type` | `TYPE_VEHICLE`, `TYPE_PEDESTRIAN`, `TYPE_CYCLIST`, or other mapped type. |
+| `timestep` | Waymo timestep/frame index or timestamp. |
+| `center_x` | Local x position in meters. |
+| `center_y` | Local y position in meters. |
+
+Optional:
+
+| Column | Meaning |
+| --- | --- |
+| `velocity_x` | x velocity. Defaults to `0`. |
+| `velocity_y` | y velocity. Defaults to `0`. |
+| `is_sdc` | `true`/`1` marks the self-driving-car track as ego. |
+| `ego_track_id` | Explicit ego track id. Overrides `is_sdc` inference. |
+| `tags` | `;`, `|`, or comma-separated ScenarioLens tags. |
+| `source` | Source label stored in ScenarioLens JSON. |
 
 Waymo's public Open Dataset site lists Motion data and challenge tracks such as
 Scenario Generation, Sim Agents, and Interaction Prediction. ScenarioLens is
@@ -82,4 +126,3 @@ References:
 
 - https://waymo.com/open/
 - https://waymo.com/open/challenges/
-

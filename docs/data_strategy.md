@@ -28,6 +28,15 @@ PYTHONPATH=src python3 -m scenariolens.cli ingest-csv \
   --output data/processed/example_scenarios.json
 ```
 
+The repo also includes a tiny Waymo Motion-shaped normalized fixture:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli ingest-waymo-motion \
+  --format normalized-csv \
+  --input docs/examples/waymo_motion_normalized.csv \
+  --output data/processed/waymo_motion_normalized.json
+```
+
 The repo should support a `data/raw/` drop-in workflow:
 
 ```text

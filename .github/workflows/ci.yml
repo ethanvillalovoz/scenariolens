@@ -42,6 +42,13 @@ jobs:
           python -m scenariolens.cli ingest-csv --input /tmp/scenariolens-tracks.csv --output /tmp/scenariolens-csv.json
           python -m scenariolens.cli report --input /tmp/scenariolens-csv.json --format json --limit 1
 
+      - name: Smoke test normalized Waymo Motion ingestion
+        env:
+          PYTHONPATH: src
+        run: |
+          python -m scenariolens.cli ingest-waymo-motion --format normalized-csv --input docs/examples/waymo_motion_normalized.csv --output /tmp/scenariolens-waymo-normalized.json --max-scenarios 1
+          python -m scenariolens.cli report --input /tmp/scenariolens-waymo-normalized.json --format json --limit 1
+
       - name: Smoke test SVG rendering
         env:
           PYTHONPATH: src
