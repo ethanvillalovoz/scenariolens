@@ -111,6 +111,14 @@ PYTHONPATH=src python3 -m scenariolens.cli report \
   --limit 5
 ```
 
+Ingest a small row-wise CSV fixture:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli ingest-csv \
+  --input data/raw/example_tracks.csv \
+  --output data/processed/example_scenarios.json
+```
+
 Render one scenario as SVG:
 
 ```bash
@@ -152,3 +160,4 @@ See [docs/scenario_taxonomy.md](docs/scenario_taxonomy.md).
 ## Data Format
 
 ScenarioLens JSON is documented in [docs/data_format.md](docs/data_format.md).
+Dataset ingestion is documented in [docs/ingestion.md](docs/ingestion.md).

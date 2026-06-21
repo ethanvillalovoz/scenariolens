@@ -21,7 +21,8 @@ part of the bridge toward real data.
 
 Goal: replace synthetic records with a small public dataset slice.
 
-- document Waymo Open Dataset access steps,
+- document ingestion boundaries and Waymo Open Dataset access steps,
+- support generic CSV ingestion for small external fixtures,
 - parse a small motion dataset subset,
 - generate a compact feature index,
 - compare synthetic and real scenario distributions,

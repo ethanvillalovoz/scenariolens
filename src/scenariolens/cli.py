@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from pathlib import Path
 
 from scenariolens.ingest.csv_tracks import save_track_csv_as_scenarios
+from scenariolens.ingest.waymo_motion import adapter_status, ingest_waymo_motion
 from scenariolens.io import load_scenarios, save_scenarios
 from scenariolens.report import json_report, markdown_report, ranked_scores
 from scenariolens.samples import synthetic_scenarios
@@ -32,6 +34,35 @@ def ingest_csv(input_path: str, output_path: str) -> int:
     save_track_csv_as_scenarios(input_path, output_path)
     scenarios = load_scenarios(output_path)
     print(f"Ingested {len(scenarios)} scenario(s) from {input_path} to {output_path}")
+    return 0
+
+
+def waymo_motion_status() -> int:
+    status = adapter_status()
+    print(f"Adapter: {status.adapter_name}")
+    print(f"Implemented: {status.implemented}")
+    print(f"Optional package: {status.optional_package}")
+    print(f"Optional package available: {status.optional_package_available}")
+    print(f"Dataset: {status.dataset_url}")
+    print(f"Challenges: {status.challenges_url}")
+    print(status.message)
+    return 0
+
+
+def ingest_waymo_motion_command(
+    input_path: str,
+    output_path: str,
+    max_scenarios: int | None,
+) -> int:
+    try:
+        ingest_waymo_motion(
+            input_path=input_path,
+            output_path=output_path,
+            max_scenarios=max_scenarios,
+        )
+    except NotImplementedError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
     return 0
 
 
@@ -132,6 +163,31 @@ def main() -> int:
         required=True,
         help="ScenarioLens JSON path to write.",
     )
+    waymo_status_parser = subparsers.add_parser(
+        "waymo-motion-status",
+        help="Show readiness status for the optional Waymo Motion adapter.",
+    )
+    waymo_status_parser.set_defaults(command="waymo-motion-status")
+    waymo_parser = subparsers.add_parser(
+        "ingest-waymo-motion",
+        help="Planned optional Waymo Motion Dataset ingestion adapter.",
+    )
+    waymo_parser.add_argument(
+        "--input",
+        required=True,
+        help="Input Waymo Motion dataset file or directory.",
+    )
+    waymo_parser.add_argument(
+        "--output",
+        required=True,
+        help="ScenarioLens JSON path to write.",
+    )
+    waymo_parser.add_argument(
+        "--max-scenarios",
+        type=int,
+        default=None,
+        help="Optional maximum number of scenarios to convert.",
+    )
     report_parser = subparsers.add_parser(
         "report",
         help="Generate a ranked scenario report.",
@@ -196,6 +252,14 @@ def main() -> int:
         return export_synthetic(output_path=args.output)
     if args.command == "ingest-csv":
         return ingest_csv(input_path=args.input, output_path=args.output)
+    if args.command == "waymo-motion-status":
+        return waymo_motion_status()
+    if args.command == "ingest-waymo-motion":
+        return ingest_waymo_motion_command(
+            input_path=args.input,
+            output_path=args.output,
+            max_scenarios=args.max_scenarios,
+        )
     if args.command == "report":
         return report(
             output_format=args.format,

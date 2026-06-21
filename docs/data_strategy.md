@@ -19,6 +19,15 @@ target is the Waymo Open Dataset, especially motion/scenario data because it is
 directly connected to interaction prediction, sim agents, and scenario
 generation.
 
+Before adding Waymo-specific parsing, ScenarioLens supports a generic row-wise
+CSV track importer. This keeps the ingestion boundary testable with tiny files:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli ingest-csv \
+  --input data/raw/example_tracks.csv \
+  --output data/processed/example_scenarios.json
+```
+
 The repo should support a `data/raw/` drop-in workflow:
 
 ```text

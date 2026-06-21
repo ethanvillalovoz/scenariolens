@@ -97,6 +97,45 @@ class CliTest(unittest.TestCase):
             self.assertIn("Ingested 1 scenario(s)", ingest_result.stdout)
             self.assertIn("csv_case", svg_path.read_text())
 
+    def test_waymo_motion_status_reports_planned_adapter(self) -> None:
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "scenariolens.cli",
+                "waymo-motion-status",
+            ],
+            check=True,
+            env={"PYTHONPATH": "src"},
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertIn("Adapter: waymo_motion", result.stdout)
+        self.assertIn("Implemented: False", result.stdout)
+
+    def test_ingest_waymo_motion_returns_clear_nonzero_placeholder(self) -> None:
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "scenariolens.cli",
+                "ingest-waymo-motion",
+                "--input",
+                "data/raw/waymo",
+                "--output",
+                "data/processed/waymo.json",
+                "--max-scenarios",
+                "1",
+            ],
+            env={"PYTHONPATH": "src"},
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("planned optional adapter", result.stderr)
+
     def test_render_single_scenario_to_file(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             output = Path(tmpdir) / "scenario.svg"
