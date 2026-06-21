@@ -3,8 +3,10 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from scenariolens.report import json_report, markdown_report
+from scenariolens.report import json_report, markdown_report, ranked_scores
 from scenariolens.samples import synthetic_scenarios
+from scenariolens.schema import Scenario
+from scenariolens.visualize import scenario_svg
 
 
 def demo() -> int:
@@ -24,6 +26,53 @@ def report(output_format: str, limit: int | None, output_path: str | None) -> in
     else:
         print(content, end="")
     return 0
+
+
+def render(
+    scenario_id: str | None,
+    top: int | None,
+    output_path: str | None,
+    output_dir: str | None,
+) -> int:
+    scenarios = synthetic_scenarios()
+    scenario_by_id = {scenario.scenario_id: scenario for scenario in scenarios}
+
+    if top is not None:
+        ranked_ids = [score.scenario_id for score in ranked_scores(scenarios)[:top]]
+        selected = tuple(scenario_by_id[ranked_id] for ranked_id in ranked_ids)
+        target_dir = Path(output_dir or "rendered")
+        target_dir.mkdir(parents=True, exist_ok=True)
+        for scenario in selected:
+            svg = scenario_svg(scenario)
+            (target_dir / f"{scenario.scenario_id}.svg").write_text(
+                svg,
+                encoding="utf-8",
+            )
+        print(f"Rendered {len(selected)} scenario(s) to {target_dir}")
+        return 0
+
+    selected_scenario = _select_scenario(scenarios, scenario_id)
+    svg = scenario_svg(selected_scenario)
+    if output_path:
+        Path(output_path).write_text(svg, encoding="utf-8")
+    else:
+        print(svg, end="")
+    return 0
+
+
+def _select_scenario(
+    scenarios: tuple[Scenario, ...],
+    scenario_id: str | None,
+) -> Scenario:
+    if scenario_id is None:
+        return scenarios[0]
+
+    for scenario in scenarios:
+        if scenario.scenario_id == scenario_id:
+            return scenario
+
+    valid_ids = ", ".join(scenario.scenario_id for scenario in scenarios)
+    raise SystemExit(f"Unknown scenario id: {scenario_id}. Valid ids: {valid_ids}")
 
 
 def main() -> int:
@@ -54,6 +103,31 @@ def main() -> int:
         default=None,
         help="Optional path to write instead of printing to stdout.",
     )
+    render_parser = subparsers.add_parser(
+        "render",
+        help="Render built-in synthetic scenarios as SVG trajectory views.",
+    )
+    render_parser.add_argument(
+        "--scenario",
+        default=None,
+        help="Scenario id to render. Defaults to the first synthetic scenario.",
+    )
+    render_parser.add_argument(
+        "--top",
+        type=int,
+        default=None,
+        help="Render the top N ranked scenarios into an output directory.",
+    )
+    render_parser.add_argument(
+        "--output",
+        default=None,
+        help="Optional SVG path for single-scenario rendering.",
+    )
+    render_parser.add_argument(
+        "--output-dir",
+        default=None,
+        help="Output directory for --top rendering. Defaults to rendered/.",
+    )
     args = parser.parse_args()
 
     if args.command == "demo":
@@ -63,6 +137,13 @@ def main() -> int:
             output_format=args.format,
             limit=args.limit,
             output_path=args.output,
+        )
+    if args.command == "render":
+        return render(
+            scenario_id=args.scenario,
+            top=args.top,
+            output_path=args.output,
+            output_dir=args.output_dir,
         )
 
     parser.print_help()
