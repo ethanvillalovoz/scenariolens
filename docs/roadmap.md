@@ -9,10 +9,13 @@ Goal: a complete local prototype with synthetic scenarios.
 - implement scenario tags,
 - rank scenarios by evaluation value,
 - add unit tests,
-- export a Markdown or JSON report.
+- export a Markdown or JSON report,
+- render scenarios as dependency-free SVG trajectory views.
 
-Status: implemented for the first synthetic corpus. Remaining polish before
-moving to real data: optional trajectory visualization and README screenshots.
+Status: implemented for the first synthetic corpus. ScenarioLens now includes
+taxonomy scoring, ranked Markdown/JSON reports, and dependency-free SVG
+trajectory rendering. Remaining polish before moving to real data: optional
+README screenshots and a small rendered gallery checked into docs.
 
 ## Milestone 2: Small Real Data Slice
 
@@ -23,6 +26,9 @@ Goal: replace synthetic records with a small public dataset slice.
 - generate a compact feature index,
 - compare synthetic and real scenario distributions,
 - create 3-5 curated scenario collections.
+
+Before downloading large data, use the renderer on the synthetic top-ranked
+scenarios to keep the portfolio story visual and understandable.
 
 ## Milestone 3: Searchable Demo
 

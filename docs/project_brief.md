@@ -51,8 +51,8 @@ The finished portfolio artifact should include:
 - a short project write-up with results and limitations.
 
 The current Milestone 1 prototype already includes the reproducible pipeline,
-synthetic corpus, taxonomy, ranking metrics, tests, and Markdown/JSON reports.
-The next user-visible upgrade should be trajectory visualization.
+synthetic corpus, taxonomy, ranking metrics, tests, Markdown/JSON reports, and
+2D SVG trajectory rendering.
 
 ## Representative Scenario Categories
 

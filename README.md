@@ -58,6 +58,7 @@ scenario records. The current prototype can:
 - normalize and infer scenario taxonomy tags,
 - rank 10 synthetic scenarios by evaluation value,
 - export Markdown or JSON reports,
+- render 2D SVG trajectory views,
 - run without external dependencies.
 
 See [docs/project_brief.md](docs/project_brief.md) and
@@ -81,6 +82,20 @@ Generate a machine-readable JSON report:
 
 ```bash
 PYTHONPATH=src python3 -m scenariolens.cli report --format json --limit 5
+```
+
+Render one scenario as SVG:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli render \
+  --scenario synthetic_occluded_pedestrian \
+  --output /tmp/synthetic_occluded_pedestrian.svg
+```
+
+Render a top-ranked scenario gallery:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli render --top 3 --output-dir /tmp/scenariolens-gallery
 ```
 
 Run tests with only the Python standard library:
