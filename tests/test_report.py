@@ -17,7 +17,7 @@ class ReportTest(unittest.TestCase):
     def test_markdown_report_includes_explanations(self) -> None:
         report = markdown_report(synthetic_scenarios(), limit=3)
 
-        self.assertIn("# ScenarioLens Synthetic Scenario Report", report)
+        self.assertIn("# ScenarioLens Scenario Report", report)
         self.assertIn("Why it matters", report)
         self.assertIn("synthetic_dense_intersection_vru", report)
 
@@ -39,4 +39,3 @@ class ReportTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

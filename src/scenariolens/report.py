@@ -82,7 +82,7 @@ def markdown_report(scenarios: tuple[Scenario, ...], limit: int | None = None) -
         scores = scores[:limit]
 
     lines = [
-        "# ScenarioLens Synthetic Scenario Report",
+        "# ScenarioLens Scenario Report",
         "",
         f"Scenarios analyzed: {len(scenarios)}",
         f"Scenarios reported: {len(scores)}",
@@ -123,4 +123,3 @@ def _format_optional(value: float | None, unit: str) -> str:
     if value is None:
         return "n/a"
     return f"{value:.3f} {unit}"
-
