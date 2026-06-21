@@ -45,6 +45,58 @@ class CliTest(unittest.TestCase):
             self.assertIn("Exported 10 scenario(s)", export_result.stdout)
             self.assertIn('"reported_count": 1', report_result.stdout)
 
+    def test_ingest_csv_then_render_from_input(self) -> None:
+        csv_text = (
+            "scenario_id,agent_id,agent_type,t,x,y,vx,vy,ego_track_id,tags\n"
+            "csv_case,ego,vehicle,0,0,0,4,0,ego,merge_conflict\n"
+            "csv_case,ego,vehicle,1,4,0,4,0,ego,merge_conflict\n"
+            "csv_case,veh_1,vehicle,0,6,2,3,-0.5,ego,merge_conflict\n"
+            "csv_case,veh_1,vehicle,1,9,1.5,3,-0.5,ego,merge_conflict\n"
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            csv_path = Path(tmpdir) / "tracks.csv"
+            json_path = Path(tmpdir) / "scenarios.json"
+            svg_path = Path(tmpdir) / "csv_case.svg"
+            csv_path.write_text(csv_text, encoding="utf-8")
+
+            ingest_result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "ingest-csv",
+                    "--input",
+                    str(csv_path),
+                    "--output",
+                    str(json_path),
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+            subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "render",
+                    "--input",
+                    str(json_path),
+                    "--scenario",
+                    "csv_case",
+                    "--output",
+                    str(svg_path),
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertIn("Ingested 1 scenario(s)", ingest_result.stdout)
+            self.assertIn("csv_case", svg_path.read_text())
+
     def test_render_single_scenario_to_file(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             output = Path(tmpdir) / "scenario.svg"
