@@ -45,7 +45,13 @@ class ScenarioScore:
     agent_count: int
     vulnerable_road_user_count: int
     min_pairwise_distance_m: float | None
+    min_vru_distance_m: float | None
+    min_path_distance_m: float | None
     min_time_to_collision_s: float | None
+    max_speed_mps: float | None
+    ego_max_speed_mps: float | None
+    max_deceleration_mps2: float | None
     taxonomy_score: float
+    component_scores: dict[str, float]
     interaction_score: float
     tags: tuple[str, ...]
