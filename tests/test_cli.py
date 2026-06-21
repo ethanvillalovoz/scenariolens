@@ -97,7 +97,7 @@ class CliTest(unittest.TestCase):
             self.assertIn("Ingested 1 scenario(s)", ingest_result.stdout)
             self.assertIn("csv_case", svg_path.read_text())
 
-    def test_waymo_motion_status_reports_planned_adapter(self) -> None:
+    def test_waymo_motion_status_reports_native_adapter(self) -> None:
         result = subprocess.run(
             [
                 sys.executable,
@@ -113,6 +113,45 @@ class CliTest(unittest.TestCase):
 
         self.assertIn("Adapter: waymo_motion", result.stdout)
         self.assertIn("Implemented: True", result.stdout)
+
+    def test_waymo_motion_preflight_reports_native_json_readiness(self) -> None:
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "scenariolens.cli",
+                "waymo-motion-preflight",
+                "--input",
+                "docs/examples/waymo_motion_native_sample.json",
+            ],
+            check=True,
+            env={"PYTHONPATH": "src"},
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertIn("Ready for ingestion: True", result.stdout)
+        self.assertIn("Supported suffixes:", result.stdout)
+        self.assertIn(".json: 1", result.stdout)
+
+    def test_waymo_motion_preflight_returns_nonzero_for_missing_input(self) -> None:
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "scenariolens.cli",
+                "waymo-motion-preflight",
+                "--input",
+                "missing-waymo-dir",
+            ],
+            env={"PYTHONPATH": "src"},
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("Ready for ingestion: False", result.stdout)
+        self.assertIn("Input path does not exist.", result.stdout)
 
     def test_ingest_waymo_motion_native_json(self) -> None:
         native_json = """{

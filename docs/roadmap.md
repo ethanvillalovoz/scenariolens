@@ -39,11 +39,13 @@ Goal: make the real-data adapter credible without making the repo heavy.
 - preserve the optional path for binary protobuf and TFRecord inputs,
 - map `sdc_track_index` to ScenarioLens ego tracks,
 - skip invalid states and preserve timestamps, object types, and velocities,
+- add a preflight command for local downloaded slices,
 - document the exact field boundary and raw-data workflow.
 
 Status: implemented for native JSON mini-slices and optional binary hooks.
-Full downloaded-dataset validation, map geometry parsing, and traffic-light
-feature extraction remain next steps.
+Local slice preflight and the downloaded-slice recipe are implemented. Full
+downloaded-dataset validation, map geometry parsing, and traffic-light feature
+extraction remain next steps.
 
 ## Milestone 3: Searchable Demo
 

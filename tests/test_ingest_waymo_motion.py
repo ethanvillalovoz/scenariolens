@@ -8,10 +8,12 @@ from scenariolens.ingest.waymo_motion import (
     WAYMO_OPEN_DATASET_URL,
     adapter_status,
     ingest_waymo_motion,
+    inspect_waymo_motion_slice,
     load_waymo_motion,
     load_normalized_motion_csv,
     save_normalized_motion_csv_as_scenarios,
     save_waymo_motion_as_scenarios,
+    waymo_motion_slice_ready,
 )
 from scenariolens.io import load_scenarios
 
@@ -84,6 +86,36 @@ class WaymoMotionIngestTest(unittest.TestCase):
         self.assertEqual(status.dataset_url, WAYMO_OPEN_DATASET_URL)
         self.assertEqual(status.challenges_url, WAYMO_OPEN_CHALLENGES_URL)
         self.assertIn("protobuf-shaped JSON", status.message)
+
+    def test_inspect_waymo_motion_slice_reports_supported_files(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            motion_dir = root / "motion"
+            motion_dir.mkdir()
+            (motion_dir / "scenario.json").write_text(
+                NATIVE_JSON_FIXTURE,
+                encoding="utf-8",
+            )
+            (motion_dir / "README.txt").write_text("ignore me", encoding="utf-8")
+
+            report = inspect_waymo_motion_slice(motion_dir)
+
+        self.assertTrue(report.exists)
+        self.assertTrue(report.is_directory)
+        self.assertEqual(report.file_count, 2)
+        self.assertEqual(report.supported_file_count, 1)
+        self.assertEqual(report.unsupported_file_count, 1)
+        self.assertEqual(report.supported_suffix_counts[".json"], 1)
+        self.assertEqual(report.unsupported_suffix_counts[".txt"], 1)
+        self.assertEqual(report.sample_supported_files, ("scenario.json",))
+        self.assertTrue(waymo_motion_slice_ready(report))
+
+    def test_inspect_waymo_motion_slice_reports_missing_input(self) -> None:
+        report = inspect_waymo_motion_slice("missing-waymo-dir")
+
+        self.assertFalse(report.exists)
+        self.assertFalse(waymo_motion_slice_ready(report))
+        self.assertIn("Input path does not exist.", report.notes)
 
     def test_load_waymo_motion_reads_protobuf_shaped_json(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

@@ -7,8 +7,10 @@ from pathlib import Path
 from scenariolens.ingest.csv_tracks import save_track_csv_as_scenarios
 from scenariolens.ingest.waymo_motion import (
     adapter_status,
+    inspect_waymo_motion_slice,
     save_normalized_motion_csv_as_scenarios,
     save_waymo_motion_as_scenarios,
+    waymo_motion_slice_ready,
 )
 from scenariolens.io import load_scenarios, save_scenarios
 from scenariolens.portfolio import generate_portfolio_report
@@ -54,6 +56,39 @@ def waymo_motion_status() -> int:
     return 0
 
 
+def waymo_motion_preflight(input_path: str) -> int:
+    report = inspect_waymo_motion_slice(input_path)
+    print(f"Input: {report.input_path}")
+    print(f"Exists: {report.exists}")
+    print(f"Directory: {report.is_directory}")
+    print(f"Files scanned: {report.file_count}")
+    print(f"Supported files: {report.supported_file_count}")
+    print(f"Unsupported files: {report.unsupported_file_count}")
+    print(f"Total size: {_format_bytes(report.total_bytes)}")
+    print(f"Optional package waymo_open_dataset: {report.optional_package_available}")
+    print(f"Optional package tensorflow: {report.tensorflow_available}")
+    print(f"Ready for ingestion: {waymo_motion_slice_ready(report)}")
+
+    if report.supported_suffix_counts:
+        print("Supported suffixes:")
+        for suffix, count in report.supported_suffix_counts.items():
+            print(f"  {suffix}: {count}")
+    if report.unsupported_suffix_counts:
+        print("Unsupported suffixes:")
+        for suffix, count in report.unsupported_suffix_counts.items():
+            print(f"  {suffix}: {count}")
+    if report.sample_supported_files:
+        print("Sample supported files:")
+        for file_path in report.sample_supported_files:
+            print(f"  {file_path}")
+    if report.notes:
+        print("Notes:")
+        for note in report.notes:
+            print(f"  - {note}")
+
+    return 0 if waymo_motion_slice_ready(report) else 2
+
+
 def ingest_waymo_motion_command(
     input_path: str,
     output_path: str,
@@ -88,6 +123,18 @@ def ingest_waymo_motion_command(
         f"from {input_path} to {output_path}"
     )
     return 0
+
+
+def _format_bytes(value: int) -> str:
+    units = ("B", "KB", "MB", "GB", "TB")
+    size = float(value)
+    for unit in units:
+        if size < 1024 or unit == units[-1]:
+            if unit == "B":
+                return f"{int(size)} {unit}"
+            return f"{size:.2f} {unit}"
+        size /= 1024
+    return f"{value} B"
 
 
 def portfolio_report(
@@ -210,6 +257,15 @@ def main() -> int:
         help="Show readiness status for the optional Waymo Motion adapter.",
     )
     waymo_status_parser.set_defaults(command="waymo-motion-status")
+    waymo_preflight_parser = subparsers.add_parser(
+        "waymo-motion-preflight",
+        help="Inspect a local Waymo Motion file or directory before ingestion.",
+    )
+    waymo_preflight_parser.add_argument(
+        "--input",
+        required=True,
+        help="Local Waymo Motion file or directory to inspect.",
+    )
     waymo_parser = subparsers.add_parser(
         "ingest-waymo-motion",
         help="Convert Waymo Motion records into ScenarioLens JSON.",
@@ -335,6 +391,8 @@ def main() -> int:
         return ingest_csv(input_path=args.input, output_path=args.output)
     if args.command == "waymo-motion-status":
         return waymo_motion_status()
+    if args.command == "waymo-motion-preflight":
+        return waymo_motion_preflight(input_path=args.input)
     if args.command == "ingest-waymo-motion":
         return ingest_waymo_motion_command(
             input_path=args.input,

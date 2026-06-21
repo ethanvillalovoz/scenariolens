@@ -85,6 +85,16 @@ The same `--format native` command can read `.pb` and `.tfrecord` files when
 optional Waymo/TensorFlow packages are installed. Those dependencies are not
 required for the core project or tests.
 
+Before pointing ingestion at a downloaded local slice, run preflight:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-preflight \
+  --input data/raw/waymo/motion/validation
+```
+
+For the full local workflow, see
+[waymo_motion_slice_recipe.md](waymo_motion_slice_recipe.md).
+
 ScenarioLens also supports a lightweight normalized CSV shape that mirrors key
 fields from a Motion extraction:
 

@@ -59,6 +59,7 @@ scenario records. The current prototype can:
 - normalize and infer scenario taxonomy tags,
 - rank 10 synthetic scenarios by evaluation value,
 - ingest protobuf-shaped Waymo Motion JSON mini-slices,
+- preflight local Waymo Motion slice folders before ingestion,
 - save/load ScenarioLens scenario JSON,
 - export Markdown or JSON reports,
 - render 2D SVG trajectory views,
@@ -151,6 +152,16 @@ PYTHONPATH=src python3 -m scenariolens.cli ingest-waymo-motion \
 
 Native JSON ingestion is dependency-free. Binary `.pb` and `.tfrecord` inputs
 are treated as optional paths that require Waymo/TensorFlow packages.
+
+Inspect a local downloaded Waymo Motion slice before ingestion:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-preflight \
+  --input data/raw/waymo/motion/validation
+```
+
+See [docs/waymo_motion_slice_recipe.md](docs/waymo_motion_slice_recipe.md) for
+the laptop-friendly real-slice workflow.
 
 Render one scenario as SVG:
 

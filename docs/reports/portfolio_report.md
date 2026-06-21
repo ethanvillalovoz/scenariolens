@@ -4,7 +4,7 @@
 
 ScenarioLens is a laptop-friendly autonomous-driving evaluation project for discovering and explaining long-tail driving scenarios. It ranks scenarios using lightweight interaction metrics, ODD-relevant taxonomy tags, vulnerable-road-user counts, same-timestep proximity, path-conflict proximity, dynamics, and a simple constant-velocity time-to-collision proxy.
 
-The current pipeline supports synthetic scenarios, ScenarioLens JSON, row-wise CSV ingestion, normalized Waymo Motion-shaped fixtures, and native protobuf-shaped Waymo Motion JSON mini-slices. Binary protobuf and TFRecord inputs are optional so the core project stays easy to run.
+The current pipeline supports synthetic scenarios, ScenarioLens JSON, row-wise CSV ingestion, normalized Waymo Motion-shaped fixtures, and native protobuf-shaped Waymo Motion JSON mini-slices. Local slice preflight helps keep binary protobuf and TFRecord ingestion optional so the core project stays easy to run.
 
 ## Current Coverage
 
@@ -232,7 +232,7 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 
 ## Next Work
 
-- Run the native adapter on a small downloaded Waymo Motion validation slice.
+- Run the documented local-slice recipe on a small downloaded Waymo Motion validation shard.
 - Add map/lane and traffic-light features from native Motion records.
 - Compare synthetic, native mini-slice, and downloaded-slice score distributions.
 - Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.

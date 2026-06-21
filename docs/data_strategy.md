@@ -50,6 +50,15 @@ PYTHONPATH=src python3 -m scenariolens.cli ingest-waymo-motion \
 The same native adapter can read binary protobuf or TFRecord files when optional
 Waymo/TensorFlow packages are installed.
 
+Use the local slice recipe when moving from fixtures to downloaded files:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-preflight \
+  --input data/raw/waymo/motion/validation
+```
+
+See `docs/waymo_motion_slice_recipe.md` for the full command sequence.
+
 The repo should support a `data/raw/` drop-in workflow:
 
 ```text

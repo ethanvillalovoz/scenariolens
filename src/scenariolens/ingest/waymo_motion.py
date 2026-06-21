@@ -78,6 +78,25 @@ class WaymoMotionAdapterStatus:
     message: str
 
 
+@dataclass(frozen=True)
+class WaymoMotionSliceReport:
+    """Preflight summary for a local Waymo Motion slice path."""
+
+    input_path: str
+    exists: bool
+    is_directory: bool
+    file_count: int
+    supported_file_count: int
+    unsupported_file_count: int
+    total_bytes: int
+    supported_suffix_counts: dict[str, int]
+    unsupported_suffix_counts: dict[str, int]
+    sample_supported_files: tuple[str, ...]
+    optional_package_available: bool
+    tensorflow_available: bool
+    notes: tuple[str, ...]
+
+
 @dataclass
 class _ScenarioBuilder:
     scenario_id: str
@@ -102,6 +121,88 @@ def adapter_status() -> WaymoMotionAdapterStatus:
             "and require Waymo/TensorFlow packages."
         ),
     )
+
+
+def inspect_waymo_motion_slice(
+    input_path: str | Path,
+    sample_limit: int = 8,
+) -> WaymoMotionSliceReport:
+    """Inspect a local Waymo Motion slice before ingestion."""
+
+    path = Path(input_path)
+    optional_package_available = find_spec(OPTIONAL_PACKAGE) is not None
+    tensorflow_available = find_spec(OPTIONAL_TF_PACKAGE) is not None
+
+    if not path.exists():
+        return WaymoMotionSliceReport(
+            input_path=str(path),
+            exists=False,
+            is_directory=False,
+            file_count=0,
+            supported_file_count=0,
+            unsupported_file_count=0,
+            total_bytes=0,
+            supported_suffix_counts={},
+            unsupported_suffix_counts={},
+            sample_supported_files=(),
+            optional_package_available=optional_package_available,
+            tensorflow_available=tensorflow_available,
+            notes=("Input path does not exist.",),
+        )
+
+    files = _all_files(path)
+    supported_files: list[Path] = []
+    supported_suffix_counts: dict[str, int] = {}
+    unsupported_suffix_counts: dict[str, int] = {}
+    total_bytes = 0
+
+    for file_path in files:
+        total_bytes += file_path.stat().st_size
+        suffix = _suffix_label(file_path)
+        if file_path.suffix.lower() in NATIVE_SUPPORTED_SUFFIXES:
+            supported_files.append(file_path)
+            supported_suffix_counts[suffix] = supported_suffix_counts.get(suffix, 0) + 1
+        else:
+            unsupported_suffix_counts[suffix] = unsupported_suffix_counts.get(suffix, 0) + 1
+
+    notes = _preflight_notes(
+        supported_suffix_counts=supported_suffix_counts,
+        supported_file_count=len(supported_files),
+        optional_package_available=optional_package_available,
+        tensorflow_available=tensorflow_available,
+    )
+
+    return WaymoMotionSliceReport(
+        input_path=str(path),
+        exists=True,
+        is_directory=path.is_dir(),
+        file_count=len(files),
+        supported_file_count=len(supported_files),
+        unsupported_file_count=len(files) - len(supported_files),
+        total_bytes=total_bytes,
+        supported_suffix_counts=dict(sorted(supported_suffix_counts.items())),
+        unsupported_suffix_counts=dict(sorted(unsupported_suffix_counts.items())),
+        sample_supported_files=tuple(
+            _display_path(file_path, root=path) for file_path in supported_files[:sample_limit]
+        ),
+        optional_package_available=optional_package_available,
+        tensorflow_available=tensorflow_available,
+        notes=notes,
+    )
+
+
+def waymo_motion_slice_ready(report: WaymoMotionSliceReport) -> bool:
+    """Return whether the inspected slice is ingestable in this environment."""
+
+    if not report.exists or report.supported_file_count == 0:
+        return False
+    if any(suffix in report.supported_suffix_counts for suffix in NATIVE_PROTO_SUFFIXES):
+        if not report.optional_package_available:
+            return False
+    if any(suffix in report.supported_suffix_counts for suffix in NATIVE_TFRECORD_SUFFIXES):
+        if not report.optional_package_available or not report.tensorflow_available:
+            return False
+    return True
 
 
 def ingest_waymo_motion(
@@ -327,6 +428,60 @@ def _native_input_files(path: Path) -> tuple[Path, ...]:
             f"Supported suffixes: {', '.join(sorted(NATIVE_SUPPORTED_SUFFIXES))}"
         )
     return (path,)
+
+
+def _all_files(path: Path) -> tuple[Path, ...]:
+    if path.is_dir():
+        return tuple(sorted(candidate for candidate in path.rglob("*") if candidate.is_file()))
+    return (path,)
+
+
+def _suffix_label(path: Path) -> str:
+    return path.suffix.lower() or "(no suffix)"
+
+
+def _display_path(path: Path, root: Path) -> str:
+    if root.is_dir():
+        return path.relative_to(root).as_posix()
+    return path.name
+
+
+def _preflight_notes(
+    supported_suffix_counts: dict[str, int],
+    supported_file_count: int,
+    optional_package_available: bool,
+    tensorflow_available: bool,
+) -> tuple[str, ...]:
+    notes: list[str] = []
+    if supported_file_count == 0:
+        notes.append(
+            "No supported Waymo Motion files found. Supported suffixes: "
+            + ", ".join(sorted(NATIVE_SUPPORTED_SUFFIXES))
+        )
+    if any(suffix in supported_suffix_counts for suffix in NATIVE_JSON_SUFFIXES):
+        notes.append("JSON inputs can be ingested without optional packages.")
+    if any(suffix in supported_suffix_counts for suffix in NATIVE_JSONL_SUFFIXES):
+        notes.append("JSONL/NDJSON inputs can be ingested without optional packages.")
+    if any(suffix in supported_suffix_counts for suffix in NATIVE_PROTO_SUFFIXES):
+        if optional_package_available:
+            notes.append("Binary protobuf inputs can use the installed Waymo package.")
+        else:
+            notes.append(
+                "Binary protobuf inputs require optional package `waymo_open_dataset`."
+            )
+    if any(suffix in supported_suffix_counts for suffix in NATIVE_TFRECORD_SUFFIXES):
+        missing = []
+        if not optional_package_available:
+            missing.append("waymo_open_dataset")
+        if not tensorflow_available:
+            missing.append("tensorflow")
+        if missing:
+            notes.append(
+                "TFRecord inputs require optional package(s): " + ", ".join(missing) + "."
+            )
+        else:
+            notes.append("TFRecord inputs can use installed Waymo and TensorFlow packages.")
+    return tuple(notes)
 
 
 def _load_native_motion_file(path: Path, max_scenarios: int | None = None) -> list[Scenario]:

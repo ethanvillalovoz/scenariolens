@@ -84,8 +84,9 @@ def portfolio_markdown(
         "",
         "The current pipeline supports synthetic scenarios, ScenarioLens JSON, "
         "row-wise CSV ingestion, normalized Waymo Motion-shaped fixtures, and "
-        "native protobuf-shaped Waymo Motion JSON mini-slices. Binary protobuf "
-        "and TFRecord inputs are optional so the core project stays easy to run.",
+        "native protobuf-shaped Waymo Motion JSON mini-slices. Local slice "
+        "preflight helps keep binary protobuf and TFRecord ingestion optional "
+        "so the core project stays easy to run.",
         "",
         "## Current Coverage",
         "",
@@ -134,7 +135,7 @@ def portfolio_markdown(
             "",
             "## Next Work",
             "",
-            "- Run the native adapter on a small downloaded Waymo Motion validation slice.",
+            "- Run the documented local-slice recipe on a small downloaded Waymo Motion validation shard.",
             "- Add map/lane and traffic-light features from native Motion records.",
             "- Compare synthetic, native mini-slice, and downloaded-slice score distributions.",
             "- Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.",
