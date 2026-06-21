@@ -19,7 +19,7 @@
 <line x1="56" y1="456" x2="864" y2="456" stroke="#dbe3ee" stroke-width="1" />
 <line x1="56" y1="536" x2="864" y2="536" stroke="#dbe3ee" stroke-width="1" />
 <text x="56" y="34" fill="#0f172a" font-size="20" font-family="Arial, sans-serif" font-weight="700">waymo_like_cyclist</text>
-<text x="56" y="56" fill="#475569" font-size="13" font-family="Arial, sans-serif">score 18.927 | vulnerable_road_user, cyclist_interaction, close_interaction</text>
+<text x="56" y="56" fill="#475569" font-size="13" font-family="Arial, sans-serif">score 23.179 | vulnerable_road_user, cyclist_interaction, close_interaction</text>
 <circle cx="56" cy="608" r="6" fill="#2563eb" />
 <text x="68" y="612" fill="#334155" font-size="12" font-family="Arial, sans-serif">vehicle</text>
 <circle cx="194" cy="608" r="6" fill="#16a34a" />

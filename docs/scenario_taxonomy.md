@@ -27,9 +27,26 @@ ScenarioLens combines taxonomy weights with lightweight interaction features:
 - number of tracked agents,
 - number of vulnerable road users,
 - minimum same-timestep pairwise distance,
+- minimum vehicle-to-vulnerable-road-user distance,
+- minimum sampled path distance between agents,
 - minimum constant-velocity time-to-collision proxy,
+- maximum speed and ego maximum speed,
+- maximum sampled deceleration,
 - taxonomy tag weights.
 
 The score is a review-prioritization heuristic. It is useful for ranking and
 explaining scenarios, but it should not be interpreted as a certified risk
 model.
+
+## Component Scores
+
+The final interaction score is the sum of these interpretable components:
+
+- `density`
+- `vru`
+- `taxonomy`
+- `proximity`
+- `ttc`
+- `vru_proximity`
+- `path_conflict`
+- `dynamics`

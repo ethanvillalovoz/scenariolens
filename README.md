@@ -55,6 +55,7 @@ scenario records. The current prototype can:
 
 - define a compact scenario schema,
 - compute lightweight risk/interaction features,
+- break rankings into interpretable score components,
 - normalize and infer scenario taxonomy tags,
 - rank 10 synthetic scenarios by evaluation value,
 - save/load ScenarioLens scenario JSON,
@@ -96,6 +97,9 @@ Generate a ranked Markdown report:
 ```bash
 PYTHONPATH=src python3 -m scenariolens.cli report --format markdown --limit 5
 ```
+
+Reports include component scores for density, VRU presence, taxonomy,
+proximity, TTC, VRU proximity, path conflict, and dynamics.
 
 Generate a machine-readable JSON report:
 

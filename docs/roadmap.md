@@ -43,6 +43,17 @@ Goal: make the project immediately understandable.
 
 Status: portfolio report implemented in `docs/reports/portfolio_report.md`.
 
+## Milestone 3B: Interaction Metrics Upgrade
+
+Goal: make ranking more interpretable and autonomy-specific.
+
+- break final scores into named components,
+- add VRU proximity and sampled path-conflict proximity,
+- add max speed, ego max speed, and max deceleration features,
+- expose component scores in JSON, Markdown, and portfolio reports.
+
+Status: implemented for synthetic and normalized Waymo-shaped scenarios.
+
 ## Milestone 4: Portfolio Polish
 
 Goal: make the repo recruiter- and engineer-readable.
