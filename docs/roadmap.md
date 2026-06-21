@@ -11,6 +11,9 @@ Goal: a complete local prototype with synthetic scenarios.
 - add unit tests,
 - export a Markdown or JSON report.
 
+Status: implemented for the first synthetic corpus. Remaining polish before
+moving to real data: optional trajectory visualization and README screenshots.
+
 ## Milestone 2: Small Real Data Slice
 
 Goal: replace synthetic records with a small public dataset slice.
@@ -47,4 +50,3 @@ Goal: make the repo recruiter- and engineer-readable.
 - Waymax or sim-agent integration,
 - baseline trajectory-prediction evaluation,
 - city/ODD gap comparison for Seattle or Bellevue.
-

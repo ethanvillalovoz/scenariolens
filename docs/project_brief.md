@@ -50,6 +50,10 @@ The finished portfolio artifact should include:
 - a dashboard or report,
 - a short project write-up with results and limitations.
 
+The current Milestone 1 prototype already includes the reproducible pipeline,
+synthetic corpus, taxonomy, ranking metrics, tests, and Markdown/JSON reports.
+The next user-visible upgrade should be trajectory visualization.
+
 ## Representative Scenario Categories
 
 - high-interaction merges,
@@ -79,4 +83,3 @@ two minutes, that Ethan:
 - Waymo Open Dataset: https://waymo.com/open/
 - Waymo Open Dataset Challenges: https://waymo.com/open/challenges/
 - Waymo Research: https://waymo.com/research/
-

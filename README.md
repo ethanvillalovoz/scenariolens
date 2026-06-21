@@ -48,16 +48,17 @@ data/                 Local data mount points, ignored by git
 notebooks/            Experiments and exploratory analysis
 ```
 
-## First Milestone
+## Current Milestone
 
 The first milestone is a complete local prototype on synthetic and small curated
-scenario records:
+scenario records. The current prototype can:
 
-- define a scenario schema,
-- compute risk/interaction features,
-- rank scenarios,
-- export a simple report,
-- then replace synthetic inputs with a small Waymo Open Dataset slice.
+- define a compact scenario schema,
+- compute lightweight risk/interaction features,
+- normalize and infer scenario taxonomy tags,
+- rank 10 synthetic scenarios by evaluation value,
+- export Markdown or JSON reports,
+- run without external dependencies.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -70,8 +71,38 @@ Run the starter demo without installing the package:
 PYTHONPATH=src python3 -m scenariolens.cli demo
 ```
 
+Generate a ranked Markdown report:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli report --format markdown --limit 5
+```
+
+Generate a machine-readable JSON report:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli report --format json --limit 5
+```
+
 Run tests with only the Python standard library:
 
 ```bash
 PYTHONPATH=src python3 -m unittest discover
 ```
+
+## Scenario Categories
+
+The first taxonomy covers high-signal autonomy-evaluation cases:
+
+- vulnerable road users,
+- pedestrian crossings,
+- cyclist interactions,
+- merge conflicts,
+- unprotected turns,
+- blocked lanes,
+- stopped vehicles,
+- hard braking,
+- close interactions,
+- dense multi-agent scenes,
+- low-interaction baselines.
+
+See [docs/scenario_taxonomy.md](docs/scenario_taxonomy.md).
