@@ -83,6 +83,17 @@ For a quick project overview, see the generated
 the ranking pipeline, top synthetic scenarios, normalized Waymo-shaped fixture
 results, limitations, and next work.
 
+## Scenario Explorer
+
+The static Scenario Explorer lives in [docs/demo](docs/demo). It consumes the
+checked-in dashboard payload and SVG assets:
+
+```bash
+python3 -m http.server 8000 --directory docs/demo
+```
+
+Then open `http://localhost:8000`.
+
 ## Example Gallery
 
 The current top-ranked synthetic scenarios are checked in under

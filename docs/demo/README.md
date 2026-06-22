@@ -1,10 +1,21 @@
-# Scenario Explorer Demo Data
+# Scenario Explorer Demo
 
-This directory contains the static data contract for the future Scenario
-Explorer dashboard.
+This directory contains the static Scenario Explorer dashboard and its data
+contract.
+
+Open locally with:
+
+```bash
+python3 -m http.server 8000 --directory docs/demo
+```
+
+Then visit `http://localhost:8000`.
 
 Generated files:
 
+- `index.html`: static dashboard shell.
+- `styles.css`: dashboard visual system.
+- `app.js`: filtering, sorting, and detail-panel interactions.
 - `scenarios.json`: ranked dashboard payload.
 - `assets/*.svg`: trajectory views referenced by `scenarios.json`.
 

@@ -24,3 +24,5 @@ data/processed/*
 .idea/
 .vscode/
 
+# Local browser verification
+.playwright-cli/

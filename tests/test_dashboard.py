@@ -13,6 +13,17 @@ from scenariolens.samples import synthetic_scenarios
 
 
 class DashboardDataTest(unittest.TestCase):
+    def test_checked_in_static_demo_files_are_present(self) -> None:
+        root = Path("docs/demo")
+        html = (root / "index.html").read_text(encoding="utf-8")
+        payload = json.loads((root / "scenarios.json").read_text(encoding="utf-8"))
+
+        self.assertIn('href="styles.css"', html)
+        self.assertIn('src="app.js"', html)
+        self.assertEqual(payload["format"], DASHBOARD_FORMAT)
+        for item in payload["scenarios"]:
+            self.assertTrue((root / item["svg_path"]).exists())
+
     def test_dashboard_payload_contains_stable_contract_fields(self) -> None:
         scenarios = synthetic_scenarios()[:2]
         payload = dashboard_payload(
