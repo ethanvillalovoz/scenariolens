@@ -95,6 +95,7 @@ def portfolio_markdown(
         f"- Normalized Waymo-shaped scenarios analyzed: {waymo_like_count}",
         "- Unit tests cover schema I/O, ranking, taxonomy, ingestion, reporting, "
         "CLI flows, and SVG rendering.",
+        "- Static dashboard data contract is generated under `docs/demo/`.",
         "",
         "## Stack Alignment",
         "",

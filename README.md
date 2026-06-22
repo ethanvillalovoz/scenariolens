@@ -70,6 +70,7 @@ scenario records. The current prototype can:
 - save/load ScenarioLens scenario JSON,
 - export Markdown or JSON reports,
 - render 2D SVG trajectory views,
+- generate static dashboard data and SVG assets,
 - run without external dependencies.
 
 See [docs/project_brief.md](docs/project_brief.md) and
@@ -193,6 +194,14 @@ PYTHONPATH=src python3 -m scenariolens.cli portfolio-report \
   --top 3
 ```
 
+Generate the Scenario Explorer dashboard data contract:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli dashboard-data \
+  --output docs/demo/scenarios.json \
+  --assets-dir docs/demo/assets
+```
+
 Run tests with only the Python standard library:
 
 ```bash
@@ -221,3 +230,4 @@ See [docs/scenario_taxonomy.md](docs/scenario_taxonomy.md).
 
 ScenarioLens JSON is documented in [docs/data_format.md](docs/data_format.md).
 Dataset ingestion is documented in [docs/ingestion.md](docs/ingestion.md).
+Dashboard data is documented in [docs/demo/README.md](docs/demo/README.md).

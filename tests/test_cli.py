@@ -272,6 +272,35 @@ class CliTest(unittest.TestCase):
             self.assertIn("ScenarioLens Portfolio Report", output.read_text())
             self.assertGreaterEqual(len(tuple(assets.glob("*.svg"))), 1)
 
+    def test_dashboard_data_command_writes_json_and_assets(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            output = root / "demo" / "scenarios.json"
+            assets = root / "demo" / "assets"
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "dashboard-data",
+                    "--output",
+                    str(output),
+                    "--assets-dir",
+                    str(assets),
+                    "--limit",
+                    "2",
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertIn("Generated dashboard data", result.stdout)
+            self.assertIn('"format": "scenariolens.dashboard.v1"', output.read_text())
+            self.assertEqual(len(tuple(assets.glob("*.svg"))), 2)
+
     def test_render_single_scenario_to_file(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             output = Path(tmpdir) / "scenario.svg"

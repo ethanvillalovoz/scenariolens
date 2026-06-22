@@ -64,12 +64,14 @@ extraction remain next steps.
 Goal: make the project immediately understandable.
 
 - generate a portfolio report with top-ranked scenarios and SVG assets,
+- generate a stable dashboard data contract,
 - build a dashboard or lightweight web app,
 - add scenario filtering and ranking views,
 - visualize trajectories on a 2D map/canvas,
 - show why each scenario was ranked highly.
 
 Status: portfolio report implemented in `docs/reports/portfolio_report.md`.
+Dashboard data contract implemented in `docs/demo/scenarios.json`.
 
 ## Milestone 3B: Interaction Metrics Upgrade
 
@@ -81,6 +83,20 @@ Goal: make ranking more interpretable and autonomy-specific.
 - expose component scores in JSON, Markdown, and portfolio reports.
 
 Status: implemented for synthetic and normalized Waymo-shaped scenarios.
+
+## Milestone 3C: Dashboard Data Contract
+
+Goal: make the future dashboard a thin presentation layer over a tested data
+contract.
+
+- combine synthetic, native Waymo-shaped JSON, and normalized Waymo-shaped CSV
+  scenarios,
+- export ranked scenario cards with score components, metrics, tags, reasons,
+  sources, datasets, and SVG paths,
+- generate matching SVG trajectory assets,
+- document the static payload shape for future UI work.
+
+Status: implemented in `docs/demo/scenarios.json` and `docs/demo/assets/`.
 
 ## Milestone 4: Portfolio Polish
 

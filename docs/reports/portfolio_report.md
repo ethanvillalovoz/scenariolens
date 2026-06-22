@@ -12,6 +12,7 @@ The current pipeline supports synthetic scenarios, ScenarioLens JSON, row-wise C
 - Native Waymo-shaped JSON scenarios analyzed: 1
 - Normalized Waymo-shaped scenarios analyzed: 2
 - Unit tests cover schema I/O, ranking, taxonomy, ingestion, reporting, CLI flows, and SVG rendering.
+- Static dashboard data contract is generated under `docs/demo/`.
 
 ## Stack Alignment
 

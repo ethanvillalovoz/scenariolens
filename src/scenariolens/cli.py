@@ -4,6 +4,7 @@ import argparse
 import sys
 from pathlib import Path
 
+from scenariolens.dashboard import generate_dashboard_data
 from scenariolens.ingest.csv_tracks import save_track_csv_as_scenarios
 from scenariolens.ingest.waymo_motion import (
     adapter_status,
@@ -152,6 +153,24 @@ def portfolio_report(
         top_n=top_n,
     )
     print(f"Generated portfolio report at {output_path}")
+    return 0
+
+
+def dashboard_data(
+    output_path: str,
+    assets_dir: str,
+    waymo_normalized_path: str,
+    waymo_native_path: str,
+    limit: int | None,
+) -> int:
+    generate_dashboard_data(
+        output_path=output_path,
+        assets_dir=assets_dir,
+        waymo_normalized_path=waymo_normalized_path,
+        waymo_native_path=waymo_native_path,
+        limit=limit,
+    )
+    print(f"Generated dashboard data at {output_path}")
     return 0
 
 
@@ -351,6 +370,36 @@ def main() -> int:
         default=3,
         help="Number of top scenarios per section.",
     )
+    dashboard_parser = subparsers.add_parser(
+        "dashboard-data",
+        help="Generate static JSON and SVG assets for the Scenario Explorer dashboard.",
+    )
+    dashboard_parser.add_argument(
+        "--output",
+        default="docs/demo/scenarios.json",
+        help="Dashboard JSON path to write.",
+    )
+    dashboard_parser.add_argument(
+        "--assets-dir",
+        default="docs/demo/assets",
+        help="Directory for dashboard SVG assets.",
+    )
+    dashboard_parser.add_argument(
+        "--waymo-normalized",
+        default="docs/examples/waymo_motion_normalized.csv",
+        help="Normalized Waymo Motion-shaped CSV fixture.",
+    )
+    dashboard_parser.add_argument(
+        "--waymo-native",
+        default="docs/examples/waymo_motion_native_sample.json",
+        help="Native protobuf-shaped Waymo Motion JSON fixture.",
+    )
+    dashboard_parser.add_argument(
+        "--limit",
+        type=int,
+        default=None,
+        help="Optional maximum number of ranked scenarios to include.",
+    )
     render_parser = subparsers.add_parser(
         "render",
         help="Render scenarios as SVG trajectory views.",
@@ -414,6 +463,14 @@ def main() -> int:
             waymo_normalized_path=args.waymo_normalized,
             waymo_native_path=args.waymo_native,
             top_n=args.top,
+        )
+    if args.command == "dashboard-data":
+        return dashboard_data(
+            output_path=args.output,
+            assets_dir=args.assets_dir,
+            waymo_normalized_path=args.waymo_normalized,
+            waymo_native_path=args.waymo_native,
+            limit=args.limit,
         )
     if args.command == "render":
         return render(
