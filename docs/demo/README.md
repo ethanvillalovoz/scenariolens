@@ -12,8 +12,8 @@ python3 -m http.server 8000 --directory docs
 Then visit `http://localhost:8000`. The `docs/index.html` entrypoint redirects
 to this explorer.
 
-When GitHub Pages is configured to publish from `main` / `docs`, the repository
-root redirects to this explorer through `docs/index.html`.
+The production copy is embedded in Ethan's personal portfolio site at
+`https://ethanvillalovoz.com/scenariolens/`.
 
 Generated files:
 

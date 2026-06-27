@@ -93,6 +93,11 @@ scenario records. The current prototype can:
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
 
+## Recruiting Packet
+
+For resume bullets, interview talking points, and suggested GitHub repository
+metadata, see [docs/recruiting_packet.md](docs/recruiting_packet.md).
+
 ## Portfolio Report
 
 For a quick project overview, see the generated
@@ -102,9 +107,11 @@ results, limitations, and next work.
 
 ## Scenario Explorer
 
+Live demo: [ethanvillalovoz.com/scenariolens](https://ethanvillalovoz.com/scenariolens/)
+
 The static Scenario Explorer lives in [docs/demo](docs/demo). It consumes the
-checked-in dashboard payload and SVG assets. Preview the same route GitHub Pages
-would serve:
+checked-in dashboard payload and SVG assets. Preview the local `docs/`
+entrypoint:
 
 ```bash
 python3 -m http.server 8000 --directory docs
@@ -112,8 +119,8 @@ python3 -m http.server 8000 --directory docs
 
 Then open `http://localhost:8000`. The root page redirects to `/demo/`.
 
-To publish it on GitHub Pages, configure the repo's Pages source to `main` /
-`docs`.
+The production demo is embedded in the personal portfolio site at
+`/scenariolens/`.
 
 ## Example Gallery
 
