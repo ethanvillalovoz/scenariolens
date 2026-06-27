@@ -18,6 +18,7 @@ from scenariolens.portfolio import generate_portfolio_report
 from scenariolens.report import json_report, markdown_report, ranked_scores
 from scenariolens.samples import synthetic_scenarios
 from scenariolens.schema import Scenario
+from scenariolens.slice_validation import validate_waymo_motion_slice
 from scenariolens.visualize import scenario_svg
 
 
@@ -123,6 +124,42 @@ def ingest_waymo_motion_command(
         f"Ingested {len(scenarios)} native Waymo Motion scenario(s) "
         f"from {input_path} to {output_path}"
     )
+    return 0
+
+
+def validate_waymo_motion_command(
+    input_path: str,
+    output_dir: str,
+    max_scenarios: int | None,
+    top: int,
+) -> int:
+    try:
+        result = validate_waymo_motion_slice(
+            input_path=input_path,
+            output_dir=output_dir,
+            max_scenarios=max_scenarios,
+            top=top,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote validation manifest to {result.manifest_path}")
+    print(f"Wrote validation summary to {result.summary_path}")
+    if not result.ready:
+        print("Slice is not ready for ingestion. See preflight.json for details.")
+        return 2
+
+    print(
+        f"Validated {result.scenario_count} Waymo Motion scenario(s); "
+        f"reported top {result.reported_count}."
+    )
+    if result.scenarios_path is not None:
+        print(f"ScenarioLens JSON: {result.scenarios_path}")
+    if result.report_path is not None:
+        print(f"Ranked report: {result.report_path}")
+    if result.assets_dir is not None:
+        print(f"SVG gallery: {result.assets_dir}")
     return 0
 
 
@@ -314,6 +351,35 @@ def main() -> int:
         default=None,
         help="Optional maximum number of scenarios to convert.",
     )
+    waymo_validate_parser = subparsers.add_parser(
+        "waymo-motion-validate",
+        help=(
+            "Run preflight, ingestion, report generation, and SVG rendering "
+            "for a local Waymo Motion slice."
+        ),
+    )
+    waymo_validate_parser.add_argument(
+        "--input",
+        required=True,
+        help="Local Waymo Motion file or directory to validate.",
+    )
+    waymo_validate_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_motion_validation_run",
+        help="Directory for validation outputs.",
+    )
+    waymo_validate_parser.add_argument(
+        "--max-scenarios",
+        type=int,
+        default=25,
+        help="Maximum number of scenarios to ingest before scoring.",
+    )
+    waymo_validate_parser.add_argument(
+        "--top",
+        type=int,
+        default=5,
+        help="Number of top-ranked scenarios to report and render.",
+    )
     report_parser = subparsers.add_parser(
         "report",
         help="Generate a ranked scenario report.",
@@ -448,6 +514,13 @@ def main() -> int:
             output_path=args.output,
             max_scenarios=args.max_scenarios,
             input_format=args.format,
+        )
+    if args.command == "waymo-motion-validate":
+        return validate_waymo_motion_command(
+            input_path=args.input,
+            output_dir=args.output_dir,
+            max_scenarios=args.max_scenarios,
+            top=args.top,
         )
     if args.command == "report":
         return report(

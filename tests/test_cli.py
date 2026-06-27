@@ -243,6 +243,38 @@ class CliTest(unittest.TestCase):
             self.assertIn("Ingested 1 normalized Waymo Motion scenario(s)", result.stdout)
             self.assertIn("waymo_like", output_path.read_text())
 
+    def test_waymo_motion_validate_command_writes_run_packet(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_dir = Path(tmpdir) / "validation"
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "waymo-motion-validate",
+                    "--input",
+                    "docs/examples/waymo_motion_native_sample.json",
+                    "--output-dir",
+                    str(output_dir),
+                    "--max-scenarios",
+                    "1",
+                    "--top",
+                    "1",
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertIn("Validated 1 Waymo Motion scenario(s)", result.stdout)
+            self.assertTrue((output_dir / "manifest.json").exists())
+            self.assertTrue((output_dir / "README.md").exists())
+            self.assertTrue((output_dir / "scenarios.json").exists())
+            self.assertTrue((output_dir / "report.md").exists())
+            self.assertEqual(len(tuple((output_dir / "assets").glob("*.svg"))), 1)
+
     def test_portfolio_report_command_writes_report_and_assets(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)

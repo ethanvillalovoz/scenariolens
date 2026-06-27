@@ -19,19 +19,15 @@ the repository remains lightweight, reviewable, and safe to clone.
 ScenarioLens has a local workflow for a downloaded public Waymo Motion slice:
 
 ```bash
-PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-preflight \
-  --input data/raw/waymo/motion/validation
-```
-
-Then, after optional Waymo/TensorFlow dependencies are available:
-
-```bash
-PYTHONPATH=src python3 -m scenariolens.cli ingest-waymo-motion \
-  --format native \
+PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-validate \
   --input data/raw/waymo/motion/validation \
-  --output data/processed/waymo_motion_validation_sample.json \
-  --max-scenarios 25
+  --output-dir data/processed/waymo_motion_validation_run \
+  --max-scenarios 25 \
+  --top 5
 ```
+
+This command writes a preflight summary, normalized ScenarioLens JSON, a ranked
+Markdown report, a rendered SVG gallery, and a machine-readable manifest.
 
 Raw downloaded dataset files are intentionally ignored by git. Keep them under
 `data/raw/` and follow the official dataset access terms.
@@ -44,7 +40,6 @@ Raw downloaded dataset files are intentionally ignored by git. Keep them under
   spending time on large downloads.
 - Waymo-shaped fixtures prove field mapping and ingestion behavior, not dataset
   scale.
-- The next production milestone is to run the same ranking/report/render path on
-  a small downloaded Waymo Motion validation slice and document the slice size,
+- The next production milestone is to run `waymo-motion-validate` on a small
+  downloaded Waymo Motion validation slice and document the slice size,
   commands, and output summary.
-

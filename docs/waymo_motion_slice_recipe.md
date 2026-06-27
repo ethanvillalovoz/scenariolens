@@ -4,7 +4,7 @@ This recipe shows the intended local workflow for a small downloaded Waymo
 Motion slice:
 
 ```text
-Waymo Motion file or folder -> preflight -> ScenarioLens JSON -> report/render/rank
+Waymo Motion file or folder -> validate -> ScenarioLens JSON + report + SVG gallery
 ```
 
 The goal is to prove that ScenarioLens can move from toy fixtures toward a real
@@ -31,23 +31,27 @@ data/raw/waymo/motion/
 Raw dataset files are intentionally ignored by git. Do not commit downloaded
 Waymo files or derived outputs unless their license and terms allow it.
 
-## 2. Preflight The Local Slice
+## 2. Validate The Local Slice
 
-Before ingestion, inspect the file or folder:
+Run the one-command validation workflow first:
 
 ```bash
-PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-preflight \
-  --input data/raw/waymo/motion/validation
+PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-validate \
+  --input data/raw/waymo/motion/validation \
+  --output-dir data/processed/waymo_motion_validation_run \
+  --max-scenarios 25 \
+  --top 5
 ```
 
-The preflight command reports:
+The validation command writes:
 
-- file counts,
-- supported and unsupported suffixes,
-- total local size,
-- whether optional Waymo/TensorFlow packages are available,
-- sample supported file names,
-- whether the current environment is ready for ingestion.
+- `preflight.json`: file counts, supported suffixes, local size, and optional
+  dependency readiness,
+- `manifest.json`: machine-readable run summary,
+- `README.md`: human-readable run summary,
+- `scenarios.json`: normalized ScenarioLens records,
+- `report.md`: ranked scenario report,
+- `assets/*.svg`: top-scenario trajectory previews.
 
 Expected behavior:
 
@@ -55,10 +59,23 @@ Expected behavior:
 - `.pb` and `.bin` require the optional Waymo Open Dataset package.
 - `.tfrecord` and `.tfrecords` require optional Waymo and TensorFlow packages.
 
-If the command says `Ready for ingestion: False`, fix the path or install the
-missing optional package in a separate environment.
+If the command says the slice is not ready, inspect
+`data/processed/waymo_motion_validation_run/preflight.json`, fix the path or
+optional dependency setup, and rerun the same command.
 
-## 3. Convert To ScenarioLens JSON
+## 3. Optional Manual Steps
+
+The validation command wraps the manual preflight, ingest, report, and render
+flow. If you want to debug those steps separately, use the commands below.
+
+### Preflight Only
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-preflight \
+  --input data/raw/waymo/motion/validation
+```
+
+### Convert To ScenarioLens JSON
 
 Once preflight passes, ingest a very small number of scenarios first:
 
@@ -80,7 +97,7 @@ PYTHONPATH=src python3 -m scenariolens.cli ingest-waymo-motion \
   --output data/processed/waymo_motion_native_sample.json
 ```
 
-## 4. Generate A Ranked Report
+### Generate A Ranked Report
 
 ```bash
 PYTHONPATH=src python3 -m scenariolens.cli report \
@@ -99,7 +116,7 @@ Look for scenarios with:
 - high deceleration,
 - useful Waymo fields such as objects of interest or tracks to predict.
 
-## 5. Render A Small Gallery
+### Render A Small Gallery
 
 ```bash
 PYTHONPATH=src python3 -m scenariolens.cli render \
@@ -110,7 +127,7 @@ PYTHONPATH=src python3 -m scenariolens.cli render \
 
 The SVGs give a quick visual sanity check before any heavier dashboard work.
 
-## 6. Portfolio Use
+## 4. Portfolio Use
 
 For a public GitHub repo, keep this distinction clear:
 

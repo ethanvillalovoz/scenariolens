@@ -95,6 +95,18 @@ PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-preflight \
 For the full local workflow, see
 [waymo_motion_slice_recipe.md](waymo_motion_slice_recipe.md).
 
+For a real-slice run, prefer the validation command because it writes the
+preflight report, ScenarioLens JSON, ranked report, SVG gallery, and manifest
+as one reproducible packet:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-validate \
+  --input data/raw/waymo/motion/validation \
+  --output-dir data/processed/waymo_motion_validation_run \
+  --max-scenarios 25 \
+  --top 5
+```
+
 ScenarioLens also supports a lightweight normalized CSV shape that mirrors key
 fields from a Motion extraction:
 

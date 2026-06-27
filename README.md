@@ -94,6 +94,7 @@ small Waymo-shaped fixtures. The current prototype can:
 - rank 10 synthetic scenarios by evaluation value,
 - ingest protobuf-shaped Waymo Motion JSON mini-slices,
 - preflight local Waymo Motion slice folders before ingestion,
+- generate a reproducible local Waymo Motion validation packet,
 - save/load ScenarioLens scenario JSON,
 - export Markdown or JSON reports,
 - render 2D SVG trajectory views,
@@ -221,6 +222,19 @@ Inspect a local downloaded Waymo Motion slice before ingestion:
 PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-preflight \
   --input data/raw/waymo/motion/validation
 ```
+
+Generate a reproducible validation packet from a local Waymo Motion slice:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-validate \
+  --input data/raw/waymo/motion/validation \
+  --output-dir data/processed/waymo_motion_validation_run \
+  --max-scenarios 25 \
+  --top 5
+```
+
+The validation packet includes `preflight.json`, `manifest.json`,
+ScenarioLens JSON, a ranked Markdown report, and a top-scenario SVG gallery.
 
 See [docs/waymo_motion_slice_recipe.md](docs/waymo_motion_slice_recipe.md) for
 the laptop-friendly real-slice workflow.
