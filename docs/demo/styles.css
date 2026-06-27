@@ -152,7 +152,7 @@ a {
 
 .workspace {
   display: grid;
-  grid-template-columns: minmax(220px, 270px) minmax(520px, 1fr) minmax(360px, 430px);
+  grid-template-columns: minmax(220px, 250px) minmax(620px, 1fr) minmax(400px, 440px);
   gap: 16px;
   padding: 18px;
   min-height: calc(100vh - 64px);
@@ -353,7 +353,7 @@ a {
 
 .scenario-table {
   width: 100%;
-  min-width: 850px;
+  min-width: 780px;
   border-collapse: collapse;
 }
 
@@ -495,14 +495,18 @@ a {
   margin-bottom: 12px;
 }
 
+.detail-header > div:first-child {
+  min-width: 0;
+}
+
 .detail-header h1 {
   margin: 0 0 6px;
-  max-width: 320px;
+  max-width: 100%;
   font-size: 20px;
   line-height: 1.15;
   font-weight: 850;
   letter-spacing: 0;
-  overflow-wrap: anywhere;
+  overflow-wrap: normal;
 }
 
 .detail-header p {
@@ -510,6 +514,7 @@ a {
   color: var(--muted);
   font-size: 13px;
   line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .detail-actions {
@@ -548,7 +553,7 @@ a {
   border-radius: var(--radius);
   background: #f8fafc;
   overflow: hidden;
-  aspect-ratio: 1.45;
+  aspect-ratio: 1.4375;
 }
 
 .svg-frame img {
@@ -655,7 +660,7 @@ a {
   background: var(--blue);
 }
 
-@media (max-width: 1180px) {
+@media (max-width: 1368px) {
   .workspace {
     grid-template-columns: 250px minmax(0, 1fr);
   }

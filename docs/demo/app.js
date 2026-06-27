@@ -150,8 +150,8 @@ function renderRows(scenarios) {
     <tr data-scenario-id="${escapeHtml(scenario.scenario_id)}" class="${scenario.scenario_id === state.selectedId ? "selected" : ""}" tabindex="0">
       <td><span class="rank-cell">#${scenario.rank}</span></td>
       <td>
-        <span class="scenario-name">${escapeHtml(scenario.scenario_id)}</span>
-        <span class="scenario-source">${escapeHtml(scenario.source)}</span>
+        <span class="scenario-name">${escapeHtml(scenarioLabel(scenario.scenario_id))}</span>
+        <span class="scenario-source">${escapeHtml(scenario.scenario_id)} / ${escapeHtml(scenario.source)}</span>
       </td>
       <td><span class="dataset-chip">${escapeHtml(shortDatasetLabel(scenario.dataset_id))}</span></td>
       <td><span class="score-chip">${formatNumber(scenario.score.interaction)}</span></td>
@@ -174,8 +174,8 @@ function renderDetail(scenario, scenarios) {
     return;
   }
 
-  nodes.detailTitle.textContent = scenario.scenario_id;
-  nodes.detailSubtitle.textContent = `${scenario.dataset_label} / score ${formatNumber(scenario.score.interaction)}`;
+  nodes.detailTitle.textContent = scenarioLabel(scenario.scenario_id);
+  nodes.detailSubtitle.textContent = `${scenario.scenario_id} / ${scenario.dataset_label} / score ${formatNumber(scenario.score.interaction)}`;
   nodes.detailTags.innerHTML = tagChips(scenario.tags, scenario.tags.length);
   nodes.scenarioImage.src = scenario.svg_path;
   nodes.scenarioImage.alt = `Trajectory preview for ${scenario.scenario_id}`;
@@ -397,6 +397,18 @@ function tagLabel(value) {
 
 function componentLabel(value) {
   return value.replaceAll("_", " ");
+}
+
+function scenarioLabel(value) {
+  const acronyms = new Set(["csv", "json", "sdc", "ttc", "vru"]);
+  return value
+    .split("_")
+    .filter(Boolean)
+    .map((word) => {
+      if (acronyms.has(word.toLowerCase())) return word.toUpperCase();
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    })
+    .join(" ");
 }
 
 function shortDatasetLabel(datasetId) {

@@ -25,6 +25,9 @@ class VisualizeTest(unittest.TestCase):
         self.assertIn("ped_1", svg)
         self.assertIn("<polyline", svg)
         self.assertIn("#dc2626", svg)
+        self.assertIn("scenario-plot-clip", svg)
+        self.assertIn("track-pedestrian", svg)
+        self.assertIn("latest", svg)
 
     def test_scenario_svg_handles_single_track_baseline(self) -> None:
         scenario = synthetic_scenarios()[-1]
@@ -37,4 +40,3 @@ class VisualizeTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

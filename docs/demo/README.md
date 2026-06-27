@@ -15,6 +15,10 @@ to this explorer.
 The production copy is embedded in Ethan's personal portfolio site at
 `https://ethanvillalovoz.com/scenariolens/`.
 
+The demo data is intentionally small: synthetic scenarios plus tiny
+Waymo Motion-shaped fixtures. See
+[`docs/data_provenance.md`](../data_provenance.md) for the exact data status.
+
 Generated files:
 
 - `index.html`: static dashboard shell.

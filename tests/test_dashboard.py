@@ -24,6 +24,8 @@ class DashboardDataTest(unittest.TestCase):
         self.assertTrue((docs_root / ".nojekyll").exists())
         self.assertIn('href="styles.css"', html)
         self.assertIn('src="app.js"', html)
+        self.assertIn('../data_provenance.md', html)
+        self.assertTrue((docs_root / "data_provenance.md").exists())
         self.assertTrue((root / "assets" / "scenariolens-explorer.png").exists())
         self.assertEqual(payload["format"], DASHBOARD_FORMAT)
         for item in payload["scenarios"]:

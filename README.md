@@ -60,6 +60,17 @@ autonomy ecosystem: Python, Waymo Motion `Scenario`-shaped records, optional
 Waymo/TensorFlow ingestion for binary files, and a future JAX/Waymax simulation
 path. See [docs/tech_stack.md](docs/tech_stack.md) for the full rationale.
 
+## Data Provenance
+
+The checked-in demo currently uses synthetic scenarios plus tiny Waymo
+Motion-shaped fixtures. It does not claim results from a full downloaded Waymo
+validation shard. The repo includes a local preflight and ingestion path for
+downloaded Waymo Motion slices, while raw dataset files stay outside git.
+
+See [docs/data_provenance.md](docs/data_provenance.md) for the exact fixture
+inventory and [docs/waymo_motion_slice_recipe.md](docs/waymo_motion_slice_recipe.md)
+for the real-slice workflow.
+
 ## Repo Layout
 
 ```text
@@ -73,8 +84,8 @@ data/                 Local data mount points, ignored by git
 
 ## Current Milestone
 
-The first milestone is a complete local prototype on synthetic and small curated
-scenario records. The current prototype can:
+The first milestone is a complete local prototype on synthetic records and
+small Waymo-shaped fixtures. The current prototype can:
 
 - define a compact scenario schema,
 - compute lightweight risk/interaction features,
@@ -89,6 +100,10 @@ scenario records. The current prototype can:
 - generate static dashboard data and SVG assets,
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
+
+The next milestone is to run the same flow on a small downloaded Waymo Motion
+validation slice and publish the commands plus a short slice-level summary
+without committing raw dataset files.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
