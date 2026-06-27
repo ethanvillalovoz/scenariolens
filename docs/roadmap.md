@@ -23,7 +23,7 @@ Goal: make the technology choices explicit and recruiter-readable.
 
 - keep the default Python package dependency-free,
 - document Waymo Motion `Scenario`-shaped records as the dataset boundary,
-- explain optional Waymo/TensorFlow dependencies for binary TFRecord ingestion,
+- explain the lightweight TFRecord/protobuf reader for local Motion slices,
 - identify JAX/Waymax as the future simulation path,
 - keep frontend/dashboard work secondary to the autonomy data stack.
 
@@ -48,16 +48,16 @@ scenarios to keep the portfolio story visual and understandable.
 Goal: make the real-data adapter credible without making the repo heavy.
 
 - ingest protobuf-shaped Waymo Motion JSON records without extra dependencies,
-- preserve the optional path for binary protobuf and TFRecord inputs,
+- read binary protobuf and TFRecord shard inputs without extra dependencies,
 - map `sdc_track_index` to ScenarioLens ego tracks,
 - skip invalid states and preserve timestamps, object types, and velocities,
 - add a preflight command for local downloaded slices,
 - document the exact field boundary and raw-data workflow.
 
-Status: implemented for native JSON mini-slices and optional binary hooks.
-Local slice preflight, the downloaded-slice recipe, and the validation packet
-command are implemented. A full downloaded-dataset validation run, map geometry
-parsing, and traffic-light feature extraction remain next steps.
+Status: implemented for native JSON mini-slices, binary Scenario protos, and
+sharded TFRecord slices. Local slice preflight, the downloaded-slice recipe, and
+the validation packet command are implemented. Map geometry parsing and richer
+traffic-light feature extraction remain next steps.
 
 ## Milestone 3: Searchable Demo
 

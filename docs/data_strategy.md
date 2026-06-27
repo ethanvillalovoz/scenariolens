@@ -47,8 +47,8 @@ PYTHONPATH=src python3 -m scenariolens.cli ingest-waymo-motion \
   --output data/processed/waymo_motion_native_sample.json
 ```
 
-The same native adapter can read binary protobuf or TFRecord files when optional
-Waymo/TensorFlow packages are installed.
+The same native adapter can read binary Scenario protobuf and sharded TFRecord
+files with the built-in lightweight parser for the fields ScenarioLens uses.
 
 Use the local slice recipe when moving from fixtures to downloaded files:
 

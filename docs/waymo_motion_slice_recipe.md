@@ -25,7 +25,7 @@ Suggested local layout:
 ```text
 data/raw/waymo/motion/
   validation/
-    shard-00000.tfrecord
+    validation.tfrecord-00007-of-00150
 ```
 
 Raw dataset files are intentionally ignored by git. Do not commit downloaded
@@ -44,7 +44,7 @@ Doctor reports:
 
 - whether the configured input path is ingestable,
 - whether `gcloud` or `gsutil` are installed,
-- whether optional Waymo/TensorFlow packages are importable,
+- whether optional reference packages are importable,
 - whether likely raw Motion files exist in Downloads or Desktop,
 - the next action needed before validation can run.
 
@@ -62,8 +62,8 @@ PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-validate \
 
 The validation command writes:
 
-- `preflight.json`: file counts, supported suffixes, local size, and optional
-  dependency readiness,
+- `preflight.json`: file counts, supported suffixes, local size, and parser
+  readiness,
 - `manifest.json`: machine-readable run summary,
 - `README.md`: human-readable run summary,
 - `scenarios.json`: normalized ScenarioLens records,
@@ -73,12 +73,14 @@ The validation command writes:
 Expected behavior:
 
 - `.json`, `.jsonl`, and `.ndjson` are dependency-free.
-- `.pb` and `.bin` require the optional Waymo Open Dataset package.
-- `.tfrecord` and `.tfrecords` require optional Waymo and TensorFlow packages.
+- `.pb` and `.bin` use the built-in lightweight Scenario parser.
+- `.tfrecord`, `.tfrecords`, and official Waymo shard names like
+  `validation.tfrecord-00007-of-00150` use the built-in lightweight TFRecord
+  reader plus Scenario parser.
 
 If the command says the slice is not ready, inspect
 `data/processed/waymo_motion_validation_run/preflight.json`, fix the path or
-optional dependency setup, and rerun the same command.
+input file setup, and rerun the same command.
 
 ## 3. Optional Manual Steps
 

@@ -41,8 +41,8 @@ Use one bullet if space is tight:
 
 Use two bullets if the project gets a dedicated entry:
 
-- Built ScenarioLens, a local-first autonomy scenario evaluation tool that ingests synthetic, Waymo Motion-shaped JSON, and normalized CSV scenarios, then ranks long-tail cases using interpretable proximity, TTC, VRU, path-conflict, density, and taxonomy features.
-- Shipped a tested portfolio demo with 60 Python unit tests, GitHub Actions CI, SVG trajectory rendering, deterministic dashboard data, and a static Scenario Explorer deployed at `ethanvillalovoz.com/scenariolens`.
+- Built ScenarioLens, a local-first autonomy scenario evaluation tool that ingests synthetic, Waymo Motion-shaped JSON, normalized CSV, and small downloaded Waymo Motion TFRecord slices, then ranks long-tail cases using interpretable proximity, TTC, VRU, path-conflict, density, and taxonomy features.
+- Shipped a tested portfolio demo with 60+ Python unit tests, GitHub Actions CI, SVG trajectory rendering, deterministic dashboard data, and a static Scenario Explorer deployed at `ethanvillalovoz.com/scenariolens`.
 
 Short project line:
 
@@ -77,7 +77,8 @@ Architecture:
 
 1. Scenario schema in `src/scenariolens/schema.py`.
 2. Ingestion adapters for synthetic scenarios, row-wise CSV, normalized
-   Waymo-shaped CSV, and protobuf-shaped Waymo Motion JSON.
+   Waymo-shaped CSV, protobuf-shaped Waymo Motion JSON, and small native
+   Waymo Motion TFRecord slices.
 3. Metrics and taxonomy scoring for proximity, TTC, VRUs, path conflicts,
    density, dynamics, and scenario category.
 4. Report, portfolio, renderer, and dashboard exporters.
@@ -87,8 +88,9 @@ Why it is Waymo-relevant:
 Waymo's public ecosystem includes Waymo Open Dataset, Waymo Motion, scenario
 data, simulation, forecasting, and safety evaluation. ScenarioLens deliberately
 aligns with that public boundary: it uses Waymo Motion-shaped records where
-possible, keeps binary Waymo/TensorFlow ingestion optional, and focuses on
-scenario triage rather than pretending to replace production autonomy systems.
+possible, reads the Motion fields needed for small downloaded slices, and
+focuses on scenario triage rather than pretending to replace production
+autonomy systems.
 
 Tradeoffs:
 
@@ -96,8 +98,8 @@ Tradeoffs:
   laptop-feasible and directly supports interaction analysis.
 - Kept the core package dependency-free so reviewers can run tests quickly.
 - Used deterministic checked-in demo data so the public artifact is stable.
-- Treated native Waymo binary ingestion as optional because the public package
-  has heavyweight platform constraints.
+- Kept the native Waymo reader narrow: it extracts the fields ScenarioLens
+  needs instead of claiming full Waymo Open Dataset parity.
 
 Testing and verification:
 
@@ -109,8 +111,8 @@ Testing and verification:
 
 What I would build next:
 
-1. Validate on a downloaded Waymo Motion validation slice in a compatible
-   TensorFlow/Waymo environment.
+1. Expand the downloaded Waymo Motion validation-slice run into a documented
+   scenario collection summary.
 2. Add richer map and traffic-light context.
 3. Add side-by-side scenario comparison and exportable collections.
 4. Integrate a lightweight Waymax/JAX simulation path for scenario replay or

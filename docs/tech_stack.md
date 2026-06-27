@@ -12,9 +12,9 @@ environment supports it.
 | Core language | Python 3.11+ | Current | Natural fit for data ingestion, metrics, ML-adjacent tooling, and autonomous-driving evaluation. |
 | Core dependencies | Python standard library | Current | Keeps the default repo reproducible on Apple Silicon without heavy installs. |
 | Data model | ScenarioLens dataclasses | Current | Small internal representation for ranking, reporting, and rendering. |
-| Waymo data boundary | Waymo Motion `Scenario`-shaped JSON, protobuf, TFRecord | Current/optional | Mirrors public Waymo Motion fields while allowing dependency-free fixtures. |
-| Native Waymo package | `waymo-open-dataset-tf-2-12-0` / `waymo_open_dataset` import | Optional | Public Waymo package for binary protobuf and TFRecord paths. Best handled in a separate compatible environment. |
-| TensorFlow | TensorFlow | Optional | Needed for native TFRecord reading, not for ScenarioLens JSON or normalized CSV. |
+| Waymo data boundary | Waymo Motion `Scenario`-shaped JSON, protobuf, TFRecord | Current | Mirrors public Waymo Motion fields while staying dependency-free for the fields ScenarioLens uses. |
+| Native Waymo package | `waymo_open_dataset` import | Optional reference | Useful for broader Waymo tooling, metrics, and generated protos, but not required for ScenarioLens slice ingestion. |
+| TensorFlow | TensorFlow | Optional reference | Useful for broader ML workflows, but ScenarioLens reads Motion TFRecord shards with a lightweight built-in reader. |
 | Simulation stretch | JAX + Waymax | Future | Waymax is a Waymo Research JAX simulator built around Waymo Open Motion data. |
 | Data index stretch | Parquet / DuckDB | Future | Useful after local slices grow beyond small JSON artifacts. |
 | Frontend demo | Static React + TypeScript + Vite | Future | Recruiter-facing presentation layer; not the core autonomy stack. |
@@ -29,15 +29,16 @@ dependencies = []
 ```
 
 That is deliberate. ScenarioLens can ingest synthetic examples, normalized CSV,
-and protobuf-shaped Waymo Motion JSON without installing TensorFlow or the Waymo
-Open Dataset package. This keeps the project easy to review and run.
+protobuf-shaped Waymo Motion JSON, binary Scenario protos, and Waymo Motion
+TFRecord shards without installing TensorFlow or the Waymo Open Dataset package.
+This keeps the project easy to review and run on Apple Silicon.
 
-Native binary Waymo inputs are treated as optional:
+Native Waymo inputs are treated as small-slice data boundaries:
 
 - `.json`, `.jsonl`, `.ndjson`: dependency-free.
-- `.pb`, `.bin`: require the public Waymo Open Dataset package.
-- `.tfrecord`, `.tfrecords`: require the public Waymo Open Dataset package and
-  TensorFlow.
+- `.pb`, `.bin`: dependency-free lightweight Scenario parser.
+- `.tfrecord`, `.tfrecords`, `*.tfrecord-00000-of-00150`: dependency-free
+  lightweight TFRecord reader plus Scenario parser.
 
 Use preflight before ingesting local downloaded data:
 
@@ -48,19 +49,20 @@ PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-preflight \
 
 ## Why Not Put Waymo Dependencies In `pyproject.toml` Yet?
 
-The public Waymo Open Dataset package is a specialized binary distribution. The
-current TensorFlow 2.12 Waymo Open Dataset package variant on PyPI is published
-by Waymo Research, but its available wheel is Linux x86_64, while this project
-is being developed on Apple Silicon. Pinning it as a normal project extra would
-make the repo look less portable and could create a rough first-run experience.
+ScenarioLens only needs a narrow subset of the public Motion `Scenario` proto:
+scenario id, timestamps, tracks, object types, states, SDC index, prediction
+targets, and coarse map/traffic-light presence. The built-in parser reads those
+fields directly from downloaded TFRecord shards. Pinning TensorFlow or
+Waymo-specific wheels would make the first-run experience heavier without
+improving this project milestone.
 
 Instead:
 
 - keep ScenarioLens core dependency-free,
-- document the optional Waymo/TensorFlow environment,
-- use protobuf-shaped JSON fixtures in CI,
-- run binary TFRecord experiments in a separate Linux or Colab-style
-  environment when needed.
+- use protobuf-shaped JSON and tiny binary fixtures in CI,
+- keep broader Waymo/TensorFlow tooling optional for future benchmarks,
+- run larger ML or metrics experiments in a separate Linux or Colab-style
+  environment only when needed.
 
 ## Public Waymo Alignment
 
@@ -70,7 +72,8 @@ matter most for this portfolio project:
 - it names the Waymo Motion `Scenario` proto as the external boundary,
 - it maps public fields such as `scenario_id`, `timestamps_seconds`, `tracks`,
   `object_type`, `states`, and `sdc_track_index`,
-- it treats TFRecord/protobuf ingestion as optional public-Waymo tooling,
+- it reads small downloaded TFRecord/protobuf slices without heavyweight runtime
+  dependencies,
 - it keeps future simulation work pointed at JAX/Waymax.
 
 ## Why Not C++ Or Bazel Yet?
@@ -89,8 +92,7 @@ project more convincing.
 
 ## Future Stack Milestones
 
-1. Add a downloaded Waymo Motion validation-slice run in a separate compatible
-   environment.
+1. Add a checked-in summary from a downloaded Waymo Motion validation-slice run.
 2. Add a compact feature index, likely JSON first and Parquet/DuckDB once the
    slice gets larger.
 3. Add a static React/TypeScript/Vite Scenario Explorer dashboard.
@@ -102,5 +104,4 @@ project more convincing.
 - Waymo Open Dataset: https://waymo.com/open/
 - Waymo Open Dataset GitHub: https://github.com/waymo-research/waymo-open-dataset
 - Waymo Motion `Scenario` proto: https://github.com/waymo-research/waymo-open-dataset/blob/master/src/waymo_open_dataset/protos/scenario.proto
-- Waymo Open Dataset PyPI package: https://pypi.org/project/waymo-open-dataset-tf-2-12-0/
 - Waymax: https://github.com/waymo-research/waymax

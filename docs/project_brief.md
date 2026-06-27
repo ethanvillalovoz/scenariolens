@@ -57,8 +57,8 @@ trajectory rendering.
 
 The stack is intentionally aligned with the public Waymo/autonomy ecosystem:
 Python for data and evaluation tooling, Waymo Motion `Scenario`-shaped records
-as the dataset boundary, optional Waymo/TensorFlow dependencies for binary
-TFRecord ingestion, and JAX/Waymax as the future simulation path. See
+as the dataset boundary, a lightweight built-in reader for downloaded Motion
+TFRecord slices, and JAX/Waymax as the future simulation path. See
 `docs/tech_stack.md` for the detailed rationale.
 
 ## Representative Scenario Categories

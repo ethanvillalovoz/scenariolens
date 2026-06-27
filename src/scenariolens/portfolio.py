@@ -84,9 +84,9 @@ def portfolio_markdown(
         "",
         "The current pipeline supports synthetic scenarios, ScenarioLens JSON, "
         "row-wise CSV ingestion, normalized Waymo Motion-shaped fixtures, and "
-        "native protobuf-shaped Waymo Motion JSON mini-slices. Local slice "
-        "preflight helps keep binary protobuf and TFRecord ingestion optional "
-        "so the core project stays easy to run.",
+        "native Waymo Motion JSON, binary Scenario proto, and small TFRecord "
+        "slice ingestion. Local slice preflight keeps raw downloaded data "
+        "separate from the checked-in demo.",
         "",
         "## Current Coverage",
         "",
@@ -101,8 +101,8 @@ def portfolio_markdown(
         "",
         "ScenarioLens uses a laptop-friendly subset of the public Waymo/autonomy "
         "ecosystem: Python for data and evaluation tooling, Waymo Motion "
-        "`Scenario`-shaped records as the dataset boundary, optional "
-        "Waymo/TensorFlow dependencies for binary inputs, and JAX/Waymax as the "
+        "`Scenario`-shaped records as the dataset boundary, a lightweight built-in "
+        "reader for the Motion fields this project needs, and JAX/Waymax as the "
         "future simulation path.",
         "",
         "## Top Synthetic Scenarios",
@@ -138,7 +138,7 @@ def portfolio_markdown(
             "## Limitations",
             "",
             "- Checked-in Waymo examples are synthetic mini fixtures, not downloaded real validation shards.",
-            "- Binary protobuf and TFRecord ingestion require optional packages and are not exercised in CI.",
+            "- The lightweight binary reader extracts the Motion fields ScenarioLens needs, not the full Waymo proto surface.",
             "- The TTC value is a simple constant-velocity screening proxy, not a certified safety metric.",
             "- The current renderer is 2D and focuses on agent trajectories, not parsed map lanes or traffic lights.",
             "",

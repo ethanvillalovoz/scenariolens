@@ -56,9 +56,10 @@ This repo is intentionally scoped for an Apple Silicon laptop with 32 GB RAM and
 ## Tech Stack
 
 ScenarioLens is built around a laptop-friendly subset of the public Waymo and
-autonomy ecosystem: Python, Waymo Motion `Scenario`-shaped records, optional
-Waymo/TensorFlow ingestion for binary files, and a future JAX/Waymax simulation
-path. See [docs/tech_stack.md](docs/tech_stack.md) for the full rationale.
+autonomy ecosystem: Python, Waymo Motion `Scenario`-shaped records, a
+dependency-free reader for the Motion fields this project needs, and a future
+JAX/Waymax simulation path. See [docs/tech_stack.md](docs/tech_stack.md) for
+the full rationale.
 
 ## Data Provenance
 
@@ -121,6 +122,10 @@ For a quick project overview, see the generated
 [ScenarioLens Portfolio Report](docs/reports/portfolio_report.md). It summarizes
 the ranking pipeline, top synthetic scenarios, normalized Waymo-shaped fixture
 results, limitations, and next work.
+
+For the first local real-data smoke run, see the
+[Waymo Motion Validation Slice Summary](docs/reports/waymo_motion_validation_summary.md).
+Raw Waymo files and per-scenario outputs remain untracked.
 
 ## Scenario Explorer
 
@@ -214,8 +219,9 @@ PYTHONPATH=src python3 -m scenariolens.cli ingest-waymo-motion \
   --output data/processed/waymo_motion_native_sample.json
 ```
 
-Native JSON ingestion is dependency-free. Binary `.pb` and `.tfrecord` inputs
-are treated as optional paths that require Waymo/TensorFlow packages.
+Native JSON ingestion is dependency-free. Binary `.pb`, `.tfrecord`, and
+official sharded TFRecord inputs such as `validation.tfrecord-00007-of-00150`
+are also parsed by the lightweight built-in Motion reader.
 
 Diagnose local Waymo Motion data readiness:
 

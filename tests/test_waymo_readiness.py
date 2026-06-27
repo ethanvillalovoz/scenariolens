@@ -13,7 +13,7 @@ class WaymoReadinessTest(unittest.TestCase):
             downloads = root / "Downloads"
             configured_input.mkdir(parents=True)
             downloads.mkdir()
-            shard = downloads / "validation.tfrecord"
+            shard = downloads / "validation.tfrecord-00007-of-00150"
             shard.write_bytes(b"waymo shard placeholder")
 
             readiness = inspect_waymo_motion_readiness(
@@ -25,6 +25,7 @@ class WaymoReadinessTest(unittest.TestCase):
             self.assertEqual(readiness.preflight.supported_file_count, 0)
             self.assertEqual(len(readiness.candidate_files), 1)
             self.assertEqual(readiness.candidate_files[0].path, str(shard))
+            self.assertEqual(readiness.candidate_files[0].suffix, ".tfrecord")
             self.assertTrue(
                 any("Copy or move one candidate file" in action for action in readiness.next_actions)
             )

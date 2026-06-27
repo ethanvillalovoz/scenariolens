@@ -1,4 +1,5 @@
 import json
+import struct
 import unittest
 import tempfile
 from pathlib import Path
@@ -77,6 +78,96 @@ def _jsonl(*payloads: str) -> str:
     return "\n".join(json.dumps(json.loads(payload)) for payload in payloads) + "\n"
 
 
+def _key(field_number: int, wire_type: int) -> bytes:
+    return _varint((field_number << 3) | wire_type)
+
+
+def _varint(value: int) -> bytes:
+    chunks = []
+    while True:
+        byte = value & 0x7F
+        value >>= 7
+        if value:
+            chunks.append(byte | 0x80)
+        else:
+            chunks.append(byte)
+            return bytes(chunks)
+
+
+def _length_delimited(field_number: int, payload: bytes) -> bytes:
+    return _key(field_number, 2) + _varint(len(payload)) + payload
+
+
+def _double(field_number: int, value: float) -> bytes:
+    return _key(field_number, 1) + struct.pack("<d", value)
+
+
+def _float(field_number: int, value: float) -> bytes:
+    return _key(field_number, 5) + struct.pack("<f", value)
+
+
+def _int32(field_number: int, value: int) -> bytes:
+    return _key(field_number, 0) + _varint(value)
+
+
+def _string(field_number: int, value: str) -> bytes:
+    return _length_delimited(field_number, value.encode("utf-8"))
+
+
+def _state_proto(x: float, y: float, vx: float, vy: float, valid: bool = True) -> bytes:
+    return b"".join(
+        (
+            _double(2, x),
+            _double(3, y),
+            _float(9, vx),
+            _float(10, vy),
+            _int32(11, int(valid)),
+        )
+    )
+
+
+def _track_proto(track_id: int, object_type: int, *states: bytes) -> bytes:
+    return b"".join(
+        (
+            _int32(1, track_id),
+            _int32(2, object_type),
+            *(_length_delimited(3, state) for state in states),
+        )
+    )
+
+
+def _scenario_proto() -> bytes:
+    vehicle = _track_proto(
+        10,
+        1,
+        _state_proto(0.0, 0.0, 5.0, 0.0),
+        _state_proto(0.5, 0.0, 5.0, 0.0),
+    )
+    pedestrian = _track_proto(
+        20,
+        2,
+        _state_proto(0.5, -1.0, 0.0, 1.0),
+        _state_proto(0.5, -0.9, 0.0, 1.0),
+    )
+    prediction = _int32(1, 1)
+    return b"".join(
+        (
+            _double(1, 0.0),
+            _double(1, 0.1),
+            _length_delimited(2, vehicle),
+            _length_delimited(2, pedestrian),
+            _int32(4, 20),
+            _string(5, "waymo_binary_fixture"),
+            _int32(6, 0),
+            _length_delimited(11, prediction),
+        )
+    )
+
+
+def _tfrecord(payload: bytes) -> bytes:
+    return struct.pack("<Q", len(payload)) + b"\x00\x00\x00\x00" + payload + b"\x00\x00\x00\x00"
+
+
 class WaymoMotionIngestTest(unittest.TestCase):
     def test_adapter_status_documents_native_adapter(self) -> None:
         status = adapter_status()
@@ -109,6 +200,35 @@ class WaymoMotionIngestTest(unittest.TestCase):
         self.assertEqual(report.unsupported_suffix_counts[".txt"], 1)
         self.assertEqual(report.sample_supported_files, ("scenario.json",))
         self.assertTrue(waymo_motion_slice_ready(report))
+
+    def test_inspect_waymo_motion_slice_supports_waymo_tfrecord_shards(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            shard = root / "validation.tfrecord-00007-of-00150"
+            shard.write_bytes(b"placeholder")
+
+            report = inspect_waymo_motion_slice(root)
+
+        self.assertEqual(report.supported_file_count, 1)
+        self.assertEqual(report.supported_suffix_counts[".tfrecord"], 1)
+        self.assertEqual(report.sample_supported_files, ("validation.tfrecord-00007-of-00150",))
+        self.assertTrue(waymo_motion_slice_ready(report))
+        self.assertIn("TFRecord inputs use the built-in lightweight reader.", report.notes)
+
+    def test_load_waymo_motion_reads_waymo_tfrecord_shard(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "validation.tfrecord-00007-of-00150"
+            path.write_bytes(_tfrecord(_scenario_proto()))
+
+            scenarios = load_waymo_motion(path)
+
+        self.assertEqual(len(scenarios), 1)
+        scenario = scenarios[0]
+        self.assertEqual(scenario.scenario_id, "waymo_binary_fixture")
+        self.assertEqual(scenario.ego_track_id, "10")
+        self.assertIn("objects_of_interest", scenario.tags)
+        self.assertIn("tracks_to_predict", scenario.tags)
+        self.assertEqual({track.agent_type for track in scenario.tracks}, {"vehicle", "pedestrian"})
 
     def test_inspect_waymo_motion_slice_reports_missing_input(self) -> None:
         report = inspect_waymo_motion_slice("missing-waymo-dir")

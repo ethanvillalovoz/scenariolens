@@ -81,9 +81,10 @@ and `velocityX`, or Python/proto-style snake_case names such as `scenario_id`,
 `timestamps_seconds`, `sdc_track_index`, `object_type`, `center_x`, and
 `velocity_x`.
 
-The same `--format native` command can read `.pb` and `.tfrecord` files when
-optional Waymo/TensorFlow packages are installed. Those dependencies are not
-required for the core project or tests.
+The same `--format native` command can read `.pb`, `.tfrecord`, and official
+sharded TFRecord files such as `validation.tfrecord-00007-of-00150` with the
+built-in lightweight parser. TensorFlow and the Waymo package are not required
+for the fields ScenarioLens currently extracts.
 
 Before pointing ingestion at a downloaded local slice, run preflight:
 

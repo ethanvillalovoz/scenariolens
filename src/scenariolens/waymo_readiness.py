@@ -6,13 +6,10 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from scenariolens.ingest.waymo_motion import (
-    NATIVE_SUPPORTED_SUFFIXES,
-    NATIVE_TFRECORD_SUFFIXES,
-    OPTIONAL_PACKAGE,
-    OPTIONAL_TF_PACKAGE,
     WAYMO_OPEN_DATASET_URL,
     WaymoMotionSliceReport,
     inspect_waymo_motion_slice,
+    native_motion_format_label,
     waymo_motion_slice_ready,
 )
 
@@ -70,14 +67,18 @@ def inspect_waymo_motion_readiness(
         tensorflow_available=preflight.tensorflow_available,
     )
 
-    roots = _candidate_roots(candidate_roots, search_common_locations)
-    candidates = _find_candidate_files(
-        roots=roots,
-        input_path=source,
-        max_depth=max_depth,
-        max_candidates=max_candidates,
-    )
     ready = waymo_motion_slice_ready(preflight)
+    roots = () if ready else _candidate_roots(candidate_roots, search_common_locations)
+    candidates = (
+        ()
+        if ready
+        else _find_candidate_files(
+            roots=roots,
+            input_path=source,
+            max_depth=max_depth,
+            max_candidates=max_candidates,
+        )
+    )
 
     return WaymoMotionReadiness(
         input_path=str(source),
@@ -128,14 +129,15 @@ def _find_candidate_files(
         if not root.exists():
             continue
         for file_path in _walk_files(root, max_depth=max_depth):
-            if file_path.suffix.lower() not in NATIVE_SUPPORTED_SUFFIXES:
+            format_label = native_motion_format_label(file_path)
+            if format_label is None:
                 continue
             if resolved_input is not None and _is_under(file_path, resolved_input):
                 continue
             candidates.append(
                 WaymoMotionCandidateFile(
                     path=str(file_path),
-                    suffix=file_path.suffix.lower(),
+                    suffix=format_label,
                     size_bytes=file_path.stat().st_size,
                 )
             )
@@ -202,23 +204,6 @@ def _next_actions(
             "manual browser downloads also work."
         )
 
-    if any(suffix in preflight.supported_suffix_counts for suffix in NATIVE_TFRECORD_SUFFIXES):
-        missing = _missing_tfrecord_packages(tooling)
-        if missing:
-            actions.append(
-                "Install optional TFRecord ingestion package(s) in a separate Python "
-                f"environment before reading binary shards: {', '.join(missing)}."
-            )
-
     if not actions:
         actions.append("Inspect the preflight notes, fix the input path, and rerun doctor.")
     return tuple(actions)
-
-
-def _missing_tfrecord_packages(tooling: WaymoMotionTooling) -> tuple[str, ...]:
-    missing: list[str] = []
-    if not tooling.waymo_open_dataset_available:
-        missing.append(OPTIONAL_PACKAGE)
-    if not tooling.tensorflow_available:
-        missing.append(OPTIONAL_TF_PACKAGE)
-    return tuple(missing)

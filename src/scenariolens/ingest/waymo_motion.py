@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import csv
 import json
+import struct
 from dataclasses import dataclass, field
 from importlib.util import find_spec
 from pathlib import Path
@@ -30,11 +31,15 @@ NATIVE_JSON_SUFFIXES = {".json"}
 NATIVE_JSONL_SUFFIXES = {".jsonl", ".ndjson"}
 NATIVE_PROTO_SUFFIXES = {".pb", ".bin"}
 NATIVE_TFRECORD_SUFFIXES = {".tfrecord", ".tfrecords"}
+NATIVE_TFRECORD_SHARD_MARKERS = (".tfrecord-", ".tfrecords-")
 NATIVE_SUPPORTED_SUFFIXES = (
     NATIVE_JSON_SUFFIXES
     | NATIVE_JSONL_SUFFIXES
     | NATIVE_PROTO_SUFFIXES
     | NATIVE_TFRECORD_SUFFIXES
+)
+NATIVE_SUPPORTED_INPUT_PATTERNS = tuple(
+    sorted(NATIVE_SUPPORTED_SUFFIXES | {".tfrecord-*-of-*"})
 )
 
 OBJECT_TYPE_MAP = {
@@ -116,9 +121,8 @@ def adapter_status() -> WaymoMotionAdapterStatus:
         dataset_url=WAYMO_OPEN_DATASET_URL,
         challenges_url=WAYMO_OPEN_CHALLENGES_URL,
         message=(
-            "Native Waymo Motion ingestion supports protobuf-shaped JSON without "
-            "extra dependencies. Binary protobuf and TFRecord inputs are optional "
-            "and require Waymo/TensorFlow packages."
+            "Native Waymo Motion ingestion supports protobuf-shaped JSON, binary "
+            "Scenario protos, and TFRecord shards without extra dependencies."
         ),
     )
 
@@ -159,7 +163,7 @@ def inspect_waymo_motion_slice(
     for file_path in files:
         total_bytes += file_path.stat().st_size
         suffix = _suffix_label(file_path)
-        if file_path.suffix.lower() in NATIVE_SUPPORTED_SUFFIXES:
+        if is_native_motion_file(file_path):
             supported_files.append(file_path)
             supported_suffix_counts[suffix] = supported_suffix_counts.get(suffix, 0) + 1
         else:
@@ -194,15 +198,7 @@ def inspect_waymo_motion_slice(
 def waymo_motion_slice_ready(report: WaymoMotionSliceReport) -> bool:
     """Return whether the inspected slice is ingestable in this environment."""
 
-    if not report.exists or report.supported_file_count == 0:
-        return False
-    if any(suffix in report.supported_suffix_counts for suffix in NATIVE_PROTO_SUFFIXES):
-        if not report.optional_package_available:
-            return False
-    if any(suffix in report.supported_suffix_counts for suffix in NATIVE_TFRECORD_SUFFIXES):
-        if not report.optional_package_available or not report.tensorflow_available:
-            return False
-    return True
+    return report.exists and report.supported_file_count > 0
 
 
 def ingest_waymo_motion(
@@ -222,8 +218,8 @@ def load_waymo_motion(
     """Load a small native Waymo Motion slice.
 
     Dependency-free ingestion accepts JSON or JSONL records that mirror the
-    public Scenario proto field names. Binary protobuf and TFRecord files use
-    optional Waymo/TensorFlow packages when available.
+    public Scenario proto field names, plus binary Scenario protobuf and
+    TFRecord shard files.
     """
 
     path = Path(input_path)
@@ -266,6 +262,30 @@ def save_normalized_motion_csv_as_scenarios(
     max_scenarios: int | None = None,
 ) -> None:
     save_scenarios(output_path, load_normalized_motion_csv(input_path, max_scenarios))
+
+
+def native_motion_format_label(path: str | Path) -> str | None:
+    """Return the supported input format label for a native Motion file path."""
+
+    file_path = Path(path)
+    suffix = file_path.suffix.lower()
+    if suffix in NATIVE_JSON_SUFFIXES:
+        return suffix
+    if suffix in NATIVE_JSONL_SUFFIXES:
+        return suffix
+    if suffix in NATIVE_PROTO_SUFFIXES:
+        return suffix
+    if suffix in NATIVE_TFRECORD_SUFFIXES:
+        return suffix
+    if any(marker in file_path.name.lower() for marker in NATIVE_TFRECORD_SHARD_MARKERS):
+        return ".tfrecord"
+    return None
+
+
+def is_native_motion_file(path: str | Path) -> bool:
+    """Return whether a path looks like a supported native Motion input file."""
+
+    return native_motion_format_label(path) is not None
 
 
 def _read_motion_rows(path: Path) -> list[tuple[int, dict[str, str]]]:
@@ -410,22 +430,21 @@ def _native_input_files(path: Path) -> tuple[Path, ...]:
             sorted(
                 candidate
                 for candidate in path.rglob("*")
-                if candidate.is_file()
-                and candidate.suffix.lower() in NATIVE_SUPPORTED_SUFFIXES
+                if candidate.is_file() and is_native_motion_file(candidate)
             )
         )
         if not files:
             raise ValueError(
                 f"No supported Waymo Motion files found under {path}. "
-                f"Supported suffixes: {', '.join(sorted(NATIVE_SUPPORTED_SUFFIXES))}"
+                f"Supported suffixes: {', '.join(NATIVE_SUPPORTED_INPUT_PATTERNS)}"
             )
         return files
     if not path.exists():
         raise FileNotFoundError(f"Waymo Motion input does not exist: {path}")
-    if path.suffix.lower() not in NATIVE_SUPPORTED_SUFFIXES:
+    if not is_native_motion_file(path):
         raise ValueError(
             f"Unsupported Waymo Motion input suffix: {path.suffix}. "
-            f"Supported suffixes: {', '.join(sorted(NATIVE_SUPPORTED_SUFFIXES))}"
+            f"Supported suffixes: {', '.join(NATIVE_SUPPORTED_INPUT_PATTERNS)}"
         )
     return (path,)
 
@@ -437,7 +456,7 @@ def _all_files(path: Path) -> tuple[Path, ...]:
 
 
 def _suffix_label(path: Path) -> str:
-    return path.suffix.lower() or "(no suffix)"
+    return native_motion_format_label(path) or path.suffix.lower() or "(no suffix)"
 
 
 def _display_path(path: Path, root: Path) -> str:
@@ -456,43 +475,28 @@ def _preflight_notes(
     if supported_file_count == 0:
         notes.append(
             "No supported Waymo Motion files found. Supported suffixes: "
-            + ", ".join(sorted(NATIVE_SUPPORTED_SUFFIXES))
+            + ", ".join(NATIVE_SUPPORTED_INPUT_PATTERNS)
         )
     if any(suffix in supported_suffix_counts for suffix in NATIVE_JSON_SUFFIXES):
         notes.append("JSON inputs can be ingested without optional packages.")
     if any(suffix in supported_suffix_counts for suffix in NATIVE_JSONL_SUFFIXES):
         notes.append("JSONL/NDJSON inputs can be ingested without optional packages.")
     if any(suffix in supported_suffix_counts for suffix in NATIVE_PROTO_SUFFIXES):
-        if optional_package_available:
-            notes.append("Binary protobuf inputs can use the installed Waymo package.")
-        else:
-            notes.append(
-                "Binary protobuf inputs require optional package `waymo_open_dataset`."
-            )
+        notes.append("Binary Scenario protobuf inputs use the built-in lightweight parser.")
     if any(suffix in supported_suffix_counts for suffix in NATIVE_TFRECORD_SUFFIXES):
-        missing = []
-        if not optional_package_available:
-            missing.append("waymo_open_dataset")
-        if not tensorflow_available:
-            missing.append("tensorflow")
-        if missing:
-            notes.append(
-                "TFRecord inputs require optional package(s): " + ", ".join(missing) + "."
-            )
-        else:
-            notes.append("TFRecord inputs can use installed Waymo and TensorFlow packages.")
+        notes.append("TFRecord inputs use the built-in lightweight reader.")
     return tuple(notes)
 
 
 def _load_native_motion_file(path: Path, max_scenarios: int | None = None) -> list[Scenario]:
-    suffix = path.suffix.lower()
-    if suffix in NATIVE_JSON_SUFFIXES:
+    format_label = native_motion_format_label(path)
+    if format_label in NATIVE_JSON_SUFFIXES:
         return _load_motion_json(path, max_scenarios=max_scenarios)
-    if suffix in NATIVE_JSONL_SUFFIXES:
+    if format_label in NATIVE_JSONL_SUFFIXES:
         return _load_motion_jsonl(path, max_scenarios=max_scenarios)
-    if suffix in NATIVE_PROTO_SUFFIXES:
+    if format_label in NATIVE_PROTO_SUFFIXES:
         return _load_motion_proto(path)
-    if suffix in NATIVE_TFRECORD_SUFFIXES:
+    if format_label in NATIVE_TFRECORD_SUFFIXES:
         return _load_motion_tfrecord(path, max_scenarios=max_scenarios)
     raise ValueError(f"Unsupported Waymo Motion input suffix: {path.suffix}")
 
@@ -674,30 +678,16 @@ def _waymo_tags(mapping: dict[str, Any]) -> tuple[str, ...]:
 
 
 def _load_motion_proto(path: Path) -> list[Scenario]:
-    scenario_pb2, message_to_dict = _waymo_proto_helpers()
-    scenario = scenario_pb2.Scenario()
-    scenario.ParseFromString(path.read_bytes())
-    mapping = message_to_dict(scenario, preserving_proto_field_name=True)
+    mapping = _scenario_mapping_from_proto_bytes(path.read_bytes())
     return [_scenario_from_waymo_mapping(mapping, source=f"waymo_motion_proto:{path.name}")]
 
 
 def _load_motion_tfrecord(path: Path, max_scenarios: int | None = None) -> list[Scenario]:
-    scenario_pb2, message_to_dict = _waymo_proto_helpers()
-    try:
-        import tensorflow as tf  # type: ignore[import-not-found]
-    except ImportError as exc:
-        raise RuntimeError(
-            "Reading Waymo Motion TFRecord files requires optional package "
-            f"`{OPTIONAL_TF_PACKAGE}`. JSON ingestion works without it."
-        ) from exc
-
     scenarios: list[Scenario] = []
-    for record_index, record in enumerate(tf.data.TFRecordDataset(str(path))):
+    for record_index, record in enumerate(_iter_tfrecord_records(path)):
         if max_scenarios is not None and len(scenarios) >= max_scenarios:
             break
-        scenario = scenario_pb2.Scenario()
-        scenario.ParseFromString(bytes(record.numpy()))
-        mapping = message_to_dict(scenario, preserving_proto_field_name=True)
+        mapping = _scenario_mapping_from_proto_bytes(record)
         scenarios.append(
             _scenario_from_waymo_mapping(
                 mapping,
@@ -707,17 +697,175 @@ def _load_motion_tfrecord(path: Path, max_scenarios: int | None = None) -> list[
     return scenarios
 
 
-def _waymo_proto_helpers() -> tuple[Any, Any]:
-    try:
-        from google.protobuf.json_format import MessageToDict
-        from waymo_open_dataset.protos import scenario_pb2
-    except ImportError as exc:
-        raise RuntimeError(
-            "Reading binary Waymo Motion protobuf inputs requires optional "
-            f"package `{OPTIONAL_PACKAGE}`. Use protobuf-shaped JSON for the "
-            "dependency-free path."
-        ) from exc
-    return scenario_pb2, MessageToDict
+def _iter_tfrecord_records(path: Path):
+    with path.open("rb") as handle:
+        record_index = 0
+        while True:
+            header = handle.read(12)
+            if not header:
+                break
+            if len(header) != 12:
+                raise ValueError(f"{path}: truncated TFRecord header at record {record_index}")
+            length = struct.unpack("<Q", header[:8])[0]
+            data = handle.read(length)
+            if len(data) != length:
+                raise ValueError(f"{path}: truncated TFRecord payload at record {record_index}")
+            footer = handle.read(4)
+            if len(footer) != 4:
+                raise ValueError(f"{path}: truncated TFRecord footer at record {record_index}")
+            yield data
+            record_index += 1
+
+
+def _scenario_mapping_from_proto_bytes(data: bytes) -> dict[str, Any]:
+    mapping: dict[str, Any] = {"tracks": []}
+    timestamps: list[float] = []
+    objects_of_interest: list[int] = []
+    tracks_to_predict: list[dict[str, int]] = []
+    has_dynamic_map_states = False
+    has_map_features = False
+
+    for field_number, wire_type, value in _iter_proto_fields(data):
+        if field_number == 1:
+            if wire_type == 1:
+                timestamps.append(_wire_double(value))
+            elif wire_type == 2:
+                timestamps.extend(_packed_doubles(value))
+        elif field_number == 2 and wire_type == 2:
+            mapping["tracks"].append(_track_mapping_from_proto_bytes(value))
+        elif field_number == 4:
+            if wire_type == 0:
+                objects_of_interest.append(value)
+            elif wire_type == 2:
+                objects_of_interest.extend(_packed_varints(value))
+        elif field_number == 5 and wire_type == 2:
+            mapping["scenario_id"] = value.decode("utf-8")
+        elif field_number == 6 and wire_type == 0:
+            mapping["sdc_track_index"] = value
+        elif field_number == 7 and wire_type == 2:
+            has_dynamic_map_states = True
+        elif field_number == 8 and wire_type == 2:
+            has_map_features = True
+        elif field_number == 11 and wire_type == 2:
+            tracks_to_predict.append(_required_prediction_from_proto_bytes(value))
+
+    mapping["timestamps_seconds"] = timestamps
+    if objects_of_interest:
+        mapping["objects_of_interest"] = objects_of_interest
+    if tracks_to_predict:
+        mapping["tracks_to_predict"] = tracks_to_predict
+    if has_dynamic_map_states:
+        mapping["dynamic_map_states"] = [{}]
+    if has_map_features:
+        mapping["map_features"] = [{}]
+    return mapping
+
+
+def _track_mapping_from_proto_bytes(data: bytes) -> dict[str, Any]:
+    mapping: dict[str, Any] = {"states": []}
+    for field_number, wire_type, value in _iter_proto_fields(data):
+        if field_number == 1 and wire_type == 0:
+            mapping["id"] = value
+        elif field_number == 2 and wire_type == 0:
+            mapping["object_type"] = value
+        elif field_number == 3 and wire_type == 2:
+            mapping["states"].append(_state_mapping_from_proto_bytes(value))
+    return mapping
+
+
+def _state_mapping_from_proto_bytes(data: bytes) -> dict[str, Any]:
+    mapping: dict[str, Any] = {}
+    for field_number, wire_type, value in _iter_proto_fields(data):
+        if field_number == 2 and wire_type == 1:
+            mapping["center_x"] = _wire_double(value)
+        elif field_number == 3 and wire_type == 1:
+            mapping["center_y"] = _wire_double(value)
+        elif field_number == 9 and wire_type == 5:
+            mapping["velocity_x"] = _wire_float(value)
+        elif field_number == 10 and wire_type == 5:
+            mapping["velocity_y"] = _wire_float(value)
+        elif field_number == 11 and wire_type == 0:
+            mapping["valid"] = bool(value)
+    return mapping
+
+
+def _required_prediction_from_proto_bytes(data: bytes) -> dict[str, int]:
+    mapping: dict[str, int] = {}
+    for field_number, wire_type, value in _iter_proto_fields(data):
+        if field_number == 1 and wire_type == 0:
+            mapping["track_index"] = value
+    return mapping
+
+
+def _iter_proto_fields(data: bytes):
+    offset = 0
+    while offset < len(data):
+        key, offset = _read_varint(data, offset)
+        field_number = key >> 3
+        wire_type = key & 0b111
+        if wire_type == 0:
+            value, offset = _read_varint(data, offset)
+        elif wire_type == 1:
+            if offset + 8 > len(data):
+                raise ValueError("truncated protobuf fixed64 field")
+            value = data[offset : offset + 8]
+            offset += 8
+        elif wire_type == 2:
+            length, offset = _read_varint(data, offset)
+            if offset + length > len(data):
+                raise ValueError("truncated protobuf length-delimited field")
+            value = data[offset : offset + length]
+            offset += length
+        elif wire_type == 5:
+            if offset + 4 > len(data):
+                raise ValueError("truncated protobuf fixed32 field")
+            value = data[offset : offset + 4]
+            offset += 4
+        else:
+            raise ValueError(f"unsupported protobuf wire type: {wire_type}")
+        yield field_number, wire_type, value
+
+
+def _read_varint(data: bytes, offset: int) -> tuple[int, int]:
+    value = 0
+    shift = 0
+    while offset < len(data):
+        byte = data[offset]
+        offset += 1
+        value |= (byte & 0x7F) << shift
+        if not byte & 0x80:
+            return value, offset
+        shift += 7
+        if shift >= 64:
+            raise ValueError("protobuf varint is too long")
+    raise ValueError("truncated protobuf varint")
+
+
+def _wire_double(value: bytes) -> float:
+    if len(value) != 8:
+        raise ValueError("protobuf double field must be 8 bytes")
+    return struct.unpack("<d", value)[0]
+
+
+def _wire_float(value: bytes) -> float:
+    if len(value) != 4:
+        raise ValueError("protobuf float field must be 4 bytes")
+    return struct.unpack("<f", value)[0]
+
+
+def _packed_doubles(value: bytes) -> tuple[float, ...]:
+    if len(value) % 8:
+        raise ValueError("packed protobuf double field has invalid length")
+    return tuple(_wire_double(value[index : index + 8]) for index in range(0, len(value), 8))
+
+
+def _packed_varints(value: bytes) -> tuple[int, ...]:
+    values: list[int] = []
+    offset = 0
+    while offset < len(value):
+        item, offset = _read_varint(value, offset)
+        values.append(item)
+    return tuple(values)
 
 
 def _field(mapping: dict[str, Any], *names: str, default: Any = None) -> Any:

@@ -32,6 +32,12 @@ Markdown report, a rendered SVG gallery, and a machine-readable manifest.
 Raw downloaded dataset files are intentionally ignored by git. Keep them under
 `data/raw/` and follow the official dataset access terms.
 
+A local smoke run has been completed on one Waymo Motion v1.3.1 validation
+shard. The summary is checked in at
+[`docs/reports/waymo_motion_validation_summary.md`](reports/waymo_motion_validation_summary.md);
+the raw shard, normalized scenario JSON, and generated SVG gallery remain local
+ignored artifacts.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark
@@ -40,6 +46,5 @@ Raw downloaded dataset files are intentionally ignored by git. Keep them under
   spending time on large downloads.
 - Waymo-shaped fixtures prove field mapping and ingestion behavior, not dataset
   scale.
-- The next production milestone is to run `waymo-motion-validate` on a small
-  downloaded Waymo Motion validation slice and document the slice size,
-  commands, and output summary.
+- The checked-in validation summary documents a small local real-data run, not
+  a full Waymo benchmark submission.
