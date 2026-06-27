@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import argparse
+import json
 import sys
+from dataclasses import asdict
 from pathlib import Path
 
 from scenariolens.dashboard import generate_dashboard_data
@@ -20,6 +22,10 @@ from scenariolens.samples import synthetic_scenarios
 from scenariolens.schema import Scenario
 from scenariolens.slice_validation import validate_waymo_motion_slice
 from scenariolens.visualize import scenario_svg
+from scenariolens.waymo_readiness import (
+    DEFAULT_WAYMO_MOTION_INPUT,
+    inspect_waymo_motion_readiness,
+)
 
 
 def demo() -> int:
@@ -89,6 +95,56 @@ def waymo_motion_preflight(input_path: str) -> int:
             print(f"  - {note}")
 
     return 0 if waymo_motion_slice_ready(report) else 2
+
+
+def waymo_motion_doctor(
+    input_path: str,
+    output_path: str | None,
+    search_common_locations: bool,
+) -> int:
+    readiness = inspect_waymo_motion_readiness(
+        input_path=input_path,
+        search_common_locations=search_common_locations,
+    )
+    if output_path:
+        Path(output_path).write_text(
+            json.dumps(asdict(readiness), indent=2) + "\n",
+            encoding="utf-8",
+        )
+
+    print(f"Input: {readiness.input_path}")
+    print(f"Ready for ingestion: {readiness.ready}")
+    print(f"Files scanned: {readiness.preflight.file_count}")
+    print(f"Supported files: {readiness.preflight.supported_file_count}")
+    print(f"Total size: {_format_bytes(readiness.preflight.total_bytes)}")
+    print(f"Tool gcloud: {readiness.tooling.gcloud_path or 'missing'}")
+    print(f"Tool gsutil: {readiness.tooling.gsutil_path or 'missing'}")
+    print(
+        "Optional package waymo_open_dataset: "
+        f"{readiness.tooling.waymo_open_dataset_available}"
+    )
+    print(f"Optional package tensorflow: {readiness.tooling.tensorflow_available}")
+
+    if readiness.searched_roots:
+        print("Searched common locations:")
+        for root in readiness.searched_roots:
+            print(f"  {root}")
+    if readiness.candidate_files:
+        print("Candidate files found outside input:")
+        for candidate in readiness.candidate_files:
+            print(f"  {candidate.path} ({_format_bytes(candidate.size_bytes)})")
+    if readiness.preflight.notes:
+        print("Preflight notes:")
+        for note in readiness.preflight.notes:
+            print(f"  - {note}")
+    if readiness.next_actions:
+        print("Next actions:")
+        for action in readiness.next_actions:
+            print(f"  - {action}")
+    if output_path:
+        print(f"Wrote readiness packet to {output_path}")
+
+    return 0 if readiness.ready else 2
 
 
 def ingest_waymo_motion_command(
@@ -322,6 +378,28 @@ def main() -> int:
         required=True,
         help="Local Waymo Motion file or directory to inspect.",
     )
+    waymo_doctor_parser = subparsers.add_parser(
+        "waymo-motion-doctor",
+        help=(
+            "Diagnose local Waymo Motion data, optional packages, cloud tooling, "
+            "and likely downloaded files."
+        ),
+    )
+    waymo_doctor_parser.add_argument(
+        "--input",
+        default=str(DEFAULT_WAYMO_MOTION_INPUT),
+        help="Configured local Waymo Motion file or directory.",
+    )
+    waymo_doctor_parser.add_argument(
+        "--output",
+        default=None,
+        help="Optional JSON readiness packet to write.",
+    )
+    waymo_doctor_parser.add_argument(
+        "--no-search-common-locations",
+        action="store_true",
+        help="Skip searching Downloads and Desktop for candidate raw files.",
+    )
     waymo_parser = subparsers.add_parser(
         "ingest-waymo-motion",
         help="Convert Waymo Motion records into ScenarioLens JSON.",
@@ -508,6 +586,12 @@ def main() -> int:
         return waymo_motion_status()
     if args.command == "waymo-motion-preflight":
         return waymo_motion_preflight(input_path=args.input)
+    if args.command == "waymo-motion-doctor":
+        return waymo_motion_doctor(
+            input_path=args.input,
+            output_path=args.output,
+            search_common_locations=not args.no_search_common_locations,
+        )
     if args.command == "ingest-waymo-motion":
         return ingest_waymo_motion_command(
             input_path=args.input,

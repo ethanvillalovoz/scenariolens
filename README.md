@@ -93,6 +93,7 @@ small Waymo-shaped fixtures. The current prototype can:
 - normalize and infer scenario taxonomy tags,
 - rank 10 synthetic scenarios by evaluation value,
 - ingest protobuf-shaped Waymo Motion JSON mini-slices,
+- diagnose local Waymo Motion data/tooling readiness,
 - preflight local Waymo Motion slice folders before ingestion,
 - generate a reproducible local Waymo Motion validation packet,
 - save/load ScenarioLens scenario JSON,
@@ -215,6 +216,18 @@ PYTHONPATH=src python3 -m scenariolens.cli ingest-waymo-motion \
 
 Native JSON ingestion is dependency-free. Binary `.pb` and `.tfrecord` inputs
 are treated as optional paths that require Waymo/TensorFlow packages.
+
+Diagnose local Waymo Motion data readiness:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-doctor \
+  --input data/raw/waymo/motion/validation \
+  --output data/processed/waymo_motion_readiness.json
+```
+
+The doctor command checks the configured raw-data folder, optional Python
+packages, `gcloud`/`gsutil`, and common download locations such as Downloads and
+Desktop. It exits nonzero until a real ingestable slice is available.
 
 Inspect a local downloaded Waymo Motion slice before ingestion:
 

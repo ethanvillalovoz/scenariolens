@@ -31,6 +31,23 @@ data/raw/waymo/motion/
 Raw dataset files are intentionally ignored by git. Do not commit downloaded
 Waymo files or derived outputs unless their license and terms allow it.
 
+If the browser downloads the shard somewhere else, run doctor before moving
+files by hand:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-doctor \
+  --input data/raw/waymo/motion/validation \
+  --output data/processed/waymo_motion_readiness.json
+```
+
+Doctor reports:
+
+- whether the configured input path is ingestable,
+- whether `gcloud` or `gsutil` are installed,
+- whether optional Waymo/TensorFlow packages are importable,
+- whether likely raw Motion files exist in Downloads or Desktop,
+- the next action needed before validation can run.
+
 ## 2. Validate The Local Slice
 
 Run the one-command validation workflow first:

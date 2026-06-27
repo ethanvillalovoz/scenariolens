@@ -153,6 +153,27 @@ class CliTest(unittest.TestCase):
         self.assertIn("Ready for ingestion: False", result.stdout)
         self.assertIn("Input path does not exist.", result.stdout)
 
+    def test_waymo_motion_doctor_reports_ready_fixture(self) -> None:
+        result = subprocess.run(
+            [
+                sys.executable,
+                "-m",
+                "scenariolens.cli",
+                "waymo-motion-doctor",
+                "--input",
+                "docs/examples/waymo_motion_native_sample.json",
+                "--no-search-common-locations",
+            ],
+            check=True,
+            env={"PYTHONPATH": "src"},
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertIn("Ready for ingestion: True", result.stdout)
+        self.assertIn("Optional package waymo_open_dataset:", result.stdout)
+        self.assertIn("Next actions:", result.stdout)
+
     def test_ingest_waymo_motion_native_json(self) -> None:
         native_json = """{
           "scenarioId": "waymo_native_cli",
