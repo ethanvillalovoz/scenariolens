@@ -2,9 +2,10 @@
 
 ## One-Line Pitch
 
-ScenarioLens mines autonomous-driving scenarios for rare, interactive, and
-safety-relevant cases, then ranks them into evaluation sets for perception,
-prediction, planning, simulation, and ODD expansion.
+ScenarioLens is a local-first autonomy evaluation tool that mines motion
+scenarios for rare, interactive, and safety-relevant cases, then ranks them into
+candidate evaluation sets for prediction, planning, simulation, safety review,
+and ODD expansion.
 
 ## Why This Is the Right Project
 
@@ -40,26 +41,32 @@ they would stress a downstream model or planner.
 
 ## Core Product
 
-The finished portfolio artifact should include:
+The finished portfolio artifact should read like a small production evaluation
+system. It should include:
 
 - a clean GitHub repo,
 - a reproducible pipeline,
-- a small curated scenario corpus,
+- a small curated scenario corpus plus a real-data validation path,
 - a scenario taxonomy,
 - ranking metrics,
-- a dashboard or report,
-- a short project write-up with results and limitations.
+- public-safe reports,
+- a dashboard/explorer,
+- a short project write-up with results, limitations, and next work.
 
 The current prototype already includes the reproducible pipeline, synthetic
-corpus, native Waymo Motion JSON ingestion, taxonomy, interaction component
-scoring, tests, Markdown/JSON reports, static dashboard data, and 2D SVG
-trajectory rendering.
+corpus, native Waymo Motion JSON/proto/TFRecord ingestion, taxonomy,
+interaction component scoring, tests, Markdown/JSON reports, a local real-data
+validation packet workflow, static dashboard data, and 2D SVG trajectory
+rendering.
 
 The stack is intentionally aligned with the public Waymo/autonomy ecosystem:
 Python for data and evaluation tooling, Waymo Motion `Scenario`-shaped records
 as the dataset boundary, a lightweight built-in reader for downloaded Motion
 TFRecord slices, and JAX/Waymax as the future simulation path. See
 `docs/tech_stack.md` for the detailed rationale.
+
+See `docs/project_strategy.md` for the product strategy and
+`docs/architecture.md` for the module/data-flow map.
 
 ## Representative Scenario Categories
 
@@ -81,6 +88,7 @@ two minutes, that Ethan:
 
 - understands a real autonomous-driving evaluation problem,
 - can build a clean data pipeline,
+- can validate against a real public dataset slice without overclaiming,
 - can define meaningful metrics,
 - can reason about long-tail autonomy risk,
 - can communicate tradeoffs without overclaiming.

@@ -17,7 +17,7 @@ environment supports it.
 | TensorFlow | TensorFlow | Optional reference | Useful for broader ML workflows, but ScenarioLens reads Motion TFRecord shards with a lightweight built-in reader. |
 | Simulation stretch | JAX + Waymax | Future | Waymax is a Waymo Research JAX simulator built around Waymo Open Motion data. |
 | Data index stretch | Parquet / DuckDB | Future | Useful after local slices grow beyond small JSON artifacts. |
-| Frontend demo | Static React + TypeScript + Vite | Future | Recruiter-facing presentation layer; not the core autonomy stack. |
+| Frontend demo | Static HTML/CSS/JavaScript | Current | Recruiter-facing explorer with no build step; React/TypeScript can be added later only if interaction complexity justifies it. |
 | CI | Python unittest + GitHub Actions | Current | Simple, dependency-light verification. |
 
 ## Current Design Decision
@@ -92,10 +92,12 @@ project more convincing.
 
 ## Future Stack Milestones
 
-1. Add a checked-in summary from a downloaded Waymo Motion validation-slice run.
+1. Expand the checked-in real-data case study across more downloaded Waymo
+   Motion validation shards.
 2. Add a compact feature index, likely JSON first and Parquet/DuckDB once the
    slice gets larger.
-3. Add a static React/TypeScript/Vite Scenario Explorer dashboard.
+3. Add a lightweight trajectory-prediction baseline over selected ranked
+   scenarios.
 4. Add a small JAX/Waymax experiment that replays or evaluates selected
    high-value scenarios.
 

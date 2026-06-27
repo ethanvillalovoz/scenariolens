@@ -18,6 +18,8 @@ The production copy is embedded in Ethan's personal portfolio site at
 The demo data is intentionally small: synthetic scenarios plus tiny
 Waymo Motion-shaped fixtures. See
 [`docs/data_provenance.md`](../data_provenance.md) for the exact data status.
+See [`docs/project_strategy.md`](../project_strategy.md) for the product goal
+and [`docs/architecture.md`](../architecture.md) for the data-flow map.
 
 Generated files:
 

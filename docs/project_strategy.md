@@ -1,0 +1,117 @@
+# ScenarioLens Product Strategy
+
+## North Star
+
+ScenarioLens is a local-first autonomy evaluation tool that turns motion
+scenario data into ranked, explainable long-tail evaluation candidates.
+
+The project is built to answer one practical question:
+
+> If an autonomous-driving team is preparing for a new operating domain, which
+> recorded scenarios should engineers inspect, replay, perturb, or add to an
+> evaluation set first?
+
+## End Goal
+
+The finished repo should feel like a small production evaluation system, not a
+toy model. A reviewer should be able to clone it, run tests, inspect the data
+boundary, generate reports, open the explorer, and understand how each scenario
+was ranked.
+
+The strongest portfolio signal is not that ScenarioLens replaces a self-driving
+stack. It is that the repo demonstrates the kind of judgment autonomy teams
+need around data quality, scenario selection, metric design, validation, and
+honest communication of limitations.
+
+## Target User
+
+ScenarioLens is aimed at an autonomy evaluation engineer, prediction/planning
+engineer, simulation engineer, or technical recruiter reviewing evidence of
+interest in Waymo-style problems.
+
+That user wants to know:
+
+- whether a dataset adapter is real or only mocked,
+- which fields are trusted and which are ignored,
+- why a scenario is considered high value,
+- how rankings can be reproduced,
+- where raw data lives,
+- what the next engineering milestone would be.
+
+## Product Surface
+
+ScenarioLens currently has four connected surfaces:
+
+1. **Dataset boundary**: synthetic records, normalized CSV, Waymo
+   Motion-shaped JSON, binary Scenario protos, and small Waymo Motion TFRecord
+   slices.
+2. **Evaluation core**: a compact schema, quality filtering, taxonomy tags, and
+   interpretable score components for density, VRUs, proximity, TTC, path
+   conflict, dynamics, and scenario category.
+3. **Artifacts**: Markdown/JSON reports, SVG trajectory previews, validation
+   packets, and public-safe real-data case studies.
+4. **Explorer**: a static dashboard for filtering, sorting, and inspecting the
+   scenario evidence without requiring a backend.
+
+## Why It Is Waymo-Aligned
+
+Waymo's public ecosystem emphasizes datasets, motion prediction, simulation,
+scenario generation, and safety evaluation. ScenarioLens fits that public
+boundary by focusing on scenario triage: finding and explaining the interactions
+that deserve more targeted evaluation.
+
+The repo intentionally uses public Waymo Motion `Scenario`-shaped records and a
+downloaded validation-shard smoke test, while keeping raw data outside git.
+That makes the project credible without implying access to Waymo's private
+stack or internal metrics.
+
+## What This Is Not
+
+ScenarioLens is not:
+
+- a production autonomy stack,
+- a motion forecasting benchmark submission,
+- a claim about Waymo production performance,
+- a replacement for the official Waymo Open Dataset tooling,
+- a visual perception or LiDAR project.
+
+It is a focused scenario evaluation and data-product project.
+
+## Work Tracks
+
+### 1. Recruiter Polish
+
+Make the first two minutes strong: README, screenshot, live explorer, concise
+project brief, recruiting packet, honest data provenance, and a public-safe
+real-data case study.
+
+### 2. Engineering Depth
+
+Keep the core runnable and tested: deterministic fixtures, dependency-light
+Waymo Motion parsing, validation packets, CI, documented schemas, and clear
+failure modes for missing or malformed data.
+
+### 3. ML and Simulation Path
+
+Use the ranking output as the bridge into ML: select high-value scenarios, add
+a lightweight trajectory-prediction baseline, compare baseline errors by
+scenario type, and reserve JAX/Waymax for replay or perturbation once the data
+contract is stable.
+
+### 4. Dashboard and Product Experience
+
+Treat the explorer as an engineering tool, not a landing page: ranked cases,
+filters, score explanations, map context, real-data status, and links back to
+reports and provenance.
+
+## Current Proof
+
+- Static explorer: [`docs/demo`](demo)
+- Data provenance: [`docs/data_provenance.md`](data_provenance.md)
+- Architecture: [`docs/architecture.md`](architecture.md)
+- Tech stack rationale: [`docs/tech_stack.md`](tech_stack.md)
+- Real-data case study:
+  [`docs/reports/waymo_motion_case_study.md`](reports/waymo_motion_case_study.md)
+- Validation summary:
+  [`docs/reports/waymo_motion_validation_summary.md`](reports/waymo_motion_validation_summary.md)
+- Roadmap: [`docs/roadmap.md`](roadmap.md)

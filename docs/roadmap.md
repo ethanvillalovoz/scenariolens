@@ -41,8 +41,9 @@ Goal: replace synthetic records with a small public dataset slice.
 - create 3-5 curated scenario collections.
 
 Status: initial downloaded Waymo Motion validation shard smoke run completed and
-summarized in `docs/reports/waymo_motion_validation_summary.md`. Broader
-distribution comparison and curated collections remain next work.
+summarized in `docs/reports/waymo_motion_validation_summary.md` and
+`docs/reports/waymo_motion_case_study.md`. Broader distribution comparison and
+curated collections remain next work.
 
 ## Milestone 2A: Native Waymo Motion Mini-Slice
 
@@ -56,9 +57,10 @@ Goal: make the real-data adapter credible without making the repo heavy.
 - document the exact field boundary and raw-data workflow.
 
 Status: implemented for native JSON mini-slices, binary Scenario protos, and
-sharded TFRecord slices. Local slice preflight, the downloaded-slice recipe, and
-the validation packet command are implemented. Map geometry parsing and richer
-traffic-light feature extraction remain next steps.
+sharded TFRecord slices. Local slice preflight, the downloaded-slice recipe, the
+validation packet command, prediction-target metadata, object-of-interest
+metadata, and coarse map-feature extraction are implemented. Richer
+traffic-light feature extraction remains next work.
 
 ## Milestone 3: Searchable Demo
 
@@ -114,12 +116,43 @@ Goal: make the repo recruiter- and engineer-readable.
 - prepare resume bullets and a project page.
 
 Status: in progress. The repo has CI, a portfolio report, a local Scenario
-Explorer demo, and a `docs/` entrypoint ready for GitHub Pages publishing.
+Explorer demo, a `docs/` entrypoint ready for GitHub Pages publishing, a product
+strategy, an architecture map, recruiting notes, and suggested GitHub metadata.
+
+## Milestone 4A: Production-Grade Repo Story
+
+Goal: make the end goal and system boundary obvious before a reviewer reads any
+code.
+
+- explain the target user and product strategy,
+- document what the project is and is not claiming,
+- map ingestion, scoring, reports, rendering, and dashboard modules,
+- connect the live demo to data provenance and the real-data case study,
+- keep the README focused on the engineering artifact.
+
+Status: implemented in `docs/project_strategy.md`, `docs/architecture.md`, the
+README, and the Scenario Explorer navigation/status panel.
+
+## Milestone 5: Baseline Evaluation Path
+
+Goal: turn scenario ranking into measurable downstream evaluation.
+
+- select a small real-data scenario collection from downloaded validation
+  shards,
+- add a lightweight constant-velocity or simple learned trajectory-prediction
+  baseline,
+- compare baseline errors by scenario tag and score component,
+- report which ranked scenarios are hardest for the baseline,
+- evaluate whether selected scenarios should be replayed or perturbed in
+  Waymax/JAX.
+
+Status: planned. This is the next best ML/simulation step because it builds on
+the existing scenario-ranking data contract without requiring heavy compute on
+the core laptop workflow.
 
 ## Stretch Goals
 
 - open-vocabulary scenario search,
 - embedding-based retrieval,
 - Waymax or sim-agent integration,
-- baseline trajectory-prediction evaluation,
 - city/ODD gap comparison for Seattle or Bellevue.

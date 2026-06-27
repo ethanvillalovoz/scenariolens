@@ -2,14 +2,15 @@
 
 [![CI](https://github.com/ethanvillalovoz/scenariolens/actions/workflows/ci.yml/badge.svg)](https://github.com/ethanvillalovoz/scenariolens/actions/workflows/ci.yml)
 
-ScenarioLens is a local-first autonomous-driving project for discovering, tagging,
-and evaluating long-tail driving scenarios.
+ScenarioLens is a local-first autonomy evaluation tool for discovering, tagging,
+ranking, and explaining long-tail driving scenarios.
 
-The project is designed as a Waymo-targeted portfolio artifact: it demonstrates
-interest in autonomous driving while staying realistic on a laptop-scale setup.
-Instead of trying to build a full self-driving stack, ScenarioLens focuses on a
-problem that appears across perception, prediction, planning, simulation, and
-safety evaluation:
+The project is designed as a Waymo-targeted portfolio artifact, but the shape is
+an engineering product: a reproducible scenario-triage pipeline, real-data
+validation workflow, public-safe reports, and a static explorer. Instead of
+trying to build a full self-driving stack, ScenarioLens focuses on a problem
+that appears across perception, prediction, planning, simulation, and safety
+evaluation:
 
 > Which rare driving scenarios deserve targeted evaluation before an autonomous
 > driving system is trusted in a new operating domain?
@@ -30,6 +31,10 @@ ScenarioLens builds a small but polished pipeline that can:
 5. Present the results in a searchable demo/dashboard.
 
 ![ScenarioLens Explorer dashboard](docs/demo/assets/scenariolens-explorer.png)
+
+For the end goal, user, non-goals, and work tracks, see
+[docs/project_strategy.md](docs/project_strategy.md). For the data flow and
+module boundaries, see [docs/architecture.md](docs/architecture.md).
 
 ## Why This Is Waymo-Relevant
 
@@ -77,16 +82,20 @@ for the real-slice workflow.
 ```text
 docs/                 Project brief, reports, examples, and static explorer
 docs/demo/            Scenario Explorer UI, payload, screenshot, and SVG assets
+docs/project_strategy.md
+                      Product strategy, target user, non-goals, and work tracks
+docs/architecture.md  Data flow, module map, scoring boundary, and artifacts
 src/scenariolens/     Lightweight Python package
 tests/                Unit tests for ingestion, metrics, reports, and dashboard data
 data/                 Local data mount points, ignored by git
 .github/workflows/    CI checks for tests and static demo JavaScript
 ```
 
-## Current Milestone
+## Current State
 
-The first milestone is a complete local prototype on synthetic records and
-small Waymo-shaped fixtures. The current prototype can:
+The current milestone is a complete local scenario-triage product on synthetic
+records, Waymo-shaped fixtures, and a public-safe local Waymo Motion validation
+smoke test. The prototype can:
 
 - define a compact scenario schema,
 - compute lightweight risk/interaction features,
@@ -106,9 +115,10 @@ small Waymo-shaped fixtures. The current prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to make the real-slice reports richer with map-derived
-context, traffic-light state summaries, and comparison views across more
-downloaded validation shards.
+The next milestone is to turn the ranking output into a deeper evaluation
+workflow: richer real-slice comparisons, map and traffic-light summaries, a
+lightweight trajectory-prediction baseline, and eventually a Waymax/JAX replay
+or perturbation experiment for selected high-value scenarios.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -116,7 +126,9 @@ See [docs/project_brief.md](docs/project_brief.md) and
 ## Recruiting Packet
 
 For resume bullets, interview talking points, and suggested GitHub repository
-metadata, see [docs/recruiting_packet.md](docs/recruiting_packet.md).
+metadata, see [docs/recruiting_packet.md](docs/recruiting_packet.md). For the
+exact suggested GitHub sidebar metadata, see
+[docs/github_metadata.md](docs/github_metadata.md).
 
 ## Portfolio Report
 

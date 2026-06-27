@@ -7,37 +7,38 @@ robotics, AI/ML, and software engineering internship conversations.
 
 - Live demo: https://ethanvillalovoz.com/scenariolens/
 - Repository: https://github.com/ethanvillalovoz/scenariolens
+- Product strategy: `docs/project_strategy.md`
+- Architecture: `docs/architecture.md`
 - Portfolio report: `docs/reports/portfolio_report.md`
+- Real-data case study: `docs/reports/waymo_motion_case_study.md`
 - Tech stack rationale: `docs/tech_stack.md`
 
 ## GitHub Repository Metadata
 
 Recommended repository description:
 
-> Waymo-aligned autonomy scenario ranking and explorer for long-tail driving evaluation.
+> Waymo-aligned autonomy scenario triage and explorer for long-tail driving evaluation.
 
 Recommended website:
 
 > https://ethanvillalovoz.com/scenariolens/
 
-Recommended topics:
+Recommended topics are maintained in `docs/github_metadata.md`. A compact set:
 
 - `autonomous-driving`
-- `self-driving-cars`
-- `waymo`
+- `waymo-open-dataset`
 - `waymo-motion`
 - `scenario-mining`
 - `scenario-ranking`
 - `motion-forecasting`
 - `safety-evaluation`
 - `python`
-- `portfolio-project`
 
 ## Resume Bullets
 
 Use one bullet if space is tight:
 
-- Built ScenarioLens, a Waymo-aligned autonomy evaluation project that ingests motion scenarios, computes interpretable interaction/risk metrics, ranks long-tail driving cases, and serves a searchable static explorer.
+- Built ScenarioLens, a Waymo-aligned autonomy evaluation tool that ingests motion scenarios, computes interpretable interaction/risk metrics, ranks long-tail driving cases, and serves a searchable static explorer.
 
 Use two bullets if the project gets a dedicated entry:
 
@@ -48,6 +49,10 @@ Short project line:
 
 > ScenarioLens | Python, Waymo Motion-shaped data, scenario ranking, static dashboard
 
+Stronger project line once the real-data case study is discussed:
+
+> ScenarioLens | Python, Waymo Motion TFRecord slices, long-tail scenario triage, static explorer
+
 ## 30-Second Pitch
 
 ScenarioLens is a small autonomy evaluation project focused on a practical
@@ -56,8 +61,9 @@ before an AV system is trusted in a new operating domain? Instead of attempting
 to build a full self-driving stack, it builds a laptop-friendly pipeline for
 ingesting motion scenarios, computing interpretable interaction and risk
 features, ranking long-tail cases, and showing the results in a searchable demo.
-I scoped it around public Waymo Motion-style records and clear testing so the
-artifact is credible, inspectable, and lightweight.
+I scoped it around public Waymo Motion-style records, a real validation-shard
+smoke test, and clear testing so the artifact is credible, inspectable, and
+lightweight.
 
 ## Interview Story
 
@@ -111,12 +117,11 @@ Testing and verification:
 
 What I would build next:
 
-1. Expand the downloaded Waymo Motion validation-slice run into a documented
-   scenario collection summary.
-2. Add richer map and traffic-light context.
-3. Add side-by-side scenario comparison and exportable collections.
-4. Integrate a lightweight Waymax/JAX simulation path for scenario replay or
-   perturbation.
+1. Expand the downloaded Waymo Motion validation-slice run across more shards.
+2. Add richer map and traffic-light summaries.
+3. Add a lightweight trajectory-prediction baseline and compare error by
+   scenario type.
+4. Integrate a Waymax/JAX replay or perturbation path for selected scenarios.
 
 ## Claims To Keep Honest
 
