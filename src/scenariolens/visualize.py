@@ -29,6 +29,9 @@ ROAD = "#e4eaf2"
 ROAD_EDGE = "#c7d3e1"
 LANE_MARK = "#ffffff"
 CONFLICT = "#f59e0b"
+MAP_LANE = "#94a3b8"
+MAP_EDGE = "#64748b"
+MAP_POLYGON = "#e0f2fe"
 MAX_TRACK_LABELS = 10
 
 PlotRect = tuple[float, float, float, float]
@@ -48,6 +51,11 @@ def scenario_bounds(scenario: Scenario) -> tuple[float, float, float, float]:
             min_y = min(min_y, state.y)
             max_x = max(max_x, state.x)
             max_y = max(max_y, state.y)
+    for x, y in _scenario_map_points(scenario):
+        min_x = min(min_x, x)
+        min_y = min(min_y, y)
+        max_x = max(max_x, x)
+        max_y = max(max_y, y)
 
     if min_x == inf:
         return (0.0, 0.0, 1.0, 1.0)
@@ -112,7 +120,8 @@ def scenario_svg(
         _plot_background(plot),
         f'<g clip-path="url(#scenario-plot-clip)">',
         _grid(plot),
-        _road_context(
+        _context_layer(
+            display_scenario,
             raw_bounds=(raw_min_x, raw_min_y, raw_max_x, raw_max_y),
             world_bounds=(min_x, min_y, max_x, max_y),
             project_xy=project_xy,
@@ -404,6 +413,80 @@ def _road_context(
     return "\n".join(elements)
 
 
+def _context_layer(
+    scenario: Scenario,
+    raw_bounds: tuple[float, float, float, float],
+    world_bounds: tuple[float, float, float, float],
+    project_xy,
+    tags: tuple[str, ...],
+) -> str:
+    map_layer = _waymo_map_layer(scenario, project_xy)
+    if map_layer:
+        return map_layer
+    return _road_context(
+        raw_bounds=raw_bounds,
+        world_bounds=world_bounds,
+        project_xy=project_xy,
+        tags=tags,
+    )
+
+
+def _waymo_map_layer(scenario: Scenario, project_xy) -> str:
+    features = _map_features(scenario)
+    if not features:
+        return ""
+    polygons: list[str] = []
+    polylines: list[str] = []
+    for feature in features:
+        kind = str(feature.get("kind", ""))
+        points = _feature_points(feature)
+        if len(points) < 2:
+            continue
+        if kind in {"crosswalk", "speed_bump", "driveway"} and len(points) >= 3:
+            polygons.append(_map_polygon(kind, points, project_xy))
+        else:
+            polylines.append(_map_polyline(kind, points, project_xy))
+    return "\n".join((*polygons, *polylines))
+
+
+def _map_polygon(kind: str, points: tuple[tuple[float, float], ...], project_xy) -> str:
+    screen_points = " ".join(
+        f"{x:.2f},{y:.2f}" for x, y in (project_xy(px, py) for px, py in points)
+    )
+    fill = "#ffffff" if kind == "crosswalk" else MAP_POLYGON
+    opacity = "0.78" if kind == "crosswalk" else "0.42"
+    return (
+        f'<polygon class="map-feature map-{kind}" points="{screen_points}" '
+        f'fill="{fill}" stroke="#bae6fd" stroke-width="1.2" opacity="{opacity}" />'
+    )
+
+
+def _map_polyline(kind: str, points: tuple[tuple[float, float], ...], project_xy) -> str:
+    screen_points = " ".join(
+        f"{x:.2f},{y:.2f}" for x, y in (project_xy(px, py) for px, py in points)
+    )
+    if kind == "lane":
+        stroke = MAP_LANE
+        width = "1.4"
+        dash = ' stroke-dasharray="10 10"'
+        opacity = "0.64"
+    elif kind == "road_line":
+        stroke = LANE_MARK
+        width = "2.2"
+        dash = ' stroke-dasharray="18 14"'
+        opacity = "0.82"
+    else:
+        stroke = MAP_EDGE
+        width = "2.2"
+        dash = ""
+        opacity = "0.74"
+    return (
+        f'<polyline class="map-feature map-{kind}" points="{screen_points}" '
+        f'fill="none" stroke="{stroke}" stroke-width="{width}" '
+        f'stroke-linecap="round" stroke-linejoin="round"{dash} opacity="{opacity}" />'
+    )
+
+
 def _closest_interaction_marker(scenario: Scenario, project_xy) -> str:
     closest = _closest_interaction(scenario)
     if closest is None:
@@ -552,6 +635,36 @@ def _has_crosswalk(tags: tuple[str, ...]) -> bool:
         {"pedestrian_crossing", "vulnerable_road_user", "cyclist_interaction"}
         .intersection(tags)
     )
+
+
+def _scenario_map_points(scenario: Scenario) -> tuple[tuple[float, float], ...]:
+    return tuple(
+        point
+        for feature in _map_features(scenario)
+        for point in _feature_points(feature)
+    )
+
+
+def _map_features(scenario: Scenario) -> tuple[dict[str, object], ...]:
+    value = scenario.metadata.get("waymo_map_features", ())
+    if not isinstance(value, list):
+        return ()
+    return tuple(feature for feature in value if isinstance(feature, dict))
+
+
+def _feature_points(feature: dict[str, object]) -> tuple[tuple[float, float], ...]:
+    raw_points = feature.get("points", ())
+    if not isinstance(raw_points, list):
+        return ()
+    points: list[tuple[float, float]] = []
+    for point in raw_points:
+        if not isinstance(point, list) or len(point) < 2:
+            continue
+        try:
+            points.append((float(point[0]), float(point[1])))
+        except (TypeError, ValueError):
+            continue
+    return tuple(points)
 
 
 def _display_scenario(scenario: Scenario) -> Scenario:

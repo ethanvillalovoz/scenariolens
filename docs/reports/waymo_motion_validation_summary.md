@@ -33,6 +33,18 @@ PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-validate \
 - Top scenarios reported: 5
 - Parser: dependency-free TFRecord reader plus lightweight Waymo Motion
   `Scenario` proto field extraction
+- Case study: [Waymo Motion Real-Data Case Study](waymo_motion_case_study.md)
+
+## Aggregate Metrics
+
+- Score range: 7.48 min / 32.57 median / 29.67 mean / 42.74 max
+- Average raw agents: 59.40
+- Average scored agents: 58.72
+- Low-quality track rate: 1.14%
+- Scenarios with VRUs: 19 of 25
+- Prediction targets: 101
+- Objects of interest: 18
+- Scenarios with parsed map features: 25
 
 | Rank | Scenario | Score | Main Reason |
 | ---: | --- | ---: | --- |

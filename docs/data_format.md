@@ -60,7 +60,9 @@ PYTHONPATH=src python3 -m scenariolens.cli render \
 - Coordinates are local 2D scene coordinates in meters.
 - `metadata` is optional and stores dataset-specific context that should survive
   ingest, such as Waymo SDC indices, current time indices, tracks to predict, and
-  objects of interest.
+  objects of interest. When available, `waymo_map_features` stores simplified
+  lane, road-line, road-edge, crosswalk, speed-bump, and driveway geometry for
+  SVG rendering.
 - The format is intentionally compact and laptop-friendly.
 - Raw dataset files should remain outside git; derived JSON slices can be
   regenerated from ingestion scripts.

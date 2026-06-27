@@ -294,6 +294,7 @@ class CliTest(unittest.TestCase):
             self.assertTrue((output_dir / "README.md").exists())
             self.assertTrue((output_dir / "scenarios.json").exists())
             self.assertTrue((output_dir / "report.md").exists())
+            self.assertTrue((output_dir / "case_study.md").exists())
             self.assertEqual(len(tuple((output_dir / "assets").glob("*.svg"))), 1)
 
     def test_portfolio_report_command_writes_report_and_assets(self) -> None:

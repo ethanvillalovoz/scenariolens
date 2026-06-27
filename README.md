@@ -126,7 +126,9 @@ the ranking pipeline, top synthetic scenarios, normalized Waymo-shaped fixture
 results, limitations, and next work.
 
 For the first local real-data smoke run, see the
-[Waymo Motion Validation Slice Summary](docs/reports/waymo_motion_validation_summary.md).
+[Waymo Motion Validation Slice Summary](docs/reports/waymo_motion_validation_summary.md)
+and the public-safe
+[Waymo Motion Real-Data Case Study](docs/reports/waymo_motion_case_study.md).
 Raw Waymo files and per-scenario outputs remain untracked.
 
 ## Scenario Explorer

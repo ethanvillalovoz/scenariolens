@@ -147,7 +147,7 @@ This section uses a tiny checked-in JSON record shaped like the public Waymo Mot
 
 | Rank | Scenario | Score | Tags |
 | ---: | --- | ---: | --- |
-| 1 | `waymo_native_sample_interaction` | 31.205 | vulnerable_road_user, objects_of_interest, tracks_to_predict |
+| 1 | `waymo_native_sample_interaction` | 31.205 | vulnerable_road_user, map_context, objects_of_interest, tracks_to_predict |
 
 ### 1. `waymo_native_sample_interaction`
 

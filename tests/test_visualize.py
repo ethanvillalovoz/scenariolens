@@ -55,6 +55,33 @@ class VisualizeTest(unittest.TestCase):
         self.assertIn("near_ped", svg)
         self.assertNotIn("far_vehicle", svg)
 
+    def test_scenario_svg_renders_waymo_map_features(self) -> None:
+        scenario = Scenario(
+            scenario_id="map_context",
+            ego_track_id="ego",
+            tracks=(
+                _track("ego", "vehicle", ((0, 0, 0, 5, 0), (1, 5, 0, 5, 0))),
+                _track("ped", "pedestrian", ((0, 2, 0, 0, 1), (1, 2, 1, 0, 1))),
+            ),
+            metadata={
+                "waymo_map_features": [
+                    {
+                        "kind": "lane",
+                        "points": [[-2.0, 0.0], [6.0, 0.0]],
+                    },
+                    {
+                        "kind": "crosswalk",
+                        "points": [[1.5, -1.0], [2.5, -1.0], [2.5, 1.0], [1.5, 1.0]],
+                    },
+                ]
+            },
+        )
+
+        svg = scenario_svg(scenario)
+
+        self.assertIn("map-feature map-lane", svg)
+        self.assertIn("map-feature map-crosswalk", svg)
+
 
 def _track(
     agent_id: str,

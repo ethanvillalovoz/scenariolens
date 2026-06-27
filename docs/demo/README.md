@@ -28,6 +28,10 @@ Generated files:
 - `assets/*.svg`: trajectory views referenced by `scenarios.json`.
 - `assets/scenariolens-explorer.png`: README screenshot of the dashboard.
 
+The explorer also links to
+[`docs/reports/waymo_motion_case_study.md`](../reports/waymo_motion_case_study.md)
+as the public-safe summary of the local real Waymo Motion smoke test.
+
 Regenerate with:
 
 ```bash

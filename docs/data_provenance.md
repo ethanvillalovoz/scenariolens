@@ -35,6 +35,8 @@ Raw downloaded dataset files are intentionally ignored by git. Keep them under
 A local smoke run has been completed on one Waymo Motion v1.3.1 validation
 shard. The summary is checked in at
 [`docs/reports/waymo_motion_validation_summary.md`](reports/waymo_motion_validation_summary.md);
+the aggregate case study is checked in at
+[`docs/reports/waymo_motion_case_study.md`](reports/waymo_motion_case_study.md);
 the raw shard, normalized scenario JSON, and generated SVG gallery remain local
 ignored artifacts.
 

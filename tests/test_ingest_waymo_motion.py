@@ -34,6 +34,29 @@ NATIVE_JSON_FIXTURE = """{
   "sdcTrackIndex": 0,
   "objectsOfInterest": [7],
   "tracksToPredict": [{"trackIndex": 1}],
+  "mapFeatures": [
+    {
+      "id": 1001,
+      "lane": {
+        "type": "TYPE_SURFACE_STREET",
+        "polyline": [
+          {"x": -1.0, "y": 0.0},
+          {"x": 1.0, "y": 0.0}
+        ]
+      }
+    },
+    {
+      "id": 1002,
+      "crosswalk": {
+        "polygon": [
+          {"x": -0.2, "y": -1.0},
+          {"x": 0.4, "y": -1.0},
+          {"x": 0.4, "y": 1.0},
+          {"x": -0.2, "y": 1.0}
+        ]
+      }
+    }
+  ],
   "tracks": [
     {
       "id": 42,
@@ -136,6 +159,18 @@ def _track_proto(track_id: int, object_type: int, *states: bytes) -> bytes:
     )
 
 
+def _map_point_proto(x: float, y: float) -> bytes:
+    return b"".join((_double(1, x), _double(2, y)))
+
+
+def _lane_proto(*points: bytes) -> bytes:
+    return b"".join((_int32(2, 2), *(_length_delimited(8, point) for point in points)))
+
+
+def _map_feature_proto(feature_id: int, lane: bytes) -> bytes:
+    return b"".join((_int32(1, feature_id), _length_delimited(3, lane)))
+
+
 def _scenario_proto() -> bytes:
     vehicle = _track_proto(
         10,
@@ -150,15 +185,18 @@ def _scenario_proto() -> bytes:
         _state_proto(0.5, -0.9, 0.0, 1.0),
     )
     prediction = _int32(1, 1)
+    lane = _lane_proto(_map_point_proto(-1.0, 0.0), _map_point_proto(1.0, 0.0))
+    map_feature = _map_feature_proto(1001, lane)
     return b"".join(
         (
             _double(1, 0.0),
             _double(1, 0.1),
             _length_delimited(2, vehicle),
             _length_delimited(2, pedestrian),
-            _int32(4, 1),
+            _int32(4, 20),
             _string(5, "waymo_binary_fixture"),
             _int32(6, 0),
+            _length_delimited(8, map_feature),
             _length_delimited(11, prediction),
         )
     )
@@ -230,6 +268,7 @@ class WaymoMotionIngestTest(unittest.TestCase):
         self.assertIn("tracks_to_predict", scenario.tags)
         self.assertEqual(scenario.metadata["waymo_tracks_to_predict_track_ids"], ["20"])
         self.assertEqual(scenario.metadata["waymo_objects_of_interest_track_ids"], ["20"])
+        self.assertEqual(scenario.metadata["waymo_map_features"][0]["kind"], "lane")
         self.assertEqual({track.agent_type for track in scenario.tracks}, {"vehicle", "pedestrian"})
 
     def test_inspect_waymo_motion_slice_reports_missing_input(self) -> None:
@@ -254,6 +293,10 @@ class WaymoMotionIngestTest(unittest.TestCase):
         self.assertIn("tracks_to_predict", scenario.tags)
         self.assertEqual(scenario.metadata["waymo_tracks_to_predict_track_ids"], ["7"])
         self.assertEqual(scenario.metadata["waymo_objects_of_interest_track_ids"], ["7"])
+        self.assertEqual(
+            [feature["kind"] for feature in scenario.metadata["waymo_map_features"]],
+            ["lane", "crosswalk"],
+        )
         pedestrian = next(track for track in scenario.tracks if track.agent_id == "7")
         self.assertEqual(pedestrian.agent_type, "pedestrian")
         self.assertEqual(len(pedestrian.states), 2)

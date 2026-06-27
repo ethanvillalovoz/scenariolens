@@ -41,6 +41,8 @@ NATIVE_SUPPORTED_SUFFIXES = (
 NATIVE_SUPPORTED_INPUT_PATTERNS = tuple(
     sorted(NATIVE_SUPPORTED_SUFFIXES | {".tfrecord-*-of-*"})
 )
+MAX_MAP_FEATURES_PER_SCENARIO = 160
+MAX_MAP_POINTS_PER_FEATURE = 80
 
 OBJECT_TYPE_MAP = {
     0: "unknown",
@@ -717,15 +719,7 @@ def _waymo_metadata(
         default=[],
     )
     object_track_ids = tuple(
-        track_id
-        for value in objects_of_interest
-        if (
-            track_id := _object_interest_track_id(
-                value,
-                track_id_by_index=track_id_by_index,
-            )
-        )
-        is not None
+        str(value) for value in objects_of_interest if value is not None
     )
 
     metadata: dict[str, object] = {}
@@ -737,6 +731,9 @@ def _waymo_metadata(
         metadata["waymo_tracks_to_predict_track_ids"] = list(prediction_track_ids)
     if object_track_ids:
         metadata["waymo_objects_of_interest_track_ids"] = list(object_track_ids)
+    map_features = _waymo_map_features(mapping)
+    if map_features:
+        metadata["waymo_map_features"] = map_features
     return metadata
 
 
@@ -753,19 +750,87 @@ def _prediction_track_id(
         return None
 
 
-def _object_interest_track_id(
-    value: Any,
-    track_id_by_index: dict[int, str],
-) -> str | None:
-    if value is None:
+def _waymo_map_features(mapping: dict[str, Any]) -> list[dict[str, object]]:
+    payload = _field(mapping, "map_features", "mapFeatures", default=[])
+    if not isinstance(payload, list):
+        return []
+    features: list[dict[str, object]] = []
+    for item in payload:
+        if not isinstance(item, dict):
+            continue
+        feature = _map_feature_from_mapping(item)
+        if feature is not None:
+            features.append(feature)
+        if len(features) >= MAX_MAP_FEATURES_PER_SCENARIO:
+            break
+    return features
+
+
+def _map_feature_from_mapping(mapping: dict[str, Any]) -> dict[str, object] | None:
+    feature_id = _field(mapping, "id", default=None)
+    feature_specs = (
+        ("lane", "lane", ("polyline",), "type"),
+        ("road_line", "roadLine", ("polyline",), "type"),
+        ("road_edge", "roadEdge", ("polyline",), "type"),
+        ("crosswalk", "crosswalk", ("polygon",), None),
+        ("speed_bump", "speedBump", ("polygon",), None),
+        ("driveway", "driveway", ("polygon",), None),
+    )
+    for kind, camel_name, point_fields, type_field in feature_specs:
+        payload = _field(mapping, kind, camel_name, default=None)
+        if not isinstance(payload, dict):
+            continue
+        points = _points_from_mapping(payload, point_fields)
+        if len(points) < 2:
+            return None
+        feature: dict[str, object] = {
+            "kind": kind,
+            "points": points[:MAX_MAP_POINTS_PER_FEATURE],
+        }
+        if feature_id is not None:
+            feature["feature_id"] = str(feature_id)
+        if type_field is not None:
+            feature_type = _field(payload, type_field, default=None)
+            if feature_type is not None:
+                feature["feature_type"] = str(feature_type)
+        return feature
+    return None
+
+
+def _points_from_mapping(
+    mapping: dict[str, Any],
+    point_fields: tuple[str, ...],
+) -> list[list[float]]:
+    values: Any = None
+    for field_name in point_fields:
+        values = _field(mapping, field_name, default=None)
+        if values is not None:
+            break
+    if not isinstance(values, list):
+        return []
+    points: list[list[float]] = []
+    for point in values:
+        parsed = _point_from_mapping(point)
+        if parsed is not None:
+            points.append(parsed)
+    return points
+
+
+def _point_from_mapping(value: Any) -> list[float] | None:
+    if isinstance(value, dict):
+        x_value = _field(value, "x", default=None)
+        y_value = _field(value, "y", default=None)
+    elif isinstance(value, (list, tuple)) and len(value) >= 2:
+        x_value = value[0]
+        y_value = value[1]
+    else:
+        return None
+    if x_value is None or y_value is None:
         return None
     try:
-        index = int(value)
+        return [round(float(x_value), 3), round(float(y_value), 3)]
     except (TypeError, ValueError):
-        index = None
-    if index is not None and index in track_id_by_index:
-        return track_id_by_index[index]
-    return str(value)
+        return None
 
 
 def _load_motion_proto(path: Path) -> list[Scenario]:
@@ -813,8 +878,8 @@ def _scenario_mapping_from_proto_bytes(data: bytes) -> dict[str, Any]:
     timestamps: list[float] = []
     objects_of_interest: list[int] = []
     tracks_to_predict: list[dict[str, int]] = []
+    map_features: list[dict[str, Any]] = []
     has_dynamic_map_states = False
-    has_map_features = False
 
     for field_number, wire_type, value in _iter_proto_fields(data):
         if field_number == 1:
@@ -836,7 +901,9 @@ def _scenario_mapping_from_proto_bytes(data: bytes) -> dict[str, Any]:
         elif field_number == 7 and wire_type == 2:
             has_dynamic_map_states = True
         elif field_number == 8 and wire_type == 2:
-            has_map_features = True
+            feature = _map_feature_mapping_from_proto_bytes(value)
+            if feature is not None:
+                map_features.append(feature)
         elif field_number == 10 and wire_type == 0:
             mapping["current_time_index"] = value
         elif field_number == 11 and wire_type == 2:
@@ -849,8 +916,8 @@ def _scenario_mapping_from_proto_bytes(data: bytes) -> dict[str, Any]:
         mapping["tracks_to_predict"] = tracks_to_predict
     if has_dynamic_map_states:
         mapping["dynamic_map_states"] = [{}]
-    if has_map_features:
-        mapping["map_features"] = [{}]
+    if map_features:
+        mapping["map_features"] = map_features
     return mapping
 
 
@@ -888,6 +955,64 @@ def _required_prediction_from_proto_bytes(data: bytes) -> dict[str, int]:
         if field_number == 1 and wire_type == 0:
             mapping["track_index"] = value
     return mapping
+
+
+def _map_feature_mapping_from_proto_bytes(data: bytes) -> dict[str, Any] | None:
+    mapping: dict[str, Any] = {}
+    for field_number, wire_type, value in _iter_proto_fields(data):
+        if field_number == 1 and wire_type == 0:
+            mapping["id"] = value
+        elif field_number == 3 and wire_type == 2:
+            mapping["lane"] = _lane_mapping_from_proto_bytes(value)
+        elif field_number == 4 and wire_type == 2:
+            mapping["road_line"] = _line_mapping_from_proto_bytes(value)
+        elif field_number == 5 and wire_type == 2:
+            mapping["road_edge"] = _line_mapping_from_proto_bytes(value)
+        elif field_number == 8 and wire_type == 2:
+            mapping["crosswalk"] = {"polygon": _polygon_from_proto_bytes(value)}
+        elif field_number == 9 and wire_type == 2:
+            mapping["speed_bump"] = {"polygon": _polygon_from_proto_bytes(value)}
+        elif field_number == 10 and wire_type == 2:
+            mapping["driveway"] = {"polygon": _polygon_from_proto_bytes(value)}
+    return mapping if _map_feature_from_mapping(mapping) is not None else None
+
+
+def _lane_mapping_from_proto_bytes(data: bytes) -> dict[str, Any]:
+    mapping: dict[str, Any] = {"polyline": []}
+    for field_number, wire_type, value in _iter_proto_fields(data):
+        if field_number == 2 and wire_type == 0:
+            mapping["type"] = value
+        elif field_number == 8 and wire_type == 2:
+            mapping["polyline"].append(_map_point_from_proto_bytes(value))
+    return mapping
+
+
+def _line_mapping_from_proto_bytes(data: bytes) -> dict[str, Any]:
+    mapping: dict[str, Any] = {"polyline": []}
+    for field_number, wire_type, value in _iter_proto_fields(data):
+        if field_number == 1 and wire_type == 0:
+            mapping["type"] = value
+        elif field_number == 2 and wire_type == 2:
+            mapping["polyline"].append(_map_point_from_proto_bytes(value))
+    return mapping
+
+
+def _polygon_from_proto_bytes(data: bytes) -> list[dict[str, float]]:
+    points: list[dict[str, float]] = []
+    for field_number, wire_type, value in _iter_proto_fields(data):
+        if field_number == 1 and wire_type == 2:
+            points.append(_map_point_from_proto_bytes(value))
+    return points
+
+
+def _map_point_from_proto_bytes(data: bytes) -> dict[str, float]:
+    point: dict[str, float] = {}
+    for field_number, wire_type, value in _iter_proto_fields(data):
+        if field_number == 1 and wire_type == 1:
+            point["x"] = _wire_double(value)
+        elif field_number == 2 and wire_type == 1:
+            point["y"] = _wire_double(value)
+    return point
 
 
 def _iter_proto_fields(data: bytes):

@@ -10,6 +10,51 @@
       "difficulty": "LEVEL_1"
     }
   ],
+  "mapFeatures": [
+    {
+      "id": 1001,
+      "lane": {
+        "type": "TYPE_SURFACE_STREET",
+        "polyline": [
+          {"x": -3.0, "y": 0.0},
+          {"x": -1.0, "y": 0.0},
+          {"x": 1.0, "y": 0.0},
+          {"x": 3.0, "y": 0.0}
+        ]
+      }
+    },
+    {
+      "id": 1002,
+      "roadLine": {
+        "type": "TYPE_BROKEN_SINGLE_WHITE",
+        "polyline": [
+          {"x": -3.0, "y": 1.8},
+          {"x": 3.0, "y": 1.8}
+        ]
+      }
+    },
+    {
+      "id": 1003,
+      "roadEdge": {
+        "type": "TYPE_ROAD_EDGE_BOUNDARY",
+        "polyline": [
+          {"x": -3.0, "y": -2.0},
+          {"x": 3.0, "y": -2.0}
+        ]
+      }
+    },
+    {
+      "id": 1004,
+      "crosswalk": {
+        "polygon": [
+          {"x": -0.3, "y": -1.8},
+          {"x": 0.5, "y": -1.8},
+          {"x": 0.5, "y": 1.8},
+          {"x": -0.3, "y": 1.8}
+        ]
+      }
+    }
+  ],
   "tracks": [
     {
       "id": 42,

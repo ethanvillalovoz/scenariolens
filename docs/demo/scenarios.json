@@ -32,6 +32,7 @@
       "dense_multi_agent",
       "hard_braking",
       "low_interaction",
+      "map_context",
       "merge_conflict",
       "objects_of_interest",
       "pedestrian_crossing",
@@ -187,6 +188,7 @@
       "svg_path": "assets/waymo_native_sample_interaction.svg",
       "tags": [
         "vulnerable_road_user",
+        "map_context",
         "objects_of_interest",
         "tracks_to_predict"
       ],

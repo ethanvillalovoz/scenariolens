@@ -214,6 +214,8 @@ def validate_waymo_motion_command(
         print(f"ScenarioLens JSON: {result.scenarios_path}")
     if result.report_path is not None:
         print(f"Ranked report: {result.report_path}")
+    if result.case_study_path is not None:
+        print(f"Case study: {result.case_study_path}")
     if result.assets_dir is not None:
         print(f"SVG gallery: {result.assets_dir}")
     return 0

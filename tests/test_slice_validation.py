@@ -29,14 +29,18 @@ class SliceValidationTest(unittest.TestCase):
             self.assertEqual(manifest["format"], VALIDATION_FORMAT)
             self.assertTrue(result.preflight_path.exists())
             self.assertTrue(result.summary_path.exists())
+            self.assertTrue(result.case_study_path and result.case_study_path.exists())
             self.assertTrue(result.scenarios_path and result.scenarios_path.exists())
             self.assertTrue(result.report_path and result.report_path.exists())
             self.assertTrue(result.assets_dir and result.assets_dir.exists())
             self.assertEqual(len(tuple(result.assets_dir.glob("*.svg"))), 1)
             self.assertIn("waymo_native_sample_interaction", result.report_path.read_text())
             self.assertEqual(manifest["scenario_count"], 1)
+            self.assertIn("aggregate_metrics", manifest)
+            self.assertEqual(manifest["outputs"]["case_study"], "case_study.md")
             self.assertEqual(manifest["outputs"]["report"], "report.md")
             self.assertEqual(manifest["top_scenarios"][0]["rank"], 1)
+            self.assertIn("Aggregate Findings", result.case_study_path.read_text())
 
     def test_validate_waymo_motion_slice_records_not_ready_preflight(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -54,6 +58,7 @@ class SliceValidationTest(unittest.TestCase):
             self.assertEqual(result.scenario_count, 0)
             self.assertTrue(result.preflight_path.exists())
             self.assertTrue(result.summary_path.exists())
+            self.assertIsNone(result.case_study_path)
             self.assertIsNone(result.scenarios_path)
             self.assertIsNone(result.report_path)
             self.assertIsNone(result.assets_dir)
