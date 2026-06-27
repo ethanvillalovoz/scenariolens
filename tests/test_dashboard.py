@@ -14,12 +14,17 @@ from scenariolens.samples import synthetic_scenarios
 
 class DashboardDataTest(unittest.TestCase):
     def test_checked_in_static_demo_files_are_present(self) -> None:
+        docs_root = Path("docs")
         root = Path("docs/demo")
+        landing = (docs_root / "index.html").read_text(encoding="utf-8")
         html = (root / "index.html").read_text(encoding="utf-8")
         payload = json.loads((root / "scenarios.json").read_text(encoding="utf-8"))
 
+        self.assertIn('url=demo/', landing)
+        self.assertTrue((docs_root / ".nojekyll").exists())
         self.assertIn('href="styles.css"', html)
         self.assertIn('src="app.js"', html)
+        self.assertTrue((root / "assets" / "scenariolens-explorer.png").exists())
         self.assertEqual(payload["format"], DASHBOARD_FORMAT)
         for item in payload["scenarios"]:
             self.assertTrue((root / item["svg_path"]).exists())

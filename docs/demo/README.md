@@ -6,10 +6,14 @@ contract.
 Open locally with:
 
 ```bash
-python3 -m http.server 8000 --directory docs/demo
+python3 -m http.server 8000 --directory docs
 ```
 
-Then visit `http://localhost:8000`.
+Then visit `http://localhost:8000`. The `docs/index.html` entrypoint redirects
+to this explorer.
+
+When GitHub Pages is configured to publish from `main` / `docs`, the repository
+root redirects to this explorer through `docs/index.html`.
 
 Generated files:
 
@@ -18,6 +22,7 @@ Generated files:
 - `app.js`: filtering, sorting, and detail-panel interactions.
 - `scenarios.json`: ranked dashboard payload.
 - `assets/*.svg`: trajectory views referenced by `scenarios.json`.
+- `assets/scenariolens-explorer.png`: README screenshot of the dashboard.
 
 Regenerate with:
 

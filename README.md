@@ -1,5 +1,7 @@
 # ScenarioLens
 
+[![CI](https://github.com/ethanvillalovoz/scenariolens/actions/workflows/ci.yml/badge.svg)](https://github.com/ethanvillalovoz/scenariolens/actions/workflows/ci.yml)
+
 ScenarioLens is a local-first autonomous-driving project for discovering, tagging,
 and evaluating long-tail driving scenarios.
 
@@ -19,13 +21,26 @@ evidence that they behave well in rare, interactive, safety-relevant situations:
 occlusions, unprotected turns, cyclists, pedestrians, blocked lanes, unusual
 merges, and other long-tail cases.
 
-ScenarioLens will build a small but polished pipeline that can:
+ScenarioLens builds a small but polished pipeline that can:
 
 1. Ingest curated autonomous-driving scenario data.
 2. Compute lightweight interaction and risk features.
 3. Tag scenarios by ODD-relevant attributes.
 4. Rank scenarios for evaluation value.
 5. Present the results in a searchable demo/dashboard.
+
+![ScenarioLens Explorer dashboard](docs/demo/assets/scenariolens-explorer.png)
+
+## Why This Is Waymo-Relevant
+
+Waymo's public research ecosystem centers on scenario data, motion forecasting,
+simulation, and safety evaluation. ScenarioLens focuses on a narrow, credible
+slice of that world: finding high-value driving interactions that deserve more
+targeted evaluation before deployment in a new operating domain.
+
+The project is intentionally scoped around public Waymo Motion-shaped data,
+interpretable metrics, and dependency-light tooling so the core demo remains
+reviewable on a laptop.
 
 ## Hardware-Conscious Scope
 
@@ -45,14 +60,15 @@ autonomy ecosystem: Python, Waymo Motion `Scenario`-shaped records, optional
 Waymo/TensorFlow ingestion for binary files, and a future JAX/Waymax simulation
 path. See [docs/tech_stack.md](docs/tech_stack.md) for the full rationale.
 
-## Initial Repo Layout
+## Repo Layout
 
 ```text
-docs/                 Project brief, data strategy, and roadmap
+docs/                 Project brief, reports, examples, and static explorer
+docs/demo/            Scenario Explorer UI, payload, screenshot, and SVG assets
 src/scenariolens/     Lightweight Python package
-tests/                Unit tests for metrics and tagging logic
+tests/                Unit tests for ingestion, metrics, reports, and dashboard data
 data/                 Local data mount points, ignored by git
-notebooks/            Experiments and exploratory analysis
+.github/workflows/    CI checks for tests and static demo JavaScript
 ```
 
 ## Current Milestone
@@ -71,6 +87,7 @@ scenario records. The current prototype can:
 - export Markdown or JSON reports,
 - render 2D SVG trajectory views,
 - generate static dashboard data and SVG assets,
+- serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
 See [docs/project_brief.md](docs/project_brief.md) and
@@ -86,13 +103,17 @@ results, limitations, and next work.
 ## Scenario Explorer
 
 The static Scenario Explorer lives in [docs/demo](docs/demo). It consumes the
-checked-in dashboard payload and SVG assets:
+checked-in dashboard payload and SVG assets. Preview the same route GitHub Pages
+would serve:
 
 ```bash
-python3 -m http.server 8000 --directory docs/demo
+python3 -m http.server 8000 --directory docs
 ```
 
-Then open `http://localhost:8000`.
+Then open `http://localhost:8000`. The root page redirects to `/demo/`.
+
+To publish it on GitHub Pages, configure the repo's Pages source to `main` /
+`docs`.
 
 ## Example Gallery
 

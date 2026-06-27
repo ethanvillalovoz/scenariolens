@@ -21,6 +21,9 @@ jobs:
           PYTHONPATH: src
         run: python -m unittest discover
 
+      - name: Check static demo JavaScript
+        run: node --check docs/demo/app.js
+
       - name: Smoke test scenario export and report
         env:
           PYTHONPATH: src

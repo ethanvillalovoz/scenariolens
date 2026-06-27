@@ -71,7 +71,9 @@ Goal: make the project immediately understandable.
 - show why each scenario was ranked highly.
 
 Status: portfolio report implemented in `docs/reports/portfolio_report.md`.
-Dashboard data contract implemented in `docs/demo/scenarios.json`.
+Dashboard data contract implemented in `docs/demo/scenarios.json`. Static
+Scenario Explorer UI implemented in `docs/demo/index.html`, with filtering,
+sorting, trajectory previews, score components, and mobile-responsive layout.
 
 ## Milestone 3B: Interaction Metrics Upgrade
 
@@ -107,6 +109,9 @@ Goal: make the repo recruiter- and engineer-readable.
 - add reproducible commands,
 - add limitations and future work,
 - prepare resume bullets and a project page.
+
+Status: in progress. The repo has CI, a portfolio report, a local Scenario
+Explorer demo, and a `docs/` entrypoint ready for GitHub Pages publishing.
 
 ## Stretch Goals
 
