@@ -80,7 +80,7 @@ def portfolio_markdown(
         "for discovering and explaining long-tail driving scenarios. It ranks "
         "scenarios using lightweight interaction metrics, ODD-relevant taxonomy "
         "tags, vulnerable-road-user counts, same-timestep proximity, path-conflict "
-        "proximity, dynamics, and a simple constant-velocity time-to-collision proxy.",
+        "proximity, dynamics, and a screened constant-velocity time-to-collision proxy.",
         "",
         "The current pipeline supports synthetic scenarios, ScenarioLens JSON, "
         "row-wise CSV ingestion, normalized Waymo Motion-shaped fixtures, and "
@@ -139,12 +139,12 @@ def portfolio_markdown(
             "",
             "- Checked-in Waymo examples are synthetic mini fixtures, not downloaded real validation shards.",
             "- The lightweight binary reader extracts the Motion fields ScenarioLens needs, not the full Waymo proto surface.",
-            "- The TTC value is a simple constant-velocity screening proxy, not a certified safety metric.",
+            "- The TTC value is a screened constant-velocity proxy, not a certified safety metric.",
             "- The current renderer is 2D and focuses on agent trajectories, not parsed map lanes or traffic lights.",
             "",
             "## Next Work",
             "",
-            "- Run the documented local-slice recipe on a small downloaded Waymo Motion validation shard.",
+            "- Expand the documented local-slice recipe across more Waymo Motion validation shards.",
             "- Add map/lane and traffic-light features from native Motion records.",
             "- Compare synthetic, native mini-slice, and downloaded-slice score distributions.",
             "- Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.",
@@ -176,14 +176,21 @@ def _score_section(scores: tuple[ScenarioScore, ...], asset_prefix: Path) -> lis
                 "",
                 f"- Score: {score.interaction_score:.3f}",
                 f"- Agents: {score.agent_count}",
+                f"- Scored agents: {score.scoring_agent_count}",
+                f"- Excluded tracks: {score.excluded_track_count}",
+                f"- Low-quality tracks: {score.low_quality_track_count}",
                 f"- Vulnerable road users: {score.vulnerable_road_user_count}",
+                f"- Scored vulnerable road users: {score.scoring_vulnerable_road_user_count}",
+                f"- SDC track present: {score.sdc_track_present}",
+                f"- Prediction targets: {score.prediction_target_count}",
+                f"- Objects of interest: {score.object_of_interest_count}",
                 f"- Min distance: {_format_optional(score.min_pairwise_distance_m, 'm')}",
                 f"- Min VRU distance: {_format_optional(score.min_vru_distance_m, 'm')}",
                 f"- Min path distance: {_format_optional(score.min_path_distance_m, 'm')}",
-                f"- Min TTC proxy: {_format_optional(score.min_time_to_collision_s, 's')}",
+                f"- Screened TTC proxy: {_format_optional(score.min_time_to_collision_s, 's')}",
                 f"- Max speed: {_format_optional(score.max_speed_mps, 'm/s')}",
                 f"- Ego max speed: {_format_optional(score.ego_max_speed_mps, 'm/s')}",
-                f"- Max deceleration: {_format_optional(score.max_deceleration_mps2, 'm/s^2')}",
+                f"- Robust max deceleration: {_format_optional(score.max_deceleration_mps2, 'm/s^2')}",
                 "- Component scores:",
             ]
         )

@@ -3,8 +3,8 @@ from __future__ import annotations
 from html import escape
 from math import hypot, inf
 
-from scenariolens.metrics import score_scenario
-from scenariolens.schema import AgentTrack, Scenario, State
+from scenariolens.metrics import score_scenario, scoring_context
+from scenariolens.schema import AgentTrack, Scenario, ScenarioScore, State
 from scenariolens.taxonomy import infer_tags
 
 AGENT_COLORS = {
@@ -29,6 +29,7 @@ ROAD = "#e4eaf2"
 ROAD_EDGE = "#c7d3e1"
 LANE_MARK = "#ffffff"
 CONFLICT = "#f59e0b"
+MAX_TRACK_LABELS = 10
 
 PlotRect = tuple[float, float, float, float]
 
@@ -69,7 +70,9 @@ def scenario_svg(
 ) -> str:
     """Render a scenario as a standalone SVG string."""
 
-    raw_min_x, raw_min_y, raw_max_x, raw_max_y = scenario_bounds(scenario)
+    score = score_scenario(scenario)
+    display_scenario = _display_scenario(scenario)
+    raw_min_x, raw_min_y, raw_max_x, raw_max_y = scenario_bounds(display_scenario)
     raw_world_width = raw_max_x - raw_min_x
     raw_world_height = raw_max_y - raw_min_y
     context_pad = max(max(raw_world_width, raw_world_height) * 0.16, 3.0)
@@ -98,14 +101,14 @@ def scenario_svg(
     def project(state: State) -> tuple[float, float]:
         return project_xy(state.x, state.y)
 
-    score = score_scenario(scenario)
     tags = infer_tags(scenario)
+    label_ids = _label_track_ids(display_scenario)
     elements = [
         _svg_header(width, height),
-        _accessibility_metadata(scenario, score.interaction_score, tags),
+        _accessibility_metadata(scenario, score, tags),
         _defs(plot),
         f'<rect x="0" y="0" width="{width}" height="{height}" fill="{BACKGROUND}" />',
-        _title(scenario, score.interaction_score, tags, width),
+        _title(scenario, score, tags, width),
         _plot_background(plot),
         f'<g clip-path="url(#scenario-plot-clip)">',
         _grid(plot),
@@ -115,16 +118,24 @@ def scenario_svg(
             project_xy=project_xy,
             tags=tags,
         ),
-        _closest_interaction_marker(scenario, project_xy),
+        _closest_interaction_marker(display_scenario, project_xy),
     ]
 
-    for track in scenario.tracks:
-        elements.append(_track_path(track, project, scenario.ego_track_id, plot))
+    for track in display_scenario.tracks:
+        elements.append(
+            _track_path(
+                track,
+                project,
+                scenario.ego_track_id,
+                plot,
+                show_label=track.agent_id in label_ids,
+            )
+        )
 
     elements.extend(
         [
             "</g>",
-            _legend(scenario, height),
+            _legend(display_scenario, height),
             "</svg>",
         ]
     )
@@ -140,17 +151,19 @@ def _svg_header(width: int, height: int) -> str:
 
 def _accessibility_metadata(
     scenario: Scenario,
-    score: float,
+    score: ScenarioScore,
     tags: tuple[str, ...],
 ) -> str:
     tag_text = ", ".join(tags) if tags else "untagged"
+    agent_text = _agent_count_text(score)
     return "\n".join(
         [
             f"<title>{escape(scenario.scenario_id)} trajectory preview</title>",
             (
                 "<desc>"
                 f"Scenario {escape(scenario.scenario_id)} from {escape(scenario.source)}. "
-                f"Score {score:.3f}. Tags: {escape(tag_text)}."
+                f"Score {score.interaction_score:.3f}. {escape(agent_text)}. "
+                f"Tags: {escape(tag_text)}."
                 "</desc>"
             ),
         ]
@@ -198,14 +211,19 @@ def _grid(plot: PlotRect) -> str:
     return "\n".join(lines)
 
 
-def _title(scenario: Scenario, score: float, tags: tuple[str, ...], width: int) -> str:
+def _title(
+    scenario: Scenario,
+    score: ScenarioScore,
+    tags: tuple[str, ...],
+    width: int,
+) -> str:
     visible_tags = tuple(_humanize_label(tag) for tag in tags[:3])
     if len(tags) > 3:
         visible_tags = (*visible_tags, f"+{len(tags) - 3} tags")
     tag_text = " / ".join(visible_tags) if visible_tags else "Untagged"
     label = _humanize_label(scenario.scenario_id)
     source_label = _compact_label(scenario.source, max_length=34)
-    subtitle = f"score {score:.2f} / {len(scenario.tracks)} agents / {tag_text}"
+    subtitle = f"score {score.interaction_score:.2f} / {_agent_count_text(score)} / {tag_text}"
     return "\n".join(
         [
             f'<text x="56" y="36" fill="{INK}" font-size="22" '
@@ -261,6 +279,7 @@ def _track_path(
     project,
     ego_track_id: str | None,
     plot: PlotRect,
+    show_label: bool = True,
 ) -> str:
     if not track.states:
         return ""
@@ -275,23 +294,23 @@ def _track_path(
     end_x, end_y = points[-1]
     label = "ego" if is_ego else track.agent_id
 
-    return "\n".join(
-        [
-            f'<g class="track track-{track.agent_type}">',
-            f'<polyline points="{point_text}" fill="none" stroke="#ffffff" '
-            f'stroke-width="{stroke_width + 5}" stroke-linecap="round" '
-            f'stroke-linejoin="round" opacity="0.78" />',
-            f'<polyline points="{point_text}" fill="none" stroke="{color}" '
-            f'stroke-width="{stroke_width}" stroke-linecap="round" '
-            f'stroke-linejoin="round" opacity="{opacity}" />',
-            f'<circle cx="{start_x:.2f}" cy="{start_y:.2f}" r="6" fill="#ffffff" '
-            f'stroke="{color}" stroke-width="2.5" />',
-            f'<circle cx="{end_x:.2f}" cy="{end_y:.2f}" r="8" fill="{color}" '
-            f'stroke="#ffffff" stroke-width="2.5" />',
-            _label_group(label, end_x, end_y, color, plot),
-            "</g>",
-        ]
-    )
+    elements = [
+        f'<g class="track track-{track.agent_type}">',
+        f'<polyline points="{point_text}" fill="none" stroke="#ffffff" '
+        f'stroke-width="{stroke_width + 5}" stroke-linecap="round" '
+        f'stroke-linejoin="round" opacity="0.78" />',
+        f'<polyline points="{point_text}" fill="none" stroke="{color}" '
+        f'stroke-width="{stroke_width}" stroke-linecap="round" '
+        f'stroke-linejoin="round" opacity="{opacity}" />',
+        f'<circle cx="{start_x:.2f}" cy="{start_y:.2f}" r="6" fill="#ffffff" '
+        f'stroke="{color}" stroke-width="2.5" />',
+        f'<circle cx="{end_x:.2f}" cy="{end_y:.2f}" r="8" fill="{color}" '
+        f'stroke="#ffffff" stroke-width="2.5" />',
+    ]
+    if show_label:
+        elements.append(_label_group(label, end_x, end_y, color, plot))
+    elements.append("</g>")
+    return "\n".join(elements)
 
 
 def _road_context(
@@ -533,6 +552,48 @@ def _has_crosswalk(tags: tuple[str, ...]) -> bool:
         {"pedestrian_crossing", "vulnerable_road_user", "cyclist_interaction"}
         .intersection(tags)
     )
+
+
+def _display_scenario(scenario: Scenario) -> Scenario:
+    context = scoring_context(scenario)
+    tracks = context.tracks if context.tracks else scenario.tracks
+    return Scenario(
+        scenario_id=scenario.scenario_id,
+        tracks=tracks,
+        ego_track_id=scenario.ego_track_id,
+        tags=scenario.tags,
+        source=scenario.source,
+        metadata=scenario.metadata,
+    )
+
+
+def _label_track_ids(scenario: Scenario) -> set[str]:
+    track_ids = {track.agent_id for track in scenario.tracks}
+    priority: list[str] = []
+    if scenario.ego_track_id and scenario.ego_track_id in track_ids:
+        priority.append(scenario.ego_track_id)
+    for key in (
+        "waymo_tracks_to_predict_track_ids",
+        "waymo_objects_of_interest_track_ids",
+    ):
+        value = scenario.metadata.get(key, ())
+        if isinstance(value, list):
+            priority.extend(
+                str(track_id) for track_id in value if str(track_id) in track_ids
+            )
+    priority.extend(
+        track.agent_id
+        for track in scenario.tracks
+        if track.agent_type in {"pedestrian", "cyclist"}
+    )
+    priority.extend(track.agent_id for track in scenario.tracks)
+    return set(dict.fromkeys(priority[:MAX_TRACK_LABELS]))
+
+
+def _agent_count_text(score: ScenarioScore) -> str:
+    if score.scoring_agent_count == score.agent_count:
+        return f"{score.agent_count} agents"
+    return f"{score.scoring_agent_count} scored of {score.agent_count} agents"
 
 
 def _humanize_label(value: str) -> str:

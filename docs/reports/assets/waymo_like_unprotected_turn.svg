@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="920" height="640" viewBox="0 0 920 640" role="img">
 <title>waymo_like_unprotected_turn trajectory preview</title>
-<desc>Scenario waymo_like_unprotected_turn from waymo_motion_normalized_example. Score 28.851. Tags: vulnerable_road_user, pedestrian_crossing, unprotected_turn.</desc>
+<desc>Scenario waymo_like_unprotected_turn from waymo_motion_normalized_example. Score 28.851. 3 agents. Tags: vulnerable_road_user, pedestrian_crossing, unprotected_turn.</desc>
 <defs>
 <clipPath id="scenario-plot-clip"><rect x="56" y="84" width="808" height="474" rx="10" /></clipPath>
 </defs>

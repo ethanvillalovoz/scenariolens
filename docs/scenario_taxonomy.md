@@ -25,13 +25,16 @@ finding high-value scenarios in early experiments.
 ScenarioLens combines taxonomy weights with lightweight interaction features:
 
 - number of tracked agents,
+- number of tracks retained in the quality-filtered scored context,
 - number of vulnerable road users,
+- number of vulnerable road users retained in the scored context,
 - minimum same-timestep pairwise distance,
 - minimum vehicle-to-vulnerable-road-user distance,
 - minimum sampled path distance between agents,
-- minimum constant-velocity time-to-collision proxy,
+- minimum screened constant-velocity time-to-collision proxy,
 - maximum speed and ego maximum speed,
-- maximum sampled deceleration,
+- robust sampled deceleration,
+- Waymo prediction-target and object-of-interest metadata when available,
 - taxonomy tag weights.
 
 The score is a review-prioritization heuristic. It is useful for ranking and

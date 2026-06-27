@@ -40,8 +40,9 @@ Goal: replace synthetic records with a small public dataset slice.
 - compare synthetic and real scenario distributions,
 - create 3-5 curated scenario collections.
 
-Before downloading large data, use the renderer on the synthetic top-ranked
-scenarios to keep the portfolio story visual and understandable.
+Status: initial downloaded Waymo Motion validation shard smoke run completed and
+summarized in `docs/reports/waymo_motion_validation_summary.md`. Broader
+distribution comparison and curated collections remain next work.
 
 ## Milestone 2A: Native Waymo Motion Mini-Slice
 
@@ -82,9 +83,11 @@ Goal: make ranking more interpretable and autonomy-specific.
 - break final scores into named components,
 - add VRU proximity and sampled path-conflict proximity,
 - add max speed, ego max speed, and max deceleration features,
+- add quality filtering and raw-vs-scored count reporting for real slices,
 - expose component scores in JSON, Markdown, and portfolio reports.
 
-Status: implemented for synthetic and normalized Waymo-shaped scenarios.
+Status: implemented for synthetic, Waymo-shaped fixtures, and small real Waymo
+Motion validation slices.
 
 ## Milestone 3C: Dashboard Data Contract
 

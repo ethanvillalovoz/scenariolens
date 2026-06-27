@@ -35,6 +35,7 @@ class Scenario:
     ego_track_id: str | None = None
     tags: tuple[str, ...] = field(default_factory=tuple)
     source: str = "synthetic"
+    metadata: dict[str, object] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -43,7 +44,14 @@ class ScenarioScore:
 
     scenario_id: str
     agent_count: int
+    scoring_agent_count: int
+    excluded_track_count: int
+    low_quality_track_count: int
     vulnerable_road_user_count: int
+    scoring_vulnerable_road_user_count: int
+    sdc_track_present: bool
+    prediction_target_count: int
+    object_of_interest_count: int
     min_pairwise_distance_m: float | None
     min_vru_distance_m: float | None
     min_path_distance_m: float | None

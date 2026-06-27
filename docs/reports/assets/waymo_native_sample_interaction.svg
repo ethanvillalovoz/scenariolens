@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="920" height="640" viewBox="0 0 920 640" role="img">
 <title>waymo_native_sample_interaction trajectory preview</title>
-<desc>Scenario waymo_native_sample_interaction from waymo_motion_json:waymo_motion_native_sample.json. Score 31.542. Tags: vulnerable_road_user, objects_of_interest, tracks_to_predict.</desc>
+<desc>Scenario waymo_native_sample_interaction from waymo_motion_json:waymo_motion_native_sample.json. Score 31.205. 3 agents. Tags: vulnerable_road_user, objects_of_interest, tracks_to_predict.</desc>
 <defs>
 <clipPath id="scenario-plot-clip"><rect x="56" y="84" width="808" height="474" rx="10" /></clipPath>
 </defs>
 <rect x="0" y="0" width="920" height="640" fill="#f8fafc" />
 <text x="56" y="36" fill="#0f172a" font-size="22" font-family="Inter, Arial, sans-serif" font-weight="800">Waymo Native Sample Interaction</text>
-<text x="56" y="60" fill="#64748b" font-size="13" font-family="Inter, Arial, sans-serif" font-weight="650">score 31.54 / 3 agents / Vulnerable Road User / Objects Of Interest / Tracks To Predict</text>
+<text x="56" y="60" fill="#64748b" font-size="13" font-family="Inter, Arial, sans-serif" font-weight="650">score 31.20 / 3 agents / Vulnerable Road User / Objects Of Interest / Tracks To Predict</text>
 <text x="864" y="38" fill="#64748b" font-size="12" font-family="Inter, Arial, sans-serif" text-anchor="end">waymo_motion_json:waymo_motion_...</text>
 <rect x="56" y="84" width="808" height="474" rx="10" fill="#f9fbfd" stroke="#d8e2ee" stroke-width="1.2" />
 <g clip-path="url(#scenario-plot-clip)">

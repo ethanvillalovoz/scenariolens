@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="920" height="640" viewBox="0 0 920 640" role="img">
 <title>synthetic_unprotected_left_turn trajectory preview</title>
-<desc>Scenario synthetic_unprotected_left_turn from synthetic. Score 27.851. Tags: vulnerable_road_user, unprotected_turn, close_interaction.</desc>
+<desc>Scenario synthetic_unprotected_left_turn from synthetic. Score 27.851. 3 agents. Tags: vulnerable_road_user, unprotected_turn, close_interaction.</desc>
 <defs>
 <clipPath id="scenario-plot-clip"><rect x="56" y="84" width="808" height="474" rx="10" /></clipPath>
 </defs>

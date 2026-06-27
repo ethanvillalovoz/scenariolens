@@ -21,6 +21,25 @@ class ScenarioIoTest(unittest.TestCase):
 
         self.assertEqual(decoded, scenario)
 
+    def test_scenario_roundtrip_preserves_metadata(self) -> None:
+        scenario = synthetic_scenarios()[0]
+        encoded = scenario_to_dict(
+            type(scenario)(
+                scenario_id=scenario.scenario_id,
+                source=scenario.source,
+                ego_track_id=scenario.ego_track_id,
+                tags=scenario.tags,
+                tracks=scenario.tracks,
+                metadata={"waymo_tracks_to_predict_track_ids": ["agent_1"]},
+            )
+        )
+        decoded = scenario_from_dict(encoded)
+
+        self.assertEqual(
+            decoded.metadata["waymo_tracks_to_predict_track_ids"],
+            ["agent_1"],
+        )
+
     def test_payload_roundtrip_preserves_scenario_count(self) -> None:
         scenarios = synthetic_scenarios()
         decoded = scenarios_from_payload(scenarios_to_payload(scenarios))
@@ -63,4 +82,3 @@ class ScenarioIoTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-

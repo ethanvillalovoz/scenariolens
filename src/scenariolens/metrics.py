@@ -1,10 +1,33 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from itertools import combinations
-from math import hypot, inf
+from math import hypot, inf, isfinite
 
 from scenariolens.schema import AgentTrack, Scenario, ScenarioScore, State
 from scenariolens.taxonomy import infer_tags, tag_weight
+
+MIN_TRACK_STATES = 2
+MAX_REASONABLE_VELOCITY_MPS = 65.0
+MAX_REASONABLE_STEP_SPEED_MPS = 85.0
+SCORING_CONTEXT_RADIUS_M = 80.0
+MIN_TTC_HORIZON_S = 0.2
+MAX_TTC_HORIZON_S = 8.0
+TTC_CONFLICT_DISTANCE_M = 2.5
+ROBUST_DECEL_PERCENTILE = 0.95
+MAX_REASONABLE_DECEL_MPS2 = 12.0
+
+
+@dataclass(frozen=True)
+class ScoringContext:
+    """Subset of a scenario used for calibrated interaction scoring."""
+
+    tracks: tuple[AgentTrack, ...]
+    excluded_track_count: int
+    low_quality_track_count: int
+    sdc_track_present: bool
+    prediction_target_count: int
+    object_of_interest_count: int
 
 
 def distance(a: State, b: State) -> float:
@@ -18,8 +41,12 @@ def speed(state: State) -> float:
 def min_pairwise_distance(scenario: Scenario) -> float | None:
     """Return the closest same-timestep distance between any two tracks."""
 
+    return _min_pairwise_distance(scenario.tracks)
+
+
+def _min_pairwise_distance(tracks: tuple[AgentTrack, ...]) -> float | None:
     best = inf
-    for left, right in combinations(scenario.tracks, 2):
+    for left, right in combinations(tracks, 2):
         right_by_time = {state.t: state for state in right.states}
         for left_state in left.states:
             right_state = right_by_time.get(left_state.t)
@@ -31,8 +58,12 @@ def min_pairwise_distance(scenario: Scenario) -> float | None:
 def min_path_distance(scenario: Scenario) -> float | None:
     """Return closest distance between any two tracks at any sampled states."""
 
+    return _min_path_distance(scenario.tracks)
+
+
+def _min_path_distance(tracks: tuple[AgentTrack, ...]) -> float | None:
     best = inf
-    for left, right in combinations(scenario.tracks, 2):
+    for left, right in combinations(tracks, 2):
         for left_state in left.states:
             for right_state in right.states:
                 best = min(best, distance(left_state, right_state))
@@ -42,9 +73,13 @@ def min_path_distance(scenario: Scenario) -> float | None:
 def min_vru_distance(scenario: Scenario) -> float | None:
     """Return closest same-timestep vehicle-to-VRU distance."""
 
-    vehicles = tuple(track for track in scenario.tracks if track.agent_type == "vehicle")
+    return _min_vru_distance(scenario.tracks)
+
+
+def _min_vru_distance(tracks: tuple[AgentTrack, ...]) -> float | None:
+    vehicles = tuple(track for track in tracks if track.agent_type == "vehicle")
     vrus = tuple(
-        track for track in scenario.tracks if track.agent_type in {"pedestrian", "cyclist"}
+        track for track in tracks if track.agent_type in {"pedestrian", "cyclist"}
     )
     best = inf
     for vehicle in vehicles:
@@ -69,18 +104,26 @@ def closing_time_to_collision(a: State, b: State) -> float | None:
     rvx = b.vx - a.vx
     rvy = b.vy - a.vy
     relative_speed_sq = rvx * rvx + rvy * rvy
-    if relative_speed_sq == 0:
+    if relative_speed_sq < 0.25:
         return None
 
     ttc = -((rx * rvx) + (ry * rvy)) / relative_speed_sq
-    if ttc <= 0:
+    if ttc < MIN_TTC_HORIZON_S or ttc > MAX_TTC_HORIZON_S:
+        return None
+
+    closest_distance = hypot(rx + rvx * ttc, ry + rvy * ttc)
+    if closest_distance > TTC_CONFLICT_DISTANCE_M:
         return None
     return ttc
 
 
 def min_time_to_collision(scenario: Scenario) -> float | None:
+    return _min_time_to_collision(scenario.tracks)
+
+
+def _min_time_to_collision(tracks: tuple[AgentTrack, ...]) -> float | None:
     best = inf
-    for left, right in combinations(scenario.tracks, 2):
+    for left, right in combinations(tracks, 2):
         right_by_time = {state.t: state for state in right.states}
         for left_state in left.states:
             right_state = right_by_time.get(left_state.t)
@@ -121,21 +164,77 @@ def ego_max_speed(scenario: Scenario) -> float | None:
 
 
 def max_deceleration(scenario: Scenario) -> float | None:
-    """Return largest positive speed drop per second across sampled tracks."""
+    """Return robust positive speed drop per second across sampled tracks."""
 
-    best = 0.0
-    found = False
-    for track in scenario.tracks:
+    return _max_deceleration(scenario.tracks)
+
+
+def _max_deceleration(tracks: tuple[AgentTrack, ...]) -> float | None:
+    decelerations: list[float] = []
+    for track in tracks:
         states = tuple(sorted(track.states, key=lambda state: state.t))
         for previous, current in zip(states, states[1:]):
             dt = current.t - previous.t
             if dt <= 0:
                 continue
             decel = (speed(previous) - speed(current)) / dt
-            if decel > best:
-                best = decel
-            found = True
-    return None if not found else best
+            if 0.0 < decel <= MAX_REASONABLE_DECEL_MPS2:
+                decelerations.append(decel)
+    if not decelerations:
+        return None
+    return _percentile(tuple(sorted(decelerations)), ROBUST_DECEL_PERCENTILE)
+
+
+def scoring_context(scenario: Scenario) -> ScoringContext:
+    """Return a quality-filtered, ego-centered scenario view for scoring."""
+
+    quality_tracks = tuple(track for track in scenario.tracks if _track_is_quality(track))
+    low_quality_count = len(scenario.tracks) - len(quality_tracks)
+    quality_by_id = {track.agent_id: track for track in quality_tracks}
+    sdc_track_present = (
+        scenario.ego_track_id is not None and scenario.ego_track_id in quality_by_id
+    )
+
+    prediction_target_ids = _metadata_track_ids(
+        scenario,
+        "waymo_tracks_to_predict_track_ids",
+    )
+    object_interest_ids = _metadata_track_ids(
+        scenario,
+        "waymo_objects_of_interest_track_ids",
+    )
+    anchor_ids = tuple(
+        track_id
+        for track_id in (
+            *((scenario.ego_track_id,) if scenario.ego_track_id else ()),
+            *prediction_target_ids,
+            *object_interest_ids,
+        )
+        if track_id in quality_by_id
+    )
+
+    if anchor_ids:
+        anchors = tuple(quality_by_id[track_id] for track_id in dict.fromkeys(anchor_ids))
+        selected = tuple(
+            track
+            for track in quality_tracks
+            if track.agent_id in anchor_ids
+            or _min_track_distance_to_any(track, anchors) <= SCORING_CONTEXT_RADIUS_M
+        )
+    else:
+        selected = quality_tracks
+
+    if len(selected) < 2 and len(quality_tracks) >= 2:
+        selected = quality_tracks
+
+    return ScoringContext(
+        tracks=selected,
+        excluded_track_count=len(scenario.tracks) - len(selected),
+        low_quality_track_count=low_quality_count,
+        sdc_track_present=sdc_track_present,
+        prediction_target_count=len(prediction_target_ids),
+        object_of_interest_count=len(object_interest_ids),
+    )
 
 
 def interaction_components(
@@ -152,7 +251,7 @@ def interaction_components(
 
     components = {
         "density": round(min(agent_count, 12) * 0.25, 3),
-        "vru": round(vru_count * 1.5, 3),
+        "vru": round(min(vru_count, 6) * 1.5, 3),
         "taxonomy": round(taxonomy_score, 3),
         "proximity": 0.0,
         "ttc": 0.0,
@@ -214,21 +313,23 @@ def interaction_score(
 
 
 def score_scenario(scenario: Scenario) -> ScenarioScore:
-    min_distance = min_pairwise_distance(scenario)
-    min_vru = min_vru_distance(scenario)
-    min_path = min_path_distance(scenario)
-    min_ttc = min_time_to_collision(scenario)
-    max_speed = max_scenario_speed(scenario)
+    context = scoring_context(scenario)
+    min_distance = _min_pairwise_distance(context.tracks)
+    min_vru = _min_vru_distance(context.tracks)
+    min_path = _min_path_distance(context.tracks)
+    min_ttc = _min_time_to_collision(context.tracks)
+    max_speed = _max_scenario_speed(context.tracks)
     max_ego_speed = ego_max_speed(scenario)
-    max_decel = max_deceleration(scenario)
+    max_decel = _max_deceleration(context.tracks)
     vru_count = vulnerable_road_user_count(scenario.tracks)
+    scoring_vru_count = vulnerable_road_user_count(context.tracks)
     tags = infer_tags(scenario)
     taxonomy_score = tag_weight(tags)
     components = interaction_components(
         min_distance_m=min_distance,
         min_ttc_s=min_ttc,
-        vru_count=vru_count,
-        agent_count=len(scenario.tracks),
+        vru_count=scoring_vru_count,
+        agent_count=len(context.tracks),
         taxonomy_score=taxonomy_score,
         min_vru_distance_m=min_vru,
         min_path_distance_m=min_path,
@@ -238,7 +339,14 @@ def score_scenario(scenario: Scenario) -> ScenarioScore:
     return ScenarioScore(
         scenario_id=scenario.scenario_id,
         agent_count=len(scenario.tracks),
+        scoring_agent_count=len(context.tracks),
+        excluded_track_count=context.excluded_track_count,
+        low_quality_track_count=context.low_quality_track_count,
         vulnerable_road_user_count=vru_count,
+        scoring_vulnerable_road_user_count=scoring_vru_count,
+        sdc_track_present=context.sdc_track_present,
+        prediction_target_count=context.prediction_target_count,
+        object_of_interest_count=context.object_of_interest_count,
         min_pairwise_distance_m=None if min_distance is None else round(min_distance, 3),
         min_vru_distance_m=None if min_vru is None else round(min_vru, 3),
         min_path_distance_m=None if min_path is None else round(min_path, 3),
@@ -251,3 +359,64 @@ def score_scenario(scenario: Scenario) -> ScenarioScore:
         interaction_score=score,
         tags=tags,
     )
+
+
+def _max_scenario_speed(tracks: tuple[AgentTrack, ...]) -> float | None:
+    speeds = tuple(
+        track_speed
+        for track in tracks
+        if (track_speed := max_track_speed(track)) is not None
+    )
+    return None if not speeds else max(speeds)
+
+
+def _track_is_quality(track: AgentTrack) -> bool:
+    states = tuple(sorted(track.states, key=lambda state: state.t))
+    if len(states) < MIN_TRACK_STATES:
+        return False
+    for state in states:
+        if not all(isfinite(value) for value in (state.t, state.x, state.y, state.vx, state.vy)):
+            return False
+        if speed(state) > MAX_REASONABLE_VELOCITY_MPS:
+            return False
+    for previous, current in zip(states, states[1:]):
+        dt = current.t - previous.t
+        if dt <= 0:
+            continue
+        if distance(previous, current) / dt > MAX_REASONABLE_STEP_SPEED_MPS:
+            return False
+    return states[-1].t > states[0].t
+
+
+def _metadata_track_ids(scenario: Scenario, key: str) -> tuple[str, ...]:
+    value = scenario.metadata.get(key, ())
+    if not isinstance(value, list):
+        return ()
+    return tuple(str(item) for item in value if item is not None)
+
+
+def _min_track_distance_to_any(
+    track: AgentTrack,
+    anchors: tuple[AgentTrack, ...],
+) -> float:
+    best = inf
+    for anchor in anchors:
+        if track.agent_id == anchor.agent_id:
+            return 0.0
+        best = min(best, _min_track_distance(track, anchor))
+    return best
+
+
+def _min_track_distance(left: AgentTrack, right: AgentTrack) -> float:
+    best = inf
+    for left_state in left.states:
+        for right_state in right.states:
+            best = min(best, distance(left_state, right_state))
+    return best
+
+
+def _percentile(sorted_values: tuple[float, ...], percentile: float) -> float:
+    if not sorted_values:
+        raise ValueError("percentile requires at least one value")
+    index = int(round((len(sorted_values) - 1) * percentile))
+    return sorted_values[index]

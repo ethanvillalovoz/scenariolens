@@ -567,12 +567,19 @@ def _scenario_from_waymo_mapping(
         ("sdc_track_index", "sdcTrackIndex"),
         f"scenario {scenario_id}",
     )
+    current_time_index = _optional_int_field(
+        mapping,
+        ("current_time_index", "currentTimeIndex"),
+        f"scenario {scenario_id}",
+    )
 
     tracks: list[AgentTrack] = []
+    track_id_by_index: dict[int, str] = {}
     for track_index, track_payload in enumerate(tracks_payload):
         if not isinstance(track_payload, dict):
             raise ValueError(f"scenario {scenario_id}: track {track_index} is not an object")
         track_id = _track_id(track_payload, track_index)
+        track_id_by_index[track_index] = track_id
         object_type = _object_type_value(
             _field(track_payload, "object_type", "objectType", default="TYPE_OTHER"),
             f"scenario {scenario_id} track {track_id}",
@@ -610,6 +617,12 @@ def _scenario_from_waymo_mapping(
         ego_track_id=ego_track_id,
         tags=_waymo_tags(mapping),
         tracks=tuple(sorted(tracks, key=lambda track: track.agent_id)),
+        metadata=_waymo_metadata(
+            mapping=mapping,
+            track_id_by_index=track_id_by_index,
+            sdc_track_index=sdc_track_index,
+            current_time_index=current_time_index,
+        ),
     )
 
 
@@ -675,6 +688,84 @@ def _waymo_tags(mapping: dict[str, Any]) -> tuple[str, ...]:
     if _field(mapping, "map_features", "mapFeatures", default=[]):
         tags.add("map_context")
     return tuple(sorted(tags))
+
+
+def _waymo_metadata(
+    mapping: dict[str, Any],
+    track_id_by_index: dict[int, str],
+    sdc_track_index: int | None,
+    current_time_index: int | None,
+) -> dict[str, object]:
+    tracks_to_predict = _field(mapping, "tracks_to_predict", "tracksToPredict", default=[])
+    prediction_track_ids = tuple(
+        track_id
+        for prediction in tracks_to_predict
+        if isinstance(prediction, dict)
+        if (
+            track_id := _prediction_track_id(
+                prediction,
+                track_id_by_index=track_id_by_index,
+            )
+        )
+        is not None
+    )
+
+    objects_of_interest = _field(
+        mapping,
+        "objects_of_interest",
+        "objectsOfInterest",
+        default=[],
+    )
+    object_track_ids = tuple(
+        track_id
+        for value in objects_of_interest
+        if (
+            track_id := _object_interest_track_id(
+                value,
+                track_id_by_index=track_id_by_index,
+            )
+        )
+        is not None
+    )
+
+    metadata: dict[str, object] = {}
+    if sdc_track_index is not None:
+        metadata["waymo_sdc_track_index"] = sdc_track_index
+    if current_time_index is not None:
+        metadata["waymo_current_time_index"] = current_time_index
+    if prediction_track_ids:
+        metadata["waymo_tracks_to_predict_track_ids"] = list(prediction_track_ids)
+    if object_track_ids:
+        metadata["waymo_objects_of_interest_track_ids"] = list(object_track_ids)
+    return metadata
+
+
+def _prediction_track_id(
+    prediction: dict[str, Any],
+    track_id_by_index: dict[int, str],
+) -> str | None:
+    track_index = _field(prediction, "track_index", "trackIndex")
+    if track_index is None:
+        return None
+    try:
+        return track_id_by_index[int(track_index)]
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
+def _object_interest_track_id(
+    value: Any,
+    track_id_by_index: dict[int, str],
+) -> str | None:
+    if value is None:
+        return None
+    try:
+        index = int(value)
+    except (TypeError, ValueError):
+        index = None
+    if index is not None and index in track_id_by_index:
+        return track_id_by_index[index]
+    return str(value)
 
 
 def _load_motion_proto(path: Path) -> list[Scenario]:
@@ -746,6 +837,8 @@ def _scenario_mapping_from_proto_bytes(data: bytes) -> dict[str, Any]:
             has_dynamic_map_states = True
         elif field_number == 8 and wire_type == 2:
             has_map_features = True
+        elif field_number == 10 and wire_type == 0:
+            mapping["current_time_index"] = value
         elif field_number == 11 and wire_type == 2:
             tracks_to_predict.append(_required_prediction_from_proto_bytes(value))
 

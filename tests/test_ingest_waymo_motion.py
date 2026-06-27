@@ -156,7 +156,7 @@ def _scenario_proto() -> bytes:
             _double(1, 0.1),
             _length_delimited(2, vehicle),
             _length_delimited(2, pedestrian),
-            _int32(4, 20),
+            _int32(4, 1),
             _string(5, "waymo_binary_fixture"),
             _int32(6, 0),
             _length_delimited(11, prediction),
@@ -228,6 +228,8 @@ class WaymoMotionIngestTest(unittest.TestCase):
         self.assertEqual(scenario.ego_track_id, "10")
         self.assertIn("objects_of_interest", scenario.tags)
         self.assertIn("tracks_to_predict", scenario.tags)
+        self.assertEqual(scenario.metadata["waymo_tracks_to_predict_track_ids"], ["20"])
+        self.assertEqual(scenario.metadata["waymo_objects_of_interest_track_ids"], ["20"])
         self.assertEqual({track.agent_type for track in scenario.tracks}, {"vehicle", "pedestrian"})
 
     def test_inspect_waymo_motion_slice_reports_missing_input(self) -> None:
@@ -250,6 +252,8 @@ class WaymoMotionIngestTest(unittest.TestCase):
         self.assertEqual(scenario.source, "waymo_motion_json:scenario.json")
         self.assertIn("objects_of_interest", scenario.tags)
         self.assertIn("tracks_to_predict", scenario.tags)
+        self.assertEqual(scenario.metadata["waymo_tracks_to_predict_track_ids"], ["7"])
+        self.assertEqual(scenario.metadata["waymo_objects_of_interest_track_ids"], ["7"])
         pedestrian = next(track for track in scenario.tracks if track.agent_id == "7")
         self.assertEqual(pedestrian.agent_type, "pedestrian")
         self.assertEqual(len(pedestrian.states), 2)

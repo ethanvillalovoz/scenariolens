@@ -161,8 +161,9 @@ Optional fields:
 | `tracks[].states[].velocityX` / `velocity_x` | x velocity. Defaults to `0`. |
 | `tracks[].states[].velocityY` / `velocity_y` | y velocity. Defaults to `0`. |
 | `tracks[].states[].valid` | Invalid states are skipped. Defaults to valid for small JSON fixtures. |
-| `objectsOfInterest` / `objects_of_interest` | Adds an explanatory `objects_of_interest` tag. |
-| `tracksToPredict` / `tracks_to_predict` | Adds an explanatory `tracks_to_predict` tag. |
+| `objectsOfInterest` / `objects_of_interest` | Adds an explanatory `objects_of_interest` tag and stores ids in scenario metadata. |
+| `tracksToPredict` / `tracks_to_predict` | Adds an explanatory `tracks_to_predict` tag and stores resolved track ids in scenario metadata. |
+| `currentTimeIndex` / `current_time_index` | Stored in scenario metadata when present. |
 | `mapFeatures` / `map_features` | Adds an explanatory `map_context` tag. |
 | `dynamicMapStates` / `dynamic_map_states` | Adds an explanatory `traffic_signal_context` tag. |
 

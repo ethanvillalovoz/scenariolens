@@ -36,14 +36,21 @@ const nodes = {
 
 const metricLabels = {
   agent_count: "Agents",
+  scoring_agent_count: "Scored agents",
+  excluded_track_count: "Excluded tracks",
+  low_quality_track_count: "Low-quality tracks",
   vulnerable_road_user_count: "VRUs",
+  scoring_vulnerable_road_user_count: "Scored VRUs",
+  sdc_track_present: "SDC present",
+  prediction_target_count: "Prediction targets",
+  object_of_interest_count: "Objects of interest",
   min_pairwise_distance_m: "Min distance",
   min_vru_distance_m: "Min VRU distance",
   min_path_distance_m: "Min path distance",
-  min_time_to_collision_s: "Min TTC",
+  min_time_to_collision_s: "Screened TTC",
   max_speed_mps: "Max speed",
   ego_max_speed_mps: "Ego speed",
-  max_deceleration_mps2: "Max decel",
+  max_deceleration_mps2: "Robust max decel",
 };
 
 const metricUnits = {
@@ -423,6 +430,9 @@ function shortDatasetLabel(datasetId) {
 function formatMetric(value, unit) {
   if (value === null || value === undefined) {
     return "n/a";
+  }
+  if (typeof value === "boolean") {
+    return value ? "yes" : "no";
   }
   return `${formatNumber(value)}${unit ? ` ${unit}` : ""}`;
 }

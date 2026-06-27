@@ -26,6 +26,12 @@ def score_reasons(score: ScenarioScore) -> tuple[str, ...]:
             f"contains {score.vulnerable_road_user_count} vulnerable road user(s)"
         )
 
+    if score.prediction_target_count:
+        reasons.append(f"includes {score.prediction_target_count} Waymo prediction target(s)")
+
+    if score.object_of_interest_count:
+        reasons.append(f"includes {score.object_of_interest_count} object(s) of interest")
+
     if score.min_pairwise_distance_m is not None and score.min_pairwise_distance_m <= 2.5:
         reasons.append(
             f"minimum agent distance is {score.min_pairwise_distance_m:.3f} m"
@@ -33,7 +39,7 @@ def score_reasons(score: ScenarioScore) -> tuple[str, ...]:
 
     if score.min_time_to_collision_s is not None and score.min_time_to_collision_s <= 1.5:
         reasons.append(
-            f"minimum constant-velocity TTC proxy is {score.min_time_to_collision_s:.3f} s"
+            f"screened constant-velocity TTC proxy is {score.min_time_to_collision_s:.3f} s"
         )
 
     if score.min_vru_distance_m is not None and score.min_vru_distance_m <= 3.0:
@@ -48,10 +54,15 @@ def score_reasons(score: ScenarioScore) -> tuple[str, ...]:
         score.max_deceleration_mps2 is not None
         and score.max_deceleration_mps2 >= 3.0
     ):
-        reasons.append(f"max deceleration is {score.max_deceleration_mps2:.3f} m/s^2")
+        reasons.append(
+            f"robust max deceleration is {score.max_deceleration_mps2:.3f} m/s^2"
+        )
 
     if score.agent_count >= 4:
-        reasons.append(f"dense scene with {score.agent_count} tracked agents")
+        reasons.append(
+            f"dense scene with {score.agent_count} tracked agents "
+            f"({score.scoring_agent_count} scored)"
+        )
 
     high_weight_tags = tuple(
         tag
@@ -120,14 +131,21 @@ def markdown_report(scenarios: tuple[Scenario, ...], limit: int | None = None) -
                 "",
                 f"- Score: {score.interaction_score:.3f}",
                 f"- Agents: {score.agent_count}",
+                f"- Scored agents: {score.scoring_agent_count}",
+                f"- Excluded tracks: {score.excluded_track_count}",
+                f"- Low-quality tracks: {score.low_quality_track_count}",
                 f"- Vulnerable road users: {score.vulnerable_road_user_count}",
+                f"- Scored vulnerable road users: {score.scoring_vulnerable_road_user_count}",
+                f"- SDC track present: {score.sdc_track_present}",
+                f"- Prediction targets: {score.prediction_target_count}",
+                f"- Objects of interest: {score.object_of_interest_count}",
                 f"- Min distance: {_format_optional(score.min_pairwise_distance_m, 'm')}",
                 f"- Min VRU distance: {_format_optional(score.min_vru_distance_m, 'm')}",
                 f"- Min path distance: {_format_optional(score.min_path_distance_m, 'm')}",
-                f"- Min TTC proxy: {_format_optional(score.min_time_to_collision_s, 's')}",
+                f"- Screened TTC proxy: {_format_optional(score.min_time_to_collision_s, 's')}",
                 f"- Max speed: {_format_optional(score.max_speed_mps, 'm/s')}",
                 f"- Ego max speed: {_format_optional(score.ego_max_speed_mps, 'm/s')}",
-                f"- Max deceleration: {_format_optional(score.max_deceleration_mps2, 'm/s^2')}",
+                f"- Robust max deceleration: {_format_optional(score.max_deceleration_mps2, 'm/s^2')}",
                 "- Component scores:",
             ]
         )

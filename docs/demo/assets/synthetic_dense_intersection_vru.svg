@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="920" height="640" viewBox="0 0 920 640" role="img">
 <title>synthetic_dense_intersection_vru trajectory preview</title>
-<desc>Scenario synthetic_dense_intersection_vru from synthetic. Score 34.658. Tags: vulnerable_road_user, pedestrian_crossing, cyclist_interaction, dense_multi_agent.</desc>
+<desc>Scenario synthetic_dense_intersection_vru from synthetic. Score 34.432. 4 agents. Tags: vulnerable_road_user, pedestrian_crossing, cyclist_interaction, dense_multi_agent.</desc>
 <defs>
 <clipPath id="scenario-plot-clip"><rect x="56" y="84" width="808" height="474" rx="10" /></clipPath>
 </defs>
 <rect x="0" y="0" width="920" height="640" fill="#f8fafc" />
 <text x="56" y="36" fill="#0f172a" font-size="22" font-family="Inter, Arial, sans-serif" font-weight="800">Synthetic Dense Intersection VRU</text>
-<text x="56" y="60" fill="#64748b" font-size="13" font-family="Inter, Arial, sans-serif" font-weight="650">score 34.66 / 4 agents / Vulnerable Road User / Pedestrian Crossing / Cyclist Interaction / +1 tags</text>
+<text x="56" y="60" fill="#64748b" font-size="13" font-family="Inter, Arial, sans-serif" font-weight="650">score 34.43 / 4 agents / Vulnerable Road User / Pedestrian Crossing / Cyclist Interaction / +1 tags</text>
 <text x="864" y="38" fill="#64748b" font-size="12" font-family="Inter, Arial, sans-serif" text-anchor="end">synthetic</text>
 <rect x="56" y="84" width="808" height="474" rx="10" fill="#f9fbfd" stroke="#d8e2ee" stroke-width="1.2" />
 <g clip-path="url(#scenario-plot-clip)">

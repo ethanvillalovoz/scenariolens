@@ -20,7 +20,9 @@ class ReportTest(unittest.TestCase):
         self.assertIn("# ScenarioLens Scenario Report", report)
         self.assertIn("Why it matters", report)
         self.assertIn("Component scores", report)
+        self.assertIn("Scored agents", report)
         self.assertIn("Min VRU distance", report)
+        self.assertIn("Screened TTC proxy", report)
         self.assertIn("synthetic_dense_intersection_vru", report)
 
     def test_json_report_is_machine_readable(self) -> None:

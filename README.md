@@ -64,9 +64,9 @@ the full rationale.
 ## Data Provenance
 
 The checked-in demo currently uses synthetic scenarios plus tiny Waymo
-Motion-shaped fixtures. It does not claim results from a full downloaded Waymo
-validation shard. The repo includes a local preflight and ingestion path for
-downloaded Waymo Motion slices, while raw dataset files stay outside git.
+Motion-shaped fixtures. A separate checked-in summary documents one local smoke
+run on a downloaded Waymo Motion validation shard, while raw dataset files and
+per-scenario derived outputs stay outside git.
 
 See [docs/data_provenance.md](docs/data_provenance.md) for the exact fixture
 inventory and [docs/waymo_motion_slice_recipe.md](docs/waymo_motion_slice_recipe.md)
@@ -97,6 +97,8 @@ small Waymo-shaped fixtures. The current prototype can:
 - diagnose local Waymo Motion data/tooling readiness,
 - preflight local Waymo Motion slice folders before ingestion,
 - generate a reproducible local Waymo Motion validation packet,
+- preserve Waymo prediction-target and object-of-interest metadata,
+- score real slices through a quality-filtered, ego-centered context,
 - save/load ScenarioLens scenario JSON,
 - export Markdown or JSON reports,
 - render 2D SVG trajectory views,
@@ -104,9 +106,9 @@ small Waymo-shaped fixtures. The current prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to run the same flow on a small downloaded Waymo Motion
-validation slice and publish the commands plus a short slice-level summary
-without committing raw dataset files.
+The next milestone is to make the real-slice reports richer with map-derived
+context, traffic-light state summaries, and comparison views across more
+downloaded validation shards.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -170,7 +172,9 @@ PYTHONPATH=src python3 -m scenariolens.cli report --format markdown --limit 5
 ```
 
 Reports include component scores for density, VRU presence, taxonomy,
-proximity, TTC, VRU proximity, path conflict, and dynamics.
+proximity, screened TTC, VRU proximity, path conflict, and dynamics. They also
+separate raw track counts from the quality-filtered scored context used for
+ranking real Waymo slices.
 
 Generate a machine-readable JSON report:
 

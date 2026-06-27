@@ -16,6 +16,7 @@ def scenario_to_dict(scenario: Scenario) -> dict[str, Any]:
         "source": scenario.source,
         "ego_track_id": scenario.ego_track_id,
         "tags": list(scenario.tags),
+        "metadata": scenario.metadata,
         "tracks": [
             {
                 "agent_id": track.agent_id,
@@ -44,6 +45,7 @@ def scenario_from_dict(data: dict[str, Any]) -> Scenario:
         source=str(data.get("source", "external")),
         ego_track_id=_optional_str(data, "ego_track_id"),
         tags=tuple(str(tag) for tag in data.get("tags", ())),
+        metadata=_optional_dict(data, "metadata"),
         tracks=tracks,
     )
 
@@ -124,6 +126,13 @@ def _required_list(data: dict[str, Any], key: str) -> list[Any]:
     if not isinstance(value, list):
         raise ValueError(f"Expected list field: {key}")
     return value
+
+
+def _optional_dict(data: dict[str, Any], key: str) -> dict[str, object]:
+    value = data.get(key, {})
+    if not isinstance(value, dict):
+        raise ValueError(f"Expected object field: {key}")
+    return dict(value)
 
 
 def _required_float(data: dict[str, Any], key: str) -> float:

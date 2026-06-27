@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="920" height="640" viewBox="0 0 920 640" role="img">
 <title>synthetic_dense_merge trajectory preview</title>
-<desc>Scenario synthetic_dense_merge from synthetic. Score 11.982. Tags: merge_conflict, dense_multi_agent.</desc>
+<desc>Scenario synthetic_dense_merge from synthetic. Score 11.982. 4 agents. Tags: merge_conflict, dense_multi_agent.</desc>
 <defs>
 <clipPath id="scenario-plot-clip"><rect x="56" y="84" width="808" height="474" rx="10" /></clipPath>
 </defs>

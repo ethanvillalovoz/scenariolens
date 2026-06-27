@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-ScenarioLens is a laptop-friendly autonomous-driving evaluation project for discovering and explaining long-tail driving scenarios. It ranks scenarios using lightweight interaction metrics, ODD-relevant taxonomy tags, vulnerable-road-user counts, same-timestep proximity, path-conflict proximity, dynamics, and a simple constant-velocity time-to-collision proxy.
+ScenarioLens is a laptop-friendly autonomous-driving evaluation project for discovering and explaining long-tail driving scenarios. It ranks scenarios using lightweight interaction metrics, ODD-relevant taxonomy tags, vulnerable-road-user counts, same-timestep proximity, path-conflict proximity, dynamics, and a screened constant-velocity time-to-collision proxy.
 
 The current pipeline supports synthetic scenarios, ScenarioLens JSON, row-wise CSV ingestion, normalized Waymo Motion-shaped fixtures, and native Waymo Motion JSON, binary Scenario proto, and small TFRecord slice ingestion. Local slice preflight keeps raw downloaded data separate from the checked-in demo.
 
@@ -22,7 +22,7 @@ ScenarioLens uses a laptop-friendly subset of the public Waymo/autonomy ecosyste
 
 | Rank | Scenario | Score | Tags |
 | ---: | --- | ---: | --- |
-| 1 | `synthetic_dense_intersection_vru` | 34.658 | vulnerable_road_user, pedestrian_crossing, cyclist_interaction, dense_multi_agent |
+| 1 | `synthetic_dense_intersection_vru` | 34.432 | vulnerable_road_user, pedestrian_crossing, cyclist_interaction, dense_multi_agent |
 | 2 | `synthetic_occluded_pedestrian` | 32.728 | vulnerable_road_user, pedestrian_crossing, blocked_lane, close_interaction |
 | 3 | `synthetic_unprotected_left_turn` | 27.851 | vulnerable_road_user, unprotected_turn, close_interaction |
 
@@ -30,32 +30,39 @@ ScenarioLens uses a laptop-friendly subset of the public Waymo/autonomy ecosyste
 
 ![synthetic_dense_intersection_vru](assets/synthetic_dense_intersection_vru.svg)
 
-- Score: 34.658
+- Score: 34.432
 - Agents: 4
+- Scored agents: 4
+- Excluded tracks: 0
+- Low-quality tracks: 0
 - Vulnerable road users: 2
+- Scored vulnerable road users: 2
+- SDC track present: True
+- Prediction targets: 0
+- Objects of interest: 0
 - Min distance: 0.632 m
 - Min VRU distance: 0.632 m
 - Min path distance: 0.632 m
-- Min TTC proxy: 0.136 s
+- Screened TTC proxy: 0.317 s
 - Max speed: 5.000 m/s
 - Ego max speed: 4.000 m/s
-- Max deceleration: 0.000 m/s^2
+- Robust max deceleration: n/a
 - Component scores:
   - density: 1.000
   - vru: 3.000
   - taxonomy: 9.000
   - proximity: 7.368
-  - ttc: 7.330
+  - ttc: 7.104
   - vru_proximity: 4.776
   - path_conflict: 2.184
   - dynamics: 0.000
 - Why it matters:
   - contains 2 vulnerable road user(s)
   - minimum agent distance is 0.632 m
-  - minimum constant-velocity TTC proxy is 0.136 s
+  - screened constant-velocity TTC proxy is 0.317 s
   - closest vehicle-to-VRU distance is 0.632 m
   - agent paths come within 0.632 m
-  - dense scene with 4 tracked agents
+  - dense scene with 4 tracked agents (4 scored)
   - high-value taxonomy tags: Vulnerable road user, Pedestrian crossing, Cyclist interaction
 
 ### 2. `synthetic_occluded_pedestrian`
@@ -64,14 +71,21 @@ ScenarioLens uses a laptop-friendly subset of the public Waymo/autonomy ecosyste
 
 - Score: 32.728
 - Agents: 3
+- Scored agents: 3
+- Excluded tracks: 0
+- Low-quality tracks: 0
 - Vulnerable road users: 1
+- Scored vulnerable road users: 1
+- SDC track present: True
+- Prediction targets: 0
+- Objects of interest: 0
 - Min distance: 0.510 m
 - Min VRU distance: 0.510 m
 - Min path distance: 0.510 m
-- Min TTC proxy: 0.500 s
+- Screened TTC proxy: 0.500 s
 - Max speed: 4.000 m/s
 - Ego max speed: 4.000 m/s
-- Max deceleration: 1.000 m/s^2
+- Robust max deceleration: 1.000 m/s^2
 - Component scores:
   - density: 0.750
   - vru: 1.500
@@ -84,7 +98,7 @@ ScenarioLens uses a laptop-friendly subset of the public Waymo/autonomy ecosyste
 - Why it matters:
   - contains 1 vulnerable road user(s)
   - minimum agent distance is 0.510 m
-  - minimum constant-velocity TTC proxy is 0.500 s
+  - screened constant-velocity TTC proxy is 0.500 s
   - closest vehicle-to-VRU distance is 0.510 m
   - agent paths come within 0.510 m
   - high-value taxonomy tags: Vulnerable road user, Pedestrian crossing, Blocked lane, Close interaction
@@ -95,14 +109,21 @@ ScenarioLens uses a laptop-friendly subset of the public Waymo/autonomy ecosyste
 
 - Score: 27.851
 - Agents: 3
+- Scored agents: 3
+- Excluded tracks: 0
+- Low-quality tracks: 0
 - Vulnerable road users: 1
+- Scored vulnerable road users: 1
+- SDC track present: True
+- Prediction targets: 0
+- Objects of interest: 0
 - Min distance: 1.887 m
 - Min VRU distance: 1.887 m
 - Min path distance: 1.000 m
-- Min TTC proxy: 0.277 s
+- Screened TTC proxy: 0.277 s
 - Max speed: 6.000 m/s
 - Ego max speed: 3.606 m/s
-- Max deceleration: 0.181 m/s^2
+- Robust max deceleration: 0.181 m/s^2
 - Component scores:
   - density: 0.750
   - vru: 1.500
@@ -115,7 +136,7 @@ ScenarioLens uses a laptop-friendly subset of the public Waymo/autonomy ecosyste
 - Why it matters:
   - contains 1 vulnerable road user(s)
   - minimum agent distance is 1.887 m
-  - minimum constant-velocity TTC proxy is 0.277 s
+  - screened constant-velocity TTC proxy is 0.277 s
   - closest vehicle-to-VRU distance is 1.887 m
   - agent paths come within 1.000 m
   - high-value taxonomy tags: Vulnerable road user, Unprotected turn, Close interaction
@@ -126,38 +147,47 @@ This section uses a tiny checked-in JSON record shaped like the public Waymo Mot
 
 | Rank | Scenario | Score | Tags |
 | ---: | --- | ---: | --- |
-| 1 | `waymo_native_sample_interaction` | 31.542 | vulnerable_road_user, objects_of_interest, tracks_to_predict |
+| 1 | `waymo_native_sample_interaction` | 31.205 | vulnerable_road_user, objects_of_interest, tracks_to_predict |
 
 ### 1. `waymo_native_sample_interaction`
 
 ![waymo_native_sample_interaction](assets/waymo_native_sample_interaction.svg)
 
-- Score: 31.542
+- Score: 31.205
 - Agents: 3
+- Scored agents: 3
+- Excluded tracks: 0
+- Low-quality tracks: 0
 - Vulnerable road users: 1
+- Scored vulnerable road users: 1
+- SDC track present: True
+- Prediction targets: 1
+- Objects of interest: 1
 - Min distance: 0.863 m
 - Min VRU distance: 0.863 m
 - Min path distance: 0.863 m
-- Min TTC proxy: 0.012 s
+- Screened TTC proxy: 0.281 s
 - Max speed: 5.000 m/s
 - Ego max speed: 5.000 m/s
-- Max deceleration: 10.000 m/s^2
+- Robust max deceleration: 10.000 m/s^2
 - Component scores:
   - density: 0.750
   - vru: 1.500
   - taxonomy: 2.000
   - proximity: 7.137
-  - ttc: 7.485
+  - ttc: 7.148
   - vru_proximity: 4.602
   - path_conflict: 2.068
   - dynamics: 6.000
 - Why it matters:
   - contains 1 vulnerable road user(s)
+  - includes 1 Waymo prediction target(s)
+  - includes 1 object(s) of interest
   - minimum agent distance is 0.863 m
-  - minimum constant-velocity TTC proxy is 0.012 s
+  - screened constant-velocity TTC proxy is 0.281 s
   - closest vehicle-to-VRU distance is 0.863 m
   - agent paths come within 0.863 m
-  - max deceleration is 10.000 m/s^2
+  - robust max deceleration is 10.000 m/s^2
   - high-value taxonomy tags: Vulnerable road user
 
 ## Normalized Waymo-Shaped Fixture Results
@@ -175,14 +205,21 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 
 - Score: 28.851
 - Agents: 3
+- Scored agents: 3
+- Excluded tracks: 0
+- Low-quality tracks: 0
 - Vulnerable road users: 1
+- Scored vulnerable road users: 1
+- SDC track present: True
+- Prediction targets: 0
+- Objects of interest: 0
 - Min distance: 1.887 m
 - Min VRU distance: 1.887 m
 - Min path distance: 1.000 m
-- Min TTC proxy: 0.277 s
+- Screened TTC proxy: 0.277 s
 - Max speed: 6.000 m/s
 - Ego max speed: 3.606 m/s
-- Max deceleration: 0.181 m/s^2
+- Robust max deceleration: 0.181 m/s^2
 - Component scores:
   - density: 0.750
   - vru: 1.500
@@ -195,7 +232,7 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 - Why it matters:
   - contains 1 vulnerable road user(s)
   - minimum agent distance is 1.887 m
-  - minimum constant-velocity TTC proxy is 0.277 s
+  - screened constant-velocity TTC proxy is 0.277 s
   - closest vehicle-to-VRU distance is 1.887 m
   - agent paths come within 1.000 m
   - high-value taxonomy tags: Vulnerable road user, Pedestrian crossing, Unprotected turn
@@ -206,14 +243,21 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 
 - Score: 23.179
 - Agents: 2
+- Scored agents: 2
+- Excluded tracks: 0
+- Low-quality tracks: 0
 - Vulnerable road users: 1
+- Scored vulnerable road users: 1
+- SDC track present: True
+- Prediction targets: 0
+- Objects of interest: 0
 - Min distance: 2.915 m
 - Min VRU distance: 2.915 m
 - Min path distance: 2.625 m
-- Min TTC proxy: 1.726 s
+- Screened TTC proxy: 1.726 s
 - Max speed: 6.000 m/s
 - Ego max speed: 6.000 m/s
-- Max deceleration: 0.000 m/s^2
+- Robust max deceleration: n/a
 - Component scores:
   - density: 0.500
   - vru: 1.500
@@ -232,12 +276,12 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 
 - Checked-in Waymo examples are synthetic mini fixtures, not downloaded real validation shards.
 - The lightweight binary reader extracts the Motion fields ScenarioLens needs, not the full Waymo proto surface.
-- The TTC value is a simple constant-velocity screening proxy, not a certified safety metric.
+- The TTC value is a screened constant-velocity proxy, not a certified safety metric.
 - The current renderer is 2D and focuses on agent trajectories, not parsed map lanes or traffic lights.
 
 ## Next Work
 
-- Run the documented local-slice recipe on a small downloaded Waymo Motion validation shard.
+- Expand the documented local-slice recipe across more Waymo Motion validation shards.
 - Add map/lane and traffic-light features from native Motion records.
 - Compare synthetic, native mini-slice, and downloaded-slice score distributions.
 - Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.

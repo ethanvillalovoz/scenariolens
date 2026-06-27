@@ -63,6 +63,9 @@ class DashboardDataTest(unittest.TestCase):
         self.assertTrue(first["svg_path"].startswith("assets/"))
         self.assertIn("components", first["score"])
         self.assertIn("agent_count", first["metrics"])
+        self.assertIn("scoring_agent_count", first["metrics"])
+        self.assertIn("excluded_track_count", first["metrics"])
+        self.assertIn("sdc_track_present", first["metrics"])
 
     def test_generate_dashboard_data_writes_json_and_svg_assets(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

@@ -68,21 +68,21 @@
       "reasons": [
         "contains 2 vulnerable road user(s)",
         "minimum agent distance is 0.632 m",
-        "minimum constant-velocity TTC proxy is 0.136 s",
+        "screened constant-velocity TTC proxy is 0.317 s",
         "closest vehicle-to-VRU distance is 0.632 m",
         "agent paths come within 0.632 m",
-        "dense scene with 4 tracked agents",
+        "dense scene with 4 tracked agents (4 scored)",
         "high-value taxonomy tags: Vulnerable road user, Pedestrian crossing, Cyclist interaction"
       ],
       "score": {
-        "interaction": 34.658,
+        "interaction": 34.432,
         "taxonomy": 9.0,
         "components": {
           "density": 1.0,
           "vru": 3.0,
           "taxonomy": 9.0,
           "proximity": 7.368,
-          "ttc": 7.33,
+          "ttc": 7.104,
           "vru_proximity": 4.776,
           "path_conflict": 2.184,
           "dynamics": 0.0
@@ -90,14 +90,21 @@
       },
       "metrics": {
         "agent_count": 4,
+        "scoring_agent_count": 4,
+        "excluded_track_count": 0,
+        "low_quality_track_count": 0,
         "vulnerable_road_user_count": 2,
+        "scoring_vulnerable_road_user_count": 2,
+        "sdc_track_present": true,
+        "prediction_target_count": 0,
+        "object_of_interest_count": 0,
         "min_pairwise_distance_m": 0.632,
         "min_vru_distance_m": 0.632,
         "min_path_distance_m": 0.632,
-        "min_time_to_collision_s": 0.136,
+        "min_time_to_collision_s": 0.317,
         "max_speed_mps": 5.0,
         "ego_max_speed_mps": 4.0,
-        "max_deceleration_mps2": 0.0
+        "max_deceleration_mps2": null
       },
       "tracks": {
         "count": 4,
@@ -125,7 +132,7 @@
       "reasons": [
         "contains 1 vulnerable road user(s)",
         "minimum agent distance is 0.510 m",
-        "minimum constant-velocity TTC proxy is 0.500 s",
+        "screened constant-velocity TTC proxy is 0.500 s",
         "closest vehicle-to-VRU distance is 0.510 m",
         "agent paths come within 0.510 m",
         "high-value taxonomy tags: Vulnerable road user, Pedestrian crossing, Blocked lane, Close interaction"
@@ -146,7 +153,14 @@
       },
       "metrics": {
         "agent_count": 3,
+        "scoring_agent_count": 3,
+        "excluded_track_count": 0,
+        "low_quality_track_count": 0,
         "vulnerable_road_user_count": 1,
+        "scoring_vulnerable_road_user_count": 1,
+        "sdc_track_present": true,
+        "prediction_target_count": 0,
+        "object_of_interest_count": 0,
         "min_pairwise_distance_m": 0.51,
         "min_vru_distance_m": 0.51,
         "min_path_distance_m": 0.51,
@@ -178,22 +192,24 @@
       ],
       "reasons": [
         "contains 1 vulnerable road user(s)",
+        "includes 1 Waymo prediction target(s)",
+        "includes 1 object(s) of interest",
         "minimum agent distance is 0.863 m",
-        "minimum constant-velocity TTC proxy is 0.012 s",
+        "screened constant-velocity TTC proxy is 0.281 s",
         "closest vehicle-to-VRU distance is 0.863 m",
         "agent paths come within 0.863 m",
-        "max deceleration is 10.000 m/s^2",
+        "robust max deceleration is 10.000 m/s^2",
         "high-value taxonomy tags: Vulnerable road user"
       ],
       "score": {
-        "interaction": 31.542,
+        "interaction": 31.205,
         "taxonomy": 2.0,
         "components": {
           "density": 0.75,
           "vru": 1.5,
           "taxonomy": 2.0,
           "proximity": 7.137,
-          "ttc": 7.485,
+          "ttc": 7.148,
           "vru_proximity": 4.602,
           "path_conflict": 2.068,
           "dynamics": 6.0
@@ -201,11 +217,18 @@
       },
       "metrics": {
         "agent_count": 3,
+        "scoring_agent_count": 3,
+        "excluded_track_count": 0,
+        "low_quality_track_count": 0,
         "vulnerable_road_user_count": 1,
+        "scoring_vulnerable_road_user_count": 1,
+        "sdc_track_present": true,
+        "prediction_target_count": 1,
+        "object_of_interest_count": 1,
         "min_pairwise_distance_m": 0.863,
         "min_vru_distance_m": 0.863,
         "min_path_distance_m": 0.863,
-        "min_time_to_collision_s": 0.012,
+        "min_time_to_collision_s": 0.281,
         "max_speed_mps": 5.0,
         "ego_max_speed_mps": 5.0,
         "max_deceleration_mps2": 10.0
@@ -234,7 +257,7 @@
       "reasons": [
         "contains 1 vulnerable road user(s)",
         "minimum agent distance is 1.887 m",
-        "minimum constant-velocity TTC proxy is 0.277 s",
+        "screened constant-velocity TTC proxy is 0.277 s",
         "closest vehicle-to-VRU distance is 1.887 m",
         "agent paths come within 1.000 m",
         "high-value taxonomy tags: Vulnerable road user, Pedestrian crossing, Unprotected turn"
@@ -255,7 +278,14 @@
       },
       "metrics": {
         "agent_count": 3,
+        "scoring_agent_count": 3,
+        "excluded_track_count": 0,
+        "low_quality_track_count": 0,
         "vulnerable_road_user_count": 1,
+        "scoring_vulnerable_road_user_count": 1,
+        "sdc_track_present": true,
+        "prediction_target_count": 0,
+        "object_of_interest_count": 0,
         "min_pairwise_distance_m": 1.887,
         "min_vru_distance_m": 1.887,
         "min_path_distance_m": 1.0,
@@ -288,7 +318,7 @@
       "reasons": [
         "contains 1 vulnerable road user(s)",
         "minimum agent distance is 1.887 m",
-        "minimum constant-velocity TTC proxy is 0.277 s",
+        "screened constant-velocity TTC proxy is 0.277 s",
         "closest vehicle-to-VRU distance is 1.887 m",
         "agent paths come within 1.000 m",
         "high-value taxonomy tags: Vulnerable road user, Unprotected turn, Close interaction"
@@ -309,7 +339,14 @@
       },
       "metrics": {
         "agent_count": 3,
+        "scoring_agent_count": 3,
+        "excluded_track_count": 0,
+        "low_quality_track_count": 0,
         "vulnerable_road_user_count": 1,
+        "scoring_vulnerable_road_user_count": 1,
+        "sdc_track_present": true,
+        "prediction_target_count": 0,
+        "object_of_interest_count": 0,
         "min_pairwise_distance_m": 1.887,
         "min_vru_distance_m": 1.887,
         "min_path_distance_m": 1.0,
@@ -342,7 +379,7 @@
       "reasons": [
         "contains 1 vulnerable road user(s)",
         "minimum agent distance is 1.640 m",
-        "minimum constant-velocity TTC proxy is 0.721 s",
+        "screened constant-velocity TTC proxy is 0.721 s",
         "closest vehicle-to-VRU distance is 1.640 m",
         "agent paths come within 1.640 m",
         "high-value taxonomy tags: Vulnerable road user, Cyclist interaction, Close interaction"
@@ -363,14 +400,21 @@
       },
       "metrics": {
         "agent_count": 2,
+        "scoring_agent_count": 2,
+        "excluded_track_count": 0,
+        "low_quality_track_count": 0,
         "vulnerable_road_user_count": 1,
+        "scoring_vulnerable_road_user_count": 1,
+        "sdc_track_present": true,
+        "prediction_target_count": 0,
+        "object_of_interest_count": 0,
         "min_pairwise_distance_m": 1.64,
         "min_vru_distance_m": 1.64,
         "min_path_distance_m": 1.64,
         "min_time_to_collision_s": 0.721,
         "max_speed_mps": 6.0,
         "ego_max_speed_mps": 6.0,
-        "max_deceleration_mps2": 0.0
+        "max_deceleration_mps2": null
       },
       "tracks": {
         "count": 2,
@@ -396,7 +440,7 @@
       "reasons": [
         "contains 1 vulnerable road user(s)",
         "minimum agent distance is 2.236 m",
-        "minimum constant-velocity TTC proxy is 0.688 s",
+        "screened constant-velocity TTC proxy is 0.688 s",
         "closest vehicle-to-VRU distance is 2.236 m",
         "high-value taxonomy tags: Vulnerable road user, Pedestrian crossing, Close interaction"
       ],
@@ -416,7 +460,14 @@
       },
       "metrics": {
         "agent_count": 2,
+        "scoring_agent_count": 2,
+        "excluded_track_count": 0,
+        "low_quality_track_count": 0,
         "vulnerable_road_user_count": 1,
+        "scoring_vulnerable_road_user_count": 1,
+        "sdc_track_present": true,
+        "prediction_target_count": 0,
+        "object_of_interest_count": 0,
         "min_pairwise_distance_m": 2.236,
         "min_vru_distance_m": 2.236,
         "min_path_distance_m": 2.236,
@@ -467,14 +518,21 @@
       },
       "metrics": {
         "agent_count": 2,
+        "scoring_agent_count": 2,
+        "excluded_track_count": 0,
+        "low_quality_track_count": 0,
         "vulnerable_road_user_count": 1,
+        "scoring_vulnerable_road_user_count": 1,
+        "sdc_track_present": true,
+        "prediction_target_count": 0,
+        "object_of_interest_count": 0,
         "min_pairwise_distance_m": 2.915,
         "min_vru_distance_m": 2.915,
         "min_path_distance_m": 2.625,
         "min_time_to_collision_s": 1.726,
         "max_speed_mps": 6.0,
         "ego_max_speed_mps": 6.0,
-        "max_deceleration_mps2": 0.0
+        "max_deceleration_mps2": null
       },
       "tracks": {
         "count": 2,
@@ -497,18 +555,18 @@
         "blocked_lane"
       ],
       "reasons": [
-        "minimum constant-velocity TTC proxy is 0.400 s",
+        "screened constant-velocity TTC proxy is 0.683 s",
         "high-value taxonomy tags: Merge conflict, Blocked lane"
       ],
       "score": {
-        "interaction": 17.845,
+        "interaction": 17.492,
         "taxonomy": 4.0,
         "components": {
           "density": 0.75,
           "vru": 0.0,
           "taxonomy": 4.0,
           "proximity": 4.895,
-          "ttc": 7.0,
+          "ttc": 6.647,
           "vru_proximity": 0.0,
           "path_conflict": 1.2,
           "dynamics": 0.0
@@ -516,11 +574,18 @@
       },
       "metrics": {
         "agent_count": 3,
+        "scoring_agent_count": 3,
+        "excluded_track_count": 0,
+        "low_quality_track_count": 0,
         "vulnerable_road_user_count": 0,
+        "scoring_vulnerable_road_user_count": 0,
+        "sdc_track_present": true,
+        "prediction_target_count": 0,
+        "object_of_interest_count": 0,
         "min_pairwise_distance_m": 3.105,
         "min_vru_distance_m": null,
         "min_path_distance_m": 2.6,
-        "min_time_to_collision_s": 0.4,
+        "min_time_to_collision_s": 0.683,
         "max_speed_mps": 5.0,
         "ego_max_speed_mps": 5.0,
         "max_deceleration_mps2": 0.921
@@ -546,7 +611,7 @@
         "close_interaction"
       ],
       "reasons": [
-        "max deceleration is 6.000 m/s^2",
+        "robust max deceleration is 6.000 m/s^2",
         "high-value taxonomy tags: Hard braking, Close interaction"
       ],
       "score": {
@@ -565,7 +630,14 @@
       },
       "metrics": {
         "agent_count": 2,
+        "scoring_agent_count": 2,
+        "excluded_track_count": 0,
+        "low_quality_track_count": 0,
         "vulnerable_road_user_count": 0,
+        "scoring_vulnerable_road_user_count": 0,
+        "sdc_track_present": true,
+        "prediction_target_count": 0,
+        "object_of_interest_count": 0,
         "min_pairwise_distance_m": 9.0,
         "min_vru_distance_m": null,
         "min_path_distance_m": 3.0,
@@ -595,7 +667,7 @@
       ],
       "reasons": [
         "agent paths come within 2.000 m",
-        "dense scene with 4 tracked agents",
+        "dense scene with 4 tracked agents (4 scored)",
         "high-value taxonomy tags: Merge conflict"
       ],
       "score": {
@@ -614,14 +686,21 @@
       },
       "metrics": {
         "agent_count": 4,
+        "scoring_agent_count": 4,
+        "excluded_track_count": 0,
+        "low_quality_track_count": 0,
         "vulnerable_road_user_count": 0,
+        "scoring_vulnerable_road_user_count": 0,
+        "sdc_track_present": true,
+        "prediction_target_count": 0,
+        "object_of_interest_count": 0,
         "min_pairwise_distance_m": 5.009,
         "min_vru_distance_m": null,
         "min_path_distance_m": 2.0,
         "min_time_to_collision_s": 3.607,
         "max_speed_mps": 9.0,
         "ego_max_speed_mps": 8.002,
-        "max_deceleration_mps2": 0.0
+        "max_deceleration_mps2": null
       },
       "tracks": {
         "count": 4,
@@ -660,14 +739,21 @@
       },
       "metrics": {
         "agent_count": 2,
+        "scoring_agent_count": 2,
+        "excluded_track_count": 0,
+        "low_quality_track_count": 0,
         "vulnerable_road_user_count": 0,
+        "scoring_vulnerable_road_user_count": 0,
+        "sdc_track_present": true,
+        "prediction_target_count": 0,
+        "object_of_interest_count": 0,
         "min_pairwise_distance_m": 30.0,
         "min_vru_distance_m": null,
         "min_path_distance_m": 16.0,
         "min_time_to_collision_s": null,
         "max_speed_mps": 7.0,
         "ego_max_speed_mps": 7.0,
-        "max_deceleration_mps2": 0.0
+        "max_deceleration_mps2": null
       },
       "tracks": {
         "count": 2,
@@ -706,14 +792,21 @@
       },
       "metrics": {
         "agent_count": 1,
+        "scoring_agent_count": 1,
+        "excluded_track_count": 0,
+        "low_quality_track_count": 0,
         "vulnerable_road_user_count": 0,
+        "scoring_vulnerable_road_user_count": 0,
+        "sdc_track_present": true,
+        "prediction_target_count": 0,
+        "object_of_interest_count": 0,
         "min_pairwise_distance_m": null,
         "min_vru_distance_m": null,
         "min_path_distance_m": null,
         "min_time_to_collision_s": null,
         "max_speed_mps": 10.0,
         "ego_max_speed_mps": 10.0,
-        "max_deceleration_mps2": 0.0
+        "max_deceleration_mps2": null
       },
       "tracks": {
         "count": 1,

@@ -131,8 +131,9 @@ Look for scenarios with:
 - vulnerable road users,
 - low same-timestep distance,
 - low path distance,
-- low constant-velocity TTC proxy,
-- high deceleration,
+- low screened constant-velocity TTC proxy,
+- high robust deceleration,
+- large gaps between raw and scored track counts,
 - useful Waymo fields such as objects of interest or tracks to predict.
 
 ### Render A Small Gallery

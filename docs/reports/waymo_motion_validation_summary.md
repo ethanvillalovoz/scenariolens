@@ -36,11 +36,11 @@ PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-validate \
 
 | Rank | Scenario | Score | Main Reason |
 | ---: | --- | ---: | --- |
-| 1 | `a651202aa8e79d45` | 69.920 | contains 22 vulnerable road users |
-| 2 | `5f5660d70a6f14f6` | 59.105 | contains 16 vulnerable road users |
-| 3 | `d30709cd60e60395` | 54.781 | contains 14 vulnerable road users |
-| 4 | `7e969997e3e0b772` | 47.730 | contains 9 vulnerable road users |
-| 5 | `67fff4d5bb3acf8d` | 45.501 | contains 9 vulnerable road users |
+| 1 | `a651202aa8e79d45` | 42.741 | contains 22 vulnerable road users |
+| 2 | `5f5660d70a6f14f6` | 41.654 | contains 16 vulnerable road users |
+| 3 | `7e969997e3e0b772` | 39.427 | contains 9 vulnerable road users |
+| 4 | `706fecd25045c8d` | 39.325 | contains 7 vulnerable road users |
+| 5 | `d30709cd60e60395` | 38.926 | contains 14 vulnerable road users |
 
 ## Notes
 
@@ -51,6 +51,8 @@ PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-validate \
   scenario id, timestamps, tracks, object types, states, SDC index, objects of
   interest, prediction targets, and coarse map/traffic-signal presence.
 - The current metrics are screening features, not certified safety metrics.
+  Ranking now uses a quality-filtered, ego-centered scoring context and reports
+  raw agent counts separately from scored agent counts.
 - Raw Waymo data, normalized ScenarioLens JSON from the shard, and generated
   SVGs remain ignored local artifacts unless licensing and publication choices
   are reviewed separately.

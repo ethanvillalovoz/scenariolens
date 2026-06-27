@@ -1,6 +1,7 @@
 import unittest
 
 from scenariolens.samples import synthetic_scenarios
+from scenariolens.schema import AgentTrack, Scenario, State
 from scenariolens.visualize import scenario_bounds, scenario_svg
 
 
@@ -36,6 +37,35 @@ class VisualizeTest(unittest.TestCase):
         self.assertIn("synthetic_open_road_baseline", svg)
         self.assertIn("ego", svg)
         self.assertIn("</svg>", svg)
+
+    def test_scenario_svg_uses_scored_context_for_dense_real_slices(self) -> None:
+        scenario = Scenario(
+            scenario_id="dense_real_slice",
+            ego_track_id="ego",
+            tracks=(
+                _track("ego", "vehicle", ((0, 0, 0, 5, 0), (1, 5, 0, 5, 0))),
+                _track("near_ped", "pedestrian", ((0, 2, 0, 0, 1), (1, 2, 1, 0, 1))),
+                _track("far_vehicle", "vehicle", ((0, 500, 0, 5, 0), (1, 505, 0, 5, 0))),
+            ),
+        )
+
+        svg = scenario_svg(scenario)
+
+        self.assertIn("2 scored of 3 agents", svg)
+        self.assertIn("near_ped", svg)
+        self.assertNotIn("far_vehicle", svg)
+
+
+def _track(
+    agent_id: str,
+    agent_type: str,
+    points: tuple[tuple[float, float, float, float, float], ...],
+) -> AgentTrack:
+    return AgentTrack(
+        agent_id=agent_id,
+        agent_type=agent_type,  # type: ignore[arg-type]
+        states=tuple(State(t=t, x=x, y=y, vx=vx, vy=vy) for t, x, y, vx, vy in points),
+    )
 
 
 if __name__ == "__main__":
