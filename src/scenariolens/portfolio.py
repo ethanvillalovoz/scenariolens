@@ -103,6 +103,8 @@ def portfolio_markdown(
         "CLI flows, and SVG rendering.",
         "- Baseline comparison report is generated under "
         "`docs/reports/lane_aware_baseline_study.md`.",
+        "- Baseline ablation report is generated under "
+        "`docs/reports/baseline_ablation_study.md`.",
         "- Static dashboard data contract is generated under `docs/demo/`.",
         "",
         "## Stack Alignment",

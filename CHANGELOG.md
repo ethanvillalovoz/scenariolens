@@ -2,6 +2,16 @@
 
 All notable changes to ScenarioLens are documented here.
 
+## [Unreleased]
+
+### Added
+
+- Baseline ablation CLI/report comparing constant velocity, default lane-aware,
+  and strict lane-aware variants without gated Waymo downloads.
+- Lane-aware fallback reason summaries in Markdown/JSON reports and the static
+  Scenario Explorer dashboard payload.
+- Short animated demo GIF for the README public surface.
+
 ## [0.2.0] - 2026-06-28
 
 ### Added

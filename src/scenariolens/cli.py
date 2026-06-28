@@ -7,7 +7,10 @@ from dataclasses import asdict
 from pathlib import Path
 
 from scenariolens.baseline_compare import (
+    STRICT_LANE_MATCH_THRESHOLD_M,
+    json_baseline_ablation_report,
     json_baseline_comparison_report,
+    markdown_baseline_ablation_report,
     markdown_baseline_comparison_report,
 )
 from scenariolens.dashboard import generate_dashboard_data
@@ -423,6 +426,31 @@ def baseline_compare(
     return 0
 
 
+def baseline_ablation(
+    output_format: str,
+    output_path: str | None,
+    input_path: str | None,
+    strict_lane_threshold_m: float,
+) -> int:
+    scenarios = _load_or_synthetic(input_path)
+    if output_format == "json":
+        content = json_baseline_ablation_report(
+            scenarios,
+            strict_lane_match_threshold_m=strict_lane_threshold_m,
+        )
+    else:
+        content = markdown_baseline_ablation_report(
+            scenarios,
+            strict_lane_match_threshold_m=strict_lane_threshold_m,
+        )
+
+    if output_path:
+        Path(output_path).write_text(content, encoding="utf-8")
+    else:
+        print(content, end="")
+    return 0
+
+
 def render(
     scenario_id: str | None,
     top: int | None,
@@ -793,6 +821,35 @@ def main() -> int:
         default=None,
         help="Optional path to write instead of printing to stdout.",
     )
+    baseline_ablation_parser = subparsers.add_parser(
+        "baseline-ablation",
+        help=(
+            "Run a no-auth ablation over constant-velocity and lane-aware "
+            "prediction baseline variants."
+        ),
+    )
+    baseline_ablation_parser.add_argument(
+        "--input",
+        default=None,
+        help="Optional ScenarioLens JSON file. Defaults to built-in synthetic scenarios.",
+    )
+    baseline_ablation_parser.add_argument(
+        "--format",
+        choices=("markdown", "json"),
+        default="markdown",
+        help="Report output format.",
+    )
+    baseline_ablation_parser.add_argument(
+        "--strict-lane-threshold",
+        type=float,
+        default=STRICT_LANE_MATCH_THRESHOLD_M,
+        help="Lane-match threshold for the strict lane-aware variant.",
+    )
+    baseline_ablation_parser.add_argument(
+        "--output",
+        default=None,
+        help="Optional path to write instead of printing to stdout.",
+    )
     portfolio_parser = subparsers.add_parser(
         "portfolio-report",
         help="Generate the checked-in ScenarioLens portfolio report.",
@@ -959,6 +1016,13 @@ def main() -> int:
             limit=args.limit,
             output_path=args.output,
             input_path=args.input,
+        )
+    if args.command == "baseline-ablation":
+        return baseline_ablation(
+            output_format=args.format,
+            output_path=args.output,
+            input_path=args.input,
+            strict_lane_threshold_m=args.strict_lane_threshold,
         )
     if args.command == "portfolio-report":
         return portfolio_report(

@@ -88,6 +88,19 @@ baseline. Vehicles and cyclists use parsed lane polylines when map context is
 available; pedestrians, missing maps, low-speed tracks, and distant lane matches
 fall back to constant velocity.
 
+## Baseline Ablation
+
+```bash
+scenariolens baseline-ablation \
+  --format markdown \
+  --output docs/reports/baseline_ablation_study.md
+```
+
+This no-auth study compares constant velocity, the default lane-aware matcher,
+and a stricter lane-aware matcher over the checked-in fixture corpus. Use it
+when Waymo shard auth is blocked but you still want a reproducible technical
+proof point.
+
 ## Stability Study
 
 ```bash

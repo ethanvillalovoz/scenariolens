@@ -38,7 +38,7 @@ ScenarioLens builds a small but polished pipeline that can:
 5. Rank scenarios by evaluation value and baseline failure evidence.
 6. Present the results in a searchable demo/dashboard.
 
-![ScenarioLens Explorer dashboard](docs/demo/assets/scenariolens-explorer.png)
+![ScenarioLens Explorer demo](docs/demo/assets/scenariolens-demo.gif)
 
 ## Why It Is Credible
 
@@ -87,6 +87,7 @@ Then open `http://localhost:8000/demo/`.
 - [Real-slice failure study](docs/reports/waymo_motion_failure_study.md)
 - [Failure distribution stability study](docs/reports/waymo_motion_failure_stability.md)
 - [Lane-aware baseline comparison](docs/reports/lane_aware_baseline_study.md)
+- [No-auth baseline ablation study](docs/reports/baseline_ablation_study.md)
 - [Shard expansion plan](docs/reports/waymo_motion_shard_plan.md)
 
 For the end goal, user, non-goals, and work tracks, see
@@ -214,6 +215,8 @@ For windowed distribution stability over 75 real scenarios, see the
 [Waymo Motion Failure Distribution Stability Study](docs/reports/waymo_motion_failure_stability.md).
 For the lane-aware prediction baseline comparison, see the
 [Lane-Aware Baseline Study](docs/reports/lane_aware_baseline_study.md).
+For the no-auth constant-velocity vs lane-aware sensitivity check, see the
+[Baseline Ablation Study](docs/reports/baseline_ablation_study.md).
 For the next gated Waymo shard downloads and cross-shard command, see the
 [Waymo Motion Shard Expansion Plan](docs/reports/waymo_motion_shard_plan.md).
 Raw Waymo files and per-scenario outputs remain untracked.
@@ -279,6 +282,14 @@ PYTHONPATH=src python3 -m scenariolens.cli baseline-compare \
   --format markdown \
   --limit 8 \
   --output docs/reports/lane_aware_baseline_study.md
+```
+
+Run the no-auth baseline ablation:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli baseline-ablation \
+  --format markdown \
+  --output docs/reports/baseline_ablation_study.md
 ```
 
 Export the synthetic corpus as ScenarioLens JSON:

@@ -92,6 +92,54 @@ class CliTest(unittest.TestCase):
             self.assertIn("scenariolens.baseline_comparison.v1", json_path.read_text())
             self.assertIn("Lane-Aware Baseline Comparison", markdown_path.read_text())
             self.assertIn("synthetic_curved_lane_prediction", markdown_path.read_text())
+            self.assertIn("Fallback Reasons", markdown_path.read_text())
+
+    def test_baseline_ablation_outputs_markdown_and_json(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            json_path = Path(tmpdir) / "ablation.json"
+            markdown_path = Path(tmpdir) / "ablation.md"
+
+            json_result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "baseline-ablation",
+                    "--format",
+                    "json",
+                    "--output",
+                    str(json_path),
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+            markdown_result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "baseline-ablation",
+                    "--format",
+                    "markdown",
+                    "--strict-lane-threshold",
+                    "0.5",
+                    "--output",
+                    str(markdown_path),
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertEqual(json_result.stdout, "")
+            self.assertEqual(markdown_result.stdout, "")
+            self.assertIn("scenariolens.baseline_ablation.v1", json_path.read_text())
+            markdown = markdown_path.read_text()
+            self.assertIn("Baseline Ablation Study", markdown)
+            self.assertIn("lane_aware_strict", markdown)
 
     def test_ingest_csv_then_render_from_input(self) -> None:
         csv_text = (

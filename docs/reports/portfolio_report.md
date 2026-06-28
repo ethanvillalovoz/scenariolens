@@ -13,6 +13,7 @@ The current pipeline supports synthetic scenarios, ScenarioLens JSON, row-wise C
 - Normalized Waymo-shaped scenarios analyzed: 2
 - Unit tests cover schema I/O, ranking, taxonomy, ingestion, reporting, CLI flows, and SVG rendering.
 - Baseline comparison report is generated under `docs/reports/lane_aware_baseline_study.md`.
+- Baseline ablation report is generated under `docs/reports/baseline_ablation_study.md`.
 - Static dashboard data contract is generated under `docs/demo/`.
 
 ## Stack Alignment

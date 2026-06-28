@@ -152,6 +152,18 @@ Status: implemented in `src/scenariolens/prediction.py`,
 `src/scenariolens/baseline_compare.py`,
 `docs/reports/lane_aware_baseline_study.md`, and the static explorer payload.
 
+## Milestone 4C: No-Auth Baseline Ablation
+
+Goal: keep technical progress visible even when Waymo shard auth is blocked.
+
+- compare constant velocity, default lane-aware, and strict lane-aware variants,
+- summarize map-used/fallback counts and fallback reasons,
+- publish a checked-in ablation report from fixture data,
+- show fallback reason summaries in the explorer.
+
+Status: implemented in `scenariolens baseline-ablation`,
+`docs/reports/baseline_ablation_study.md`, and the dashboard payload.
+
 ## Milestone 4A: Production-Grade Repo Story
 
 Goal: make the end goal and system boundary obvious before a reviewer reads any

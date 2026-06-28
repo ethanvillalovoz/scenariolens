@@ -204,6 +204,9 @@ def _dashboard_item(
             ),
             "lane_aware_map_used_count": baseline_comparison.map_used_count,
             "lane_aware_fallback_count": baseline_comparison.fallback_count,
+            "lane_aware_fallback_reasons": _fallback_reasons(
+                baseline_comparison
+            ),
         },
         "tracks": {
             "count": len(scenario.tracks),
@@ -229,3 +232,20 @@ def _round_optional(value: float | None) -> float | None:
     if value is None:
         return None
     return round(value, 3)
+
+
+def _fallback_reasons(baseline_comparison: object) -> list[str]:
+    track_results = getattr(baseline_comparison, "track_results", ())
+    counts: dict[str, int] = {}
+    for row in track_results:
+        reason = getattr(row, "lane_fallback_reason", None)
+        if reason is None:
+            continue
+        counts[reason] = counts.get(reason, 0) + 1
+    return [
+        f"{reason} ({count})"
+        for reason, count in sorted(
+            counts.items(),
+            key=lambda item: (-item[1], item[0]),
+        )
+    ]

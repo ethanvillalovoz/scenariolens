@@ -14,6 +14,23 @@ expected to live only on a developer machine.
 The static explorer at `docs/demo/` is generated from these small fixtures so
 the repository remains lightweight, reviewable, and safe to clone.
 
+## No-Auth Technical Proof
+
+When authenticated Waymo shard downloads are unavailable, ScenarioLens still
+has a reproducible local technical path:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli baseline-ablation \
+  --format markdown \
+  --output docs/reports/baseline_ablation_study.md
+```
+
+The ablation compares constant velocity, default lane-aware matching, and a
+stricter lane-aware matcher over the checked-in fixture corpus. It is not a
+dataset-scale claim; it is a no-auth proof that the framework can compare
+baseline assumptions, summarize map-use/fallback behavior, and publish a
+public-safe report while gated downloads remain blocked.
+
 ## Real Dataset Path
 
 ScenarioLens has a local workflow for a downloaded public Waymo Motion slice:

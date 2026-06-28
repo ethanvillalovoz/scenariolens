@@ -11,6 +11,7 @@ robotics, AI/ML, and software engineering internship conversations.
 - Architecture: `docs/architecture.md`
 - Portfolio report: `docs/reports/portfolio_report.md`
 - Lane-aware baseline study: `docs/reports/lane_aware_baseline_study.md`
+- Baseline ablation study: `docs/reports/baseline_ablation_study.md`
 - Technical case study: `docs/case_studies/waymo_baseline_failures.md`
 - Real-data case study: `docs/reports/waymo_motion_case_study.md`
 - Tech stack rationale: `docs/tech_stack.md`
@@ -45,7 +46,7 @@ Use one bullet if space is tight:
 Use two bullets if the project gets a dedicated entry:
 
 - Built ScenarioLens, a local-first autonomy scenario evaluation tool that ingests synthetic, Waymo Motion-shaped JSON, normalized CSV, and small downloaded Waymo Motion TFRecord slices, then ranks long-tail cases using interpretable proximity, TTC, VRU, path-conflict, density, and taxonomy features.
-- Shipped a tested portfolio demo with 93 Python unit tests, GitHub Actions CI, SVG trajectory rendering, deterministic dashboard data, lane-aware baseline comparison, and a static Scenario Explorer deployed at `ethanvillalovoz.com/scenariolens`.
+- Shipped a tested portfolio demo with 94 Python unit tests, GitHub Actions CI, SVG trajectory rendering, deterministic dashboard data, lane-aware baseline comparison, and a static Scenario Explorer deployed at `ethanvillalovoz.com/scenariolens`.
 
 Short project line:
 
