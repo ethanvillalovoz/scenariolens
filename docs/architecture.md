@@ -9,7 +9,7 @@ flowchart LR
     M["Waymo Motion TFRecord / proto slices"] --> C
     C --> D
     D --> E["Quality-filtered scored context"]
-    D --> P["Constant-velocity prediction baseline"]
+    D --> P["Prediction baselines"]
     E --> F["Metrics and taxonomy scoring"]
     P --> F
     F --> G["Markdown and JSON reports"]
@@ -30,7 +30,8 @@ flowchart LR
 | Ingestion | `src/scenariolens/ingest/` | Converts CSV, Waymo Motion-shaped JSON, binary protos, and TFRecord slices into ScenarioLens scenarios. |
 | Readiness and validation | `src/scenariolens/waymo_readiness.py`, `src/scenariolens/slice_validation.py` | Checks local dataset setup and produces reproducible validation packets. |
 | Metrics | `src/scenariolens/metrics.py` | Computes interpretable interaction features such as density, proximity, TTC, VRU context, path conflict, and dynamics. |
-| Prediction baseline | `src/scenariolens/prediction.py` | Evaluates a constant-velocity forecast on Waymo prediction targets or non-ego fixture tracks, producing ADE/FDE, miss rate, and failure score. |
+| Prediction baseline | `src/scenariolens/prediction.py` | Evaluates constant-velocity and lane-aware forecasts on Waymo prediction targets or non-ego fixture tracks, producing ADE/FDE, miss rate, failure score, and comparison deltas. |
+| Baseline comparison | `src/scenariolens/baseline_compare.py` | Generates public-safe Markdown/JSON comparison reports for constant-velocity versus lane-aware prediction baselines. |
 | Failure study | `src/scenariolens/failure_study.py` | Aggregates ADE/FDE, miss rate, tag-level failures, score-component failures, and hardest scenario ids without publishing raw data. |
 | Failure stability | `src/scenariolens/failure_stability.py` | Compares aggregate failure distributions across multiple inputs or contiguous scenario windows to show whether baseline failures are stable. |
 | Taxonomy | `src/scenariolens/taxonomy.py` | Normalizes scenario tags and adds category-level ranking signal. |
@@ -61,7 +62,7 @@ heuristic over interpretable features:
 - vulnerable-road-user proximity,
 - sampled path-conflict proximity,
 - maximum speed and braking context,
-- constant-velocity baseline ADE/FDE and miss rate,
+- constant-velocity baseline ADE/FDE, lane-aware comparison deltas, and miss rate,
 - scenario taxonomy tags.
 
 The score is designed to help engineers choose cases for deeper review,

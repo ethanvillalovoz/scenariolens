@@ -42,8 +42,56 @@ class CliTest(unittest.TestCase):
                 text=True,
             )
 
-            self.assertIn("Exported 10 scenario(s)", export_result.stdout)
+            self.assertIn("Exported 11 scenario(s)", export_result.stdout)
             self.assertIn('"reported_count": 1', report_result.stdout)
+
+    def test_baseline_compare_outputs_markdown_and_json(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            json_path = Path(tmpdir) / "comparison.json"
+            markdown_path = Path(tmpdir) / "comparison.md"
+
+            json_result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "baseline-compare",
+                    "--format",
+                    "json",
+                    "--limit",
+                    "1",
+                    "--output",
+                    str(json_path),
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+            markdown_result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "baseline-compare",
+                    "--format",
+                    "markdown",
+                    "--limit",
+                    "1",
+                    "--output",
+                    str(markdown_path),
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertEqual(json_result.stdout, "")
+            self.assertEqual(markdown_result.stdout, "")
+            self.assertIn("scenariolens.baseline_comparison.v1", json_path.read_text())
+            self.assertIn("Lane-Aware Baseline Comparison", markdown_path.read_text())
+            self.assertIn("synthetic_curved_lane_prediction", markdown_path.read_text())
 
     def test_ingest_csv_then_render_from_input(self) -> None:
         csv_text = (

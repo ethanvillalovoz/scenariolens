@@ -6,6 +6,10 @@ import sys
 from dataclasses import asdict
 from pathlib import Path
 
+from scenariolens.baseline_compare import (
+    json_baseline_comparison_report,
+    markdown_baseline_comparison_report,
+)
 from scenariolens.dashboard import generate_dashboard_data
 from scenariolens.failure_study import (
     FAILURE_STUDY_INPUT_FORMATS,
@@ -400,6 +404,25 @@ def report(
     return 0
 
 
+def baseline_compare(
+    output_format: str,
+    limit: int | None,
+    output_path: str | None,
+    input_path: str | None,
+) -> int:
+    scenarios = _load_or_synthetic(input_path)
+    if output_format == "json":
+        content = json_baseline_comparison_report(scenarios, limit=limit)
+    else:
+        content = markdown_baseline_comparison_report(scenarios, limit=limit)
+
+    if output_path:
+        Path(output_path).write_text(content, encoding="utf-8")
+    else:
+        print(content, end="")
+    return 0
+
+
 def render(
     scenario_id: str | None,
     top: int | None,
@@ -744,6 +767,32 @@ def main() -> int:
         default=None,
         help="Optional path to write instead of printing to stdout.",
     )
+    baseline_compare_parser = subparsers.add_parser(
+        "baseline-compare",
+        help="Compare constant-velocity and lane-aware prediction baselines.",
+    )
+    baseline_compare_parser.add_argument(
+        "--input",
+        default=None,
+        help="Optional ScenarioLens JSON file. Defaults to built-in synthetic scenarios.",
+    )
+    baseline_compare_parser.add_argument(
+        "--format",
+        choices=("markdown", "json"),
+        default="markdown",
+        help="Report output format.",
+    )
+    baseline_compare_parser.add_argument(
+        "--limit",
+        type=int,
+        default=None,
+        help="Maximum number of comparison rows to include.",
+    )
+    baseline_compare_parser.add_argument(
+        "--output",
+        default=None,
+        help="Optional path to write instead of printing to stdout.",
+    )
     portfolio_parser = subparsers.add_parser(
         "portfolio-report",
         help="Generate the checked-in ScenarioLens portfolio report.",
@@ -899,6 +948,13 @@ def main() -> int:
         )
     if args.command == "report":
         return report(
+            output_format=args.format,
+            limit=args.limit,
+            output_path=args.output,
+            input_path=args.input,
+        )
+    if args.command == "baseline-compare":
+        return baseline_compare(
             output_format=args.format,
             limit=args.limit,
             output_path=args.output,

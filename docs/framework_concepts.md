@@ -33,10 +33,13 @@ safety score.
 
 ## Baseline Evaluator
 
-The current evaluator is a constant-velocity prediction baseline. It computes
-ADE, FDE, max FDE, miss rate, and a failure score on prediction targets. This is
-simple on purpose: the baseline creates a measurable reference point for future
-lane-aware or simulation-backed comparisons.
+The default evaluator is a constant-velocity prediction baseline. It computes
+ADE, FDE, max FDE, miss rate, and a failure score on prediction targets. A
+second lane-aware comparison baseline uses parsed lane polylines for
+vehicle/cyclist targets when map context is available, then falls back to
+constant velocity for pedestrians, missing maps, low-speed tracks, or distant
+lane matches. This keeps the core baseline stable while showing how map context
+can reduce forecast error on curved-road cases.
 
 ## Reports
 
@@ -53,7 +56,8 @@ score components, baseline failures, and links to the public reports.
 ## Extension Points
 
 - Add a dataset adapter for another public motion dataset.
-- Add a stronger prediction baseline.
+- Add another prediction baseline or calibrate the lane-aware matcher on more
+  public data.
 - Add map-aware features or traffic-light summaries.
 - Add a Waymax/JAX replay path for selected hard scenarios.
 - Add additional public-safe report types.

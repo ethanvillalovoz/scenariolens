@@ -61,6 +61,12 @@ const metricLabels = {
   baseline_max_fde_m: "Max baseline FDE",
   baseline_miss_rate: "Baseline miss rate",
   baseline_failure_score: "Baseline failure",
+  lane_aware_ade_m: "Lane-aware ADE",
+  lane_aware_fde_m: "Lane-aware FDE",
+  lane_aware_miss_rate: "Lane-aware miss rate",
+  baseline_fde_improvement_m: "FDE improvement",
+  lane_aware_map_used_count: "Lane map used",
+  lane_aware_fallback_count: "Lane fallback",
 };
 
 const metricUnits = {
@@ -74,6 +80,9 @@ const metricUnits = {
   baseline_ade_m: "m",
   baseline_fde_m: "m",
   baseline_max_fde_m: "m",
+  lane_aware_ade_m: "m",
+  lane_aware_fde_m: "m",
+  baseline_fde_improvement_m: "m",
 };
 
 async function boot() {
@@ -228,23 +237,56 @@ function renderDetail(scenario, scenarios) {
 
 function baselineCard(scenario) {
   const metrics = scenario.metrics;
-  const missRate = metrics.baseline_miss_rate === null || metrics.baseline_miss_rate === undefined
-    ? "n/a"
-    : `${formatNumber(metrics.baseline_miss_rate * 100)}%`;
+  const cvMissRate = percentMetric(metrics.baseline_miss_rate);
+  const laneMissRate = percentMetric(metrics.lane_aware_miss_rate);
   const evaluatedTargets = formatMetric(metrics.prediction_target_evaluated_count);
-  return `
-    <div class="baseline-grid">
-      <div>
-        <dt>ADE</dt>
-        <dd>${formatMetric(metrics.baseline_ade_m, "m")}</dd>
+  const laneFde = metrics.lane_aware_fde_m;
+  const hasLaneComparison = laneFde !== null && laneFde !== undefined;
+  if (!hasLaneComparison) {
+    return `
+      <div class="baseline-grid">
+        <div>
+          <dt>ADE</dt>
+          <dd>${formatMetric(metrics.baseline_ade_m, "m")}</dd>
+        </div>
+        <div>
+          <dt>FDE</dt>
+          <dd>${formatMetric(metrics.baseline_fde_m, "m")}</dd>
+        </div>
+        <div>
+          <dt>Miss rate</dt>
+          <dd>${cvMissRate}</dd>
+        </div>
+        <div>
+          <dt>Targets</dt>
+          <dd>${evaluatedTargets}</dd>
+        </div>
       </div>
+      <p>${escapeHtml(baselineInterpretation(metrics))}</p>
+    `;
+  }
+
+  return `
+    <div class="baseline-grid compare-grid">
       <div>
-        <dt>FDE</dt>
+        <dt>CV FDE</dt>
         <dd>${formatMetric(metrics.baseline_fde_m, "m")}</dd>
       </div>
       <div>
-        <dt>Miss rate</dt>
-        <dd>${missRate}</dd>
+        <dt>Lane FDE</dt>
+        <dd>${formatMetric(metrics.lane_aware_fde_m, "m")}</dd>
+      </div>
+      <div>
+        <dt>FDE delta</dt>
+        <dd>${formatDelta(metrics.baseline_fde_improvement_m)}</dd>
+      </div>
+      <div>
+        <dt>Lane miss</dt>
+        <dd>${laneMissRate}</dd>
+      </div>
+      <div>
+        <dt>Map used</dt>
+        <dd>${formatMetric(metrics.lane_aware_map_used_count)}</dd>
       </div>
       <div>
         <dt>Targets</dt>
@@ -261,6 +303,9 @@ function baselineInterpretation(metrics) {
   }
   if (metrics.baseline_fde_m >= 20 || (metrics.baseline_miss_rate ?? 0) >= 0.75) {
     return "The constant-velocity baseline struggles here, making this a useful scenario for deeper prediction or replay analysis.";
+  }
+  if ((metrics.baseline_fde_improvement_m ?? 0) > 1.0 && (metrics.lane_aware_map_used_count ?? 0) > 0) {
+    return "The lane-aware baseline reduces final displacement error here, showing why map context can matter for prediction evaluation.";
   }
   if (metrics.baseline_fde_m >= 5) {
     return "The baseline has moderate error here, useful for comparing against stronger forecasting assumptions.";
@@ -512,6 +557,18 @@ function formatMetric(value, unit) {
     return formatNumber(value);
   }
   return `${formatNumber(value)}${unit ? ` ${unit}` : ""}`;
+}
+
+function percentMetric(value) {
+  return value === null || value === undefined ? "n/a" : `${formatNumber(value * 100)}%`;
+}
+
+function formatDelta(value) {
+  if (value === null || value === undefined) {
+    return "n/a";
+  }
+  const formatted = formatNumber(value);
+  return value > 0 ? `+${formatted} m` : `${formatted} m`;
 }
 
 function formatNumber(value) {

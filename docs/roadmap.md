@@ -104,7 +104,7 @@ contract.
 - document the static payload shape for future UI work.
 
 Status: implemented in `docs/demo/scenarios.json` and `docs/demo/assets/`,
-including baseline ADE/FDE and failure-score fields.
+including baseline ADE/FDE, lane-aware comparison, and failure-score fields.
 
 ## Milestone 3D: Baseline Failure Mining
 
@@ -135,6 +135,22 @@ Goal: make the repo recruiter- and engineer-readable.
 Status: in progress. The repo has CI, a portfolio report, a local Scenario
 Explorer demo, a `docs/` entrypoint ready for GitHub Pages publishing, a product
 strategy, an architecture map, recruiting notes, and suggested GitHub metadata.
+
+## Milestone 4B: Lane-Aware Baseline Comparison
+
+Goal: show that ScenarioLens can move beyond constant-velocity scoring while
+remaining laptop-friendly.
+
+- add a second prediction baseline using parsed lane polylines,
+- keep constant velocity as the default scoring baseline,
+- preserve fallback behavior for pedestrians, missing maps, low-speed tracks,
+  and distant lane matches,
+- add a curved-lane fixture with an obvious comparison win,
+- expose comparison metrics in CLI reports and the Scenario Explorer.
+
+Status: implemented in `src/scenariolens/prediction.py`,
+`src/scenariolens/baseline_compare.py`,
+`docs/reports/lane_aware_baseline_study.md`, and the static explorer payload.
 
 ## Milestone 4A: Production-Grade Repo Story
 
@@ -167,7 +183,7 @@ windowed stability report in
 `docs/reports/waymo_motion_failure_stability.md`. Next work is to download more
 validation shards from `docs/reports/waymo_motion_shard_plan.md`, rerun
 `failure-study-stability` with multiple `--input` paths, and use the hardest
-scenario ids to motivate a stronger baseline or Waymax replay.
+scenario ids plus lane-aware comparison deltas to motivate a Waymax replay.
 
 ## Stretch Goals
 

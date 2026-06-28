@@ -12,12 +12,13 @@ class PortfolioTest(unittest.TestCase):
         scores = ranked_scores(synthetic_scenarios())[:1]
 
         markdown = portfolio_markdown(
-            synthetic_count=10,
+            synthetic_count=11,
             waymo_native_count=1,
             waymo_like_count=2,
             synthetic_scores=scores,
             waymo_native_scores=scores,
             waymo_scores=scores,
+            lane_comparisons=(),
             asset_prefix=Path("assets"),
         )
 
@@ -25,12 +26,14 @@ class PortfolioTest(unittest.TestCase):
         self.assertIn("## Executive Summary", markdown)
         self.assertIn("## Stack Alignment", markdown)
         self.assertIn("## Top Synthetic Scenarios", markdown)
+        self.assertIn("## Lane-Aware Baseline Comparison", markdown)
         self.assertIn("## Native Waymo Motion JSON Mini-Slice", markdown)
         self.assertIn("## Normalized Waymo-Shaped Fixture Results", markdown)
         self.assertIn("## Limitations", markdown)
         self.assertIn("## Next Work", markdown)
         self.assertIn("Component scores", markdown)
         self.assertIn("Baseline FDE", markdown)
+        self.assertIn("lane_aware_baseline_study.md", markdown)
 
     def test_generate_portfolio_report_writes_markdown_and_assets(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

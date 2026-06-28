@@ -16,9 +16,10 @@ The production copy is embedded in Ethan's personal portfolio site at
 `https://ethanvillalovoz.com/scenariolens/`.
 
 The demo data is intentionally small: synthetic scenarios plus tiny
-Waymo Motion-shaped fixtures. Each scenario includes interaction-risk metrics
-and a constant-velocity prediction baseline so the explorer can surface cases
-where a simple forecast fails. See
+Waymo Motion-shaped fixtures. Each scenario includes interaction-risk metrics,
+a constant-velocity prediction baseline, and lane-aware comparison fields when
+map context is available so the explorer can surface cases where a simple
+forecast fails. See
 [`docs/data_provenance.md`](../data_provenance.md) for the exact data status.
 See [`docs/project_strategy.md`](../project_strategy.md) for the product goal
 and [`docs/architecture.md`](../architecture.md) for the data-flow map.
@@ -38,8 +39,8 @@ The explorer also links to
 [`docs/reports/waymo_motion_case_study.md`](../reports/waymo_motion_case_study.md)
 as the public-safe summary of the local real Waymo Motion smoke test.
 The first viewport links to the failure study, stability study, shard expansion
-plan, and portfolio packet so reviewers can jump from the product surface to
-the evidence behind it.
+plan, lane-aware comparison study, and portfolio packet so reviewers can jump
+from the product surface to the evidence behind it.
 
 Regenerate with:
 
@@ -59,6 +60,7 @@ scenariolens dashboard-data \
 - score totals and component scores,
 - raw and scored-context metrics used in ranking,
 - constant-velocity baseline ADE/FDE, miss rate, target source, and failure score,
+- lane-aware ADE/FDE, miss rate, FDE improvement, map-used count, and fallback count,
 - Waymo metadata credibility fields such as SDC presence, prediction targets,
   and objects of interest when available,
 - taxonomy tags,

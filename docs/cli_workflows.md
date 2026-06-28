@@ -74,6 +74,20 @@ scenariolens failure-study \
   --public-report docs/reports/waymo_motion_failure_study.md
 ```
 
+## Baseline Comparison
+
+```bash
+scenariolens baseline-compare \
+  --format markdown \
+  --limit 8 \
+  --output docs/reports/lane_aware_baseline_study.md
+```
+
+This compares the default constant-velocity baseline against the lane-aware
+baseline. Vehicles and cyclists use parsed lane polylines when map context is
+available; pedestrians, missing maps, low-speed tracks, and distant lane matches
+fall back to constant velocity.
+
 ## Stability Study
 
 ```bash

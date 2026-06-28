@@ -1,12 +1,12 @@
 {
   "format": "scenariolens.dashboard.v1",
-  "scenario_count": 13,
-  "reported_count": 13,
+  "scenario_count": 14,
+  "reported_count": 14,
   "datasets": [
     {
       "dataset_id": "synthetic",
       "label": "Synthetic scenarios",
-      "scenario_count": 10
+      "scenario_count": 11
     },
     {
       "dataset_id": "waymo_native_json",
@@ -114,7 +114,13 @@
         "baseline_fde_m": 0.0,
         "baseline_max_fde_m": 0.0,
         "baseline_miss_rate": 0.0,
-        "baseline_failure_score": 0.45
+        "baseline_failure_score": 0.45,
+        "lane_aware_ade_m": 0.0,
+        "lane_aware_fde_m": 0.0,
+        "lane_aware_miss_rate": 0.0,
+        "baseline_fde_improvement_m": 0.0,
+        "lane_aware_map_used_count": 0,
+        "lane_aware_fallback_count": 3
       },
       "tracks": {
         "count": 4,
@@ -185,7 +191,13 @@
         "baseline_fde_m": 0.0,
         "baseline_max_fde_m": 0.0,
         "baseline_miss_rate": 0.0,
-        "baseline_failure_score": 0.3
+        "baseline_failure_score": 0.3,
+        "lane_aware_ade_m": 0.0,
+        "lane_aware_fde_m": 0.0,
+        "lane_aware_miss_rate": 0.0,
+        "baseline_fde_improvement_m": 0.0,
+        "lane_aware_map_used_count": 0,
+        "lane_aware_fallback_count": 2
       },
       "tracks": {
         "count": 3,
@@ -258,7 +270,13 @@
         "baseline_fde_m": 0.0,
         "baseline_max_fde_m": 0.0,
         "baseline_miss_rate": 0.0,
-        "baseline_failure_score": 0.15
+        "baseline_failure_score": 0.15,
+        "lane_aware_ade_m": 0.0,
+        "lane_aware_fde_m": 0.0,
+        "lane_aware_miss_rate": 0.0,
+        "baseline_fde_improvement_m": 0.0,
+        "lane_aware_map_used_count": 0,
+        "lane_aware_fallback_count": 1
       },
       "tracks": {
         "count": 3,
@@ -327,7 +345,13 @@
         "baseline_fde_m": 0.0,
         "baseline_max_fde_m": 0.0,
         "baseline_miss_rate": 0.0,
-        "baseline_failure_score": 0.3
+        "baseline_failure_score": 0.3,
+        "lane_aware_ade_m": 0.0,
+        "lane_aware_fde_m": 0.0,
+        "lane_aware_miss_rate": 0.0,
+        "baseline_fde_improvement_m": 0.0,
+        "lane_aware_map_used_count": 0,
+        "lane_aware_fallback_count": 2
       },
       "tracks": {
         "count": 3,
@@ -396,7 +420,13 @@
         "baseline_fde_m": 0.0,
         "baseline_max_fde_m": 0.0,
         "baseline_miss_rate": 0.0,
-        "baseline_failure_score": 0.3
+        "baseline_failure_score": 0.3,
+        "lane_aware_ade_m": 0.0,
+        "lane_aware_fde_m": 0.0,
+        "lane_aware_miss_rate": 0.0,
+        "baseline_fde_improvement_m": 0.0,
+        "lane_aware_map_used_count": 0,
+        "lane_aware_fallback_count": 2
       },
       "tracks": {
         "count": 3,
@@ -465,7 +495,13 @@
         "baseline_fde_m": 0.1,
         "baseline_max_fde_m": 0.1,
         "baseline_miss_rate": 0.0,
-        "baseline_failure_score": 0.196
+        "baseline_failure_score": 0.196,
+        "lane_aware_ade_m": 0.1,
+        "lane_aware_fde_m": 0.1,
+        "lane_aware_miss_rate": 0.0,
+        "baseline_fde_improvement_m": 0.0,
+        "lane_aware_map_used_count": 0,
+        "lane_aware_fallback_count": 1
       },
       "tracks": {
         "count": 2,
@@ -533,7 +569,13 @@
         "baseline_fde_m": 0.0,
         "baseline_max_fde_m": 0.0,
         "baseline_miss_rate": 0.0,
-        "baseline_failure_score": 0.15
+        "baseline_failure_score": 0.15,
+        "lane_aware_ade_m": 0.0,
+        "lane_aware_fde_m": 0.0,
+        "lane_aware_miss_rate": 0.0,
+        "baseline_fde_improvement_m": 0.0,
+        "lane_aware_map_used_count": 0,
+        "lane_aware_fallback_count": 1
       },
       "tracks": {
         "count": 2,
@@ -599,7 +641,13 @@
         "baseline_fde_m": 0.2,
         "baseline_max_fde_m": 0.2,
         "baseline_miss_rate": 0.0,
-        "baseline_failure_score": 0.242
+        "baseline_failure_score": 0.242,
+        "lane_aware_ade_m": 0.2,
+        "lane_aware_fde_m": 0.2,
+        "lane_aware_miss_rate": 0.0,
+        "baseline_fde_improvement_m": 0.0,
+        "lane_aware_map_used_count": 0,
+        "lane_aware_fallback_count": 1
       },
       "tracks": {
         "count": 2,
@@ -663,7 +711,13 @@
         "baseline_fde_m": 0.0,
         "baseline_max_fde_m": 0.0,
         "baseline_miss_rate": 0.0,
-        "baseline_failure_score": 0.3
+        "baseline_failure_score": 0.3,
+        "lane_aware_ade_m": 0.0,
+        "lane_aware_fde_m": 0.0,
+        "lane_aware_miss_rate": 0.0,
+        "baseline_fde_improvement_m": 0.0,
+        "lane_aware_map_used_count": 0,
+        "lane_aware_fallback_count": 2
       },
       "tracks": {
         "count": 3,
@@ -727,7 +781,13 @@
         "baseline_fde_m": 1.0,
         "baseline_max_fde_m": 1.0,
         "baseline_miss_rate": 0.0,
-        "baseline_failure_score": 0.61
+        "baseline_failure_score": 0.61,
+        "lane_aware_ade_m": 1.0,
+        "lane_aware_fde_m": 1.0,
+        "lane_aware_miss_rate": 0.0,
+        "baseline_fde_improvement_m": 0.0,
+        "lane_aware_map_used_count": 0,
+        "lane_aware_fallback_count": 1
       },
       "tracks": {
         "count": 2,
@@ -791,7 +851,13 @@
         "baseline_fde_m": 0.0,
         "baseline_max_fde_m": 0.0,
         "baseline_miss_rate": 0.0,
-        "baseline_failure_score": 0.45
+        "baseline_failure_score": 0.45,
+        "lane_aware_ade_m": 0.0,
+        "lane_aware_fde_m": 0.0,
+        "lane_aware_miss_rate": 0.0,
+        "baseline_fde_improvement_m": 0.0,
+        "lane_aware_map_used_count": 0,
+        "lane_aware_fallback_count": 3
       },
       "tracks": {
         "count": 4,
@@ -803,6 +869,77 @@
     },
     {
       "rank": 12,
+      "scenario_id": "synthetic_curved_lane_prediction",
+      "dataset_id": "synthetic",
+      "dataset_label": "Synthetic scenarios",
+      "source": "synthetic",
+      "svg_path": "assets/synthetic_curved_lane_prediction.svg",
+      "tags": [
+        "map_context",
+        "tracks_to_predict"
+      ],
+      "reasons": [
+        "includes 1 Waymo prediction target(s)",
+        "agent paths come within 2.000 m",
+        "constant-velocity baseline FDE is 5.831 m across 1 target(s)",
+        "baseline miss rate is 100.0%"
+      ],
+      "score": {
+        "interaction": 6.902,
+        "taxonomy": 0,
+        "components": {
+          "density": 0.5,
+          "vru": 0.0,
+          "taxonomy": 0,
+          "proximity": 0.174,
+          "ttc": 0.0,
+          "vru_proximity": 0.0,
+          "path_conflict": 1.5,
+          "dynamics": 0.0,
+          "baseline_failure": 4.728
+        }
+      },
+      "metrics": {
+        "agent_count": 2,
+        "scoring_agent_count": 2,
+        "excluded_track_count": 0,
+        "low_quality_track_count": 0,
+        "vulnerable_road_user_count": 0,
+        "scoring_vulnerable_road_user_count": 0,
+        "sdc_track_present": true,
+        "prediction_target_count": 1,
+        "object_of_interest_count": 0,
+        "min_pairwise_distance_m": 7.826,
+        "min_vru_distance_m": null,
+        "min_path_distance_m": 2.0,
+        "min_time_to_collision_s": null,
+        "max_speed_mps": 4.031,
+        "ego_max_speed_mps": 4.0,
+        "max_deceleration_mps2": 0.646,
+        "prediction_target_source": "waymo_tracks_to_predict",
+        "prediction_target_evaluated_count": 1,
+        "baseline_ade_m": 3.817,
+        "baseline_fde_m": 5.831,
+        "baseline_max_fde_m": 5.831,
+        "baseline_miss_rate": 1.0,
+        "baseline_failure_score": 4.728,
+        "lane_aware_ade_m": 0.63,
+        "lane_aware_fde_m": 0.615,
+        "lane_aware_miss_rate": 0.0,
+        "baseline_fde_improvement_m": 5.216,
+        "lane_aware_map_used_count": 1,
+        "lane_aware_fallback_count": 0
+      },
+      "tracks": {
+        "count": 2,
+        "ego_track_id": "ego",
+        "agent_types": [
+          "vehicle"
+        ]
+      }
+    },
+    {
+      "rank": 13,
       "scenario_id": "synthetic_easy_following",
       "dataset_id": "synthetic",
       "dataset_label": "Synthetic scenarios",
@@ -852,7 +989,13 @@
         "baseline_fde_m": 0.0,
         "baseline_max_fde_m": 0.0,
         "baseline_miss_rate": 0.0,
-        "baseline_failure_score": 0.15
+        "baseline_failure_score": 0.15,
+        "lane_aware_ade_m": 0.0,
+        "lane_aware_fde_m": 0.0,
+        "lane_aware_miss_rate": 0.0,
+        "baseline_fde_improvement_m": 0.0,
+        "lane_aware_map_used_count": 0,
+        "lane_aware_fallback_count": 1
       },
       "tracks": {
         "count": 2,
@@ -863,7 +1006,7 @@
       }
     },
     {
-      "rank": 13,
+      "rank": 14,
       "scenario_id": "synthetic_open_road_baseline",
       "dataset_id": "synthetic",
       "dataset_label": "Synthetic scenarios",
@@ -913,7 +1056,13 @@
         "baseline_fde_m": 0.0,
         "baseline_max_fde_m": 0.0,
         "baseline_miss_rate": 0.0,
-        "baseline_failure_score": 0.15
+        "baseline_failure_score": 0.15,
+        "lane_aware_ade_m": 0.0,
+        "lane_aware_fde_m": 0.0,
+        "lane_aware_miss_rate": 0.0,
+        "baseline_fde_improvement_m": 0.0,
+        "lane_aware_map_used_count": 0,
+        "lane_aware_fallback_count": 1
       },
       "tracks": {
         "count": 1,

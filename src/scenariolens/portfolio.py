@@ -2,10 +2,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from scenariolens.baseline_compare import baseline_comparisons
 from scenariolens.ingest.waymo_motion import (
     load_normalized_motion_csv,
     load_waymo_motion,
 )
+from scenariolens.prediction import PredictionBaselineComparison
 from scenariolens.report import ranked_scores, score_reasons
 from scenariolens.samples import synthetic_scenarios
 from scenariolens.schema import Scenario, ScenarioScore
@@ -56,6 +58,7 @@ def generate_portfolio_report(
             synthetic_scores=synthetic_scores,
             waymo_native_scores=waymo_native_scores,
             waymo_scores=waymo_scores,
+            lane_comparisons=baseline_comparisons(synthetic, limit=3),
             asset_prefix=assets.relative_to(target.parent),
         ),
         encoding="utf-8",
@@ -70,6 +73,7 @@ def portfolio_markdown(
     waymo_native_scores: tuple[ScenarioScore, ...],
     waymo_scores: tuple[ScenarioScore, ...],
     asset_prefix: Path,
+    lane_comparisons: tuple[PredictionBaselineComparison, ...] = (),
 ) -> str:
     lines = [
         "# ScenarioLens Portfolio Report",
@@ -81,7 +85,8 @@ def portfolio_markdown(
         "scenarios using lightweight interaction metrics, ODD-relevant taxonomy "
         "tags, vulnerable-road-user counts, same-timestep proximity, path-conflict "
         "proximity, dynamics, a screened constant-velocity time-to-collision proxy, "
-        "and a constant-velocity prediction baseline with ADE/FDE-style errors.",
+        "a constant-velocity prediction baseline with ADE/FDE-style errors, and "
+        "a lane-aware comparison baseline for map-backed vehicle/cyclist targets.",
         "",
         "The current pipeline supports synthetic scenarios, ScenarioLens JSON, "
         "row-wise CSV ingestion, normalized Waymo Motion-shaped fixtures, and "
@@ -96,6 +101,8 @@ def portfolio_markdown(
         f"- Normalized Waymo-shaped scenarios analyzed: {waymo_like_count}",
         "- Unit tests cover schema I/O, ranking, taxonomy, ingestion, reporting, "
         "CLI flows, and SVG rendering.",
+        "- Baseline comparison report is generated under "
+        "`docs/reports/lane_aware_baseline_study.md`.",
         "- Static dashboard data contract is generated under `docs/demo/`.",
         "",
         "## Stack Alignment",
@@ -111,6 +118,7 @@ def portfolio_markdown(
     ]
 
     lines.extend(_score_section(synthetic_scores, asset_prefix))
+    lines.extend(_lane_comparison_section(lane_comparisons))
     lines.extend(
         [
             "## Native Waymo Motion JSON Mini-Slice",
@@ -141,19 +149,58 @@ def portfolio_markdown(
             "- Checked-in Waymo examples are synthetic mini fixtures, not downloaded real validation shards.",
             "- The lightweight binary reader extracts the Motion fields ScenarioLens needs, not the full Waymo proto surface.",
             "- The TTC value is a screened constant-velocity proxy, not a certified safety metric.",
-            "- The prediction baseline is intentionally simple; it is a failure-mining screen, not a benchmark claim.",
+            "- The prediction baselines are intentionally simple; they are failure-mining screens, not benchmark claims.",
             "- The current renderer is 2D and focuses on agent trajectories, map context, and baseline overlays, not traffic-light logic.",
             "",
             "## Next Work",
             "",
             "- Expand the documented local-slice recipe across more Waymo Motion validation shards.",
             "- Compare baseline ADE/FDE distributions across more validation shards.",
+            "- Calibrate lane-aware comparison behavior on more real Motion slices.",
             "- Add traffic-light and richer lane-context features from native Motion records.",
             "- Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.",
             "",
         ]
     )
     return "\n".join(lines).rstrip() + "\n"
+
+
+def _lane_comparison_section(
+    comparisons: tuple[PredictionBaselineComparison, ...],
+) -> list[str]:
+    lines = [
+        "## Lane-Aware Baseline Comparison",
+        "",
+        "This section compares the default constant-velocity predictor with a "
+        "lightweight lane-aware predictor. Positive improvement means the "
+        "lane-aware baseline lowered FDE while preserving constant-velocity "
+        "fallback behavior for unsupported cases.",
+        "",
+        "| Rank | Scenario | CV FDE | Lane FDE | Improvement | Map used | Fallbacks |",
+        "| ---: | --- | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    if not comparisons:
+        lines.extend(["| n/a | n/a | n/a | n/a | n/a | n/a | n/a |", ""])
+        return lines
+
+    for rank, comparison in enumerate(comparisons, start=1):
+        lines.append(
+            "| "
+            f"{rank} | `{comparison.scenario_id}` | "
+            f"{_format_optional(comparison.constant_velocity_fde_m, 'm')} | "
+            f"{_format_optional(comparison.lane_aware_fde_m, 'm')} | "
+            f"{_format_optional(comparison.fde_improvement_m, 'm')} | "
+            f"{comparison.map_used_count} | "
+            f"{comparison.fallback_count} |"
+        )
+    lines.extend(
+        [
+            "",
+            "Full report: `docs/reports/lane_aware_baseline_study.md`.",
+            "",
+        ]
+    )
+    return lines
 
 
 def _score_section(scores: tuple[ScenarioScore, ...], asset_prefix: Path) -> list[str]:

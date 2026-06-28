@@ -7,8 +7,9 @@ long-tail motion scenarios and finding where simple prediction baselines fail.
 
 It ingests public Waymo Motion-shaped data and small local TFRecord slices,
 computes interpretable interaction metrics, evaluates a constant-velocity
-baseline with ADE/FDE and miss rate, then publishes public-safe reports and a
-static Scenario Explorer.
+baseline with ADE/FDE and miss rate, compares a lightweight lane-aware baseline
+where map context exists, then publishes public-safe reports and a static
+Scenario Explorer.
 
 The goal is not to build a self-driving system. It is to build the kind of
 evaluation tooling autonomy teams rely on: scenario triage, failure analysis,

@@ -2,7 +2,7 @@
 
 All notable changes to ScenarioLens are documented here.
 
-## [0.2.0] - Planned
+## [0.2.0] - 2026-06-28
 
 ### Added
 
@@ -12,13 +12,17 @@ All notable changes to ScenarioLens are documented here.
   baseline release.
 - Scenario Explorer evidence band and baseline-failure summary card.
 - CLI workflow documentation and framework concepts guide.
+- Lane-aware prediction baseline comparison using parsed lane polylines when
+  map context is available.
+- `scenariolens baseline-compare` Markdown/JSON reports, a curved-lane fixture,
+  dashboard comparison metrics, and the checked-in lane-aware study report.
 
-### Targeted
+### Deferred
 
 - True cross-shard Waymo Motion failure stability report after authenticated
   shard downloads are available.
-- One deeper autonomy experiment, likely a lane-aware baseline or small Waymax
-  replay path.
+- Small Waymax/JAX replay or perturbation path for selected high-value
+  scenarios.
 
 ## [0.1.0] - 2026-06-28
 

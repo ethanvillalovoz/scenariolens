@@ -2,16 +2,17 @@
 
 ## Executive Summary
 
-ScenarioLens is a laptop-friendly autonomous-driving evaluation project for discovering and explaining long-tail driving scenarios. It ranks scenarios using lightweight interaction metrics, ODD-relevant taxonomy tags, vulnerable-road-user counts, same-timestep proximity, path-conflict proximity, dynamics, a screened constant-velocity time-to-collision proxy, and a constant-velocity prediction baseline with ADE/FDE-style errors.
+ScenarioLens is a laptop-friendly autonomous-driving evaluation project for discovering and explaining long-tail driving scenarios. It ranks scenarios using lightweight interaction metrics, ODD-relevant taxonomy tags, vulnerable-road-user counts, same-timestep proximity, path-conflict proximity, dynamics, a screened constant-velocity time-to-collision proxy, a constant-velocity prediction baseline with ADE/FDE-style errors, and a lane-aware comparison baseline for map-backed vehicle/cyclist targets.
 
 The current pipeline supports synthetic scenarios, ScenarioLens JSON, row-wise CSV ingestion, normalized Waymo Motion-shaped fixtures, and native Waymo Motion JSON, binary Scenario proto, and small TFRecord slice ingestion. Local slice preflight keeps raw downloaded data separate from the checked-in demo.
 
 ## Current Coverage
 
-- Synthetic scenarios analyzed: 10
+- Synthetic scenarios analyzed: 11
 - Native Waymo-shaped JSON scenarios analyzed: 1
 - Normalized Waymo-shaped scenarios analyzed: 2
 - Unit tests cover schema I/O, ranking, taxonomy, ingestion, reporting, CLI flows, and SVG rendering.
+- Baseline comparison report is generated under `docs/reports/lane_aware_baseline_study.md`.
 - Static dashboard data contract is generated under `docs/demo/`.
 
 ## Stack Alignment
@@ -161,6 +162,18 @@ ScenarioLens uses a laptop-friendly subset of the public Waymo/autonomy ecosyste
   - closest vehicle-to-VRU distance is 1.887 m
   - agent paths come within 1.000 m
   - high-value taxonomy tags: Vulnerable road user, Unprotected turn, Close interaction
+
+## Lane-Aware Baseline Comparison
+
+This section compares the default constant-velocity predictor with a lightweight lane-aware predictor. Positive improvement means the lane-aware baseline lowered FDE while preserving constant-velocity fallback behavior for unsupported cases.
+
+| Rank | Scenario | CV FDE | Lane FDE | Improvement | Map used | Fallbacks |
+| ---: | --- | ---: | ---: | ---: | ---: | ---: |
+| 1 | `synthetic_curved_lane_prediction` | 5.831 m | 0.615 m | 5.216 m | 1 | 0 |
+| 2 | `synthetic_pedestrian_crossing` | 0.000 m | 0.000 m | 0.000 m | 0 | 1 |
+| 3 | `synthetic_dense_merge` | 0.000 m | 0.000 m | 0.000 m | 0 | 3 |
+
+Full report: `docs/reports/lane_aware_baseline_study.md`.
 
 ## Native Waymo Motion JSON Mini-Slice
 
@@ -319,12 +332,13 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 - Checked-in Waymo examples are synthetic mini fixtures, not downloaded real validation shards.
 - The lightweight binary reader extracts the Motion fields ScenarioLens needs, not the full Waymo proto surface.
 - The TTC value is a screened constant-velocity proxy, not a certified safety metric.
-- The prediction baseline is intentionally simple; it is a failure-mining screen, not a benchmark claim.
+- The prediction baselines are intentionally simple; they are failure-mining screens, not benchmark claims.
 - The current renderer is 2D and focuses on agent trajectories, map context, and baseline overlays, not traffic-light logic.
 
 ## Next Work
 
 - Expand the documented local-slice recipe across more Waymo Motion validation shards.
 - Compare baseline ADE/FDE distributions across more validation shards.
+- Calibrate lane-aware comparison behavior on more real Motion slices.
 - Add traffic-light and richer lane-context features from native Motion records.
 - Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.

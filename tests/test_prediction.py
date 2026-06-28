@@ -1,6 +1,11 @@
 import unittest
 
-from scenariolens.prediction import constant_velocity_baseline
+from scenariolens.prediction import (
+    compare_prediction_baselines,
+    constant_velocity_baseline,
+    lane_aware_baseline,
+)
+from scenariolens.samples import synthetic_scenarios
 from scenariolens.schema import AgentTrack, Scenario, State
 
 
@@ -60,6 +65,69 @@ class PredictionBaselineTest(unittest.TestCase):
         self.assertEqual(summary.ade_m, 0.0)
         self.assertEqual(summary.fde_m, 0.0)
         self.assertEqual(summary.miss_rate, 0.0)
+
+    def test_lane_aware_baseline_improves_curved_lane_fixture(self) -> None:
+        scenario = _scenario_by_id("synthetic_curved_lane_prediction")
+
+        constant = constant_velocity_baseline(scenario)
+        lane = lane_aware_baseline(scenario)
+        comparison = compare_prediction_baselines(scenario)
+
+        self.assertEqual(lane.baseline_name, "lane_aware")
+        self.assertEqual(lane.map_used_count, 1)
+        self.assertEqual(lane.fallback_count, 0)
+        self.assertLess(lane.fde_m or 999.0, constant.fde_m or 0.0)
+        self.assertGreater(comparison.fde_improvement_m or 0.0, 3.0)
+        self.assertTrue(comparison.track_results[0].lane_map_used)
+
+    def test_lane_aware_baseline_falls_back_for_pedestrians(self) -> None:
+        scenario = Scenario(
+            scenario_id="pedestrian_with_lane",
+            ego_track_id="ego",
+            metadata={
+                "waymo_current_time_index": 0,
+                "waymo_tracks_to_predict_track_ids": ["ped"],
+                "waymo_map_features": [
+                    {"kind": "lane", "points": [[0.0, 0.0], [10.0, 0.0]]}
+                ],
+            },
+            tracks=(
+                _track("ego", "vehicle", ((0, 0, 0, 1, 0), (1, 1, 0, 1, 0))),
+                _track("ped", "pedestrian", ((0, 3, -1, 0, 1), (1, 3, 0, 0, 1))),
+            ),
+        )
+
+        summary = lane_aware_baseline(scenario)
+
+        self.assertEqual(summary.map_used_count, 0)
+        self.assertEqual(summary.fallback_count, 1)
+        self.assertEqual(summary.track_results[0].fallback_reason, "non_vehicle_or_cyclist_target")
+        self.assertEqual(summary.fde_m, 0.0)
+
+    def test_lane_aware_baseline_falls_back_without_map(self) -> None:
+        scenario = Scenario(
+            scenario_id="vehicle_without_map",
+            metadata={
+                "waymo_current_time_index": 0,
+                "waymo_tracks_to_predict_track_ids": ["target"],
+            },
+            tracks=(
+                _track("target", "vehicle", ((0, 0, 0, 2, 0), (1, 2, 0, 2, 0))),
+            ),
+        )
+
+        summary = lane_aware_baseline(scenario)
+
+        self.assertEqual(summary.map_used_count, 0)
+        self.assertEqual(summary.fallback_count, 1)
+        self.assertEqual(summary.track_results[0].fallback_reason, "no_lane_map_features")
+
+
+def _scenario_by_id(scenario_id: str) -> Scenario:
+    for scenario in synthetic_scenarios():
+        if scenario.scenario_id == scenario_id:
+            return scenario
+    raise AssertionError(f"Missing synthetic scenario: {scenario_id}")
 
 
 def _track(

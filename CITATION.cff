@@ -4,7 +4,7 @@ title: "ScenarioLens: Lightweight Scenario Mining For Autonomy Evaluation"
 authors:
   - family-names: "Villalovoz"
     given-names: "Ethan"
-version: "0.1.0"
+version: "0.2.0"
 date-released: "2026-06-28"
 url: "https://github.com/ethanvillalovoz/scenariolens"
 repository-code: "https://github.com/ethanvillalovoz/scenariolens"

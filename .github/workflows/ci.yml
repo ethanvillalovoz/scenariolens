@@ -38,6 +38,7 @@ jobs:
         run: |
           scenariolens export-synthetic --output /tmp/scenariolens-synthetic.json
           scenariolens report --input /tmp/scenariolens-synthetic.json --format markdown --limit 3
+          scenariolens baseline-compare --input /tmp/scenariolens-synthetic.json --format json --limit 3
 
       - name: Smoke test CSV ingestion
         run: |

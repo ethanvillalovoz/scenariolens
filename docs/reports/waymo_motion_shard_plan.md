@@ -37,6 +37,15 @@ gsutil cp gs://waymo_open_dataset_motion_v_1_3_1/uncompressed/scenario/validatio
 
 If `gsutil` returns a 401, complete the official Waymo Open Dataset access flow and authenticate `gcloud` before rerunning the commands.
 
+## Auth Gate Status
+
+Checked on 2026-06-28:
+
+- `gcloud auth list` reported no credentialed accounts.
+- `gsutil ls` for shard `00008` returned a 401 anonymous-caller error.
+- Cross-shard downloads remain gated; the v0.2.0 release proceeds with the
+  checked-in 75-scenario windowed study and the lane-aware baseline comparison.
+
 ## Cross-Shard Stability Command
 
 Run this after the recommended shard files exist locally:

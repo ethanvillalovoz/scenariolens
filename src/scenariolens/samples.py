@@ -327,4 +327,48 @@ def synthetic_scenarios() -> tuple[Scenario, ...]:
                 ),
             ),
         ),
+        Scenario(
+            scenario_id="synthetic_curved_lane_prediction",
+            ego_track_id="ego",
+            tags=("map_context", "tracks_to_predict"),
+            metadata={
+                "waymo_current_time_index": 1,
+                "waymo_tracks_to_predict_track_ids": ["curving_veh"],
+                "waymo_map_features": [
+                    {
+                        "kind": "lane",
+                        "feature_id": "synthetic_curve_lane",
+                        "points": [
+                            [0.0, 0.0],
+                            [4.0, 0.0],
+                            [7.0, 1.5],
+                            [9.0, 5.0],
+                            [9.5, 8.0],
+                        ],
+                    }
+                ],
+            },
+            tracks=(
+                _track(
+                    "ego",
+                    "vehicle",
+                    (
+                        (0, -8, -2, 4, 0),
+                        (1, -4, -2, 4, 0),
+                        (2, 0, -2, 4, 0),
+                        (3, 4, -2, 4, 0),
+                    ),
+                ),
+                _track(
+                    "curving_veh",
+                    "vehicle",
+                    (
+                        (0, 0, 0, 4, 0),
+                        (1, 4, 0, 4, 0),
+                        (2, 7, 1.5, 3, 1.5),
+                        (3, 9, 5, 2, 3.5),
+                    ),
+                ),
+            ),
+        ),
     )

@@ -10,7 +10,7 @@ prediction baselines fail.
 
 - **Live demo:** [ethanvillalovoz.com/scenariolens](https://ethanvillalovoz.com/scenariolens/)
 - **Case study:** [Finding baseline failures in Waymo Motion scenarios](docs/case_studies/waymo_baseline_failures.md)
-- **Release target:** [v0.2.0 checklist](docs/release_checklist_v0.2.0.md)
+- **Latest release:** [v0.2.0 notes](docs/releases/v0.2.0.md)
 
 ScenarioLens is designed as a Waymo-targeted portfolio artifact, but the shape
 is an engineering product: a reproducible scenario-triage pipeline, real-data
@@ -33,7 +33,7 @@ ScenarioLens builds a small but polished pipeline that can:
 
 1. Ingest curated autonomous-driving scenario data.
 2. Compute lightweight interaction and risk features.
-3. Evaluate a constant-velocity trajectory baseline on prediction targets.
+3. Evaluate constant-velocity and lane-aware trajectory baselines on prediction targets.
 4. Tag scenarios by ODD-relevant attributes.
 5. Rank scenarios by evaluation value and baseline failure evidence.
 6. Present the results in a searchable demo/dashboard.
@@ -46,7 +46,7 @@ ScenarioLens builds a small but polished pipeline that can:
 | --- | --- |
 | Working framework | Python package, installable CLI, schema, metrics, reports, rendering, dashboard exporter |
 | Real-data path | Native Waymo Motion JSON/proto/TFRecord slice reader with local preflight and validation |
-| Baseline evidence | Constant-velocity ADE/FDE, miss rate, failure score, tag studies, and stability studies |
+| Baseline evidence | Constant-velocity ADE/FDE, miss rate, lane-aware comparison, tag studies, and stability studies |
 | Public demo | Static Scenario Explorer with filters, SVG trajectories, score components, and failure cards |
 | Repo quality | MIT license, contributor docs, changelog, citation, issue templates, CI, and release checklist |
 
@@ -86,6 +86,7 @@ Then open `http://localhost:8000/demo/`.
 - [Waymo Motion validation summary](docs/reports/waymo_motion_validation_summary.md)
 - [Real-slice failure study](docs/reports/waymo_motion_failure_study.md)
 - [Failure distribution stability study](docs/reports/waymo_motion_failure_stability.md)
+- [Lane-aware baseline comparison](docs/reports/lane_aware_baseline_study.md)
 - [Shard expansion plan](docs/reports/waymo_motion_shard_plan.md)
 
 For the end goal, user, non-goals, and work tracks, see
@@ -164,7 +165,7 @@ smoke test. The prototype can:
 - compute constant-velocity baseline ADE/FDE, miss rate, and failure score,
 - break rankings into interpretable score components,
 - normalize and infer scenario taxonomy tags,
-- rank 10 synthetic scenarios by evaluation value,
+- rank 11 synthetic scenarios by evaluation value,
 - ingest protobuf-shaped Waymo Motion JSON mini-slices,
 - diagnose local Waymo Motion data/tooling readiness,
 - preflight local Waymo Motion slice folders before ingestion,
@@ -174,14 +175,15 @@ smoke test. The prototype can:
 - save/load ScenarioLens scenario JSON,
 - export Markdown or JSON reports,
 - render 2D SVG trajectory views,
-- generate public-safe failure and distribution-stability studies,
+- generate public-safe failure, distribution-stability, and baseline-comparison studies,
 - generate static dashboard data and SVG assets,
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
 The next milestone is to download additional Waymo Motion validation shards,
-rerun the stability study with multiple `--input` paths, and eventually add a
-Waymax/JAX replay or perturbation experiment for selected high-value scenarios.
+rerun the stability study with multiple `--input` paths, and use the new
+lane-aware comparison output to choose candidates for a small Waymax/JAX replay
+or perturbation experiment.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -210,6 +212,8 @@ For tag-level ADE/FDE and miss-rate analysis, see the
 [Waymo Motion Real-Slice Failure Study](docs/reports/waymo_motion_failure_study.md).
 For windowed distribution stability over 75 real scenarios, see the
 [Waymo Motion Failure Distribution Stability Study](docs/reports/waymo_motion_failure_stability.md).
+For the lane-aware prediction baseline comparison, see the
+[Lane-Aware Baseline Study](docs/reports/lane_aware_baseline_study.md).
 For the next gated Waymo shard downloads and cross-shard command, see the
 [Waymo Motion Shard Expansion Plan](docs/reports/waymo_motion_shard_plan.md).
 Raw Waymo files and per-scenario outputs remain untracked.
@@ -266,6 +270,15 @@ Generate a machine-readable JSON report:
 
 ```bash
 PYTHONPATH=src python3 -m scenariolens.cli report --format json --limit 5
+```
+
+Compare the constant-velocity and lane-aware prediction baselines:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli baseline-compare \
+  --format markdown \
+  --limit 8 \
+  --output docs/reports/lane_aware_baseline_study.md
 ```
 
 Export the synthetic corpus as ScenarioLens JSON:

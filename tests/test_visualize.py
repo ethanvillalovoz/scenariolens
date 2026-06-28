@@ -32,7 +32,11 @@ class VisualizeTest(unittest.TestCase):
         self.assertIn("latest", svg)
 
     def test_scenario_svg_handles_single_track_baseline(self) -> None:
-        scenario = synthetic_scenarios()[-1]
+        scenario = next(
+            scenario
+            for scenario in synthetic_scenarios()
+            if scenario.scenario_id == "synthetic_open_road_baseline"
+        )
         svg = scenario_svg(scenario)
 
         self.assertIn("synthetic_open_road_baseline", svg)

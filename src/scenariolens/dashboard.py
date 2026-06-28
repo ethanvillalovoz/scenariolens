@@ -13,6 +13,7 @@ from scenariolens.portfolio import (
     DEFAULT_WAYMO_NATIVE_PATH,
     DEFAULT_WAYMO_NORMALIZED_PATH,
 )
+from scenariolens.prediction import compare_prediction_baselines
 from scenariolens.report import ranked_scores, score_reasons
 from scenariolens.samples import synthetic_scenarios
 from scenariolens.schema import Scenario, ScenarioScore
@@ -147,6 +148,7 @@ def _dashboard_item(
     scenario_set: DashboardScenarioSet,
     asset_root: Path,
 ) -> dict[str, object]:
+    baseline_comparison = compare_prediction_baselines(scenario)
     return {
         "rank": rank,
         "scenario_id": score.scenario_id,
@@ -188,6 +190,20 @@ def _dashboard_item(
             "baseline_max_fde_m": _round_optional(score.baseline_max_fde_m),
             "baseline_miss_rate": _round_optional(score.baseline_miss_rate),
             "baseline_failure_score": _round_optional(score.baseline_failure_score),
+            "lane_aware_ade_m": _round_optional(
+                baseline_comparison.lane_aware_ade_m
+            ),
+            "lane_aware_fde_m": _round_optional(
+                baseline_comparison.lane_aware_fde_m
+            ),
+            "lane_aware_miss_rate": _round_optional(
+                baseline_comparison.lane_aware_miss_rate
+            ),
+            "baseline_fde_improvement_m": _round_optional(
+                baseline_comparison.fde_improvement_m
+            ),
+            "lane_aware_map_used_count": baseline_comparison.map_used_count,
+            "lane_aware_fallback_count": baseline_comparison.fallback_count,
         },
         "tracks": {
             "count": len(scenario.tracks),

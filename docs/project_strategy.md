@@ -48,9 +48,9 @@ ScenarioLens currently has four connected surfaces:
    Motion-shaped JSON, binary Scenario protos, and small Waymo Motion TFRecord
    slices.
 2. **Evaluation core**: a compact schema, quality filtering, taxonomy tags,
-   constant-velocity baseline ADE/FDE, and interpretable score components for
-   density, VRUs, proximity, TTC, path conflict, dynamics, baseline failure,
-   and scenario category.
+   constant-velocity baseline ADE/FDE, lane-aware baseline comparison, and
+   interpretable score components for density, VRUs, proximity, TTC, path
+   conflict, dynamics, baseline failure, and scenario category.
 3. **Artifacts**: Markdown/JSON reports, SVG trajectory previews, validation
    packets, and public-safe real-data case studies.
 4. **Explorer**: a static dashboard for filtering, sorting, and inspecting the
@@ -125,6 +125,8 @@ and links back to reports and provenance.
   [`docs/reports/waymo_motion_failure_study.md`](reports/waymo_motion_failure_study.md)
 - Failure stability study:
   [`docs/reports/waymo_motion_failure_stability.md`](reports/waymo_motion_failure_stability.md)
+- Lane-aware baseline comparison:
+  [`docs/reports/lane_aware_baseline_study.md`](reports/lane_aware_baseline_study.md)
 - Shard expansion plan:
   [`docs/reports/waymo_motion_shard_plan.md`](reports/waymo_motion_shard_plan.md)
 - Roadmap: [`docs/roadmap.md`](roadmap.md)

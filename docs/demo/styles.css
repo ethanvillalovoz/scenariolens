@@ -771,6 +771,10 @@ a {
   gap: 8px;
 }
 
+.baseline-grid.compare-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .baseline-grid div {
   min-width: 0;
   padding: 10px;
@@ -1061,6 +1065,10 @@ a {
   }
 
   .baseline-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .baseline-grid.compare-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
