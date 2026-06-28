@@ -117,8 +117,8 @@ Testing and verification:
 
 What I would build next:
 
-1. Expand the real-slice failure study across more Waymo Motion validation shards.
-2. Compare distribution stability across shards and scenario tags.
+1. Download more Waymo Motion validation shards and rerun the stability study.
+2. Compare distribution stability across true shards and scenario tags.
 3. Add richer map and traffic-light summaries.
 4. Integrate a Waymax/JAX replay or perturbation path for selected scenarios.
 

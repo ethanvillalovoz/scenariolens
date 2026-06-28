@@ -54,7 +54,7 @@ def generate_failure_study(
     report_path = target / "report.md"
     copied_report_path = Path(public_report_path) if public_report_path else None
 
-    ready, preflight, scenarios = _load_input_scenarios(
+    ready, preflight, scenarios = load_failure_study_input(
         source=source,
         input_format=input_format,
         max_scenarios=max_scenarios,
@@ -86,6 +86,20 @@ def generate_failure_study(
         manifest_path=manifest_path,
         report_path=report_path,
         public_report_path=copied_report_path,
+    )
+
+
+def load_failure_study_input(
+    source: str | Path,
+    input_format: str,
+    max_scenarios: int | None,
+) -> tuple[bool, dict[str, object] | None, tuple[Scenario, ...]]:
+    """Load scenarios for failure-study workflows."""
+
+    return _load_input_scenarios(
+        source=Path(source),
+        input_format=input_format,
+        max_scenarios=max_scenarios,
     )
 
 
@@ -265,6 +279,8 @@ def failure_study_markdown(payload: dict[str, object]) -> str:
             "of the target motion in that scenario.",
             "- Tag-level differences help identify scenario families that deserve "
             "a stronger baseline, replay, perturbation, or Waymax experiment.",
+            "- For distribution stability across windows or shards, rerun with "
+            "`failure-study-stability`.",
         ]
     )
     return "\n".join(lines).rstrip() + "\n"

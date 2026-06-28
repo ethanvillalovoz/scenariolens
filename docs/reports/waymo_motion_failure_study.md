@@ -79,3 +79,4 @@ This report summarizes public-safe aggregate findings from ScenarioLens baseline
 - This is a screening study, not a benchmark claim.
 - High FDE means the constant-velocity baseline is a poor explanation of the target motion in that scenario.
 - Tag-level differences help identify scenario families that deserve a stronger baseline, replay, perturbation, or Waymax experiment.
+- For distribution stability across windows or shards, rerun with `failure-study-stability`.

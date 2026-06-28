@@ -11,6 +11,7 @@ from scenariolens.failure_study import (
     FAILURE_STUDY_INPUT_FORMATS,
     generate_failure_study,
 )
+from scenariolens.failure_stability import generate_failure_stability_study
 from scenariolens.ingest.csv_tracks import save_track_csv_as_scenarios
 from scenariolens.ingest.waymo_motion import (
     adapter_status,
@@ -256,6 +257,45 @@ def failure_study_command(
         print("Input is not ready for failure analysis. See manifest.json for details.")
         return 2
     print(f"Analyzed {result.scenario_count} scenario(s).")
+    return 0
+
+
+def failure_stability_command(
+    input_paths: list[str],
+    output_dir: str,
+    max_scenarios: int | None,
+    window_size: int | None,
+    top_tags: int,
+    min_tag_slices: int,
+    input_format: str,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_failure_stability_study(
+            input_paths=tuple(input_paths),
+            output_dir=output_dir,
+            max_scenarios=max_scenarios,
+            window_size=window_size,
+            top_tags=top_tags,
+            min_tag_slices=min_tag_slices,
+            input_format=input_format,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote failure-stability manifest to {result.manifest_path}")
+    print(f"Wrote failure-stability report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("One or more inputs are not ready. See manifest.json for details.")
+        return 2
+    print(
+        f"Compared {result.slice_count} slice(s) "
+        f"across {result.scenario_count} scenario(s)."
+    )
     return 0
 
 
@@ -544,6 +584,65 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe report copy.",
     )
+    failure_stability_parser = subparsers.add_parser(
+        "failure-study-stability",
+        help=(
+            "Compare public-safe ADE/FDE and miss-rate distributions across "
+            "Waymo Motion shards, inputs, or scenario windows."
+        ),
+    )
+    failure_stability_parser.add_argument(
+        "--input",
+        action="append",
+        required=True,
+        help=(
+            "Input Waymo Motion file/directory or ScenarioLens JSON file. "
+            "Repeat this flag to compare multiple downloaded shards."
+        ),
+    )
+    failure_stability_parser.add_argument(
+        "--format",
+        choices=FAILURE_STUDY_INPUT_FORMATS,
+        default="native",
+        help="Input representation. Native accepts Waymo Motion files.",
+    )
+    failure_stability_parser.add_argument(
+        "--output-dir",
+        default="data/processed/failure_stability",
+        help="Directory for manifest.json and report.md.",
+    )
+    failure_stability_parser.add_argument(
+        "--max-scenarios",
+        type=int,
+        default=75,
+        help="Maximum number of scenarios to ingest per input before analysis.",
+    )
+    failure_stability_parser.add_argument(
+        "--window-size",
+        type=int,
+        default=25,
+        help=(
+            "Scenario count per comparison window. Use a value greater than "
+            "max-scenarios to keep one slice per input."
+        ),
+    )
+    failure_stability_parser.add_argument(
+        "--top-tags",
+        type=int,
+        default=10,
+        help="Number of tag stability rows to report.",
+    )
+    failure_stability_parser.add_argument(
+        "--min-tag-slices",
+        type=int,
+        default=2,
+        help="Minimum slices a tag must appear in to be included.",
+    )
+    failure_stability_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe report copy.",
+    )
     report_parser = subparsers.add_parser(
         "report",
         help="Generate a ranked scenario report.",
@@ -699,6 +798,17 @@ def main() -> int:
             max_scenarios=args.max_scenarios,
             top=args.top,
             min_tag_count=args.min_tag_count,
+            input_format=args.format,
+            public_report=args.public_report,
+        )
+    if args.command == "failure-study-stability":
+        return failure_stability_command(
+            input_paths=args.input,
+            output_dir=args.output_dir,
+            max_scenarios=args.max_scenarios,
+            window_size=args.window_size,
+            top_tags=args.top_tags,
+            min_tag_slices=args.min_tag_slices,
             input_format=args.format,
             public_report=args.public_report,
         )

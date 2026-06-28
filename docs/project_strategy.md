@@ -119,4 +119,6 @@ and links back to reports and provenance.
   [`docs/reports/waymo_motion_validation_summary.md`](reports/waymo_motion_validation_summary.md)
 - Failure study:
   [`docs/reports/waymo_motion_failure_study.md`](reports/waymo_motion_failure_study.md)
+- Failure stability study:
+  [`docs/reports/waymo_motion_failure_stability.md`](reports/waymo_motion_failure_stability.md)
 - Roadmap: [`docs/roadmap.md`](roadmap.md)

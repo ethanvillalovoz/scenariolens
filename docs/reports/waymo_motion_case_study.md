@@ -47,4 +47,5 @@ This case study summarizes one local ScenarioLens smoke run against a downloaded
 - The run demonstrates that ScenarioLens can ingest a real Motion TFRecord shard with a dependency-free reader.
 - The aggregate section is safe to publish because it contains counts and summary statistics only.
 - The companion [Real-Slice Failure Study](waymo_motion_failure_study.md) breaks baseline ADE/FDE and miss rate down by tag and score component.
-- The next useful expansion is to compare these interaction and baseline-failure distributions across more validation shards.
+- The companion [Failure Distribution Stability Study](waymo_motion_failure_stability.md) compares three contiguous real-data windows from the local shard.
+- The next useful expansion is to rerun the stability command across more validation shards.

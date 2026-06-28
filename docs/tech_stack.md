@@ -94,9 +94,10 @@ project more convincing.
 
 ## Future Stack Milestones
 
-1. Expand the checked-in real-data case study and failure study across more
-   downloaded Waymo Motion validation shards.
-2. Compare distribution stability across shards, tags, and score components.
+1. Rerun the checked-in failure stability workflow across more downloaded
+   Waymo Motion validation shards.
+2. Compare distribution stability across true shards, tags, and score
+   components.
 3. Add a compact feature index, likely JSON first and Parquet/DuckDB once the
    slice gets larger.
 4. Add a small JAX/Waymax experiment that replays or evaluates selected

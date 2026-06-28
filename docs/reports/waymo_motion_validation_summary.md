@@ -35,6 +35,7 @@ PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-validate \
   `Scenario` proto field extraction
 - Case study: [Waymo Motion Real-Data Case Study](waymo_motion_case_study.md)
 - Failure study: [Waymo Motion Real-Slice Failure Study](waymo_motion_failure_study.md)
+- Stability study: [Waymo Motion Failure Distribution Stability Study](waymo_motion_failure_stability.md)
 
 ## Aggregate Metrics
 

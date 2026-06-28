@@ -116,12 +116,13 @@ smoke test. The prototype can:
 - save/load ScenarioLens scenario JSON,
 - export Markdown or JSON reports,
 - render 2D SVG trajectory views,
+- generate public-safe failure and distribution-stability studies,
 - generate static dashboard data and SVG assets,
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to expand the real-slice failure study across more Waymo
-Motion validation shards, compare distribution stability, and eventually add a
+The next milestone is to download additional Waymo Motion validation shards,
+rerun the stability study with multiple `--input` paths, and eventually add a
 Waymax/JAX replay or perturbation experiment for selected high-value scenarios.
 
 See [docs/project_brief.md](docs/project_brief.md) and
@@ -147,6 +148,8 @@ and the public-safe
 [Waymo Motion Real-Data Case Study](docs/reports/waymo_motion_case_study.md).
 For tag-level ADE/FDE and miss-rate analysis, see the
 [Waymo Motion Real-Slice Failure Study](docs/reports/waymo_motion_failure_study.md).
+For windowed distribution stability over 75 real scenarios, see the
+[Waymo Motion Failure Distribution Stability Study](docs/reports/waymo_motion_failure_stability.md).
 Raw Waymo files and per-scenario outputs remain untracked.
 
 ## Scenario Explorer
@@ -294,6 +297,22 @@ PYTHONPATH=src python3 -m scenariolens.cli failure-study \
 The failure study reports target-weighted ADE/FDE, miss rate by tag, failure by
 score component, interaction/FDE quadrants, and the hardest baseline-failure
 scenario ids without committing raw Waymo scenario data.
+
+Generate a public-safe failure distribution stability study:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli failure-study-stability \
+  --input data/raw/waymo/motion/validation \
+  --output-dir data/processed/waymo_motion_failure_stability \
+  --max-scenarios 75 \
+  --window-size 25 \
+  --top-tags 10 \
+  --min-tag-slices 2 \
+  --public-report docs/reports/waymo_motion_failure_stability.md
+```
+
+The stability study compares ADE/FDE and miss-rate distributions across
+multiple inputs or, when only one shard is local, contiguous scenario windows.
 
 See [docs/waymo_motion_slice_recipe.md](docs/waymo_motion_slice_recipe.md) for
 the laptop-friendly real-slice workflow.

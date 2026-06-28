@@ -136,6 +136,35 @@ Look for scenarios with:
 - large gaps between raw and scored track counts,
 - useful Waymo fields such as objects of interest or tracks to predict.
 
+### Generate Baseline Failure Studies
+
+For aggregate ADE/FDE and miss-rate breakdowns by tag and score component:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli failure-study \
+  --input data/raw/waymo/motion/validation \
+  --output-dir data/processed/waymo_motion_failure_study \
+  --max-scenarios 25 \
+  --top 10 \
+  --public-report docs/reports/waymo_motion_failure_study.md
+```
+
+For distribution stability across contiguous windows of the local shard:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli failure-study-stability \
+  --input data/raw/waymo/motion/validation \
+  --output-dir data/processed/waymo_motion_failure_stability \
+  --max-scenarios 75 \
+  --window-size 25 \
+  --top-tags 10 \
+  --min-tag-slices 2 \
+  --public-report docs/reports/waymo_motion_failure_stability.md
+```
+
+When more shards are downloaded, repeat `--input` for each shard or shard
+directory to turn the windowed comparison into a true cross-shard comparison.
+
 ### Render A Small Gallery
 
 ```bash

@@ -16,6 +16,7 @@ flowchart LR
     F --> H["SVG trajectory previews"]
     P --> H
     F --> L["Failure-study aggregate report"]
+    F --> N["Failure-stability comparison report"]
     F --> I["Static dashboard payload"]
     I --> J["Scenario Explorer"]
     G --> K["Public-safe case studies"]
@@ -31,6 +32,7 @@ flowchart LR
 | Metrics | `src/scenariolens/metrics.py` | Computes interpretable interaction features such as density, proximity, TTC, VRU context, path conflict, and dynamics. |
 | Prediction baseline | `src/scenariolens/prediction.py` | Evaluates a constant-velocity forecast on Waymo prediction targets or non-ego fixture tracks, producing ADE/FDE, miss rate, and failure score. |
 | Failure study | `src/scenariolens/failure_study.py` | Aggregates ADE/FDE, miss rate, tag-level failures, score-component failures, and hardest scenario ids without publishing raw data. |
+| Failure stability | `src/scenariolens/failure_stability.py` | Compares aggregate failure distributions across multiple inputs or contiguous scenario windows to show whether baseline failures are stable. |
 | Taxonomy | `src/scenariolens/taxonomy.py` | Normalizes scenario tags and adds category-level ranking signal. |
 | Reports | `src/scenariolens/report.py`, `src/scenariolens/portfolio.py` | Generates Markdown/JSON summaries for humans and downstream tools. |
 | Rendering | `src/scenariolens/visualize.py` | Produces dependency-free SVG trajectory previews with map context when available. |
@@ -71,7 +73,7 @@ The public artifact path is:
 
 1. run ingestion or validation,
 2. normalize into ScenarioLens JSON,
-3. generate ranked reports, SVGs, and aggregate failure studies,
+3. generate ranked reports, SVGs, aggregate failure studies, and stability studies,
 4. publish aggregate summaries, dashboard payloads, and public-safe study reports,
 5. keep raw data and per-scenario downloaded outputs local.
 

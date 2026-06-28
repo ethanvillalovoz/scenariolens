@@ -162,9 +162,12 @@ Goal: make the baseline failure analysis credible on more real data.
   Waymax/JAX.
 
 Status: initial implementation complete for one local Waymo Motion validation
-shard in `docs/reports/waymo_motion_failure_study.md`. Next work is to run the
-same command across more shards, compare distribution stability, and use the
-hardest scenario ids to motivate a stronger baseline or Waymax replay.
+shard in `docs/reports/waymo_motion_failure_study.md`, plus a 75-scenario
+windowed stability report in
+`docs/reports/waymo_motion_failure_stability.md`. Next work is to download more
+validation shards, rerun `failure-study-stability` with multiple `--input`
+paths, and use the hardest scenario ids to motivate a stronger baseline or
+Waymax replay.
 
 ## Stretch Goals
 

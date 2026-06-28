@@ -332,6 +332,45 @@ class CliTest(unittest.TestCase):
             self.assertTrue(public_report.exists())
             self.assertIn("Failure By Tag", public_report.read_text())
 
+    def test_failure_stability_command_writes_public_safe_report(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            output_dir = root / "failure_stability"
+            public_report = root / "reports" / "failure_stability.md"
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "failure-study-stability",
+                    "--input",
+                    "docs/examples/waymo_motion_native_sample.json",
+                    "--output-dir",
+                    str(output_dir),
+                    "--max-scenarios",
+                    "1",
+                    "--window-size",
+                    "1",
+                    "--top-tags",
+                    "1",
+                    "--min-tag-slices",
+                    "1",
+                    "--public-report",
+                    str(public_report),
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertIn("Compared 1 slice(s) across 1 scenario(s)", result.stdout)
+            self.assertTrue((output_dir / "manifest.json").exists())
+            self.assertTrue((output_dir / "report.md").exists())
+            self.assertTrue(public_report.exists())
+            self.assertIn("Slice Distribution", public_report.read_text())
+
     def test_portfolio_report_command_writes_report_and_assets(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
