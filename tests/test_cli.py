@@ -297,6 +297,41 @@ class CliTest(unittest.TestCase):
             self.assertTrue((output_dir / "case_study.md").exists())
             self.assertEqual(len(tuple((output_dir / "assets").glob("*.svg"))), 1)
 
+    def test_failure_study_command_writes_public_safe_report(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            output_dir = root / "failure_study"
+            public_report = root / "reports" / "failure_study.md"
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "failure-study",
+                    "--input",
+                    "docs/examples/waymo_motion_native_sample.json",
+                    "--output-dir",
+                    str(output_dir),
+                    "--max-scenarios",
+                    "1",
+                    "--top",
+                    "1",
+                    "--public-report",
+                    str(public_report),
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertIn("Analyzed 1 scenario(s)", result.stdout)
+            self.assertTrue((output_dir / "manifest.json").exists())
+            self.assertTrue((output_dir / "report.md").exists())
+            self.assertTrue(public_report.exists())
+            self.assertIn("Failure By Tag", public_report.read_text())
+
     def test_portfolio_report_command_writes_report_and_assets(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)

@@ -34,6 +34,7 @@ PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-validate \
 - Parser: dependency-free TFRecord reader plus lightweight Waymo Motion
   `Scenario` proto field extraction
 - Case study: [Waymo Motion Real-Data Case Study](waymo_motion_case_study.md)
+- Failure study: [Waymo Motion Real-Slice Failure Study](waymo_motion_failure_study.md)
 
 ## Aggregate Metrics
 

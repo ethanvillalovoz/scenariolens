@@ -94,9 +94,9 @@ project more convincing.
 
 ## Future Stack Milestones
 
-1. Expand the checked-in real-data case study across more downloaded Waymo
-   Motion validation shards.
-2. Compare baseline ADE/FDE distributions by scenario tag and score component.
+1. Expand the checked-in real-data case study and failure study across more
+   downloaded Waymo Motion validation shards.
+2. Compare distribution stability across shards, tags, and score components.
 3. Add a compact feature index, likely JSON first and Parquet/DuckDB once the
    slice gets larger.
 4. Add a small JAX/Waymax experiment that replays or evaluates selected

@@ -161,9 +161,10 @@ Goal: make the baseline failure analysis credible on more real data.
 - evaluate whether selected scenarios should be replayed or perturbed in
   Waymax/JAX.
 
-Status: next work. This is the next best ML/simulation step because it builds on
-the implemented baseline data contract without requiring heavy compute on the
-core laptop workflow.
+Status: initial implementation complete for one local Waymo Motion validation
+shard in `docs/reports/waymo_motion_failure_study.md`. Next work is to run the
+same command across more shards, compare distribution stability, and use the
+hardest scenario ids to motivate a stronger baseline or Waymax replay.
 
 ## Stretch Goals
 

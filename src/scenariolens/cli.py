@@ -7,6 +7,10 @@ from dataclasses import asdict
 from pathlib import Path
 
 from scenariolens.dashboard import generate_dashboard_data
+from scenariolens.failure_study import (
+    FAILURE_STUDY_INPUT_FORMATS,
+    generate_failure_study,
+)
 from scenariolens.ingest.csv_tracks import save_track_csv_as_scenarios
 from scenariolens.ingest.waymo_motion import (
     adapter_status,
@@ -218,6 +222,40 @@ def validate_waymo_motion_command(
         print(f"Case study: {result.case_study_path}")
     if result.assets_dir is not None:
         print(f"SVG gallery: {result.assets_dir}")
+    return 0
+
+
+def failure_study_command(
+    input_path: str,
+    output_dir: str,
+    max_scenarios: int | None,
+    top: int,
+    min_tag_count: int,
+    input_format: str,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_failure_study(
+            input_path=input_path,
+            output_dir=output_dir,
+            max_scenarios=max_scenarios,
+            top=top,
+            min_tag_count=min_tag_count,
+            input_format=input_format,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote failure-study manifest to {result.manifest_path}")
+    print(f"Wrote failure-study report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("Input is not ready for failure analysis. See manifest.json for details.")
+        return 2
+    print(f"Analyzed {result.scenario_count} scenario(s).")
     return 0
 
 
@@ -460,6 +498,52 @@ def main() -> int:
         default=5,
         help="Number of top-ranked scenarios to report and render.",
     )
+    failure_study_parser = subparsers.add_parser(
+        "failure-study",
+        help=(
+            "Generate public-safe aggregate ADE/FDE and miss-rate analysis "
+            "for a Waymo Motion or ScenarioLens JSON slice."
+        ),
+    )
+    failure_study_parser.add_argument(
+        "--input",
+        required=True,
+        help="Input Waymo Motion file/directory or ScenarioLens JSON file.",
+    )
+    failure_study_parser.add_argument(
+        "--format",
+        choices=FAILURE_STUDY_INPUT_FORMATS,
+        default="native",
+        help="Input representation. Native accepts Waymo Motion files.",
+    )
+    failure_study_parser.add_argument(
+        "--output-dir",
+        default="data/processed/failure_study",
+        help="Directory for manifest.json and report.md.",
+    )
+    failure_study_parser.add_argument(
+        "--max-scenarios",
+        type=int,
+        default=100,
+        help="Maximum number of scenarios to ingest before analysis.",
+    )
+    failure_study_parser.add_argument(
+        "--top",
+        type=int,
+        default=10,
+        help="Number of hardest baseline-failure scenarios to report.",
+    )
+    failure_study_parser.add_argument(
+        "--min-tag-count",
+        type=int,
+        default=1,
+        help="Minimum scenarios required for a tag to appear in the tag table.",
+    )
+    failure_study_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe report copy.",
+    )
     report_parser = subparsers.add_parser(
         "report",
         help="Generate a ranked scenario report.",
@@ -607,6 +691,16 @@ def main() -> int:
             output_dir=args.output_dir,
             max_scenarios=args.max_scenarios,
             top=args.top,
+        )
+    if args.command == "failure-study":
+        return failure_study_command(
+            input_path=args.input,
+            output_dir=args.output_dir,
+            max_scenarios=args.max_scenarios,
+            top=args.top,
+            min_tag_count=args.min_tag_count,
+            input_format=args.format,
+            public_report=args.public_report,
         )
     if args.command == "report":
         return report(

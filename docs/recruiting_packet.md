@@ -117,8 +117,8 @@ Testing and verification:
 
 What I would build next:
 
-1. Expand the downloaded Waymo Motion validation-slice run across more shards.
-2. Compare constant-velocity baseline ADE/FDE distributions by scenario type.
+1. Expand the real-slice failure study across more Waymo Motion validation shards.
+2. Compare distribution stability across shards and scenario tags.
 3. Add richer map and traffic-light summaries.
 4. Integrate a Waymax/JAX replay or perturbation path for selected scenarios.
 

@@ -46,4 +46,5 @@ This case study summarizes one local ScenarioLens smoke run against a downloaded
 - The scores are screening heuristics for review prioritization, not certified safety metrics.
 - The run demonstrates that ScenarioLens can ingest a real Motion TFRecord shard with a dependency-free reader.
 - The aggregate section is safe to publish because it contains counts and summary statistics only.
+- The companion [Real-Slice Failure Study](waymo_motion_failure_study.md) breaks baseline ADE/FDE and miss rate down by tag and score component.
 - The next useful expansion is to compare these interaction and baseline-failure distributions across more validation shards.

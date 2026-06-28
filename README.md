@@ -120,10 +120,9 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to run the baseline failure analysis across larger real
-Waymo Motion validation slices, compare failure distributions across scenario
-types, and eventually add a Waymax/JAX replay or perturbation experiment for
-selected high-value scenarios.
+The next milestone is to expand the real-slice failure study across more Waymo
+Motion validation shards, compare distribution stability, and eventually add a
+Waymax/JAX replay or perturbation experiment for selected high-value scenarios.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -146,6 +145,8 @@ For the first local real-data smoke run, see the
 [Waymo Motion Validation Slice Summary](docs/reports/waymo_motion_validation_summary.md)
 and the public-safe
 [Waymo Motion Real-Data Case Study](docs/reports/waymo_motion_case_study.md).
+For tag-level ADE/FDE and miss-rate analysis, see the
+[Waymo Motion Real-Slice Failure Study](docs/reports/waymo_motion_failure_study.md).
 Raw Waymo files and per-scenario outputs remain untracked.
 
 ## Scenario Explorer
@@ -278,6 +279,21 @@ PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-validate \
 
 The validation packet includes `preflight.json`, `manifest.json`,
 ScenarioLens JSON, a ranked Markdown report, and a top-scenario SVG gallery.
+
+Generate a public-safe real-slice baseline failure study:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli failure-study \
+  --input data/raw/waymo/motion/validation \
+  --output-dir data/processed/waymo_motion_failure_study \
+  --max-scenarios 25 \
+  --top 10 \
+  --public-report docs/reports/waymo_motion_failure_study.md
+```
+
+The failure study reports target-weighted ADE/FDE, miss rate by tag, failure by
+score component, interaction/FDE quadrants, and the hardest baseline-failure
+scenario ids without committing raw Waymo scenario data.
 
 See [docs/waymo_motion_slice_recipe.md](docs/waymo_motion_slice_recipe.md) for
 the laptop-friendly real-slice workflow.
