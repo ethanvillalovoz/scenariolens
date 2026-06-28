@@ -3,13 +3,14 @@
 ## North Star
 
 ScenarioLens is a local-first autonomy evaluation tool that turns motion
-scenario data into ranked, explainable long-tail evaluation candidates.
+scenario data into ranked, explainable long-tail evaluation candidates where
+simple prediction baselines struggle.
 
 The project is built to answer one practical question:
 
 > If an autonomous-driving team is preparing for a new operating domain, which
 > recorded scenarios should engineers inspect, replay, perturb, or add to an
-> evaluation set first?
+> evaluation set first, especially when a lightweight predictor fails?
 
 ## End Goal
 
@@ -34,6 +35,7 @@ That user wants to know:
 - whether a dataset adapter is real or only mocked,
 - which fields are trusted and which are ignored,
 - why a scenario is considered high value,
+- where a baseline predictor fails,
 - how rankings can be reproduced,
 - where raw data lives,
 - what the next engineering milestone would be.
@@ -45,9 +47,10 @@ ScenarioLens currently has four connected surfaces:
 1. **Dataset boundary**: synthetic records, normalized CSV, Waymo
    Motion-shaped JSON, binary Scenario protos, and small Waymo Motion TFRecord
    slices.
-2. **Evaluation core**: a compact schema, quality filtering, taxonomy tags, and
-   interpretable score components for density, VRUs, proximity, TTC, path
-   conflict, dynamics, and scenario category.
+2. **Evaluation core**: a compact schema, quality filtering, taxonomy tags,
+   constant-velocity baseline ADE/FDE, and interpretable score components for
+   density, VRUs, proximity, TTC, path conflict, dynamics, baseline failure,
+   and scenario category.
 3. **Artifacts**: Markdown/JSON reports, SVG trajectory previews, validation
    packets, and public-safe real-data case studies.
 4. **Explorer**: a static dashboard for filtering, sorting, and inspecting the
@@ -58,7 +61,8 @@ ScenarioLens currently has four connected surfaces:
 Waymo's public ecosystem emphasizes datasets, motion prediction, simulation,
 scenario generation, and safety evaluation. ScenarioLens fits that public
 boundary by focusing on scenario triage: finding and explaining the interactions
-that deserve more targeted evaluation.
+where a simple trajectory baseline struggles and that deserve more targeted
+evaluation.
 
 The repo intentionally uses public Waymo Motion `Scenario`-shaped records and a
 downloaded validation-shard smoke test, while keeping raw data outside git.
@@ -93,16 +97,15 @@ failure modes for missing or malformed data.
 
 ### 3. ML and Simulation Path
 
-Use the ranking output as the bridge into ML: select high-value scenarios, add
-a lightweight trajectory-prediction baseline, compare baseline errors by
-scenario type, and reserve JAX/Waymax for replay or perturbation once the data
-contract is stable.
+Use the ranking output as the bridge into ML: select high-value scenarios,
+compare lightweight trajectory-baseline errors by scenario type, and reserve
+JAX/Waymax for replay or perturbation once the data contract is stable.
 
 ### 4. Dashboard and Product Experience
 
 Treat the explorer as an engineering tool, not a landing page: ranked cases,
-filters, score explanations, map context, real-data status, and links back to
-reports and provenance.
+filters, score explanations, baseline ADE/FDE, map context, real-data status,
+and links back to reports and provenance.
 
 ## Current Proof
 

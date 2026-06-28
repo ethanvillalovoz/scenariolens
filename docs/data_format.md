@@ -84,3 +84,12 @@ scoring view used for ranking:
 - `sdc_track_present`, `prediction_target_count`, and
   `object_of_interest_count`: credibility fields preserved from Waymo-shaped
   inputs when available.
+- `prediction_target_source`: how the baseline selected forecast targets,
+  usually `waymo_tracks_to_predict` for native Waymo Motion records and
+  `non_ego_tracks` for small fixtures.
+- `prediction_target_evaluated_count`: number of tracks with enough history and
+  future states for baseline evaluation.
+- `baseline_ade_m`, `baseline_fde_m`, `baseline_max_fde_m`, and
+  `baseline_miss_rate`: constant-velocity forecast error summary.
+- `baseline_failure_score`: bounded ranking component derived from ADE/FDE,
+  miss rate, and evaluated target count.

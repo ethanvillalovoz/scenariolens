@@ -80,7 +80,8 @@ def portfolio_markdown(
         "for discovering and explaining long-tail driving scenarios. It ranks "
         "scenarios using lightweight interaction metrics, ODD-relevant taxonomy "
         "tags, vulnerable-road-user counts, same-timestep proximity, path-conflict "
-        "proximity, dynamics, and a screened constant-velocity time-to-collision proxy.",
+        "proximity, dynamics, a screened constant-velocity time-to-collision proxy, "
+        "and a constant-velocity prediction baseline with ADE/FDE-style errors.",
         "",
         "The current pipeline supports synthetic scenarios, ScenarioLens JSON, "
         "row-wise CSV ingestion, normalized Waymo Motion-shaped fixtures, and "
@@ -140,13 +141,14 @@ def portfolio_markdown(
             "- Checked-in Waymo examples are synthetic mini fixtures, not downloaded real validation shards.",
             "- The lightweight binary reader extracts the Motion fields ScenarioLens needs, not the full Waymo proto surface.",
             "- The TTC value is a screened constant-velocity proxy, not a certified safety metric.",
-            "- The current renderer is 2D and focuses on agent trajectories, not parsed map lanes or traffic lights.",
+            "- The prediction baseline is intentionally simple; it is a failure-mining screen, not a benchmark claim.",
+            "- The current renderer is 2D and focuses on agent trajectories, map context, and baseline overlays, not traffic-light logic.",
             "",
             "## Next Work",
             "",
             "- Expand the documented local-slice recipe across more Waymo Motion validation shards.",
-            "- Add map/lane and traffic-light features from native Motion records.",
-            "- Compare synthetic, native mini-slice, and downloaded-slice score distributions.",
+            "- Compare baseline ADE/FDE distributions across more validation shards.",
+            "- Add traffic-light and richer lane-context features from native Motion records.",
             "- Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.",
             "",
         ]
@@ -191,6 +193,12 @@ def _score_section(scores: tuple[ScenarioScore, ...], asset_prefix: Path) -> lis
                 f"- Max speed: {_format_optional(score.max_speed_mps, 'm/s')}",
                 f"- Ego max speed: {_format_optional(score.ego_max_speed_mps, 'm/s')}",
                 f"- Robust max deceleration: {_format_optional(score.max_deceleration_mps2, 'm/s^2')}",
+                f"- Prediction target source: {score.prediction_target_source}",
+                f"- Baseline targets evaluated: {score.prediction_target_evaluated_count}",
+                f"- Baseline ADE: {_format_optional(score.baseline_ade_m, 'm')}",
+                f"- Baseline FDE: {_format_optional(score.baseline_fde_m, 'm')}",
+                f"- Baseline miss rate: {_format_percent_optional(score.baseline_miss_rate)}",
+                f"- Baseline failure score: {score.baseline_failure_score:.3f}",
                 "- Component scores:",
             ]
         )
@@ -208,3 +216,9 @@ def _format_optional(value: float | None, unit: str) -> str:
     if value is None:
         return "n/a"
     return f"{value:.3f} {unit}"
+
+
+def _format_percent_optional(value: float | None) -> str:
+    if value is None:
+        return "n/a"
+    return f"{value * 100:.1f}%"

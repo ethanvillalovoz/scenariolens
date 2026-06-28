@@ -40,7 +40,9 @@ class SliceValidationTest(unittest.TestCase):
             self.assertEqual(manifest["outputs"]["case_study"], "case_study.md")
             self.assertEqual(manifest["outputs"]["report"], "report.md")
             self.assertEqual(manifest["top_scenarios"][0]["rank"], 1)
+            self.assertIn("prediction_baseline", manifest["aggregate_metrics"])
             self.assertIn("Aggregate Findings", result.case_study_path.read_text())
+            self.assertIn("Prediction baseline", result.case_study_path.read_text())
 
     def test_validate_waymo_motion_slice_records_not_ready_preflight(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

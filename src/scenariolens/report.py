@@ -58,6 +58,18 @@ def score_reasons(score: ScenarioScore) -> tuple[str, ...]:
             f"robust max deceleration is {score.max_deceleration_mps2:.3f} m/s^2"
         )
 
+    if score.baseline_failure_score >= 1.0:
+        if score.baseline_fde_m is not None:
+            reasons.append(
+                "constant-velocity baseline FDE is "
+                f"{score.baseline_fde_m:.3f} m across "
+                f"{score.prediction_target_evaluated_count} target(s)"
+            )
+        if score.baseline_miss_rate is not None and score.baseline_miss_rate > 0.0:
+            reasons.append(
+                f"baseline miss rate is {score.baseline_miss_rate * 100:.1f}%"
+            )
+
     if score.agent_count >= 4:
         reasons.append(
             f"dense scene with {score.agent_count} tracked agents "
@@ -146,6 +158,13 @@ def markdown_report(scenarios: tuple[Scenario, ...], limit: int | None = None) -
                 f"- Max speed: {_format_optional(score.max_speed_mps, 'm/s')}",
                 f"- Ego max speed: {_format_optional(score.ego_max_speed_mps, 'm/s')}",
                 f"- Robust max deceleration: {_format_optional(score.max_deceleration_mps2, 'm/s^2')}",
+                f"- Prediction target source: {score.prediction_target_source}",
+                f"- Baseline targets evaluated: {score.prediction_target_evaluated_count}",
+                f"- Baseline ADE: {_format_optional(score.baseline_ade_m, 'm')}",
+                f"- Baseline FDE: {_format_optional(score.baseline_fde_m, 'm')}",
+                f"- Baseline max FDE: {_format_optional(score.baseline_max_fde_m, 'm')}",
+                f"- Baseline miss rate: {_format_percent_optional(score.baseline_miss_rate)}",
+                f"- Baseline failure score: {score.baseline_failure_score:.3f}",
                 "- Component scores:",
             ]
         )
@@ -163,3 +182,9 @@ def _format_optional(value: float | None, unit: str) -> str:
     if value is None:
         return "n/a"
     return f"{value:.3f} {unit}"
+
+
+def _format_percent_optional(value: float | None) -> str:
+    if value is None:
+        return "n/a"
+    return f"{value * 100:.1f}%"

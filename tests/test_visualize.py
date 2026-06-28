@@ -28,6 +28,7 @@ class VisualizeTest(unittest.TestCase):
         self.assertIn("#dc2626", svg)
         self.assertIn("scenario-plot-clip", svg)
         self.assertIn("track-pedestrian", svg)
+        self.assertIn("baseline-prediction", svg)
         self.assertIn("latest", svg)
 
     def test_scenario_svg_handles_single_track_baseline(self) -> None:

@@ -58,7 +58,7 @@
               <h2>Minimum Score</h2>
               <span id="scoreLabel">0.00</span>
             </div>
-            <input id="scoreRange" class="score-range" type="range" min="0" max="35" step="0.25" value="0" />
+            <input id="scoreRange" class="score-range" type="range" min="0" max="50" step="0.25" value="0" />
           </section>
 
           <section class="filter-section">
@@ -89,6 +89,7 @@
                 <option value="score-asc">Score ascending</option>
                 <option value="distance-asc">Closest distance</option>
                 <option value="ttc-asc">Lowest TTC</option>
+                <option value="fde-desc">Highest baseline FDE</option>
                 <option value="rank-asc">Original rank</option>
               </select>
             </label>
@@ -123,6 +124,7 @@
                   <th>Scenario</th>
                   <th>Dataset</th>
                   <th>Score</th>
+                  <th>Baseline FDE</th>
                   <th>Tags</th>
                   <th>Why high score?</th>
                 </tr>

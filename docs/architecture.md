@@ -9,9 +9,12 @@ flowchart LR
     M["Waymo Motion TFRecord / proto slices"] --> C
     C --> D
     D --> E["Quality-filtered scored context"]
+    D --> P["Constant-velocity prediction baseline"]
     E --> F["Metrics and taxonomy scoring"]
+    P --> F
     F --> G["Markdown and JSON reports"]
     F --> H["SVG trajectory previews"]
+    P --> H
     F --> I["Static dashboard payload"]
     I --> J["Scenario Explorer"]
     G --> K["Public-safe case studies"]
@@ -25,6 +28,7 @@ flowchart LR
 | Ingestion | `src/scenariolens/ingest/` | Converts CSV, Waymo Motion-shaped JSON, binary protos, and TFRecord slices into ScenarioLens scenarios. |
 | Readiness and validation | `src/scenariolens/waymo_readiness.py`, `src/scenariolens/slice_validation.py` | Checks local dataset setup and produces reproducible validation packets. |
 | Metrics | `src/scenariolens/metrics.py` | Computes interpretable interaction features such as density, proximity, TTC, VRU context, path conflict, and dynamics. |
+| Prediction baseline | `src/scenariolens/prediction.py` | Evaluates a constant-velocity forecast on Waymo prediction targets or non-ego fixture tracks, producing ADE/FDE, miss rate, and failure score. |
 | Taxonomy | `src/scenariolens/taxonomy.py` | Normalizes scenario tags and adds category-level ranking signal. |
 | Reports | `src/scenariolens/report.py`, `src/scenariolens/portfolio.py` | Generates Markdown/JSON summaries for humans and downstream tools. |
 | Rendering | `src/scenariolens/visualize.py` | Produces dependency-free SVG trajectory previews with map context when available. |
@@ -42,8 +46,9 @@ pipeline can ingest a real public Motion TFRecord shard locally.
 
 ## Scoring Boundary
 
-ScenarioLens ranks scenarios by evaluation value, not by model performance. The
-current score is a transparent heuristic over interpretable features:
+ScenarioLens ranks scenarios by evaluation value and baseline failure evidence,
+not by a production model benchmark. The current score is a transparent
+heuristic over interpretable features:
 
 - agent density,
 - vulnerable-road-user presence,
@@ -52,6 +57,7 @@ current score is a transparent heuristic over interpretable features:
 - vulnerable-road-user proximity,
 - sampled path-conflict proximity,
 - maximum speed and braking context,
+- constant-velocity baseline ADE/FDE and miss rate,
 - scenario taxonomy tags.
 
 The score is designed to help engineers choose cases for deeper review,

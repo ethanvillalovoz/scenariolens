@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-ScenarioLens is a laptop-friendly autonomous-driving evaluation project for discovering and explaining long-tail driving scenarios. It ranks scenarios using lightweight interaction metrics, ODD-relevant taxonomy tags, vulnerable-road-user counts, same-timestep proximity, path-conflict proximity, dynamics, and a screened constant-velocity time-to-collision proxy.
+ScenarioLens is a laptop-friendly autonomous-driving evaluation project for discovering and explaining long-tail driving scenarios. It ranks scenarios using lightweight interaction metrics, ODD-relevant taxonomy tags, vulnerable-road-user counts, same-timestep proximity, path-conflict proximity, dynamics, a screened constant-velocity time-to-collision proxy, and a constant-velocity prediction baseline with ADE/FDE-style errors.
 
 The current pipeline supports synthetic scenarios, ScenarioLens JSON, row-wise CSV ingestion, normalized Waymo Motion-shaped fixtures, and native Waymo Motion JSON, binary Scenario proto, and small TFRecord slice ingestion. Local slice preflight keeps raw downloaded data separate from the checked-in demo.
 
@@ -22,15 +22,15 @@ ScenarioLens uses a laptop-friendly subset of the public Waymo/autonomy ecosyste
 
 | Rank | Scenario | Score | Tags |
 | ---: | --- | ---: | --- |
-| 1 | `synthetic_dense_intersection_vru` | 34.432 | vulnerable_road_user, pedestrian_crossing, cyclist_interaction, dense_multi_agent |
-| 2 | `synthetic_occluded_pedestrian` | 32.728 | vulnerable_road_user, pedestrian_crossing, blocked_lane, close_interaction |
-| 3 | `synthetic_unprotected_left_turn` | 27.851 | vulnerable_road_user, unprotected_turn, close_interaction |
+| 1 | `synthetic_dense_intersection_vru` | 34.882 | vulnerable_road_user, pedestrian_crossing, cyclist_interaction, dense_multi_agent |
+| 2 | `synthetic_occluded_pedestrian` | 33.028 | vulnerable_road_user, pedestrian_crossing, blocked_lane, close_interaction |
+| 3 | `synthetic_unprotected_left_turn` | 28.151 | vulnerable_road_user, unprotected_turn, close_interaction |
 
 ### 1. `synthetic_dense_intersection_vru`
 
 ![synthetic_dense_intersection_vru](assets/synthetic_dense_intersection_vru.svg)
 
-- Score: 34.432
+- Score: 34.882
 - Agents: 4
 - Scored agents: 4
 - Excluded tracks: 0
@@ -47,6 +47,12 @@ ScenarioLens uses a laptop-friendly subset of the public Waymo/autonomy ecosyste
 - Max speed: 5.000 m/s
 - Ego max speed: 4.000 m/s
 - Robust max deceleration: n/a
+- Prediction target source: non_ego_tracks
+- Baseline targets evaluated: 3
+- Baseline ADE: 0.000 m
+- Baseline FDE: 0.000 m
+- Baseline miss rate: 0.0%
+- Baseline failure score: 0.450
 - Component scores:
   - density: 1.000
   - vru: 3.000
@@ -56,6 +62,7 @@ ScenarioLens uses a laptop-friendly subset of the public Waymo/autonomy ecosyste
   - vru_proximity: 4.776
   - path_conflict: 2.184
   - dynamics: 0.000
+  - baseline_failure: 0.450
 - Why it matters:
   - contains 2 vulnerable road user(s)
   - minimum agent distance is 0.632 m
@@ -69,7 +76,7 @@ ScenarioLens uses a laptop-friendly subset of the public Waymo/autonomy ecosyste
 
 ![synthetic_occluded_pedestrian](assets/synthetic_occluded_pedestrian.svg)
 
-- Score: 32.728
+- Score: 33.028
 - Agents: 3
 - Scored agents: 3
 - Excluded tracks: 0
@@ -86,6 +93,12 @@ ScenarioLens uses a laptop-friendly subset of the public Waymo/autonomy ecosyste
 - Max speed: 4.000 m/s
 - Ego max speed: 4.000 m/s
 - Robust max deceleration: 1.000 m/s^2
+- Prediction target source: non_ego_tracks
+- Baseline targets evaluated: 2
+- Baseline ADE: 0.000 m
+- Baseline FDE: 0.000 m
+- Baseline miss rate: 0.0%
+- Baseline failure score: 0.300
 - Component scores:
   - density: 0.750
   - vru: 1.500
@@ -95,6 +108,7 @@ ScenarioLens uses a laptop-friendly subset of the public Waymo/autonomy ecosyste
   - vru_proximity: 4.868
   - path_conflict: 2.245
   - dynamics: 0.000
+  - baseline_failure: 0.300
 - Why it matters:
   - contains 1 vulnerable road user(s)
   - minimum agent distance is 0.510 m
@@ -107,7 +121,7 @@ ScenarioLens uses a laptop-friendly subset of the public Waymo/autonomy ecosyste
 
 ![synthetic_unprotected_left_turn](assets/synthetic_unprotected_left_turn.svg)
 
-- Score: 27.851
+- Score: 28.151
 - Agents: 3
 - Scored agents: 3
 - Excluded tracks: 0
@@ -124,6 +138,12 @@ ScenarioLens uses a laptop-friendly subset of the public Waymo/autonomy ecosyste
 - Max speed: 6.000 m/s
 - Ego max speed: 3.606 m/s
 - Robust max deceleration: 0.181 m/s^2
+- Prediction target source: non_ego_tracks
+- Baseline targets evaluated: 2
+- Baseline ADE: 0.000 m
+- Baseline FDE: 0.000 m
+- Baseline miss rate: 0.0%
+- Baseline failure score: 0.300
 - Component scores:
   - density: 0.750
   - vru: 1.500
@@ -133,6 +153,7 @@ ScenarioLens uses a laptop-friendly subset of the public Waymo/autonomy ecosyste
   - vru_proximity: 3.835
   - path_conflict: 2.000
   - dynamics: 0.000
+  - baseline_failure: 0.300
 - Why it matters:
   - contains 1 vulnerable road user(s)
   - minimum agent distance is 1.887 m
@@ -147,13 +168,13 @@ This section uses a tiny checked-in JSON record shaped like the public Waymo Mot
 
 | Rank | Scenario | Score | Tags |
 | ---: | --- | ---: | --- |
-| 1 | `waymo_native_sample_interaction` | 31.205 | vulnerable_road_user, map_context, objects_of_interest, tracks_to_predict |
+| 1 | `waymo_native_sample_interaction` | 31.355 | vulnerable_road_user, map_context, objects_of_interest, tracks_to_predict |
 
 ### 1. `waymo_native_sample_interaction`
 
 ![waymo_native_sample_interaction](assets/waymo_native_sample_interaction.svg)
 
-- Score: 31.205
+- Score: 31.355
 - Agents: 3
 - Scored agents: 3
 - Excluded tracks: 0
@@ -170,6 +191,12 @@ This section uses a tiny checked-in JSON record shaped like the public Waymo Mot
 - Max speed: 5.000 m/s
 - Ego max speed: 5.000 m/s
 - Robust max deceleration: 10.000 m/s^2
+- Prediction target source: waymo_tracks_to_predict
+- Baseline targets evaluated: 1
+- Baseline ADE: 0.000 m
+- Baseline FDE: 0.000 m
+- Baseline miss rate: 0.0%
+- Baseline failure score: 0.150
 - Component scores:
   - density: 0.750
   - vru: 1.500
@@ -179,6 +206,7 @@ This section uses a tiny checked-in JSON record shaped like the public Waymo Mot
   - vru_proximity: 4.602
   - path_conflict: 2.068
   - dynamics: 6.000
+  - baseline_failure: 0.150
 - Why it matters:
   - contains 1 vulnerable road user(s)
   - includes 1 Waymo prediction target(s)
@@ -196,14 +224,14 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 
 | Rank | Scenario | Score | Tags |
 | ---: | --- | ---: | --- |
-| 1 | `waymo_like_unprotected_turn` | 28.851 | vulnerable_road_user, pedestrian_crossing, unprotected_turn |
-| 2 | `waymo_like_cyclist` | 23.179 | vulnerable_road_user, cyclist_interaction, close_interaction |
+| 1 | `waymo_like_unprotected_turn` | 29.151 | vulnerable_road_user, pedestrian_crossing, unprotected_turn |
+| 2 | `waymo_like_cyclist` | 23.421 | vulnerable_road_user, cyclist_interaction, close_interaction |
 
 ### 1. `waymo_like_unprotected_turn`
 
 ![waymo_like_unprotected_turn](assets/waymo_like_unprotected_turn.svg)
 
-- Score: 28.851
+- Score: 29.151
 - Agents: 3
 - Scored agents: 3
 - Excluded tracks: 0
@@ -220,6 +248,12 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 - Max speed: 6.000 m/s
 - Ego max speed: 3.606 m/s
 - Robust max deceleration: 0.181 m/s^2
+- Prediction target source: non_ego_tracks
+- Baseline targets evaluated: 2
+- Baseline ADE: 0.000 m
+- Baseline FDE: 0.000 m
+- Baseline miss rate: 0.0%
+- Baseline failure score: 0.300
 - Component scores:
   - density: 0.750
   - vru: 1.500
@@ -229,6 +263,7 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
   - vru_proximity: 3.835
   - path_conflict: 2.000
   - dynamics: 0.000
+  - baseline_failure: 0.300
 - Why it matters:
   - contains 1 vulnerable road user(s)
   - minimum agent distance is 1.887 m
@@ -241,7 +276,7 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 
 ![waymo_like_cyclist](assets/waymo_like_cyclist.svg)
 
-- Score: 23.179
+- Score: 23.421
 - Agents: 2
 - Scored agents: 2
 - Excluded tracks: 0
@@ -258,6 +293,12 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 - Max speed: 6.000 m/s
 - Ego max speed: 6.000 m/s
 - Robust max deceleration: n/a
+- Prediction target source: non_ego_tracks
+- Baseline targets evaluated: 1
+- Baseline ADE: 0.200 m
+- Baseline FDE: 0.200 m
+- Baseline miss rate: 0.0%
+- Baseline failure score: 0.242
 - Component scores:
   - density: 0.500
   - vru: 1.500
@@ -267,6 +308,7 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
   - vru_proximity: 3.063
   - path_conflict: 1.188
   - dynamics: 0.000
+  - baseline_failure: 0.242
 - Why it matters:
   - contains 1 vulnerable road user(s)
   - closest vehicle-to-VRU distance is 2.915 m
@@ -277,11 +319,12 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 - Checked-in Waymo examples are synthetic mini fixtures, not downloaded real validation shards.
 - The lightweight binary reader extracts the Motion fields ScenarioLens needs, not the full Waymo proto surface.
 - The TTC value is a screened constant-velocity proxy, not a certified safety metric.
-- The current renderer is 2D and focuses on agent trajectories, not parsed map lanes or traffic lights.
+- The prediction baseline is intentionally simple; it is a failure-mining screen, not a benchmark claim.
+- The current renderer is 2D and focuses on agent trajectories, map context, and baseline overlays, not traffic-light logic.
 
 ## Next Work
 
 - Expand the documented local-slice recipe across more Waymo Motion validation shards.
-- Add map/lane and traffic-light features from native Motion records.
-- Compare synthetic, native mini-slice, and downloaded-slice score distributions.
+- Compare baseline ADE/FDE distributions across more validation shards.
+- Add traffic-light and richer lane-context features from native Motion records.
 - Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.

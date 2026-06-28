@@ -82,6 +82,7 @@ class MetricsTest(unittest.TestCase):
                 "vru_proximity",
                 "path_conflict",
                 "dynamics",
+                "baseline_failure",
             ),
         )
         self.assertGreater(components["dynamics"], 0.0)
@@ -133,6 +134,10 @@ class MetricsTest(unittest.TestCase):
         self.assertTrue(score.sdc_track_present)
         self.assertEqual(score.prediction_target_count, 1)
         self.assertEqual(score.object_of_interest_count, 1)
+        self.assertEqual(score.prediction_target_source, "waymo_tracks_to_predict")
+        self.assertEqual(score.prediction_target_evaluated_count, 1)
+        self.assertIsNotNone(score.baseline_ade_m)
+        self.assertIn("baseline_failure", score.component_scores)
 
     def test_closing_time_to_collision_requires_future_conflict(self) -> None:
         left = State(t=0, x=0, y=0, vx=5, vy=0)

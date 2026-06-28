@@ -74,6 +74,8 @@ matter most for this portfolio project:
   `object_type`, `states`, and `sdc_track_index`,
 - it reads small downloaded TFRecord/protobuf slices without heavyweight runtime
   dependencies,
+- it evaluates a lightweight constant-velocity baseline on Motion prediction
+  targets,
 - it keeps future simulation work pointed at JAX/Waymax.
 
 ## Why Not C++ Or Bazel Yet?
@@ -94,10 +96,9 @@ project more convincing.
 
 1. Expand the checked-in real-data case study across more downloaded Waymo
    Motion validation shards.
-2. Add a compact feature index, likely JSON first and Parquet/DuckDB once the
+2. Compare baseline ADE/FDE distributions by scenario tag and score component.
+3. Add a compact feature index, likely JSON first and Parquet/DuckDB once the
    slice gets larger.
-3. Add a lightweight trajectory-prediction baseline over selected ranked
-   scenarios.
 4. Add a small JAX/Waymax experiment that replays or evaluates selected
    high-value scenarios.
 

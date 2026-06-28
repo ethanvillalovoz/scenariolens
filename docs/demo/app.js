@@ -51,6 +51,13 @@ const metricLabels = {
   max_speed_mps: "Max speed",
   ego_max_speed_mps: "Ego speed",
   max_deceleration_mps2: "Robust max decel",
+  prediction_target_source: "Target source",
+  prediction_target_evaluated_count: "Evaluated targets",
+  baseline_ade_m: "Baseline ADE",
+  baseline_fde_m: "Baseline FDE",
+  baseline_max_fde_m: "Max baseline FDE",
+  baseline_miss_rate: "Baseline miss rate",
+  baseline_failure_score: "Baseline failure",
 };
 
 const metricUnits = {
@@ -61,6 +68,9 @@ const metricUnits = {
   max_speed_mps: "m/s",
   ego_max_speed_mps: "m/s",
   max_deceleration_mps2: "m/s^2",
+  baseline_ade_m: "m",
+  baseline_fde_m: "m",
+  baseline_max_fde_m: "m",
 };
 
 async function boot() {
@@ -78,7 +88,7 @@ async function boot() {
     nodes.datasetSummary.textContent = error.message;
     nodes.scenarioRows.innerHTML = `
       <tr class="empty-row">
-        <td colspan="6">Dashboard data could not be loaded.</td>
+        <td colspan="7">Dashboard data could not be loaded.</td>
       </tr>
     `;
   }
@@ -147,7 +157,7 @@ function renderRows(scenarios) {
   if (scenarios.length === 0) {
     nodes.scenarioRows.innerHTML = `
       <tr class="empty-row">
-        <td colspan="6">No scenarios match the active filters.</td>
+        <td colspan="7">No scenarios match the active filters.</td>
       </tr>
     `;
     return;
@@ -162,6 +172,7 @@ function renderRows(scenarios) {
       </td>
       <td><span class="dataset-chip">${escapeHtml(shortDatasetLabel(scenario.dataset_id))}</span></td>
       <td><span class="score-chip">${formatNumber(scenario.score.interaction)}</span></td>
+      <td><span class="failure-chip">${formatMetric(scenario.metrics.baseline_fde_m, "m")}</span></td>
       <td><div class="tag-cell">${tagChips(scenario.tags, 4)}</div></td>
       <td><div class="reason-snippet">${escapeHtml(scenario.reasons[0] ?? "Included for comparison.")}</div></td>
     </tr>
@@ -247,6 +258,8 @@ function sortScenarios(scenarios) {
       return sorted.sort((a, b) => optional(a.metrics.min_pairwise_distance_m) - optional(b.metrics.min_pairwise_distance_m));
     case "ttc-asc":
       return sorted.sort((a, b) => optional(a.metrics.min_time_to_collision_s) - optional(b.metrics.min_time_to_collision_s));
+    case "fde-desc":
+      return sorted.sort((a, b) => (b.metrics.baseline_fde_m ?? -1) - (a.metrics.baseline_fde_m ?? -1));
     case "rank-asc":
       return sorted.sort((a, b) => a.rank - b.rank);
     case "score-desc":
@@ -433,6 +446,12 @@ function formatMetric(value, unit) {
   }
   if (typeof value === "boolean") {
     return value ? "yes" : "no";
+  }
+  if (typeof value === "string") {
+    return value.replaceAll("_", " ");
+  }
+  if (unit === undefined && String(value).includes(".")) {
+    return formatNumber(value);
   }
   return `${formatNumber(value)}${unit ? ` ${unit}` : ""}`;
 }

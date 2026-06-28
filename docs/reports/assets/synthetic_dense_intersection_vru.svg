@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="920" height="640" viewBox="0 0 920 640" role="img">
 <title>synthetic_dense_intersection_vru trajectory preview</title>
-<desc>Scenario synthetic_dense_intersection_vru from synthetic. Score 34.432. 4 agents. Tags: vulnerable_road_user, pedestrian_crossing, cyclist_interaction, dense_multi_agent.</desc>
+<desc>Scenario synthetic_dense_intersection_vru from synthetic. Score 34.882. 4 agents. Tags: vulnerable_road_user, pedestrian_crossing, cyclist_interaction, dense_multi_agent.</desc>
 <defs>
 <clipPath id="scenario-plot-clip"><rect x="56" y="84" width="808" height="474" rx="10" /></clipPath>
 </defs>
 <rect x="0" y="0" width="920" height="640" fill="#f8fafc" />
 <text x="56" y="36" fill="#0f172a" font-size="22" font-family="Inter, Arial, sans-serif" font-weight="800">Synthetic Dense Intersection VRU</text>
-<text x="56" y="60" fill="#64748b" font-size="13" font-family="Inter, Arial, sans-serif" font-weight="650">score 34.43 / 4 agents / Vulnerable Road User / Pedestrian Crossing / Cyclist Interaction / +1 tags</text>
+<text x="56" y="60" fill="#64748b" font-size="13" font-family="Inter, Arial, sans-serif" font-weight="650">score 34.88 / 4 agents / Vulnerable Road User / Pedestrian Crossing / Cyclist Interaction / +1 tags</text>
 <text x="864" y="38" fill="#64748b" font-size="12" font-family="Inter, Arial, sans-serif" text-anchor="end">synthetic</text>
 <rect x="56" y="84" width="808" height="474" rx="10" fill="#f9fbfd" stroke="#d8e2ee" stroke-width="1.2" />
 <g clip-path="url(#scenario-plot-clip)">
@@ -84,6 +84,18 @@
 <rect x="641.94" y="214.01" width="4" height="10" rx="2" fill="#16a34a" />
 <text x="651.94" y="223.51" fill="#0f172a" font-size="12" font-family="Inter, Arial, sans-serif" font-weight="750">cyclist_1</text>
 </g>
+<g class="baseline-prediction prediction-vehicle">
+<polyline points="474.81,321.00 474.81,172.88" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="10 9" opacity="0.82" />
+<polyline points="474.81,321.00 474.81,172.88" fill="none" stroke="#2563eb" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="9 8" opacity="0.88" />
+</g>
+<g class="baseline-prediction prediction-pedestrian">
+<polyline points="539.99,318.04 516.29,285.45" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="10 9" opacity="0.82" />
+<polyline points="539.99,318.04 516.29,285.45" fill="none" stroke="#dc2626" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="9 8" opacity="0.88" />
+</g>
+<g class="baseline-prediction prediction-cyclist">
+<polyline points="504.44,229.16 622.94,241.01" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="10 9" opacity="0.82" />
+<polyline points="504.44,229.16 622.94,241.01" fill="none" stroke="#16a34a" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="9 8" opacity="0.88" />
+</g>
 </g>
 <rect x="56" y="585" width="120" height="30" rx="15" fill="#ffffff" stroke="#d8e2ee" />
 <circle cx="74" cy="600" r="6" fill="#2563eb" />
@@ -98,4 +110,6 @@
 <circle cx="542" cy="600" r="6" fill="#0f172a" />
 <text x="488" y="604" fill="#64748b" font-size="12" font-family="Inter, Arial, sans-serif" font-weight="700">start</text>
 <text x="554" y="604" fill="#64748b" font-size="12" font-family="Inter, Arial, sans-serif" font-weight="700">latest</text>
+<line x1="604" y1="600" x2="638" y2="600" stroke="#0f172a" stroke-width="3" stroke-linecap="round" stroke-dasharray="8 7" opacity="0.76" />
+<text x="648" y="604" fill="#64748b" font-size="12" font-family="Inter, Arial, sans-serif" font-weight="700">baseline forecast</text>
 </svg>

@@ -37,7 +37,7 @@ PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-validate \
 
 ## Aggregate Metrics
 
-- Score range: 7.48 min / 32.57 median / 29.67 mean / 42.74 max
+- Score range: 19.48 min / 41.06 median / 39.29 mean / 51.43 max
 - Average raw agents: 59.40
 - Average scored agents: 58.72
 - Low-quality track rate: 1.14%
@@ -45,14 +45,18 @@ PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-validate \
 - Prediction targets: 101
 - Objects of interest: 18
 - Scenarios with parsed map features: 25
+- Baseline targets evaluated: 101
+- Mean baseline ADE / FDE: 10.49 m / 27.55 m
+- Max baseline FDE: 69.32 m
+- Weighted baseline miss rate: 96.04%
 
 | Rank | Scenario | Score | Main Reason |
 | ---: | --- | ---: | --- |
-| 1 | `a651202aa8e79d45` | 42.741 | contains 22 vulnerable road users |
-| 2 | `5f5660d70a6f14f6` | 41.654 | contains 16 vulnerable road users |
-| 3 | `7e969997e3e0b772` | 39.427 | contains 9 vulnerable road users |
-| 4 | `706fecd25045c8d` | 39.325 | contains 7 vulnerable road users |
-| 5 | `d30709cd60e60395` | 38.926 | contains 14 vulnerable road users |
+| 1 | `7e969997e3e0b772` | 51.427 | contains 9 vulnerable road users |
+| 2 | `706fecd25045c8d` | 51.325 | contains 7 vulnerable road users |
+| 3 | `770fec53ec3e0395` | 50.890 | contains 4 vulnerable road users |
+| 4 | `d30709cd60e60395` | 50.759 | contains 14 vulnerable road users |
+| 5 | `67fff4d5bb3acf8d` | 50.543 | contains 9 vulnerable road users |
 
 ## Notes
 
@@ -63,8 +67,9 @@ PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-validate \
   scenario id, timestamps, tracks, object types, states, SDC index, objects of
   interest, prediction targets, and coarse map/traffic-signal presence.
 - The current metrics are screening features, not certified safety metrics.
-  Ranking now uses a quality-filtered, ego-centered scoring context and reports
-  raw agent counts separately from scored agent counts.
+  Ranking now uses a quality-filtered, ego-centered scoring context plus a
+  calibrated constant-velocity baseline failure component, and reports raw
+  agent counts separately from scored agent counts.
 - Raw Waymo data, normalized ScenarioLens JSON from the shard, and generated
   SVGs remain ignored local artifacts unless licensing and publication choices
   are reviewed separately.

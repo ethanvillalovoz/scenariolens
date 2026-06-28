@@ -23,6 +23,8 @@ class ReportTest(unittest.TestCase):
         self.assertIn("Scored agents", report)
         self.assertIn("Min VRU distance", report)
         self.assertIn("Screened TTC proxy", report)
+        self.assertIn("Baseline FDE", report)
+        self.assertIn("Baseline failure score", report)
         self.assertIn("synthetic_dense_intersection_vru", report)
 
     def test_json_report_is_machine_readable(self) -> None:
@@ -32,6 +34,7 @@ class ReportTest(unittest.TestCase):
         self.assertGreaterEqual(payload["scenario_count"], 10)
         self.assertIn("reasons", payload["scenarios"][0])
         self.assertIn("component_scores", payload["scenarios"][0])
+        self.assertIn("baseline_fde_m", payload["scenarios"][0])
 
     def test_score_reasons_falls_back_for_baseline(self) -> None:
         baseline = ranked_scores(synthetic_scenarios())[-1]

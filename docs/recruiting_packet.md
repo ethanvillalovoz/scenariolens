@@ -118,9 +118,8 @@ Testing and verification:
 What I would build next:
 
 1. Expand the downloaded Waymo Motion validation-slice run across more shards.
-2. Add richer map and traffic-light summaries.
-3. Add a lightweight trajectory-prediction baseline and compare error by
-   scenario type.
+2. Compare constant-velocity baseline ADE/FDE distributions by scenario type.
+3. Add richer map and traffic-light summaries.
 4. Integrate a Waymax/JAX replay or perturbation path for selected scenarios.
 
 ## Claims To Keep Honest

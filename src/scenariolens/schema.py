@@ -59,6 +59,13 @@ class ScenarioScore:
     max_speed_mps: float | None
     ego_max_speed_mps: float | None
     max_deceleration_mps2: float | None
+    prediction_target_source: str
+    prediction_target_evaluated_count: int
+    baseline_ade_m: float | None
+    baseline_fde_m: float | None
+    baseline_max_fde_m: float | None
+    baseline_miss_rate: float | None
+    baseline_failure_score: float
     taxonomy_score: float
     component_scores: dict[str, float]
     interaction_score: float

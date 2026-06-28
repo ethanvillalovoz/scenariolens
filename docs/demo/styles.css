@@ -413,7 +413,7 @@ a {
 
 .scenario-table {
   width: 100%;
-  min-width: 780px;
+  min-width: 880px;
   border-collapse: collapse;
 }
 
@@ -472,6 +472,7 @@ a {
 
 .dataset-chip,
 .score-chip,
+.failure-chip,
 .tag-chip {
   display: inline-flex;
   align-items: center;
@@ -493,6 +494,13 @@ a {
   justify-content: center;
   color: #ffffff;
   background: var(--ink);
+}
+
+.failure-chip {
+  min-width: 62px;
+  justify-content: center;
+  color: var(--amber);
+  background: var(--amber-soft);
 }
 
 .tag-cell {

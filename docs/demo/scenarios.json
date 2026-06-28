@@ -42,6 +42,7 @@
       "vulnerable_road_user"
     ],
     "component_names": [
+      "baseline_failure",
       "density",
       "dynamics",
       "path_conflict",
@@ -76,7 +77,7 @@
         "high-value taxonomy tags: Vulnerable road user, Pedestrian crossing, Cyclist interaction"
       ],
       "score": {
-        "interaction": 34.432,
+        "interaction": 34.882,
         "taxonomy": 9.0,
         "components": {
           "density": 1.0,
@@ -86,7 +87,8 @@
           "ttc": 7.104,
           "vru_proximity": 4.776,
           "path_conflict": 2.184,
-          "dynamics": 0.0
+          "dynamics": 0.0,
+          "baseline_failure": 0.45
         }
       },
       "metrics": {
@@ -105,7 +107,14 @@
         "min_time_to_collision_s": 0.317,
         "max_speed_mps": 5.0,
         "ego_max_speed_mps": 4.0,
-        "max_deceleration_mps2": null
+        "max_deceleration_mps2": null,
+        "prediction_target_source": "non_ego_tracks",
+        "prediction_target_evaluated_count": 3,
+        "baseline_ade_m": 0.0,
+        "baseline_fde_m": 0.0,
+        "baseline_max_fde_m": 0.0,
+        "baseline_miss_rate": 0.0,
+        "baseline_failure_score": 0.45
       },
       "tracks": {
         "count": 4,
@@ -139,7 +148,7 @@
         "high-value taxonomy tags: Vulnerable road user, Pedestrian crossing, Blocked lane, Close interaction"
       ],
       "score": {
-        "interaction": 32.728,
+        "interaction": 33.028,
         "taxonomy": 9.0,
         "components": {
           "density": 0.75,
@@ -149,7 +158,8 @@
           "ttc": 6.875,
           "vru_proximity": 4.868,
           "path_conflict": 2.245,
-          "dynamics": 0.0
+          "dynamics": 0.0,
+          "baseline_failure": 0.3
         }
       },
       "metrics": {
@@ -168,7 +178,14 @@
         "min_time_to_collision_s": 0.5,
         "max_speed_mps": 4.0,
         "ego_max_speed_mps": 4.0,
-        "max_deceleration_mps2": 1.0
+        "max_deceleration_mps2": 1.0,
+        "prediction_target_source": "non_ego_tracks",
+        "prediction_target_evaluated_count": 2,
+        "baseline_ade_m": 0.0,
+        "baseline_fde_m": 0.0,
+        "baseline_max_fde_m": 0.0,
+        "baseline_miss_rate": 0.0,
+        "baseline_failure_score": 0.3
       },
       "tracks": {
         "count": 3,
@@ -204,7 +221,7 @@
         "high-value taxonomy tags: Vulnerable road user"
       ],
       "score": {
-        "interaction": 31.205,
+        "interaction": 31.355,
         "taxonomy": 2.0,
         "components": {
           "density": 0.75,
@@ -214,7 +231,8 @@
           "ttc": 7.148,
           "vru_proximity": 4.602,
           "path_conflict": 2.068,
-          "dynamics": 6.0
+          "dynamics": 6.0,
+          "baseline_failure": 0.15
         }
       },
       "metrics": {
@@ -233,7 +251,14 @@
         "min_time_to_collision_s": 0.281,
         "max_speed_mps": 5.0,
         "ego_max_speed_mps": 5.0,
-        "max_deceleration_mps2": 10.0
+        "max_deceleration_mps2": 10.0,
+        "prediction_target_source": "waymo_tracks_to_predict",
+        "prediction_target_evaluated_count": 1,
+        "baseline_ade_m": 0.0,
+        "baseline_fde_m": 0.0,
+        "baseline_max_fde_m": 0.0,
+        "baseline_miss_rate": 0.0,
+        "baseline_failure_score": 0.15
       },
       "tracks": {
         "count": 3,
@@ -265,7 +290,7 @@
         "high-value taxonomy tags: Vulnerable road user, Pedestrian crossing, Unprotected turn"
       ],
       "score": {
-        "interaction": 28.851,
+        "interaction": 29.151,
         "taxonomy": 7.5,
         "components": {
           "density": 0.75,
@@ -275,7 +300,8 @@
           "ttc": 7.153,
           "vru_proximity": 3.835,
           "path_conflict": 2.0,
-          "dynamics": 0.0
+          "dynamics": 0.0,
+          "baseline_failure": 0.3
         }
       },
       "metrics": {
@@ -294,7 +320,14 @@
         "min_time_to_collision_s": 0.277,
         "max_speed_mps": 6.0,
         "ego_max_speed_mps": 3.606,
-        "max_deceleration_mps2": 0.181
+        "max_deceleration_mps2": 0.181,
+        "prediction_target_source": "non_ego_tracks",
+        "prediction_target_evaluated_count": 2,
+        "baseline_ade_m": 0.0,
+        "baseline_fde_m": 0.0,
+        "baseline_max_fde_m": 0.0,
+        "baseline_miss_rate": 0.0,
+        "baseline_failure_score": 0.3
       },
       "tracks": {
         "count": 3,
@@ -326,7 +359,7 @@
         "high-value taxonomy tags: Vulnerable road user, Unprotected turn, Close interaction"
       ],
       "score": {
-        "interaction": 27.851,
+        "interaction": 28.151,
         "taxonomy": 6.5,
         "components": {
           "density": 0.75,
@@ -336,7 +369,8 @@
           "ttc": 7.153,
           "vru_proximity": 3.835,
           "path_conflict": 2.0,
-          "dynamics": 0.0
+          "dynamics": 0.0,
+          "baseline_failure": 0.3
         }
       },
       "metrics": {
@@ -355,7 +389,14 @@
         "min_time_to_collision_s": 0.277,
         "max_speed_mps": 6.0,
         "ego_max_speed_mps": 3.606,
-        "max_deceleration_mps2": 0.181
+        "max_deceleration_mps2": 0.181,
+        "prediction_target_source": "non_ego_tracks",
+        "prediction_target_evaluated_count": 2,
+        "baseline_ade_m": 0.0,
+        "baseline_fde_m": 0.0,
+        "baseline_max_fde_m": 0.0,
+        "baseline_miss_rate": 0.0,
+        "baseline_failure_score": 0.3
       },
       "tracks": {
         "count": 3,
@@ -387,7 +428,7 @@
         "high-value taxonomy tags: Vulnerable road user, Cyclist interaction, Close interaction"
       ],
       "score": {
-        "interaction": 27.158,
+        "interaction": 27.354,
         "taxonomy": 6.5,
         "components": {
           "density": 0.5,
@@ -397,7 +438,8 @@
           "ttc": 6.598,
           "vru_proximity": 4.02,
           "path_conflict": 1.68,
-          "dynamics": 0.0
+          "dynamics": 0.0,
+          "baseline_failure": 0.196
         }
       },
       "metrics": {
@@ -416,7 +458,14 @@
         "min_time_to_collision_s": 0.721,
         "max_speed_mps": 6.0,
         "ego_max_speed_mps": 6.0,
-        "max_deceleration_mps2": null
+        "max_deceleration_mps2": null,
+        "prediction_target_source": "non_ego_tracks",
+        "prediction_target_evaluated_count": 1,
+        "baseline_ade_m": 0.1,
+        "baseline_fde_m": 0.1,
+        "baseline_max_fde_m": 0.1,
+        "baseline_miss_rate": 0.0,
+        "baseline_failure_score": 0.196
       },
       "tracks": {
         "count": 2,
@@ -447,7 +496,7 @@
         "high-value taxonomy tags: Vulnerable road user, Pedestrian crossing, Close interaction"
       ],
       "score": {
-        "interaction": 26.359,
+        "interaction": 26.509,
         "taxonomy": 7.0,
         "components": {
           "density": 0.5,
@@ -457,7 +506,8 @@
           "ttc": 6.64,
           "vru_proximity": 3.573,
           "path_conflict": 1.382,
-          "dynamics": 0.0
+          "dynamics": 0.0,
+          "baseline_failure": 0.15
         }
       },
       "metrics": {
@@ -476,7 +526,14 @@
         "min_time_to_collision_s": 0.688,
         "max_speed_mps": 5.0,
         "ego_max_speed_mps": 5.0,
-        "max_deceleration_mps2": 1.0
+        "max_deceleration_mps2": 1.0,
+        "prediction_target_source": "non_ego_tracks",
+        "prediction_target_evaluated_count": 1,
+        "baseline_ade_m": 0.0,
+        "baseline_fde_m": 0.0,
+        "baseline_max_fde_m": 0.0,
+        "baseline_miss_rate": 0.0,
+        "baseline_failure_score": 0.15
       },
       "tracks": {
         "count": 2,
@@ -505,7 +562,7 @@
         "high-value taxonomy tags: Vulnerable road user, Cyclist interaction, Close interaction"
       ],
       "score": {
-        "interaction": 23.179,
+        "interaction": 23.421,
         "taxonomy": 6.5,
         "components": {
           "density": 0.5,
@@ -515,7 +572,8 @@
           "ttc": 5.343,
           "vru_proximity": 3.063,
           "path_conflict": 1.188,
-          "dynamics": 0.0
+          "dynamics": 0.0,
+          "baseline_failure": 0.242
         }
       },
       "metrics": {
@@ -534,7 +592,14 @@
         "min_time_to_collision_s": 1.726,
         "max_speed_mps": 6.0,
         "ego_max_speed_mps": 6.0,
-        "max_deceleration_mps2": null
+        "max_deceleration_mps2": null,
+        "prediction_target_source": "non_ego_tracks",
+        "prediction_target_evaluated_count": 1,
+        "baseline_ade_m": 0.2,
+        "baseline_fde_m": 0.2,
+        "baseline_max_fde_m": 0.2,
+        "baseline_miss_rate": 0.0,
+        "baseline_failure_score": 0.242
       },
       "tracks": {
         "count": 2,
@@ -561,7 +626,7 @@
         "high-value taxonomy tags: Merge conflict, Blocked lane"
       ],
       "score": {
-        "interaction": 17.492,
+        "interaction": 17.792,
         "taxonomy": 4.0,
         "components": {
           "density": 0.75,
@@ -571,7 +636,8 @@
           "ttc": 6.647,
           "vru_proximity": 0.0,
           "path_conflict": 1.2,
-          "dynamics": 0.0
+          "dynamics": 0.0,
+          "baseline_failure": 0.3
         }
       },
       "metrics": {
@@ -590,7 +656,14 @@
         "min_time_to_collision_s": 0.683,
         "max_speed_mps": 5.0,
         "ego_max_speed_mps": 5.0,
-        "max_deceleration_mps2": 0.921
+        "max_deceleration_mps2": 0.921,
+        "prediction_target_source": "non_ego_tracks",
+        "prediction_target_evaluated_count": 2,
+        "baseline_ade_m": 0.0,
+        "baseline_fde_m": 0.0,
+        "baseline_max_fde_m": 0.0,
+        "baseline_miss_rate": 0.0,
+        "baseline_failure_score": 0.3
       },
       "tracks": {
         "count": 3,
@@ -617,7 +690,7 @@
         "high-value taxonomy tags: Hard braking, Close interaction"
       ],
       "score": {
-        "interaction": 14.488,
+        "interaction": 15.098,
         "taxonomy": 5.5,
         "components": {
           "density": 0.5,
@@ -627,7 +700,8 @@
           "ttc": 4.688,
           "vru_proximity": 0.0,
           "path_conflict": 1.0,
-          "dynamics": 2.8
+          "dynamics": 2.8,
+          "baseline_failure": 0.61
         }
       },
       "metrics": {
@@ -646,7 +720,14 @@
         "min_time_to_collision_s": 2.25,
         "max_speed_mps": 9.0,
         "ego_max_speed_mps": 9.0,
-        "max_deceleration_mps2": 6.0
+        "max_deceleration_mps2": 6.0,
+        "prediction_target_source": "non_ego_tracks",
+        "prediction_target_evaluated_count": 1,
+        "baseline_ade_m": 1.0,
+        "baseline_fde_m": 1.0,
+        "baseline_max_fde_m": 1.0,
+        "baseline_miss_rate": 0.0,
+        "baseline_failure_score": 0.61
       },
       "tracks": {
         "count": 2,
@@ -673,7 +754,7 @@
         "high-value taxonomy tags: Merge conflict"
       ],
       "score": {
-        "interaction": 11.982,
+        "interaction": 12.432,
         "taxonomy": 3.5,
         "components": {
           "density": 1.0,
@@ -683,7 +764,8 @@
           "ttc": 2.991,
           "vru_proximity": 0.0,
           "path_conflict": 1.5,
-          "dynamics": 0.0
+          "dynamics": 0.0,
+          "baseline_failure": 0.45
         }
       },
       "metrics": {
@@ -702,7 +784,14 @@
         "min_time_to_collision_s": 3.607,
         "max_speed_mps": 9.0,
         "ego_max_speed_mps": 8.002,
-        "max_deceleration_mps2": null
+        "max_deceleration_mps2": null,
+        "prediction_target_source": "non_ego_tracks",
+        "prediction_target_evaluated_count": 3,
+        "baseline_ade_m": 0.0,
+        "baseline_fde_m": 0.0,
+        "baseline_max_fde_m": 0.0,
+        "baseline_miss_rate": 0.0,
+        "baseline_failure_score": 0.45
       },
       "tracks": {
         "count": 4,
@@ -726,7 +815,7 @@
         "included as a low-interaction baseline"
       ],
       "score": {
-        "interaction": 0.5,
+        "interaction": 0.65,
         "taxonomy": 0.0,
         "components": {
           "density": 0.5,
@@ -736,7 +825,8 @@
           "ttc": 0.0,
           "vru_proximity": 0.0,
           "path_conflict": 0.0,
-          "dynamics": 0.0
+          "dynamics": 0.0,
+          "baseline_failure": 0.15
         }
       },
       "metrics": {
@@ -755,7 +845,14 @@
         "min_time_to_collision_s": null,
         "max_speed_mps": 7.0,
         "ego_max_speed_mps": 7.0,
-        "max_deceleration_mps2": null
+        "max_deceleration_mps2": null,
+        "prediction_target_source": "non_ego_tracks",
+        "prediction_target_evaluated_count": 1,
+        "baseline_ade_m": 0.0,
+        "baseline_fde_m": 0.0,
+        "baseline_max_fde_m": 0.0,
+        "baseline_miss_rate": 0.0,
+        "baseline_failure_score": 0.15
       },
       "tracks": {
         "count": 2,
@@ -779,7 +876,7 @@
         "included as a low-interaction baseline"
       ],
       "score": {
-        "interaction": 0.25,
+        "interaction": 0.4,
         "taxonomy": 0.0,
         "components": {
           "density": 0.25,
@@ -789,7 +886,8 @@
           "ttc": 0.0,
           "vru_proximity": 0.0,
           "path_conflict": 0.0,
-          "dynamics": 0.0
+          "dynamics": 0.0,
+          "baseline_failure": 0.15
         }
       },
       "metrics": {
@@ -808,7 +906,14 @@
         "min_time_to_collision_s": null,
         "max_speed_mps": 10.0,
         "ego_max_speed_mps": 10.0,
-        "max_deceleration_mps2": null
+        "max_deceleration_mps2": null,
+        "prediction_target_source": "all_tracks",
+        "prediction_target_evaluated_count": 1,
+        "baseline_ade_m": 0.0,
+        "baseline_fde_m": 0.0,
+        "baseline_max_fde_m": 0.0,
+        "baseline_miss_rate": 0.0,
+        "baseline_failure_score": 0.15
       },
       "tracks": {
         "count": 1,

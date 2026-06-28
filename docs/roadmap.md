@@ -103,7 +103,24 @@ contract.
 - generate matching SVG trajectory assets,
 - document the static payload shape for future UI work.
 
-Status: implemented in `docs/demo/scenarios.json` and `docs/demo/assets/`.
+Status: implemented in `docs/demo/scenarios.json` and `docs/demo/assets/`,
+including baseline ADE/FDE and failure-score fields.
+
+## Milestone 3D: Baseline Failure Mining
+
+Goal: turn scenario ranking into measurable downstream evaluation.
+
+- select prediction targets from Waymo Motion metadata when available,
+- run a lightweight constant-velocity trajectory baseline,
+- compute ADE, FDE, max FDE, miss rate, and baseline failure score,
+- add baseline failure as an interpretable score component,
+- render dashed forecast overlays in SVG previews,
+- expose baseline metrics in Markdown/JSON reports, validation packets, and
+  the Scenario Explorer.
+
+Status: implemented for synthetic fixtures, Waymo-shaped JSON/CSV fixtures,
+and local Waymo Motion validation slices. Broader real-slice distribution
+analysis remains next work.
 
 ## Milestone 4: Portfolio Polish
 
@@ -133,22 +150,20 @@ code.
 Status: implemented in `docs/project_strategy.md`, `docs/architecture.md`, the
 README, and the Scenario Explorer navigation/status panel.
 
-## Milestone 5: Baseline Evaluation Path
+## Milestone 5: Real-Slice Distribution Study
 
-Goal: turn scenario ranking into measurable downstream evaluation.
+Goal: make the baseline failure analysis credible on more real data.
 
-- select a small real-data scenario collection from downloaded validation
+- select larger real-data scenario collections from downloaded validation
   shards,
-- add a lightweight constant-velocity or simple learned trajectory-prediction
-  baseline,
 - compare baseline errors by scenario tag and score component,
 - report which ranked scenarios are hardest for the baseline,
 - evaluate whether selected scenarios should be replayed or perturbed in
   Waymax/JAX.
 
-Status: planned. This is the next best ML/simulation step because it builds on
-the existing scenario-ranking data contract without requiring heavy compute on
-the core laptop workflow.
+Status: next work. This is the next best ML/simulation step because it builds on
+the implemented baseline data contract without requiring heavy compute on the
+core laptop workflow.
 
 ## Stretch Goals
 

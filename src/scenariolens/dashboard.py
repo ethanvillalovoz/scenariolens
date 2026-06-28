@@ -181,6 +181,13 @@ def _dashboard_item(
             "max_speed_mps": _round_optional(score.max_speed_mps),
             "ego_max_speed_mps": _round_optional(score.ego_max_speed_mps),
             "max_deceleration_mps2": _round_optional(score.max_deceleration_mps2),
+            "prediction_target_source": score.prediction_target_source,
+            "prediction_target_evaluated_count": score.prediction_target_evaluated_count,
+            "baseline_ade_m": _round_optional(score.baseline_ade_m),
+            "baseline_fde_m": _round_optional(score.baseline_fde_m),
+            "baseline_max_fde_m": _round_optional(score.baseline_max_fde_m),
+            "baseline_miss_rate": _round_optional(score.baseline_miss_rate),
+            "baseline_failure_score": _round_optional(score.baseline_failure_score),
         },
         "tracks": {
             "count": len(scenario.tracks),

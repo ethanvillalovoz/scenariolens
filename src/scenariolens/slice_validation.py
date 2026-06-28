@@ -180,6 +180,7 @@ def case_study_markdown(manifest: dict[str, object]) -> str:
     agent_summary = _required_mapping(aggregate, "agent_summary")
     vru_summary = _required_mapping(aggregate, "vru_summary")
     waymo_summary = _required_mapping(aggregate, "waymo_metadata")
+    baseline_summary = _required_mapping(aggregate, "prediction_baseline")
     top_scenarios = manifest["top_scenarios"]
     if not isinstance(top_scenarios, list):
         raise TypeError("manifest top_scenarios must be a list")
@@ -216,6 +217,10 @@ def case_study_markdown(manifest: dict[str, object]) -> str:
         f"| Waymo metadata | total prediction targets | {waymo_summary['prediction_target_total']} |",
         f"| Waymo metadata | total objects of interest | {waymo_summary['object_of_interest_total']} |",
         f"| Waymo metadata | scenarios with parsed map features | {waymo_summary['scenarios_with_map_features']} |",
+        f"| Prediction baseline | evaluated targets | {baseline_summary['evaluated_target_total']} |",
+        f"| Prediction baseline | mean ADE / FDE | {_float_text(baseline_summary['mean_ade_m'])} m / {_float_text(baseline_summary['mean_fde_m'])} m |",
+        f"| Prediction baseline | max FDE | {_float_text(baseline_summary['max_fde_m'])} m |",
+        f"| Prediction baseline | weighted miss rate | {_percent_text(baseline_summary['weighted_miss_rate'])} |",
         "",
         "## Top Ranked Scenarios",
         "",
@@ -238,7 +243,7 @@ def case_study_markdown(manifest: dict[str, object]) -> str:
             "- The scores are screening heuristics for review prioritization, not certified safety metrics.",
             "- The run demonstrates that ScenarioLens can ingest a real Motion TFRecord shard with a dependency-free reader.",
             "- The aggregate section is safe to publish because it contains counts and summary statistics only.",
-            "- The next useful expansion is to compare these aggregate distributions across more validation shards.",
+            "- The next useful expansion is to compare these interaction and baseline-failure distributions across more validation shards.",
         ]
     )
     return "\n".join(lines).rstrip() + "\n"
@@ -278,6 +283,7 @@ def _summary_markdown(manifest: dict[str, object]) -> str:
         agent_summary = _required_mapping(aggregate, "agent_summary")
         vru_summary = _required_mapping(aggregate, "vru_summary")
         waymo_summary = _required_mapping(aggregate, "waymo_metadata")
+        baseline_summary = _required_mapping(aggregate, "prediction_baseline")
         lines.extend(
             [
                 "",
@@ -290,6 +296,9 @@ def _summary_markdown(manifest: dict[str, object]) -> str:
                 f"- Prediction targets: {waymo_summary['prediction_target_total']}",
                 f"- Objects of interest: {waymo_summary['object_of_interest_total']}",
                 f"- Scenarios with parsed map features: {waymo_summary['scenarios_with_map_features']}",
+                f"- Baseline targets evaluated: {baseline_summary['evaluated_target_total']}",
+                f"- Mean baseline FDE: {_float_text(baseline_summary['mean_fde_m'])} m",
+                f"- Weighted baseline miss rate: {_percent_text(baseline_summary['weighted_miss_rate'])}",
             ]
         )
 
@@ -346,6 +355,15 @@ def _aggregate_metrics(scores) -> dict[str, object]:
                 "object_of_interest_total": 0,
                 "scenarios_with_map_features": 0,
             },
+            "prediction_baseline": {
+                "scenarios_with_evaluated_targets": 0,
+                "evaluated_target_total": 0,
+                "mean_ade_m": 0.0,
+                "mean_fde_m": 0.0,
+                "max_fde_m": 0.0,
+                "weighted_miss_rate": 0.0,
+                "mean_failure_score": 0.0,
+            },
             "top_tags": [],
         }
 
@@ -355,6 +373,22 @@ def _aggregate_metrics(scores) -> dict[str, object]:
     low_quality_tracks = tuple(score.low_quality_track_count for score in scores)
     raw_vrus = tuple(score.vulnerable_road_user_count for score in scores)
     scored_vrus = tuple(score.scoring_vulnerable_road_user_count for score in scores)
+    baseline_scores = tuple(
+        score for score in scores if score.prediction_target_evaluated_count > 0
+    )
+    baseline_ades = tuple(
+        score.baseline_ade_m for score in baseline_scores if score.baseline_ade_m is not None
+    )
+    baseline_fdes = tuple(
+        score.baseline_fde_m for score in baseline_scores if score.baseline_fde_m is not None
+    )
+    evaluated_targets = sum(
+        score.prediction_target_evaluated_count for score in baseline_scores
+    )
+    weighted_misses = sum(
+        (score.baseline_miss_rate or 0.0) * score.prediction_target_evaluated_count
+        for score in baseline_scores
+    )
     tag_counts: dict[str, int] = {}
     for score in scores:
         for tag in score.tags:
@@ -383,6 +417,18 @@ def _aggregate_metrics(scores) -> dict[str, object]:
             "object_of_interest_total": sum(score.object_of_interest_count for score in scores),
             "scenarios_with_map_features": sum(
                 1 for score in scores if "map_context" in score.tags
+            ),
+        },
+        "prediction_baseline": {
+            "scenarios_with_evaluated_targets": len(baseline_scores),
+            "evaluated_target_total": evaluated_targets,
+            "mean_ade_m": round(_mean(baseline_ades), 3),
+            "mean_fde_m": round(_mean(baseline_fdes), 3),
+            "max_fde_m": round(max(baseline_fdes), 3) if baseline_fdes else 0.0,
+            "weighted_miss_rate": _float_rate(weighted_misses, evaluated_targets),
+            "mean_failure_score": round(
+                _mean(tuple(score.baseline_failure_score for score in baseline_scores)),
+                3,
             ),
         },
         "top_tags": [
@@ -419,6 +465,10 @@ def _median(sorted_values: tuple[float, ...]) -> float:
 
 
 def _rate(numerator: int, denominator: int) -> float:
+    return 0.0 if denominator == 0 else round(numerator / denominator, 4)
+
+
+def _float_rate(numerator: float, denominator: int) -> float:
     return 0.0 if denominator == 0 else round(numerator / denominator, 4)
 
 

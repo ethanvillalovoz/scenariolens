@@ -3,7 +3,8 @@
 [![CI](https://github.com/ethanvillalovoz/scenariolens/actions/workflows/ci.yml/badge.svg)](https://github.com/ethanvillalovoz/scenariolens/actions/workflows/ci.yml)
 
 ScenarioLens is a local-first autonomy evaluation tool for discovering, tagging,
-ranking, and explaining long-tail driving scenarios.
+ranking, and explaining long-tail driving scenarios where simple prediction
+baselines fail.
 
 The project is designed as a Waymo-targeted portfolio artifact, but the shape is
 an engineering product: a reproducible scenario-triage pipeline, real-data
@@ -26,9 +27,10 @@ ScenarioLens builds a small but polished pipeline that can:
 
 1. Ingest curated autonomous-driving scenario data.
 2. Compute lightweight interaction and risk features.
-3. Tag scenarios by ODD-relevant attributes.
-4. Rank scenarios for evaluation value.
-5. Present the results in a searchable demo/dashboard.
+3. Evaluate a constant-velocity trajectory baseline on prediction targets.
+4. Tag scenarios by ODD-relevant attributes.
+5. Rank scenarios by evaluation value and baseline failure evidence.
+6. Present the results in a searchable demo/dashboard.
 
 ![ScenarioLens Explorer dashboard](docs/demo/assets/scenariolens-explorer.png)
 
@@ -40,8 +42,9 @@ module boundaries, see [docs/architecture.md](docs/architecture.md).
 
 Waymo's public research ecosystem centers on scenario data, motion forecasting,
 simulation, and safety evaluation. ScenarioLens focuses on a narrow, credible
-slice of that world: finding high-value driving interactions that deserve more
-targeted evaluation before deployment in a new operating domain.
+slice of that world: finding high-value driving interactions where a lightweight
+forecasting baseline struggles, then turning those failures into reviewable
+scenario evidence before deployment in a new operating domain.
 
 The project is intentionally scoped around public Waymo Motion-shaped data,
 interpretable metrics, and dependency-light tooling so the core demo remains
@@ -69,8 +72,9 @@ the full rationale.
 ## Data Provenance
 
 The checked-in demo currently uses synthetic scenarios plus tiny Waymo
-Motion-shaped fixtures. A separate checked-in summary documents one local smoke
-run on a downloaded Waymo Motion validation shard, while raw dataset files and
+Motion-shaped fixtures. Synthetic data is the test harness, not the final
+claim. A separate checked-in summary documents one local smoke run on a
+downloaded Waymo Motion validation shard, while raw dataset files and
 per-scenario derived outputs stay outside git.
 
 See [docs/data_provenance.md](docs/data_provenance.md) for the exact fixture
@@ -99,6 +103,7 @@ smoke test. The prototype can:
 
 - define a compact scenario schema,
 - compute lightweight risk/interaction features,
+- compute constant-velocity baseline ADE/FDE, miss rate, and failure score,
 - break rankings into interpretable score components,
 - normalize and infer scenario taxonomy tags,
 - rank 10 synthetic scenarios by evaluation value,
@@ -115,10 +120,10 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to turn the ranking output into a deeper evaluation
-workflow: richer real-slice comparisons, map and traffic-light summaries, a
-lightweight trajectory-prediction baseline, and eventually a Waymax/JAX replay
-or perturbation experiment for selected high-value scenarios.
+The next milestone is to run the baseline failure analysis across larger real
+Waymo Motion validation slices, compare failure distributions across scenario
+types, and eventually add a Waymax/JAX replay or perturbation experiment for
+selected high-value scenarios.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -187,7 +192,8 @@ PYTHONPATH=src python3 -m scenariolens.cli report --format markdown --limit 5
 
 Reports include component scores for density, VRU presence, taxonomy,
 proximity, screened TTC, VRU proximity, path conflict, and dynamics. They also
-separate raw track counts from the quality-filtered scored context used for
+include constant-velocity baseline ADE/FDE, miss rate, and failure score, while
+separating raw track counts from the quality-filtered scored context used for
 ranking real Waymo slices.
 
 Generate a machine-readable JSON report:

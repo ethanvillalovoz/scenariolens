@@ -5,7 +5,8 @@
 ScenarioLens is a local-first autonomy evaluation tool that mines motion
 scenarios for rare, interactive, and safety-relevant cases, then ranks them into
 candidate evaluation sets for prediction, planning, simulation, safety review,
-and ODD expansion.
+and ODD expansion, with baseline ADE/FDE evidence showing where simple motion
+forecasts fail.
 
 ## Why This Is the Right Project
 
@@ -37,7 +38,7 @@ This project should read well for:
 ScenarioLens is not trying to train a complete autonomous-driving model or clone
 Waymo's internal stack. The strongest signal is thoughtful evaluation tooling:
 finding the scenarios that matter, explaining why they matter, and showing how
-they would stress a downstream model or planner.
+they stress a downstream prediction baseline, model, or planner.
 
 ## Core Product
 
@@ -55,9 +56,10 @@ system. It should include:
 
 The current prototype already includes the reproducible pipeline, synthetic
 corpus, native Waymo Motion JSON/proto/TFRecord ingestion, taxonomy,
-interaction component scoring, tests, Markdown/JSON reports, a local real-data
-validation packet workflow, static dashboard data, and 2D SVG trajectory
-rendering.
+interaction component scoring, constant-velocity baseline ADE/FDE and miss-rate
+analysis, tests, Markdown/JSON reports, a local real-data validation packet
+workflow, static dashboard data, and 2D SVG trajectory rendering with forecast
+overlays.
 
 The stack is intentionally aligned with the public Waymo/autonomy ecosystem:
 Python for data and evaluation tooling, Waymo Motion `Scenario`-shaped records
@@ -90,6 +92,7 @@ two minutes, that Ethan:
 - can build a clean data pipeline,
 - can validate against a real public dataset slice without overclaiming,
 - can define meaningful metrics,
+- can compare simple baseline failures across scenario types,
 - can reason about long-tail autonomy risk,
 - can communicate tradeoffs without overclaiming.
 

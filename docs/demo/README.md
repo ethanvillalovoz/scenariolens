@@ -16,7 +16,9 @@ The production copy is embedded in Ethan's personal portfolio site at
 `https://ethanvillalovoz.com/scenariolens/`.
 
 The demo data is intentionally small: synthetic scenarios plus tiny
-Waymo Motion-shaped fixtures. See
+Waymo Motion-shaped fixtures. Each scenario includes interaction-risk metrics
+and a constant-velocity prediction baseline so the explorer can surface cases
+where a simple forecast fails. See
 [`docs/data_provenance.md`](../data_provenance.md) for the exact data status.
 See [`docs/project_strategy.md`](../project_strategy.md) for the product goal
 and [`docs/architecture.md`](../architecture.md) for the data-flow map.
@@ -51,6 +53,7 @@ PYTHONPATH=src python3 -m scenariolens.cli dashboard-data \
 - ranked scenarios,
 - score totals and component scores,
 - raw and scored-context metrics used in ranking,
+- constant-velocity baseline ADE/FDE, miss rate, target source, and failure score,
 - Waymo metadata credibility fields such as SDC presence, prediction targets,
   and objects of interest when available,
 - taxonomy tags,

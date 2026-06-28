@@ -4,6 +4,7 @@ from html import escape
 from math import hypot, inf
 
 from scenariolens.metrics import score_scenario, scoring_context
+from scenariolens.prediction import PredictionTrackResult, constant_velocity_baseline
 from scenariolens.schema import AgentTrack, Scenario, ScenarioScore, State
 from scenariolens.taxonomy import infer_tags
 
@@ -51,6 +52,11 @@ def scenario_bounds(scenario: Scenario) -> tuple[float, float, float, float]:
             min_y = min(min_y, state.y)
             max_x = max(max_x, state.x)
             max_y = max(max_y, state.y)
+    for state in _prediction_states(scenario):
+        min_x = min(min_x, state.x)
+        min_y = min(min_y, state.y)
+        max_x = max(max_x, state.x)
+        max_y = max(max_y, state.y)
     for x, y in _scenario_map_points(scenario):
         min_x = min(min_x, x)
         min_y = min(min_y, y)
@@ -80,6 +86,7 @@ def scenario_svg(
 
     score = score_scenario(scenario)
     display_scenario = _display_scenario(scenario)
+    prediction_summary = constant_velocity_baseline(display_scenario)
     raw_min_x, raw_min_y, raw_max_x, raw_max_y = scenario_bounds(display_scenario)
     raw_world_width = raw_max_x - raw_min_x
     raw_world_height = raw_max_y - raw_min_y
@@ -141,10 +148,17 @@ def scenario_svg(
             )
         )
 
+    for result in prediction_summary.track_results:
+        elements.append(_prediction_path(result, project))
+
     elements.extend(
         [
             "</g>",
-            _legend(display_scenario, height),
+            _legend(
+                display_scenario,
+                height,
+                show_prediction=bool(prediction_summary.track_results),
+            ),
             "</svg>",
         ]
     )
@@ -246,7 +260,7 @@ def _title(
     )
 
 
-def _legend(scenario: Scenario, height: int) -> str:
+def _legend(scenario: Scenario, height: int, show_prediction: bool = False) -> str:
     present_types = tuple(
         agent_type
         for agent_type in ("vehicle", "pedestrian", "cyclist", "unknown")
@@ -280,6 +294,17 @@ def _legend(scenario: Scenario, height: int) -> str:
             f'font-family="Inter, Arial, sans-serif" font-weight="700">latest</text>',
         ]
     )
+    if show_prediction:
+        x += 146
+        pieces.extend(
+            [
+                f'<line x1="{x}" y1="{y}" x2="{x + 34}" y2="{y}" '
+                f'stroke="{INK}" stroke-width="3" stroke-linecap="round" '
+                f'stroke-dasharray="8 7" opacity="0.76" />',
+                f'<text x="{x + 44}" y="{y + 4}" fill="{MUTED}" font-size="12" '
+                f'font-family="Inter, Arial, sans-serif" font-weight="700">baseline forecast</text>',
+            ]
+        )
     return "\n".join(pieces)
 
 
@@ -320,6 +345,26 @@ def _track_path(
         elements.append(_label_group(label, end_x, end_y, color, plot))
     elements.append("</g>")
     return "\n".join(elements)
+
+
+def _prediction_path(result: PredictionTrackResult, project) -> str:
+    if len(result.predicted_states) < 2:
+        return ""
+    points = [project(state) for state in result.predicted_states]
+    point_text = " ".join(f"{x:.2f},{y:.2f}" for x, y in points)
+    color = AGENT_COLORS.get(result.agent_type, AGENT_COLORS["unknown"])
+    return "\n".join(
+        [
+            f'<g class="baseline-prediction prediction-{result.agent_type}">',
+            f'<polyline points="{point_text}" fill="none" stroke="#ffffff" '
+            f'stroke-width="7" stroke-linecap="round" stroke-linejoin="round" '
+            f'stroke-dasharray="10 9" opacity="0.82" />',
+            f'<polyline points="{point_text}" fill="none" stroke="{color}" '
+            f'stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" '
+            f'stroke-dasharray="9 8" opacity="0.88" />',
+            "</g>",
+        ]
+    )
 
 
 def _road_context(
@@ -642,6 +687,14 @@ def _scenario_map_points(scenario: Scenario) -> tuple[tuple[float, float], ...]:
         point
         for feature in _map_features(scenario)
         for point in _feature_points(feature)
+    )
+
+
+def _prediction_states(scenario: Scenario) -> tuple[State, ...]:
+    return tuple(
+        state
+        for result in constant_velocity_baseline(scenario).track_results
+        for state in result.predicted_states
     )
 
 

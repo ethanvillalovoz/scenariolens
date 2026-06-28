@@ -30,6 +30,7 @@ class PortfolioTest(unittest.TestCase):
         self.assertIn("## Limitations", markdown)
         self.assertIn("## Next Work", markdown)
         self.assertIn("Component scores", markdown)
+        self.assertIn("Baseline FDE", markdown)
 
     def test_generate_portfolio_report_writes_markdown_and_assets(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

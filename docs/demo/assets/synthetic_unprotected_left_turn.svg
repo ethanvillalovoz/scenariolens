@@ -1,12 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="920" height="640" viewBox="0 0 920 640" role="img">
 <title>synthetic_unprotected_left_turn trajectory preview</title>
-<desc>Scenario synthetic_unprotected_left_turn from synthetic. Score 27.851. 3 agents. Tags: vulnerable_road_user, unprotected_turn, close_interaction.</desc>
+<desc>Scenario synthetic_unprotected_left_turn from synthetic. Score 28.151. 3 agents. Tags: vulnerable_road_user, unprotected_turn, close_interaction.</desc>
 <defs>
 <clipPath id="scenario-plot-clip"><rect x="56" y="84" width="808" height="474" rx="10" /></clipPath>
 </defs>
 <rect x="0" y="0" width="920" height="640" fill="#f8fafc" />
 <text x="56" y="36" fill="#0f172a" font-size="22" font-family="Inter, Arial, sans-serif" font-weight="800">Synthetic Unprotected Left Turn</text>
-<text x="56" y="60" fill="#64748b" font-size="13" font-family="Inter, Arial, sans-serif" font-weight="650">score 27.85 / 3 agents / Vulnerable Road User / Unprotected Turn / Close Interaction</text>
+<text x="56" y="60" fill="#64748b" font-size="13" font-family="Inter, Arial, sans-serif" font-weight="650">score 28.15 / 3 agents / Vulnerable Road User / Unprotected Turn / Close Interaction</text>
 <text x="864" y="38" fill="#64748b" font-size="12" font-family="Inter, Arial, sans-serif" text-anchor="end">synthetic</text>
 <rect x="56" y="84" width="808" height="474" rx="10" fill="#f9fbfd" stroke="#d8e2ee" stroke-width="1.2" />
 <g clip-path="url(#scenario-plot-clip)">
@@ -75,6 +75,14 @@
 <rect x="438.60" y="257.64" width="4" height="10" rx="2" fill="#dc2626" />
 <text x="448.60" y="267.14" fill="#0f172a" font-size="12" font-family="Inter, Arial, sans-serif" font-weight="750">ped_1</text>
 </g>
+<g class="baseline-prediction prediction-vehicle">
+<polyline points="500.40,260.40 258.00,260.40" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="10 9" opacity="0.82" />
+<polyline points="500.40,260.40 258.00,260.40" fill="none" stroke="#2563eb" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="9 8" opacity="0.88" />
+</g>
+<g class="baseline-prediction prediction-pedestrian">
+<polyline points="419.60,333.12 419.60,284.64" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="10 9" opacity="0.82" />
+<polyline points="419.60,333.12 419.60,284.64" fill="none" stroke="#dc2626" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="9 8" opacity="0.88" />
+</g>
 </g>
 <rect x="56" y="585" width="120" height="30" rx="15" fill="#ffffff" stroke="#d8e2ee" />
 <circle cx="74" cy="600" r="6" fill="#2563eb" />
@@ -86,4 +94,6 @@
 <circle cx="412" cy="600" r="6" fill="#0f172a" />
 <text x="358" y="604" fill="#64748b" font-size="12" font-family="Inter, Arial, sans-serif" font-weight="700">start</text>
 <text x="424" y="604" fill="#64748b" font-size="12" font-family="Inter, Arial, sans-serif" font-weight="700">latest</text>
+<line x1="474" y1="600" x2="508" y2="600" stroke="#0f172a" stroke-width="3" stroke-linecap="round" stroke-dasharray="8 7" opacity="0.76" />
+<text x="518" y="604" fill="#64748b" font-size="12" font-family="Inter, Arial, sans-serif" font-weight="700">baseline forecast</text>
 </svg>

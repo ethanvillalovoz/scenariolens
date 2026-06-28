@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from itertools import combinations
 from math import hypot, inf, isfinite
 
+from scenariolens.prediction import constant_velocity_baseline
 from scenariolens.schema import AgentTrack, Scenario, ScenarioScore, State
 from scenariolens.taxonomy import infer_tags, tag_weight
 
@@ -246,6 +247,7 @@ def interaction_components(
     min_vru_distance_m: float | None = None,
     min_path_distance_m: float | None = None,
     max_deceleration_mps2: float | None = None,
+    baseline_failure_score: float | None = None,
 ) -> dict[str, float]:
     """Break scenario ranking into interpretable score components."""
 
@@ -258,6 +260,7 @@ def interaction_components(
         "vru_proximity": 0.0,
         "path_conflict": 0.0,
         "dynamics": 0.0,
+        "baseline_failure": 0.0,
     }
 
     if min_distance_m is not None:
@@ -284,6 +287,12 @@ def interaction_components(
             3,
         )
 
+    if baseline_failure_score is not None:
+        components["baseline_failure"] = round(
+            min(max(0.0, baseline_failure_score), 12.0),
+            3,
+        )
+
     return components
 
 
@@ -296,6 +305,7 @@ def interaction_score(
     min_vru_distance_m: float | None = None,
     min_path_distance_m: float | None = None,
     max_deceleration_mps2: float | None = None,
+    baseline_failure_score: float | None = None,
 ) -> float:
     """Rank scenarios for review using lightweight interpretable features."""
 
@@ -308,6 +318,7 @@ def interaction_score(
         min_vru_distance_m=min_vru_distance_m,
         min_path_distance_m=min_path_distance_m,
         max_deceleration_mps2=max_deceleration_mps2,
+        baseline_failure_score=baseline_failure_score,
     )
     return round(sum(components.values()), 3)
 
@@ -325,6 +336,7 @@ def score_scenario(scenario: Scenario) -> ScenarioScore:
     scoring_vru_count = vulnerable_road_user_count(context.tracks)
     tags = infer_tags(scenario)
     taxonomy_score = tag_weight(tags)
+    baseline = constant_velocity_baseline(scenario)
     components = interaction_components(
         min_distance_m=min_distance,
         min_ttc_s=min_ttc,
@@ -334,6 +346,7 @@ def score_scenario(scenario: Scenario) -> ScenarioScore:
         min_vru_distance_m=min_vru,
         min_path_distance_m=min_path,
         max_deceleration_mps2=max_decel,
+        baseline_failure_score=baseline.failure_score,
     )
     score = round(sum(components.values()), 3)
     return ScenarioScore(
@@ -354,6 +367,13 @@ def score_scenario(scenario: Scenario) -> ScenarioScore:
         max_speed_mps=None if max_speed is None else round(max_speed, 3),
         ego_max_speed_mps=None if max_ego_speed is None else round(max_ego_speed, 3),
         max_deceleration_mps2=None if max_decel is None else round(max_decel, 3),
+        prediction_target_source=baseline.target_source,
+        prediction_target_evaluated_count=baseline.evaluated_track_count,
+        baseline_ade_m=baseline.ade_m,
+        baseline_fde_m=baseline.fde_m,
+        baseline_max_fde_m=baseline.max_fde_m,
+        baseline_miss_rate=baseline.miss_rate,
+        baseline_failure_score=baseline.failure_score,
         taxonomy_score=taxonomy_score,
         component_scores=components,
         interaction_score=score,
