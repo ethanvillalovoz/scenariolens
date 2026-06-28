@@ -10,6 +10,7 @@ robotics, AI/ML, and software engineering internship conversations.
 - Product strategy: `docs/project_strategy.md`
 - Architecture: `docs/architecture.md`
 - Portfolio report: `docs/reports/portfolio_report.md`
+- Technical case study: `docs/case_studies/waymo_baseline_failures.md`
 - Real-data case study: `docs/reports/waymo_motion_case_study.md`
 - Tech stack rationale: `docs/tech_stack.md`
 
@@ -17,7 +18,7 @@ robotics, AI/ML, and software engineering internship conversations.
 
 Recommended repository description:
 
-> Waymo-aligned autonomy scenario triage and explorer for long-tail driving evaluation.
+> Waymo-aligned scenario mining framework for autonomy motion evaluation.
 
 Recommended website:
 
@@ -43,7 +44,7 @@ Use one bullet if space is tight:
 Use two bullets if the project gets a dedicated entry:
 
 - Built ScenarioLens, a local-first autonomy scenario evaluation tool that ingests synthetic, Waymo Motion-shaped JSON, normalized CSV, and small downloaded Waymo Motion TFRecord slices, then ranks long-tail cases using interpretable proximity, TTC, VRU, path-conflict, density, and taxonomy features.
-- Shipped a tested portfolio demo with 60+ Python unit tests, GitHub Actions CI, SVG trajectory rendering, deterministic dashboard data, and a static Scenario Explorer deployed at `ethanvillalovoz.com/scenariolens`.
+- Shipped a tested portfolio demo with 89 Python unit tests, GitHub Actions CI, SVG trajectory rendering, deterministic dashboard data, and a static Scenario Explorer deployed at `ethanvillalovoz.com/scenariolens`.
 
 Short project line:
 
@@ -111,7 +112,8 @@ Testing and verification:
 
 - Unit tests cover schema behavior, ingestion, metrics, reports, rendering, and
   dashboard data.
-- GitHub Actions runs the test suite and static JavaScript syntax check.
+- GitHub Actions runs the test suite, install smoke checks, dashboard JSON
+  validation, and static JavaScript syntax check.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 

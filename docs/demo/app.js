@@ -27,11 +27,14 @@ const nodes = {
   detailSubtitle: document.querySelector("#detailSubtitle"),
   detailTags: document.querySelector("#detailTags"),
   scenarioImage: document.querySelector("#scenarioImage"),
+  baselineCard: document.querySelector("#baselineCard"),
   componentBars: document.querySelector("#componentBars"),
   metricGrid: document.querySelector("#metricGrid"),
   reasonList: document.querySelector("#reasonList"),
   previousScenario: document.querySelector("#previousScenario"),
   nextScenario: document.querySelector("#nextScenario"),
+  heroScenarioCount: document.querySelector("#heroScenarioCount"),
+  heroMaxFde: document.querySelector("#heroMaxFde"),
 };
 
 const metricLabels = {
@@ -81,6 +84,7 @@ async function boot() {
     }
     state.payload = await response.json();
     state.datasets = new Set(state.payload.filters.datasets);
+    renderHeroStats();
     renderFilters();
     render();
   } catch (error) {
@@ -92,6 +96,16 @@ async function boot() {
       </tr>
     `;
   }
+}
+
+function renderHeroStats() {
+  const scenarios = state.payload.scenarios;
+  const maxFde = Math.max(
+    0,
+    ...scenarios.map((scenario) => scenario.metrics.baseline_fde_m ?? 0),
+  );
+  nodes.heroScenarioCount.textContent = String(state.payload.scenario_count);
+  nodes.heroMaxFde.textContent = `${formatNumber(maxFde)} m`;
 }
 
 function renderFilters() {
@@ -186,6 +200,7 @@ function renderDetail(scenario, scenarios) {
     nodes.detailTags.innerHTML = "";
     nodes.scenarioImage.removeAttribute("src");
     nodes.scenarioImage.alt = "";
+    nodes.baselineCard.innerHTML = "";
     nodes.componentBars.innerHTML = "";
     nodes.metricGrid.innerHTML = "";
     nodes.reasonList.innerHTML = "";
@@ -197,6 +212,7 @@ function renderDetail(scenario, scenarios) {
   nodes.detailTags.innerHTML = tagChips(scenario.tags, scenario.tags.length);
   nodes.scenarioImage.src = scenario.svg_path;
   nodes.scenarioImage.alt = `Trajectory preview for ${scenario.scenario_id}`;
+  nodes.baselineCard.innerHTML = baselineCard(scenario);
   nodes.componentBars.innerHTML = componentBars(scenario.score.components);
   nodes.metricGrid.innerHTML = metrics(scenario.metrics);
   nodes.reasonList.innerHTML = scenario.reasons
@@ -208,6 +224,48 @@ function renderDetail(scenario, scenarios) {
   nodes.nextScenario.disabled = scenarios.length <= 1;
   nodes.previousScenario.dataset.index = String(index <= 0 ? scenarios.length - 1 : index - 1);
   nodes.nextScenario.dataset.index = String(index >= scenarios.length - 1 ? 0 : index + 1);
+}
+
+function baselineCard(scenario) {
+  const metrics = scenario.metrics;
+  const missRate = metrics.baseline_miss_rate === null || metrics.baseline_miss_rate === undefined
+    ? "n/a"
+    : `${formatNumber(metrics.baseline_miss_rate * 100)}%`;
+  const evaluatedTargets = formatMetric(metrics.prediction_target_evaluated_count);
+  return `
+    <div class="baseline-grid">
+      <div>
+        <dt>ADE</dt>
+        <dd>${formatMetric(metrics.baseline_ade_m, "m")}</dd>
+      </div>
+      <div>
+        <dt>FDE</dt>
+        <dd>${formatMetric(metrics.baseline_fde_m, "m")}</dd>
+      </div>
+      <div>
+        <dt>Miss rate</dt>
+        <dd>${missRate}</dd>
+      </div>
+      <div>
+        <dt>Targets</dt>
+        <dd>${evaluatedTargets}</dd>
+      </div>
+    </div>
+    <p>${escapeHtml(baselineInterpretation(metrics))}</p>
+  `;
+}
+
+function baselineInterpretation(metrics) {
+  if (metrics.baseline_fde_m === null || metrics.baseline_fde_m === undefined) {
+    return "No evaluable future target was available for this scenario.";
+  }
+  if (metrics.baseline_fde_m >= 20 || (metrics.baseline_miss_rate ?? 0) >= 0.75) {
+    return "The constant-velocity baseline struggles here, making this a useful scenario for deeper prediction or replay analysis.";
+  }
+  if (metrics.baseline_fde_m >= 5) {
+    return "The baseline has moderate error here, useful for comparing against stronger forecasting assumptions.";
+  }
+  return "The baseline explains this short fixture well; this scenario is mainly useful for interaction scoring and visual sanity checks.";
 }
 
 function componentBars(components) {

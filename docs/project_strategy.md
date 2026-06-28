@@ -112,7 +112,11 @@ and links back to reports and provenance.
 - Static explorer: [`docs/demo`](demo)
 - Data provenance: [`docs/data_provenance.md`](data_provenance.md)
 - Architecture: [`docs/architecture.md`](architecture.md)
+- Framework concepts: [`docs/framework_concepts.md`](framework_concepts.md)
+- CLI workflows: [`docs/cli_workflows.md`](cli_workflows.md)
 - Tech stack rationale: [`docs/tech_stack.md`](tech_stack.md)
+- Technical case study:
+  [`docs/case_studies/waymo_baseline_failures.md`](case_studies/waymo_baseline_failures.md)
 - Real-data case study:
   [`docs/reports/waymo_motion_case_study.md`](reports/waymo_motion_case_study.md)
 - Validation summary:

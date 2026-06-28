@@ -1,13 +1,19 @@
 # ScenarioLens
 
 [![CI](https://github.com/ethanvillalovoz/scenariolens/actions/workflows/ci.yml/badge.svg)](https://github.com/ethanvillalovoz/scenariolens/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-0f172a.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-1d4ed8.svg)](pyproject.toml)
 
-ScenarioLens is a local-first autonomy evaluation tool for discovering, tagging,
-ranking, and explaining long-tail driving scenarios where simple prediction
-baselines fail.
+ScenarioLens is a local-first autonomy evaluation framework for discovering,
+ranking, visualizing, and explaining long-tail driving scenarios where simple
+prediction baselines fail.
 
-The project is designed as a Waymo-targeted portfolio artifact, but the shape is
-an engineering product: a reproducible scenario-triage pipeline, real-data
+- **Live demo:** [ethanvillalovoz.com/scenariolens](https://ethanvillalovoz.com/scenariolens/)
+- **Case study:** [Finding baseline failures in Waymo Motion scenarios](docs/case_studies/waymo_baseline_failures.md)
+- **Release target:** [v0.2.0 checklist](docs/release_checklist_v0.2.0.md)
+
+ScenarioLens is designed as a Waymo-targeted portfolio artifact, but the shape
+is an engineering product: a reproducible scenario-triage pipeline, real-data
 validation workflow, public-safe reports, and a static explorer. Instead of
 trying to build a full self-driving stack, ScenarioLens focuses on a problem
 that appears across perception, prediction, planning, simulation, and safety
@@ -34,9 +40,60 @@ ScenarioLens builds a small but polished pipeline that can:
 
 ![ScenarioLens Explorer dashboard](docs/demo/assets/scenariolens-explorer.png)
 
+## Why It Is Credible
+
+| Proof point | Current status |
+| --- | --- |
+| Working framework | Python package, installable CLI, schema, metrics, reports, rendering, dashboard exporter |
+| Real-data path | Native Waymo Motion JSON/proto/TFRecord slice reader with local preflight and validation |
+| Baseline evidence | Constant-velocity ADE/FDE, miss rate, failure score, tag studies, and stability studies |
+| Public demo | Static Scenario Explorer with filters, SVG trajectories, score components, and failure cards |
+| Repo quality | MIT license, contributor docs, changelog, citation, issue templates, CI, and release checklist |
+
+## Quick Start
+
+```bash
+git clone https://github.com/ethanvillalovoz/scenariolens.git
+cd scenariolens
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e .
+scenariolens report --format markdown --limit 5
+```
+
+Preview the explorer locally:
+
+```bash
+python3 -m http.server 8000 --directory docs
+```
+
+Then open `http://localhost:8000/demo/`.
+
+## Supported Inputs
+
+| Input | Status | Notes |
+| --- | --- | --- |
+| Synthetic scenarios | Supported | Deterministic test and demo corpus |
+| ScenarioLens JSON | Supported | Stable internal interchange format |
+| Row-wise CSV tracks | Supported | Lightweight adapter for custom fixtures |
+| Waymo Motion-shaped JSON/CSV | Supported | Checked-in public fixtures |
+| Waymo Motion proto/TFRecord slices | Supported for small local slices | Dependency-free reader for the fields ScenarioLens uses |
+| Full Waymo-scale benchmark | Not claimed | Raw data remains local and access-gated |
+
+## Public Evidence
+
+- [Portfolio report](docs/reports/portfolio_report.md)
+- [Waymo Motion validation summary](docs/reports/waymo_motion_validation_summary.md)
+- [Real-slice failure study](docs/reports/waymo_motion_failure_study.md)
+- [Failure distribution stability study](docs/reports/waymo_motion_failure_stability.md)
+- [Shard expansion plan](docs/reports/waymo_motion_shard_plan.md)
+
 For the end goal, user, non-goals, and work tracks, see
 [docs/project_strategy.md](docs/project_strategy.md). For the data flow and
-module boundaries, see [docs/architecture.md](docs/architecture.md).
+module boundaries, see [docs/architecture.md](docs/architecture.md). For the
+framework vocabulary and copy-paste CLI workflows, see
+[docs/framework_concepts.md](docs/framework_concepts.md) and
+[docs/cli_workflows.md](docs/cli_workflows.md).
 
 ## Why This Is Waymo-Relevant
 
@@ -89,6 +146,7 @@ docs/demo/            Scenario Explorer UI, payload, screenshot, and SVG assets
 docs/project_strategy.md
                       Product strategy, target user, non-goals, and work tracks
 docs/architecture.md  Data flow, module map, scoring boundary, and artifacts
+docs/cli_workflows.md Copy-paste CLI workflows for common analysis paths
 src/scenariolens/     Lightweight Python package
 tests/                Unit tests for ingestion, metrics, reports, and dashboard data
 data/                 Local data mount points, ignored by git
@@ -134,6 +192,8 @@ For resume bullets, interview talking points, and suggested GitHub repository
 metadata, see [docs/recruiting_packet.md](docs/recruiting_packet.md). For the
 exact suggested GitHub sidebar metadata, see
 [docs/github_metadata.md](docs/github_metadata.md).
+For the focused technical story, see
+[docs/case_studies/waymo_baseline_failures.md](docs/case_studies/waymo_baseline_failures.md).
 
 ## Portfolio Report
 
@@ -393,3 +453,18 @@ See [docs/scenario_taxonomy.md](docs/scenario_taxonomy.md).
 ScenarioLens JSON is documented in [docs/data_format.md](docs/data_format.md).
 Dataset ingestion is documented in [docs/ingestion.md](docs/ingestion.md).
 Dashboard data is documented in [docs/demo/README.md](docs/demo/README.md).
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, data-safety rules, and
+pull request expectations. Public reports should stay aggregate and
+license-safe; raw Waymo files stay outside git.
+
+## Citation
+
+If this project helps your autonomy evaluation work, see
+[CITATION.cff](CITATION.cff).
+
+## License
+
+ScenarioLens is released under the [MIT License](LICENSE).

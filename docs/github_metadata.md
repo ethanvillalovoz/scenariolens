@@ -5,8 +5,7 @@ GitHub sidebar.
 
 ## Description
 
-Waymo-aligned autonomy scenario triage and explorer for long-tail driving
-evaluation.
+Waymo-aligned scenario mining framework for autonomy motion evaluation.
 
 ## Homepage
 
@@ -25,6 +24,7 @@ https://ethanvillalovoz.com/scenariolens/
 - `simulation`
 - `safety-evaluation`
 - `python`
+- `evaluation`
 - `portfolio-project`
 
 ## Positioning Note

@@ -17,9 +17,9 @@
         <nav class="topnav" aria-label="Primary">
           <a class="topnav-link active" href="./">Explorer</a>
           <a class="topnav-link" href="./scenarios.json">Data</a>
+          <a class="topnav-link" href="../reports/waymo_motion_failure_stability.md">Reports</a>
           <a class="topnav-link" href="../project_strategy.md">Strategy</a>
           <a class="topnav-link" href="../data_provenance.md">Provenance</a>
-          <a class="topnav-link" href="../tech_stack.md">Stack</a>
         </nav>
         <a class="repo-link" href="https://github.com/ethanvillalovoz/scenariolens">
           <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -28,6 +28,53 @@
           View repo
         </a>
       </header>
+
+      <section class="evidence-hero" aria-label="ScenarioLens product overview">
+        <div class="hero-copy">
+          <h1>Mine long-tail motion scenarios before they become evaluation gaps.</h1>
+          <p>
+            ScenarioLens ranks autonomy scenarios, measures constant-velocity
+            baseline failures, and turns Waymo Motion slices into public-safe
+            evidence for review.
+          </p>
+          <div class="hero-actions">
+            <a href="#scenarioRows">Explore scenarios</a>
+            <a href="../reports/waymo_motion_failure_study.md">Read failure study</a>
+          </div>
+        </div>
+        <dl class="hero-stats">
+          <div>
+            <dt>Explorer scenarios</dt>
+            <dd id="heroScenarioCount">--</dd>
+          </div>
+          <div>
+            <dt>Max demo FDE</dt>
+            <dd id="heroMaxFde">--</dd>
+          </div>
+          <div>
+            <dt>Real-data study</dt>
+            <dd>75 scenarios</dd>
+          </div>
+          <div>
+            <dt>CI-backed tests</dt>
+            <dd>89</dd>
+          </div>
+        </dl>
+        <div class="report-rail" aria-label="Public evidence reports">
+          <a href="../reports/waymo_motion_failure_stability.md">
+            <span>Stability</span>
+            75 real scenarios across 3 windows
+          </a>
+          <a href="../reports/waymo_motion_shard_plan.md">
+            <span>Shard plan</span>
+            Next gated downloads for cross-shard analysis
+          </a>
+          <a href="../reports/portfolio_report.md">
+            <span>Portfolio packet</span>
+            Architecture, metrics, and demo provenance
+          </a>
+        </div>
+      </section>
 
       <main class="workspace">
         <aside class="filters" aria-label="Scenario filters">
@@ -157,6 +204,11 @@
             <div class="svg-frame">
               <img id="scenarioImage" alt="" />
             </div>
+          </section>
+
+          <section class="detail-section">
+            <h2>Baseline Failure</h2>
+            <div id="baselineCard" class="baseline-card"></div>
           </section>
 
           <section class="detail-section">

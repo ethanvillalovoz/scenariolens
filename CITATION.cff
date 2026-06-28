@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If ScenarioLens helps your autonomy evaluation work, please cite it."
+title: "ScenarioLens: Lightweight Scenario Mining For Autonomy Evaluation"
+authors:
+  - family-names: "Villalovoz"
+    given-names: "Ethan"
+version: "0.1.0"
+date-released: "2026-06-28"
+url: "https://github.com/ethanvillalovoz/scenariolens"
+repository-code: "https://github.com/ethanvillalovoz/scenariolens"
+license: "MIT"
+keywords:
+  - autonomous driving
+  - scenario mining
+  - motion forecasting
+  - Waymo Open Dataset
+  - safety evaluation

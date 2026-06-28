@@ -31,15 +31,20 @@ Generated files:
 - `scenarios.json`: ranked dashboard payload.
 - `assets/*.svg`: trajectory views referenced by `scenarios.json`.
 - `assets/scenariolens-explorer.png`: README screenshot of the dashboard.
+- The evidence band and baseline-failure card are code-native UI backed by
+  `scenarios.json`.
 
 The explorer also links to
 [`docs/reports/waymo_motion_case_study.md`](../reports/waymo_motion_case_study.md)
 as the public-safe summary of the local real Waymo Motion smoke test.
+The first viewport links to the failure study, stability study, shard expansion
+plan, and portfolio packet so reviewers can jump from the product surface to
+the evidence behind it.
 
 Regenerate with:
 
 ```bash
-PYTHONPATH=src python3 -m scenariolens.cli dashboard-data \
+scenariolens dashboard-data \
   --output docs/demo/scenarios.json \
   --assets-dir docs/demo/assets
 ```
