@@ -297,6 +297,44 @@ class CliTest(unittest.TestCase):
             self.assertTrue((output_dir / "case_study.md").exists())
             self.assertEqual(len(tuple((output_dir / "assets").glob("*.svg"))), 1)
 
+    def test_waymo_motion_shard_plan_writes_report_and_json(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            input_dir = root / "raw" / "validation"
+            input_dir.mkdir(parents=True)
+            (input_dir / "validation.tfrecord-00007-of-00150").write_text(
+                "placeholder",
+                encoding="utf-8",
+            )
+            output = root / "reports" / "shard_plan.md"
+            json_output = root / "processed" / "shard_plan.json"
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "waymo-motion-shard-plan",
+                    "--input",
+                    str(input_dir),
+                    "--output",
+                    str(output),
+                    "--json-output",
+                    str(json_output),
+                    "--next-count",
+                    "2",
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertIn("Found 1 local shard(s)", result.stdout)
+            self.assertTrue(output.exists())
+            self.assertTrue(json_output.exists())
+            self.assertIn("validation.tfrecord-00008-of-00150", output.read_text())
+
     def test_failure_study_command_writes_public_safe_report(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)

@@ -58,3 +58,4 @@ This report compares public-safe aggregate baseline-failure statistics across re
 - This is a distribution screen, not a benchmark claim.
 - Large FDE range across slices means the constant-velocity baseline fails unevenly across sampled scenario families.
 - With one local shard, the current report compares contiguous scenario windows; with more downloaded shards, rerun the same command with multiple `--input` values for true cross-shard stability.
+- The [Shard Expansion Plan](waymo_motion_shard_plan.md) lists the next gated downloads and the cross-shard rerun command.

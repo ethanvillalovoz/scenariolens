@@ -165,6 +165,24 @@ PYTHONPATH=src python3 -m scenariolens.cli failure-study-stability \
 When more shards are downloaded, repeat `--input` for each shard or shard
 directory to turn the windowed comparison into a true cross-shard comparison.
 
+### Plan The Next Shards
+
+If only one shard is local, generate a public-safe expansion plan before
+downloading more data:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-shard-plan \
+  --input data/raw/waymo/motion/validation \
+  --output docs/reports/waymo_motion_shard_plan.md \
+  --json-output data/processed/waymo_motion_shard_plan.json \
+  --next-count 3
+```
+
+The plan lists local shard coverage, the next official GCS URIs to fetch, and
+the exact cross-shard stability command to run after the downloads complete. If
+`gsutil` returns a 401, complete the official Waymo access flow and authenticate
+`gcloud` first.
+
 ### Render A Small Gallery
 
 ```bash

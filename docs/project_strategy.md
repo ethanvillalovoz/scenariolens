@@ -121,4 +121,6 @@ and links back to reports and provenance.
   [`docs/reports/waymo_motion_failure_study.md`](reports/waymo_motion_failure_study.md)
 - Failure stability study:
   [`docs/reports/waymo_motion_failure_stability.md`](reports/waymo_motion_failure_stability.md)
+- Shard expansion plan:
+  [`docs/reports/waymo_motion_shard_plan.md`](reports/waymo_motion_shard_plan.md)
 - Roadmap: [`docs/roadmap.md`](roadmap.md)

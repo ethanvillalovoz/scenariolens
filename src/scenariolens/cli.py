@@ -31,6 +31,7 @@ from scenariolens.waymo_readiness import (
     DEFAULT_WAYMO_MOTION_INPUT,
     inspect_waymo_motion_readiness,
 )
+from scenariolens.waymo_shards import generate_waymo_motion_shard_plan
 
 
 def demo() -> int:
@@ -150,6 +151,39 @@ def waymo_motion_doctor(
         print(f"Wrote readiness packet to {output_path}")
 
     return 0 if readiness.ready else 2
+
+
+def waymo_motion_shard_plan_command(
+    input_path: str,
+    output_path: str,
+    json_output_path: str | None,
+    split: str,
+    dataset_version: str,
+    total_shards: int,
+    next_count: int,
+) -> int:
+    try:
+        result = generate_waymo_motion_shard_plan(
+            input_path=input_path,
+            output_path=output_path,
+            json_output_path=json_output_path,
+            split=split,
+            dataset_version=dataset_version,
+            total_shards=total_shards,
+            next_count=next_count,
+        )
+    except ValueError as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote Waymo shard expansion plan to {result.output_path}")
+    if result.json_output_path is not None:
+        print(f"Wrote Waymo shard expansion JSON to {result.json_output_path}")
+    print(
+        f"Found {result.local_shard_count} local shard(s); "
+        f"recommended {result.recommended_download_count} download(s)."
+    )
+    return 0
 
 
 def ingest_waymo_motion_command(
@@ -480,6 +514,47 @@ def main() -> int:
         action="store_true",
         help="Skip searching Downloads and Desktop for candidate raw files.",
     )
+    waymo_shard_plan_parser = subparsers.add_parser(
+        "waymo-motion-shard-plan",
+        help="Generate a public-safe plan for expanding local Waymo Motion shards.",
+    )
+    waymo_shard_plan_parser.add_argument(
+        "--input",
+        default=str(DEFAULT_WAYMO_MOTION_INPUT),
+        help="Local Waymo Motion shard file or directory.",
+    )
+    waymo_shard_plan_parser.add_argument(
+        "--output",
+        default="docs/reports/waymo_motion_shard_plan.md",
+        help="Markdown output path for the shard expansion plan.",
+    )
+    waymo_shard_plan_parser.add_argument(
+        "--json-output",
+        default=None,
+        help="Optional JSON output path for the shard expansion plan.",
+    )
+    waymo_shard_plan_parser.add_argument(
+        "--split",
+        default="validation",
+        help="Waymo Motion split name used in shard filenames.",
+    )
+    waymo_shard_plan_parser.add_argument(
+        "--dataset-version",
+        default="waymo_open_dataset_motion_v_1_3_1",
+        help="Waymo Open Dataset Motion GCS bucket/version name.",
+    )
+    waymo_shard_plan_parser.add_argument(
+        "--total-shards",
+        type=int,
+        default=150,
+        help="Total number of shards in the split.",
+    )
+    waymo_shard_plan_parser.add_argument(
+        "--next-count",
+        type=int,
+        default=3,
+        help="Number of next missing shards to recommend.",
+    )
     waymo_parser = subparsers.add_parser(
         "ingest-waymo-motion",
         help="Convert Waymo Motion records into ScenarioLens JSON.",
@@ -776,6 +851,16 @@ def main() -> int:
             input_path=args.input,
             output_path=args.output,
             search_common_locations=not args.no_search_common_locations,
+        )
+    if args.command == "waymo-motion-shard-plan":
+        return waymo_motion_shard_plan_command(
+            input_path=args.input,
+            output_path=args.output,
+            json_output_path=args.json_output,
+            split=args.split,
+            dataset_version=args.dataset_version,
+            total_shards=args.total_shards,
+            next_count=args.next_count,
         )
     if args.command == "ingest-waymo-motion":
         return ingest_waymo_motion_command(

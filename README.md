@@ -150,6 +150,8 @@ For tag-level ADE/FDE and miss-rate analysis, see the
 [Waymo Motion Real-Slice Failure Study](docs/reports/waymo_motion_failure_study.md).
 For windowed distribution stability over 75 real scenarios, see the
 [Waymo Motion Failure Distribution Stability Study](docs/reports/waymo_motion_failure_stability.md).
+For the next gated Waymo shard downloads and cross-shard command, see the
+[Waymo Motion Shard Expansion Plan](docs/reports/waymo_motion_shard_plan.md).
 Raw Waymo files and per-scenario outputs remain untracked.
 
 ## Scenario Explorer
@@ -313,6 +315,20 @@ PYTHONPATH=src python3 -m scenariolens.cli failure-study-stability \
 
 The stability study compares ADE/FDE and miss-rate distributions across
 multiple inputs or, when only one shard is local, contiguous scenario windows.
+
+Generate a public-safe plan for the next cross-shard run:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-shard-plan \
+  --input data/raw/waymo/motion/validation \
+  --output docs/reports/waymo_motion_shard_plan.md \
+  --json-output data/processed/waymo_motion_shard_plan.json \
+  --next-count 3
+```
+
+The shard plan inventories local files, lists the next official GCS shard URIs,
+and prints the cross-shard `failure-study-stability` command to run after the
+access-gated downloads complete.
 
 See [docs/waymo_motion_slice_recipe.md](docs/waymo_motion_slice_recipe.md) for
 the laptop-friendly real-slice workflow.
