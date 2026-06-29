@@ -88,6 +88,7 @@ Then open `http://localhost:8000/demo/`.
 - [Failure distribution stability study](docs/reports/waymo_motion_failure_stability.md)
 - [Cross-shard failure stability study](docs/reports/waymo_motion_failure_stability_cross_shard.md)
 - [Real Waymo lane-aware baseline diagnostic](docs/reports/waymo_lane_aware_baseline_cross_shard.md)
+- [Lane-aware baseline debug casebook](docs/reports/waymo_lane_aware_debug_casebook.md)
 - [Fixture lane-aware baseline comparison](docs/reports/lane_aware_baseline_study.md)
 - [No-auth baseline ablation study](docs/reports/baseline_ablation_study.md)
 - [Shard expansion plan](docs/reports/waymo_motion_shard_plan.md)
@@ -136,7 +137,7 @@ The checked-in demo currently uses synthetic scenarios plus tiny Waymo
 Motion-shaped fixtures. Synthetic data is the test harness, not the final
 claim. A separate checked-in summary documents one local smoke run on a
 downloaded Waymo Motion validation shard, while raw dataset files and
-per-scenario derived outputs stay outside git.
+local per-case debug artifacts stay outside git.
 
 See [docs/data_provenance.md](docs/data_provenance.md) for the exact fixture
 inventory and [docs/waymo_motion_slice_recipe.md](docs/waymo_motion_slice_recipe.md)
@@ -181,13 +182,15 @@ smoke test. The prototype can:
 - generate public-safe failure, distribution-stability, and baseline-comparison studies,
 - compare constant-velocity and lane-aware baselines across 100 real scenarios
   from four local Waymo Motion validation shards,
+- auto-select lane-aware improvement, regression, and fallback-heavy cases for
+  local baseline debugging,
 - generate static dashboard data and SVG assets,
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to use the hardest cross-shard scenarios plus lane-aware
-win/regression deltas to choose candidates for a small Waymax/JAX replay or
-perturbation experiment.
+The next milestone is to use the debug casebook's selected win/regression
+scenarios as candidates for a small Waymax/JAX replay or perturbation
+experiment.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -222,6 +225,9 @@ validation shards, see the
 For the real 100-scenario lane-aware diagnostic over the same four validation
 shards, see the
 [Waymo Lane-Aware Baseline Cross-Shard Study](docs/reports/waymo_lane_aware_baseline_cross_shard.md).
+For a public-safe explanation of the selected improvement, regression, and
+fallback-heavy cases from that study, see the
+[Waymo Lane-Aware Baseline Debug Casebook](docs/reports/waymo_lane_aware_debug_casebook.md).
 For the fixture-level lane-aware prediction baseline comparison, see the
 [Lane-Aware Baseline Study](docs/reports/lane_aware_baseline_study.md).
 For the no-auth constant-velocity vs lane-aware sensitivity check, see the
@@ -305,6 +311,16 @@ PYTHONPATH=src python3 -m scenariolens.cli baseline-compare-study \
   --max-scenarios 25 \
   --top 10 \
   --public-report docs/reports/waymo_lane_aware_baseline_cross_shard.md
+```
+
+Generate local debug overlays from the real study manifest:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli baseline-debug \
+  --study-manifest data/processed/waymo_lane_aware_baseline_cross_shard/manifest.json \
+  --output-dir data/processed/waymo_lane_aware_debug_casebook \
+  --case-count 3 \
+  --public-report docs/reports/waymo_lane_aware_debug_casebook.md
 ```
 
 Run the no-auth baseline ablation:

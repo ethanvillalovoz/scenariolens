@@ -52,7 +52,7 @@ ScenarioLens currently has four connected surfaces:
    interpretable score components for density, VRUs, proximity, TTC, path
    conflict, dynamics, baseline failure, and scenario category.
 3. **Artifacts**: Markdown/JSON reports, SVG trajectory previews, validation
-   packets, and public-safe real-data case studies.
+   packets, baseline-debug casebooks, and public-safe real-data case studies.
 4. **Explorer**: a static dashboard for filtering, sorting, and inspecting the
    scenario evidence without requiring a backend.
 
@@ -129,6 +129,8 @@ and links back to reports and provenance.
   [`docs/reports/lane_aware_baseline_study.md`](reports/lane_aware_baseline_study.md)
 - Real lane-aware cross-shard diagnostic:
   [`docs/reports/waymo_lane_aware_baseline_cross_shard.md`](reports/waymo_lane_aware_baseline_cross_shard.md)
+- Lane-aware baseline debug casebook:
+  [`docs/reports/waymo_lane_aware_debug_casebook.md`](reports/waymo_lane_aware_debug_casebook.md)
 - No-auth baseline ablation:
   [`docs/reports/baseline_ablation_study.md`](reports/baseline_ablation_study.md)
 - Shard expansion plan:

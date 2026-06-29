@@ -109,6 +109,22 @@ top regressions, map-used counts, and fallback reasons. Negative improvement is
 valid diagnostic evidence: it shows where naive nearest-lane following needs a
 richer map, intent, or replay model.
 
+## Baseline Debug Casebook
+
+```bash
+scenariolens baseline-debug \
+  --study-manifest data/processed/waymo_lane_aware_baseline_cross_shard/manifest.json \
+  --output-dir data/processed/waymo_lane_aware_debug_casebook \
+  --case-count 3 \
+  --public-report docs/reports/waymo_lane_aware_debug_casebook.md
+```
+
+This selects a lane-aware improvement, regression, and fallback-heavy case from
+a `baseline-compare-study` manifest. It writes local SVG overlays and per-track
+debug manifests under ignored `data/processed/` paths, plus a public-safe
+casebook with scenario IDs, metric summaries, fallback reasons, and
+interpretation.
+
 ## Baseline Ablation
 
 ```bash

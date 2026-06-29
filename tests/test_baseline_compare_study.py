@@ -52,6 +52,7 @@ class BaselineComparisonStudyTest(unittest.TestCase):
             self.assertIsInstance(regressions, list)
             self.assertEqual(improvements[0]["scenario_id"], "lane_following_win")
             self.assertEqual(regressions[0]["scenario_id"], "lane_following_regression")
+            self.assertEqual(payload["top_fallbacks"][0]["scenario_id"], "pedestrian_fallback")
 
             markdown = baseline_comparison_study_markdown(payload)
             self.assertIn("Real Waymo Lane-Aware Baseline Study", markdown)
@@ -59,6 +60,7 @@ class BaselineComparisonStudyTest(unittest.TestCase):
             self.assertIn("non_vehicle_or_cyclist_target", markdown)
             self.assertIn("Largest Lane-Aware Improvements", markdown)
             self.assertIn("Largest Lane-Aware Regressions", markdown)
+            self.assertIn("Fallback-Heavy Scenarios", markdown)
             self.assertIn("naive lane-following", markdown)
 
     def test_generate_study_writes_manifest_report_and_public_copy(self) -> None:

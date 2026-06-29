@@ -159,6 +159,22 @@ explorer payload. The four-shard diagnostic intentionally publishes both wins
 and regressions: the naive lane-aware baseline improves some scenarios but
 regresses overall, which makes the next richer-map or replay step concrete.
 
+## Milestone 4D: Baseline Debug Casebook
+
+Goal: make the lane-aware diagnostic explainable, not just numeric.
+
+- select representative real-data cases from a baseline comparison study,
+- render local SVG overlays with ground truth, constant velocity, lane-aware
+  forecast, and map context,
+- write per-track metric timelines and lane-match diagnostics locally,
+- publish a public-safe casebook with scenario IDs, metric summaries,
+  fallback reasons, and interpretation.
+
+Status: implemented in `scenariolens baseline-debug`,
+`src/scenariolens/baseline_debug.py`, and
+`docs/reports/waymo_lane_aware_debug_casebook.md`. Raw Waymo files, local SVG
+overlays, and per-case debug manifests remain ignored under `data/processed/`.
+
 ## Milestone 4C: No-Auth Baseline Ablation
 
 Goal: keep technical progress visible even when Waymo shard auth is blocked.
@@ -203,9 +219,10 @@ windowed stability report in
 stability report across four validation shards in
 `docs/reports/waymo_motion_failure_stability_cross_shard.md`. A matching
 100-scenario lane-aware baseline diagnostic is checked in at
-`docs/reports/waymo_lane_aware_baseline_cross_shard.md`. Next work is to expand
-the shard set from `docs/reports/waymo_motion_shard_plan.md` and use the
-hardest scenario ids plus lane-aware win/regression deltas to motivate a Waymax
+`docs/reports/waymo_lane_aware_baseline_cross_shard.md`, with a public-safe
+debug casebook at `docs/reports/waymo_lane_aware_debug_casebook.md`. Next work
+is to expand the shard set from `docs/reports/waymo_motion_shard_plan.md` and
+use the debug casebook's selected win/regression cases to motivate a Waymax
 replay.
 
 ## Stretch Goals

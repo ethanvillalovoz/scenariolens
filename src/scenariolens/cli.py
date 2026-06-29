@@ -17,6 +17,10 @@ from scenariolens.baseline_compare_study import (
     BASELINE_COMPARISON_STUDY_INPUT_FORMATS,
     generate_baseline_comparison_study,
 )
+from scenariolens.baseline_debug import (
+    BASELINE_DEBUG_INPUT_FORMATS,
+    generate_baseline_debug_casebook,
+)
 from scenariolens.dashboard import generate_dashboard_data
 from scenariolens.failure_study import (
     FAILURE_STUDY_INPUT_FORMATS,
@@ -491,6 +495,42 @@ def baseline_compare_study_command(
     return 0
 
 
+def baseline_debug_command(
+    output_dir: str,
+    input_path: str | None,
+    scenario_ids: list[str] | None,
+    input_format: str,
+    max_scenarios: int | None,
+    study_manifest: str | None,
+    case_count: int,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_baseline_debug_casebook(
+            output_dir=output_dir,
+            input_path=input_path,
+            scenario_ids=tuple(scenario_ids or ()),
+            input_format=input_format,
+            max_scenarios=max_scenarios,
+            study_manifest_path=study_manifest,
+            case_count=case_count,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote baseline-debug manifest to {result.manifest_path}")
+    print(f"Wrote baseline-debug report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("One or more debug cases are not ready. See manifest.json for details.")
+        return 2
+    print(f"Generated {result.case_count} baseline-debug case(s).")
+    return 0
+
+
 def render(
     scenario_id: str | None,
     top: int | None,
@@ -934,6 +974,66 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe report copy.",
     )
+    baseline_debug_parser = subparsers.add_parser(
+        "baseline-debug",
+        help=(
+            "Generate local SVG/debug artifacts for selected baseline "
+            "comparison cases."
+        ),
+    )
+    baseline_debug_parser.add_argument(
+        "--study-manifest",
+        default=None,
+        help=(
+            "Optional baseline-compare-study manifest to auto-select "
+            "improvement, regression, and fallback-heavy cases."
+        ),
+    )
+    baseline_debug_parser.add_argument(
+        "--input",
+        default=None,
+        help=(
+            "Input Waymo Motion file/directory or ScenarioLens JSON file for "
+            "direct debugging. Not required when --study-manifest is used."
+        ),
+    )
+    baseline_debug_parser.add_argument(
+        "--scenario",
+        action="append",
+        default=None,
+        help=(
+            "Scenario id to debug from --input. Repeat to render multiple "
+            "cases. Defaults to the first loaded scenario."
+        ),
+    )
+    baseline_debug_parser.add_argument(
+        "--format",
+        choices=BASELINE_DEBUG_INPUT_FORMATS,
+        default="native",
+        help="Input representation for direct --input mode.",
+    )
+    baseline_debug_parser.add_argument(
+        "--output-dir",
+        default="data/processed/baseline_debug_casebook",
+        help="Ignored directory for manifest, report, and SVG debug artifacts.",
+    )
+    baseline_debug_parser.add_argument(
+        "--max-scenarios",
+        type=int,
+        default=25,
+        help="Maximum scenarios to load per input before selecting cases.",
+    )
+    baseline_debug_parser.add_argument(
+        "--case-count",
+        type=int,
+        default=3,
+        help="Number of cases to select when using --study-manifest.",
+    )
+    baseline_debug_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe casebook copy.",
+    )
     portfolio_parser = subparsers.add_parser(
         "portfolio-report",
         help="Generate the checked-in ScenarioLens portfolio report.",
@@ -1115,6 +1215,17 @@ def main() -> int:
             max_scenarios=args.max_scenarios,
             top=args.top,
             input_format=args.format,
+            public_report=args.public_report,
+        )
+    if args.command == "baseline-debug":
+        return baseline_debug_command(
+            output_dir=args.output_dir,
+            input_path=args.input,
+            scenario_ids=args.scenario,
+            input_format=args.format,
+            max_scenarios=args.max_scenarios,
+            study_manifest=args.study_manifest,
+            case_count=args.case_count,
             public_report=args.public_report,
         )
     if args.command == "portfolio-report":

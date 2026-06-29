@@ -70,6 +70,23 @@ Negative deltas mean the naive lane-following baseline had higher FDE than const
 | 9 | `validation.tfrecord-00007-of-00150` | `46c1c1fbe5ef29d1` | 6 | 20.759 m | 41.729 m | -20.970 m | 3 | 3 | `target_too_far_from_lane (2)` |
 | 10 | `validation.tfrecord-00010-of-00150` | `f672132039e83c40` | 4 | 33.797 m | 53.772 m | -19.975 m | 3 | 1 | `target_too_far_from_lane (1)` |
 
+## Fallback-Heavy Scenarios
+
+These rows show where the lane-aware baseline intentionally returned to constant velocity because the map or target state was not usable for simple lane following.
+
+| Rank | Source | Scenario | Targets | CV FDE | Lane FDE | FDE delta | Map used | Fallbacks | Top fallback reason |
+| ---: | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| 1 | `validation.tfrecord-00010-of-00150` | `2f035a284480e981` | 8 | 31.995 m | 31.995 m | 0.000 m | 0 | 8 | `target_too_far_from_lane (8)` |
+| 2 | `validation.tfrecord-00009-of-00150` | `6bdc7f92afefff73` | 8 | 14.348 m | 14.348 m | 0.000 m | 0 | 8 | `target_too_far_from_lane (8)` |
+| 3 | `validation.tfrecord-00009-of-00150` | `937eb2fa17da45c0` | 8 | 18.817 m | 18.817 m | 0.000 m | 0 | 8 | `target_too_far_from_lane (8)` |
+| 4 | `validation.tfrecord-00008-of-00150` | `ed1dc559821784f8` | 8 | 20.197 m | 20.197 m | 0.000 m | 0 | 8 | `target_too_far_from_lane (7)` |
+| 5 | `validation.tfrecord-00010-of-00150` | `5c49e681a66c720` | 8 | 22.976 m | 25.149 m | -2.173 m | 1 | 7 | `target_too_far_from_lane (3)` |
+| 6 | `validation.tfrecord-00008-of-00150` | `4cc3cc262460ff87` | 8 | 23.248 m | 22.874 m | +0.374 m | 1 | 7 | `target_too_far_from_lane (5)` |
+| 7 | `validation.tfrecord-00008-of-00150` | `6bfab54b46fe8f78` | 7 | 46.271 m | 46.271 m | 0.000 m | 0 | 7 | `target_too_far_from_lane (6)` |
+| 8 | `validation.tfrecord-00007-of-00150` | `d30709cd60e60395` | 7 | 25.307 m | 25.307 m | 0.000 m | 0 | 7 | `target_too_far_from_lane (6)` |
+| 9 | `validation.tfrecord-00008-of-00150` | `3a63a018b28ad4ef` | 7 | 19.999 m | 21.064 m | -1.065 m | 1 | 6 | `low_or_invalid_anchor_speed (2)` |
+| 10 | `validation.tfrecord-00009-of-00150` | `d896f49c65abbda` | 6 | 18.879 m | 18.879 m | 0.000 m | 0 | 6 | `target_too_far_from_lane (5)` |
+
 ## Interpretation
 
 - The lane-aware mean FDE is higher in this run, which is useful: it exposes cases where nearest-lane following is too naive.

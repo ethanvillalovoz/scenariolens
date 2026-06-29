@@ -103,6 +103,8 @@ def portfolio_markdown(
         "CLI flows, and SVG rendering.",
         "- Real lane-aware baseline diagnostic is checked in under "
         "`docs/reports/waymo_lane_aware_baseline_cross_shard.md`.",
+        "- Baseline-debug casebook is checked in under "
+        "`docs/reports/waymo_lane_aware_debug_casebook.md`.",
         "- Baseline comparison report is generated under "
         "`docs/reports/lane_aware_baseline_study.md`.",
         "- Baseline ablation report is generated under "
@@ -160,7 +162,7 @@ def portfolio_markdown(
             "",
             "- Expand the documented local-slice recipe across more Waymo Motion validation shards.",
             "- Compare baseline ADE/FDE distributions across more validation shards.",
-            "- Use lane-aware wins and regressions to select Waymax replay candidates.",
+            "- Use the debug casebook's lane-aware wins and regressions to select Waymax replay candidates.",
             "- Add traffic-light and richer lane-context features from native Motion records.",
             "- Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.",
             "",
@@ -203,6 +205,7 @@ def _lane_comparison_section(
             "Full report: `docs/reports/lane_aware_baseline_study.md`.",
             "Real-data diagnostic: "
             "`docs/reports/waymo_lane_aware_baseline_cross_shard.md`.",
+            "Debug casebook: `docs/reports/waymo_lane_aware_debug_casebook.md`.",
             "",
         ]
     )

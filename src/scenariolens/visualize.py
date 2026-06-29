@@ -4,7 +4,12 @@ from html import escape
 from math import hypot, inf
 
 from scenariolens.metrics import score_scenario, scoring_context
-from scenariolens.prediction import PredictionTrackResult, constant_velocity_baseline
+from scenariolens.prediction import (
+    PredictionBaselineSummary,
+    PredictionTrackResult,
+    constant_velocity_baseline,
+    lane_aware_baseline,
+)
 from scenariolens.schema import AgentTrack, Scenario, ScenarioScore, State
 from scenariolens.taxonomy import infer_tags
 
@@ -33,12 +38,17 @@ CONFLICT = "#f59e0b"
 MAP_LANE = "#94a3b8"
 MAP_EDGE = "#64748b"
 MAP_POLYGON = "#e0f2fe"
+CONSTANT_FORECAST = "#334155"
+LANE_AWARE_FORECAST = "#0f766e"
 MAX_TRACK_LABELS = 10
 
 PlotRect = tuple[float, float, float, float]
 
 
-def scenario_bounds(scenario: Scenario) -> tuple[float, float, float, float]:
+def scenario_bounds(
+    scenario: Scenario,
+    prediction_summaries: tuple[PredictionBaselineSummary, ...] | None = None,
+) -> tuple[float, float, float, float]:
     """Return min_x, min_y, max_x, max_y for all states in a scenario."""
 
     min_x = inf
@@ -52,7 +62,7 @@ def scenario_bounds(scenario: Scenario) -> tuple[float, float, float, float]:
             min_y = min(min_y, state.y)
             max_x = max(max_x, state.x)
             max_y = max(max_y, state.y)
-    for state in _prediction_states(scenario):
+    for state in _prediction_states(scenario, prediction_summaries):
         min_x = min(min_x, state.x)
         min_y = min(min_y, state.y)
         max_x = max(max_x, state.x)
@@ -81,13 +91,23 @@ def scenario_svg(
     width: int = 920,
     height: int = 640,
     padding: int = 56,
+    show_lane_aware_baseline: bool = False,
 ) -> str:
     """Render a scenario as a standalone SVG string."""
 
     score = score_scenario(scenario)
     display_scenario = _display_scenario(scenario)
-    prediction_summary = constant_velocity_baseline(display_scenario)
-    raw_min_x, raw_min_y, raw_max_x, raw_max_y = scenario_bounds(display_scenario)
+    constant_summary = constant_velocity_baseline(display_scenario)
+    prediction_summaries = (constant_summary,)
+    if show_lane_aware_baseline:
+        prediction_summaries = (
+            constant_summary,
+            lane_aware_baseline(display_scenario),
+        )
+    raw_min_x, raw_min_y, raw_max_x, raw_max_y = scenario_bounds(
+        display_scenario,
+        prediction_summaries,
+    )
     raw_world_width = raw_max_x - raw_min_x
     raw_world_height = raw_max_y - raw_min_y
     context_pad = max(max(raw_world_width, raw_world_height) * 0.16, 3.0)
@@ -148,8 +168,16 @@ def scenario_svg(
             )
         )
 
-    for result in prediction_summary.track_results:
-        elements.append(_prediction_path(result, project))
+    comparison_mode = show_lane_aware_baseline
+    for summary in prediction_summaries:
+        for result in summary.track_results:
+            elements.append(
+                _prediction_path(
+                    result,
+                    project,
+                    comparison_mode=comparison_mode,
+                )
+            )
 
     elements.extend(
         [
@@ -157,7 +185,10 @@ def scenario_svg(
             _legend(
                 display_scenario,
                 height,
-                show_prediction=bool(prediction_summary.track_results),
+                show_prediction=any(
+                    summary.track_results for summary in prediction_summaries
+                ),
+                show_lane_aware=show_lane_aware_baseline,
             ),
             "</svg>",
         ]
@@ -260,7 +291,12 @@ def _title(
     )
 
 
-def _legend(scenario: Scenario, height: int, show_prediction: bool = False) -> str:
+def _legend(
+    scenario: Scenario,
+    height: int,
+    show_prediction: bool = False,
+    show_lane_aware: bool = False,
+) -> str:
     present_types = tuple(
         agent_type
         for agent_type in ("vehicle", "pedestrian", "cyclist", "unknown")
@@ -296,13 +332,29 @@ def _legend(scenario: Scenario, height: int, show_prediction: bool = False) -> s
     )
     if show_prediction:
         x += 146
+        label = "baseline forecast"
+        stroke = INK
+        if show_lane_aware:
+            label = "CV forecast"
+            stroke = CONSTANT_FORECAST
         pieces.extend(
             [
                 f'<line x1="{x}" y1="{y}" x2="{x + 34}" y2="{y}" '
-                f'stroke="{INK}" stroke-width="3" stroke-linecap="round" '
+                f'stroke="{stroke}" stroke-width="3" stroke-linecap="round" '
                 f'stroke-dasharray="8 7" opacity="0.76" />',
                 f'<text x="{x + 44}" y="{y + 4}" fill="{MUTED}" font-size="12" '
-                f'font-family="Inter, Arial, sans-serif" font-weight="700">baseline forecast</text>',
+                f'font-family="Inter, Arial, sans-serif" font-weight="700">{label}</text>',
+            ]
+        )
+    if show_lane_aware:
+        x += 140
+        pieces.extend(
+            [
+                f'<line x1="{x}" y1="{y}" x2="{x + 34}" y2="{y}" '
+                f'stroke="{LANE_AWARE_FORECAST}" stroke-width="3.4" '
+                f'stroke-linecap="round" stroke-dasharray="4 6" opacity="0.90" />',
+                f'<text x="{x + 44}" y="{y + 4}" fill="{MUTED}" font-size="12" '
+                f'font-family="Inter, Arial, sans-serif" font-weight="700">lane-aware</text>',
             ]
         )
     return "\n".join(pieces)
@@ -347,21 +399,38 @@ def _track_path(
     return "\n".join(elements)
 
 
-def _prediction_path(result: PredictionTrackResult, project) -> str:
+def _prediction_path(
+    result: PredictionTrackResult,
+    project,
+    comparison_mode: bool = False,
+) -> str:
     if len(result.predicted_states) < 2:
         return ""
     points = [project(state) for state in result.predicted_states]
     point_text = " ".join(f"{x:.2f},{y:.2f}" for x, y in points)
     color = AGENT_COLORS.get(result.agent_type, AGENT_COLORS["unknown"])
+    dash = "9 8"
+    width = "3.2"
+    opacity = "0.88"
+    if comparison_mode and result.baseline_name == "constant_velocity":
+        color = CONSTANT_FORECAST
+        dash = "10 9"
+        opacity = "0.78"
+    if comparison_mode and result.baseline_name == "lane_aware":
+        color = LANE_AWARE_FORECAST
+        dash = "4 6"
+        width = "3.4"
+        opacity = "0.92"
     return "\n".join(
         [
-            f'<g class="baseline-prediction prediction-{result.agent_type}">',
+            f'<g class="baseline-prediction baseline-{result.baseline_name} '
+            f'prediction-{result.agent_type}">',
             f'<polyline points="{point_text}" fill="none" stroke="#ffffff" '
             f'stroke-width="7" stroke-linecap="round" stroke-linejoin="round" '
             f'stroke-dasharray="10 9" opacity="0.82" />',
             f'<polyline points="{point_text}" fill="none" stroke="{color}" '
-            f'stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" '
-            f'stroke-dasharray="9 8" opacity="0.88" />',
+            f'stroke-width="{width}" stroke-linecap="round" stroke-linejoin="round" '
+            f'stroke-dasharray="{dash}" opacity="{opacity}" />',
             "</g>",
         ]
     )
@@ -690,10 +759,15 @@ def _scenario_map_points(scenario: Scenario) -> tuple[tuple[float, float], ...]:
     )
 
 
-def _prediction_states(scenario: Scenario) -> tuple[State, ...]:
+def _prediction_states(
+    scenario: Scenario,
+    prediction_summaries: tuple[PredictionBaselineSummary, ...] | None = None,
+) -> tuple[State, ...]:
+    summaries = prediction_summaries or (constant_velocity_baseline(scenario),)
     return tuple(
         state
-        for result in constant_velocity_baseline(scenario).track_results
+        for summary in summaries
+        for result in summary.track_results
         for state in result.predicted_states
     )
 

@@ -193,6 +193,77 @@ class CliTest(unittest.TestCase):
             self.assertTrue(public_report.exists())
             self.assertIn("Per-Source Summary", public_report.read_text())
 
+    def test_baseline_debug_writes_casebook_from_study_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            input_path = root / "synthetic.json"
+            study_dir = root / "baseline_study"
+            debug_dir = root / "debug"
+            public_report = root / "reports" / "debug_casebook.md"
+
+            subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "export-synthetic",
+                    "--output",
+                    str(input_path),
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+            subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "baseline-compare-study",
+                    "--input",
+                    str(input_path),
+                    "--format",
+                    "scenariolens-json",
+                    "--output-dir",
+                    str(study_dir),
+                    "--max-scenarios",
+                    "11",
+                    "--top",
+                    "6",
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "baseline-debug",
+                    "--study-manifest",
+                    str(study_dir / "manifest.json"),
+                    "--output-dir",
+                    str(debug_dir),
+                    "--case-count",
+                    "3",
+                    "--public-report",
+                    str(public_report),
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertIn("Generated 3 baseline-debug case(s)", result.stdout)
+            self.assertTrue((debug_dir / "manifest.json").exists())
+            self.assertTrue((debug_dir / "report.md").exists())
+            self.assertTrue(public_report.exists())
+            self.assertIn("Baseline Debug Casebook", public_report.read_text())
+
     def test_ingest_csv_then_render_from_input(self) -> None:
         csv_text = (
             "scenario_id,agent_id,agent_type,t,x,y,vx,vy,ego_track_id,tags\n"

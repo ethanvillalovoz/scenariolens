@@ -13,6 +13,9 @@ All notable changes to ScenarioLens are documented here.
 - 100-scenario real Waymo lane-aware baseline diagnostic across four local
   validation shards, including top improvements, top regressions, map-used
   counts, and fallback reasons.
+- `scenariolens baseline-debug` casebook workflow that selects improvement,
+  regression, and fallback-heavy cases from a comparison study, writes local SVG
+  overlays, and publishes a public-safe summary.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

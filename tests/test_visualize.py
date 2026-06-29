@@ -87,6 +87,19 @@ class VisualizeTest(unittest.TestCase):
         self.assertIn("map-feature map-lane", svg)
         self.assertIn("map-feature map-crosswalk", svg)
 
+    def test_scenario_svg_can_overlay_lane_aware_baseline(self) -> None:
+        scenario = next(
+            scenario
+            for scenario in synthetic_scenarios()
+            if scenario.scenario_id == "synthetic_curved_lane_prediction"
+        )
+
+        svg = scenario_svg(scenario, show_lane_aware_baseline=True)
+
+        self.assertIn("baseline-constant_velocity", svg)
+        self.assertIn("baseline-lane_aware", svg)
+        self.assertIn("lane-aware", svg)
+
 
 def _track(
     agent_id: str,

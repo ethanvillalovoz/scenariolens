@@ -73,6 +73,14 @@ It publishes both improvements and regressions: in this run, the naive
 lane-aware baseline improved several individual scenarios but regressed overall,
 which is useful evidence for the next replay or richer-map baseline step.
 
+A companion baseline-debug casebook is checked in at
+[`docs/reports/waymo_lane_aware_debug_casebook.md`](reports/waymo_lane_aware_debug_casebook.md).
+It summarizes one improvement, one regression, and one fallback-heavy scenario
+selected from the 100-scenario lane-aware study. The public report includes
+scenario IDs, metric summaries, fallback reasons, and interpretation only; the
+local SVG overlays and per-case debug manifests remain ignored under
+`data/processed/waymo_lane_aware_debug_casebook/`.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

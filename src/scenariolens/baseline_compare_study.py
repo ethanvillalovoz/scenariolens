@@ -159,6 +159,7 @@ def baseline_comparison_study_payload(
         "fallback_reasons": fallback_reason_counts(tuple(all_comparisons)),
         "top_improvements": _rank_improvements(scenario_rows, top=top),
         "top_regressions": _rank_regressions(scenario_rows, top=top),
+        "top_fallbacks": _rank_fallbacks(scenario_rows, top=top),
         "outputs": {
             "manifest": "manifest.json",
             "report": "report.md",
@@ -174,6 +175,7 @@ def baseline_comparison_study_markdown(payload: dict[str, object]) -> str:
     fallback_reasons = _required_mapping(payload, "fallback_reasons")
     top_improvements = _required_list(payload, "top_improvements")
     top_regressions = _required_list(payload, "top_regressions")
+    top_fallbacks = _required_list(payload, "top_fallbacks")
 
     lines = [
         "# ScenarioLens Real Waymo Lane-Aware Baseline Study",
@@ -278,6 +280,21 @@ def baseline_comparison_study_markdown(payload: dict[str, object]) -> str:
         ]
     )
     _append_ranked_rows(lines, top_regressions)
+
+    lines.extend(
+        [
+            "",
+            "## Fallback-Heavy Scenarios",
+            "",
+            "These rows show where the lane-aware baseline intentionally returned "
+            "to constant velocity because the map or target state was not usable "
+            "for simple lane following.",
+            "",
+            "| Rank | Source | Scenario | Targets | CV FDE | Lane FDE | FDE delta | Map used | Fallbacks | Top fallback reason |",
+            "| ---: | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |",
+        ]
+    )
+    _append_ranked_rows(lines, top_fallbacks)
 
     lines.extend(
         [
@@ -396,6 +413,25 @@ def _rank_regressions(
         key=lambda row: (
             float(row["fde_improvement_m"]),
             -int(row["map_used_count"]),
+            str(row["scenario_id"]),
+        ),
+    )[:top]
+
+
+def _rank_fallbacks(
+    rows: list[dict[str, object]],
+    top: int,
+) -> list[dict[str, object]]:
+    return sorted(
+        (
+            row
+            for row in _rankable_rows(rows)
+            if int(row["fallback_count"]) > 0
+        ),
+        key=lambda row: (
+            -int(row["fallback_count"]),
+            -int(row["evaluated_target_count"]),
+            float(row["fde_improvement_m"]),
             str(row["scenario_id"]),
         ),
     )[:top]

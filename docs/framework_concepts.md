@@ -8,6 +8,7 @@ Dataset Adapter
 -> Scenario Schema
 -> Metrics
 -> Baseline Evaluator
+-> Debug Casebook
 -> Reports
 -> Explorer
 ```
@@ -40,6 +41,14 @@ vehicle/cyclist targets when map context is available, then falls back to
 constant velocity for pedestrians, missing maps, low-speed tracks, or distant
 lane matches. This keeps the core baseline stable while showing how map context
 can reduce forecast error on curved-road cases.
+
+## Debug Casebook
+
+The debug casebook turns a baseline comparison study into selected examples:
+one improvement, one regression, and one fallback-heavy case by default. Local
+artifacts include SVG overlays, per-track error timelines, lane-match distance,
+and fallback reasons. Public copies keep the raw trajectories and local debug
+manifests out of git while preserving the interpretation.
 
 ## Reports
 
