@@ -202,6 +202,7 @@ class CliTest(unittest.TestCase):
             public_report = root / "reports" / "debug_casebook.md"
             replay_dir = root / "replay"
             prototype_dir = root / "prototype"
+            map_audit_dir = root / "map_audit"
 
             subprocess.run(
                 [
@@ -309,6 +310,29 @@ class CliTest(unittest.TestCase):
             self.assertIn("Generated", prototype_result.stdout)
             self.assertTrue((prototype_dir / "manifest.json").exists())
             self.assertTrue((prototype_dir / "report.md").exists())
+
+            map_audit_result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "map-match-audit",
+                    "--debug-manifest",
+                    str(debug_dir / "manifest.json"),
+                    "--output-dir",
+                    str(map_audit_dir),
+                    "--case-count",
+                    "3",
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertIn("Generated", map_audit_result.stdout)
+            self.assertTrue((map_audit_dir / "manifest.json").exists())
+            self.assertTrue((map_audit_dir / "report.md").exists())
 
     def test_ingest_csv_then_render_from_input(self) -> None:
         csv_text = (

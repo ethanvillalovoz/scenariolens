@@ -158,6 +158,24 @@ scenarios, four prediction targets, and eight perturbation trials. It is not a
 closed-loop simulator, not Waymax/JAX execution, and not a Waymo benchmark
 claim.
 
+## Map-Match Audit
+
+```bash
+scenariolens map-match-audit \
+  --debug-manifest data/processed/waymo_lane_aware_debug_casebook/manifest.json \
+  --output-dir data/processed/waymo_map_match_audit \
+  --case-count 1 \
+  --public-report docs/reports/waymo_map_match_audit.md
+```
+
+This reads a `baseline-debug` manifest, reloads selected fallback-heavy local
+scenarios, sweeps lane-match thresholds, and checks whether accepting farther
+lane matches helps or hurts FDE. The checked-in real-data report shows why the
+current threshold is a guardrail: widening the radius on the fallback-heavy case
+made the lane-aware baseline worse, so the right next step is lane-set,
+coordinate-frame, and lane-selection auditing rather than a larger default
+radius.
+
 ## Baseline Ablation
 
 ```bash

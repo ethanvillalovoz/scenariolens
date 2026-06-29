@@ -16,6 +16,7 @@ The current pipeline supports synthetic scenarios, ScenarioLens JSON, row-wise C
 - Baseline-debug casebook is checked in under `docs/reports/waymo_lane_aware_debug_casebook.md`.
 - Replay candidate plan is checked in under `docs/reports/waymo_replay_candidate_plan.md`.
 - Open-loop replay prototype is checked in under `docs/reports/waymo_open_loop_replay_prototype.md`.
+- Map-match threshold audit is checked in under `docs/reports/waymo_map_match_audit.md`.
 - Baseline comparison report is generated under `docs/reports/lane_aware_baseline_study.md`.
 - Baseline ablation report is generated under `docs/reports/baseline_ablation_study.md`.
 - Static dashboard data contract is generated under `docs/demo/`.
@@ -183,6 +184,7 @@ Real-data diagnostic: `docs/reports/waymo_lane_aware_baseline_cross_shard.md`.
 Debug casebook: `docs/reports/waymo_lane_aware_debug_casebook.md`.
 Replay candidate plan: `docs/reports/waymo_replay_candidate_plan.md`.
 Open-loop replay prototype: `docs/reports/waymo_open_loop_replay_prototype.md`.
+Map-match threshold audit: `docs/reports/waymo_map_match_audit.md`.
 
 ## Native Waymo Motion JSON Mini-Slice
 
@@ -342,13 +344,14 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 - The lightweight binary reader extracts the Motion fields ScenarioLens needs, not the full Waymo proto surface.
 - The TTC value is a screened constant-velocity proxy, not a certified safety metric.
 - The prediction baselines are intentionally simple; they are failure-mining screens, not benchmark claims.
+- The map-match audit is a threshold-sensitivity diagnostic, not a production map matcher.
 - The current renderer is 2D and focuses on agent trajectories, map context, and baseline overlays, not traffic-light logic.
 
 ## Next Work
 
 - Expand the documented local-slice recipe across more Waymo Motion validation shards.
 - Compare baseline ADE/FDE distributions across more validation shards.
-- Improve map matching for fallback-heavy replay candidates.
+- Improve map matching with heading, lane coverage, coordinate-frame, and route/intent checks.
 - Graduate stable open-loop replay candidates into an optional Waymax/JAX path.
 - Add traffic-light and richer lane-context features from native Motion records.
 - Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.

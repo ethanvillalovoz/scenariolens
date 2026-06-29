@@ -46,7 +46,7 @@ ScenarioLens builds a small but polished pipeline that can:
 | --- | --- |
 | Working framework | Python package, installable CLI, schema, metrics, reports, rendering, dashboard exporter |
 | Real-data path | Native Waymo Motion JSON/proto/TFRecord slice reader with local preflight and validation |
-| Baseline evidence | Constant-velocity ADE/FDE, miss rate, lane-aware comparison, tag studies, and stability studies |
+| Baseline evidence | Constant-velocity ADE/FDE, miss rate, lane-aware comparison, map-match audit, tag studies, and stability studies |
 | Public demo | Static Scenario Explorer with filters, SVG trajectories, score components, and failure cards |
 | Repo quality | MIT license, contributor docs, changelog, citation, issue templates, CI, and release checklist |
 
@@ -91,6 +91,7 @@ Then open `http://localhost:8000/demo/`.
 - [Lane-aware baseline debug casebook](docs/reports/waymo_lane_aware_debug_casebook.md)
 - [Replay candidate plan](docs/reports/waymo_replay_candidate_plan.md)
 - [Open-loop replay prototype](docs/reports/waymo_open_loop_replay_prototype.md)
+- [Map-match threshold audit](docs/reports/waymo_map_match_audit.md)
 - [Fixture lane-aware baseline comparison](docs/reports/lane_aware_baseline_study.md)
 - [No-auth baseline ablation study](docs/reports/baseline_ablation_study.md)
 - [Shard expansion plan](docs/reports/waymo_motion_shard_plan.md)
@@ -189,13 +190,15 @@ smoke test. The prototype can:
 - produce a replay candidate queue for downstream replay/simulation work,
 - run an open-loop replay and perturbation prototype for two replay-ready real
   Waymo scenarios,
+- audit a fallback-heavy real Waymo case with a map-match threshold sweep before
+  changing matcher behavior,
 - generate static dashboard data and SVG assets,
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to use the replay prototype evidence to improve
-map-matching and then graduate the most stable candidates into an optional
-Waymax/JAX replay path.
+The next milestone is to use the replay and map-match audit evidence to improve
+lane selection, coordinate-frame checks, and richer map context before
+graduating the most stable candidates into an optional Waymax/JAX replay path.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -237,6 +240,8 @@ For the next experiment queue derived from those cases, see the
 [Waymo Replay Candidate Plan](docs/reports/waymo_replay_candidate_plan.md).
 For the first open-loop replay and perturbation run over that queue, see the
 [Waymo Open-Loop Replay Prototype](docs/reports/waymo_open_loop_replay_prototype.md).
+For the fallback-heavy threshold-sensitivity audit, see the
+[Waymo Map-Match Audit](docs/reports/waymo_map_match_audit.md).
 For the fixture-level lane-aware prediction baseline comparison, see the
 [Lane-Aware Baseline Study](docs/reports/lane_aware_baseline_study.md).
 For the no-auth constant-velocity vs lane-aware sensitivity check, see the
@@ -349,6 +354,16 @@ PYTHONPATH=src python3 -m scenariolens.cli replay-prototype \
   --output-dir data/processed/waymo_replay_prototype \
   --top 2 \
   --public-report docs/reports/waymo_open_loop_replay_prototype.md
+```
+
+Audit fallback-heavy map matching before changing lane-match behavior:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli map-match-audit \
+  --debug-manifest data/processed/waymo_lane_aware_debug_casebook/manifest.json \
+  --output-dir data/processed/waymo_map_match_audit \
+  --case-count 1 \
+  --public-report docs/reports/waymo_map_match_audit.md
 ```
 
 Run the no-auth baseline ablation:

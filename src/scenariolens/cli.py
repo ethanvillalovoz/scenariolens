@@ -36,6 +36,10 @@ from scenariolens.ingest.waymo_motion import (
     waymo_motion_slice_ready,
 )
 from scenariolens.io import load_scenarios, save_scenarios
+from scenariolens.map_match_audit import (
+    DEFAULT_AUDIT_THRESHOLDS_M,
+    generate_map_match_audit,
+)
 from scenariolens.portfolio import generate_portfolio_report
 from scenariolens.report import json_report, markdown_report, ranked_scores
 from scenariolens.replay_candidates import generate_replay_candidate_plan
@@ -588,6 +592,48 @@ def replay_prototype_command(
         f"{result.replay_track_count} target(s)."
     )
     return 0
+
+
+def map_match_audit_command(
+    debug_manifest: str,
+    output_dir: str,
+    thresholds: str,
+    case_count: int,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_map_match_audit(
+            debug_manifest_path=debug_manifest,
+            output_dir=output_dir,
+            thresholds_m=_parse_thresholds(thresholds),
+            case_count=case_count,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote map-match-audit manifest to {result.manifest_path}")
+    print(f"Wrote map-match-audit report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("Map-match audit is not ready. See manifest.json for details.")
+        return 2
+    print(f"Generated {result.case_count} map-match audit case(s).")
+    return 0
+
+
+def _parse_thresholds(value: str) -> tuple[float, ...]:
+    thresholds = []
+    for item in value.split(","):
+        item = item.strip()
+        if not item:
+            continue
+        thresholds.append(float(item))
+    if not thresholds:
+        raise ValueError("At least one threshold is required.")
+    return tuple(thresholds)
 
 
 def render(
@@ -1143,6 +1189,39 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe replay prototype copy.",
     )
+    map_match_audit_parser = subparsers.add_parser(
+        "map-match-audit",
+        help=(
+            "Audit lane-aware fallback-heavy cases with a lane-match threshold "
+            "sweep."
+        ),
+    )
+    map_match_audit_parser.add_argument(
+        "--debug-manifest",
+        required=True,
+        help="Manifest produced by scenariolens baseline-debug.",
+    )
+    map_match_audit_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_map_match_audit",
+        help="Directory for map-match audit manifest, report, and local packets.",
+    )
+    map_match_audit_parser.add_argument(
+        "--thresholds",
+        default=",".join(str(value) for value in DEFAULT_AUDIT_THRESHOLDS_M),
+        help="Comma-separated lane-match thresholds in meters.",
+    )
+    map_match_audit_parser.add_argument(
+        "--case-count",
+        type=int,
+        default=3,
+        help="Maximum fallback-heavy debug cases to audit.",
+    )
+    map_match_audit_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe map-match audit copy.",
+    )
     portfolio_parser = subparsers.add_parser(
         "portfolio-report",
         help="Generate the checked-in ScenarioLens portfolio report.",
@@ -1348,6 +1427,14 @@ def main() -> int:
             candidate_manifest=args.candidate_manifest,
             output_dir=args.output_dir,
             top=args.top,
+            public_report=args.public_report,
+        )
+    if args.command == "map-match-audit":
+        return map_match_audit_command(
+            debug_manifest=args.debug_manifest,
+            output_dir=args.output_dir,
+            thresholds=args.thresholds,
+            case_count=args.case_count,
             public_report=args.public_report,
         )
     if args.command == "portfolio-report":

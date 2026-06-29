@@ -11,6 +11,7 @@ Dataset Adapter
 -> Debug Casebook
 -> Replay Candidate Plan
 -> Open-Loop Replay Prototype
+-> Map-Match Audit
 -> Reports
 -> Explorer
 ```
@@ -70,6 +71,16 @@ which diagnostics preserve their expected improvement/regression sign, which
 are sensitive to small state changes, and which cases should remain blocked on
 map matching. It is still open-loop evaluation, not closed-loop simulation.
 
+## Map-Match Audit
+
+The map-match audit handles cases that are not ready to be treated as replay
+evidence. It reloads fallback-heavy debug examples, sweeps lane-match
+thresholds, and asks a narrow engineering question: would accepting farther
+lanes improve the diagnostic, or would it make the forecast less trustworthy?
+The current real-data audit shows that widening the radius can worsen FDE, so
+the correct follow-up is coordinate-frame, lane-coverage, and lane-selection
+work before changing the default matcher.
+
 ## Reports
 
 Reports are public-safe artifacts. They summarize aggregate metrics, tag-level
@@ -87,6 +98,8 @@ score components, baseline failures, and links to the public reports.
 - Add a dataset adapter for another public motion dataset.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
+- Add richer map-match diagnostics for lane coverage, heading alignment, and
+  route/intent priors.
 - Add map-aware features or traffic-light summaries.
 - Graduate stable replay-prototype candidates into an optional Waymax/JAX path.
 - Add additional public-safe report types.

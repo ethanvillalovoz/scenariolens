@@ -96,6 +96,15 @@ public report includes metric summaries and stability labels only; local replay
 packets, SVG overlays, and raw TFRecords remain ignored. This is diagnostic
 open-loop evidence, not Waymax/JAX execution or a closed-loop simulation claim.
 
+The map-match threshold audit is checked in at
+[`docs/reports/waymo_map_match_audit.md`](reports/waymo_map_match_audit.md).
+It reloads the fallback-heavy case from the debug casebook, sweeps lane-match
+thresholds, and publishes only target-level distance summaries plus aggregate
+FDE deltas. In the current run, widening the threshold matched more lanes but
+worsened FDE, which keeps the public claim honest: the next step is auditing
+coordinate frames, lane coverage, and lane-selection logic, not simply
+loosening the matcher.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

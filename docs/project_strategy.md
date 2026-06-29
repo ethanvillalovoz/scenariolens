@@ -53,7 +53,7 @@ ScenarioLens currently has four connected surfaces:
    conflict, dynamics, baseline failure, and scenario category.
 3. **Artifacts**: Markdown/JSON reports, SVG trajectory previews, validation
    packets, baseline-debug casebooks, replay-candidate plans, open-loop replay
-   prototype packets, and public-safe real-data case studies.
+   prototype packets, map-match audits, and public-safe real-data case studies.
 4. **Explorer**: a static dashboard for filtering, sorting, and inspecting the
    scenario evidence without requiring a backend.
 
@@ -136,6 +136,8 @@ and links back to reports and provenance.
   [`docs/reports/waymo_replay_candidate_plan.md`](reports/waymo_replay_candidate_plan.md)
 - Open-loop replay prototype:
   [`docs/reports/waymo_open_loop_replay_prototype.md`](reports/waymo_open_loop_replay_prototype.md)
+- Map-match threshold audit:
+  [`docs/reports/waymo_map_match_audit.md`](reports/waymo_map_match_audit.md)
 - No-auth baseline ablation:
   [`docs/reports/baseline_ablation_study.md`](reports/baseline_ablation_study.md)
 - Shard expansion plan:

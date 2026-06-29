@@ -212,6 +212,28 @@ evaluates two replay-ready Waymo Motion scenarios, four prediction targets, and
 eight perturbation trials. This is open-loop diagnostic evidence, not
 Waymax/JAX execution or closed-loop simulation.
 
+## Milestone 4G: Map-Match Threshold Audit
+
+Goal: turn fallback-heavy lane-aware cases into actionable map diagnostics
+before changing matcher behavior.
+
+- read a baseline-debug manifest,
+- select fallback-heavy cases that should not yet be treated as replay evidence,
+- reload the local source scenarios,
+- sweep lane-match thresholds,
+- publish target-level lane-distance summaries and aggregate FDE deltas while
+  keeping raw trajectories and per-case packets ignored,
+- separate "raise the threshold" hypotheses from coordinate-frame, lane-set,
+  and lane-selection audit work.
+
+Status: implemented in `scenariolens map-match-audit`,
+`src/scenariolens/map_match_audit.py`, and
+`docs/reports/waymo_map_match_audit.md`. The current real-data run audits the
+fallback-heavy debug case from the 100-scenario lane-aware study and shows that
+widening the match radius uses more lanes but worsens FDE. That makes the next
+engineering step more specific: improve map matching with heading, coverage,
+coordinate-frame, and intent checks instead of loosening the default threshold.
+
 ## Milestone 4C: No-Auth Baseline Ablation
 
 Goal: keep technical progress visible even when Waymo shard auth is blocked.
@@ -260,10 +282,12 @@ stability report across four validation shards in
 debug casebook at `docs/reports/waymo_lane_aware_debug_casebook.md` and replay
 candidate queue at `docs/reports/waymo_replay_candidate_plan.md`. The first
 open-loop replay prototype is checked in at
-`docs/reports/waymo_open_loop_replay_prototype.md`. Next work is to expand the
-shard set from `docs/reports/waymo_motion_shard_plan.md`, improve map matching
-for fallback-heavy cases, and graduate stable replay candidates into an
-optional Waymax/JAX path.
+`docs/reports/waymo_open_loop_replay_prototype.md`, and the fallback-heavy
+map-match threshold audit is checked in at
+`docs/reports/waymo_map_match_audit.md`. Next work is to expand the shard set
+from `docs/reports/waymo_motion_shard_plan.md`, improve map matching with
+heading/route-aware lane selection, and graduate stable replay candidates into
+an optional Waymax/JAX path.
 
 ## Stretch Goals
 

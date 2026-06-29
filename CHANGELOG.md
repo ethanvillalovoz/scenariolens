@@ -22,6 +22,9 @@ All notable changes to ScenarioLens are documented here.
   scenarios, reruns open-loop baseline rollouts, and applies deterministic
   anchor-velocity perturbations before publishing a public-safe stability
   report.
+- `scenariolens map-match-audit` workflow that reloads fallback-heavy debug
+  cases, sweeps lane-match thresholds, and publishes a public-safe diagnostic
+  before changing matcher behavior.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.
