@@ -317,13 +317,24 @@ def failure_stability_markdown(payload: dict[str, object]) -> str:
             "- This is a distribution screen, not a benchmark claim.",
             "- Large FDE range across slices means the constant-velocity baseline "
             "fails unevenly across sampled scenario families.",
-            "- With one local shard, the current report compares contiguous "
-            "scenario windows; with more downloaded shards, rerun the same "
-            "command with multiple `--input` values for true cross-shard "
-            "stability.",
+            _analysis_scope_note(payload),
         ]
     )
     return "\n".join(lines).rstrip() + "\n"
+
+
+def _analysis_scope_note(payload: dict[str, object]) -> str:
+    if int(payload["source_count"]) > 1:
+        return (
+            "- This run uses repeated `--input` values, so each downloaded shard "
+            "is treated as its own cross-input comparison slice."
+        )
+    return (
+        "- With one local shard, the current report compares contiguous "
+        "scenario windows; with more downloaded shards, rerun the same "
+        "command with multiple `--input` values for true cross-shard "
+        "stability."
+    )
 
 
 @dataclass(frozen=True)

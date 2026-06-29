@@ -12,6 +12,7 @@ robotics, AI/ML, and software engineering internship conversations.
 - Portfolio report: `docs/reports/portfolio_report.md`
 - Lane-aware baseline study: `docs/reports/lane_aware_baseline_study.md`
 - Baseline ablation study: `docs/reports/baseline_ablation_study.md`
+- Cross-shard stability study: `docs/reports/waymo_motion_failure_stability_cross_shard.md`
 - Technical case study: `docs/case_studies/waymo_baseline_failures.md`
 - Real-data case study: `docs/reports/waymo_motion_case_study.md`
 - Tech stack rationale: `docs/tech_stack.md`
@@ -46,7 +47,7 @@ Use one bullet if space is tight:
 Use two bullets if the project gets a dedicated entry:
 
 - Built ScenarioLens, a local-first autonomy scenario evaluation tool that ingests synthetic, Waymo Motion-shaped JSON, normalized CSV, and small downloaded Waymo Motion TFRecord slices, then ranks long-tail cases using interpretable proximity, TTC, VRU, path-conflict, density, and taxonomy features.
-- Shipped a tested portfolio demo with 94 Python unit tests, GitHub Actions CI, SVG trajectory rendering, deterministic dashboard data, lane-aware baseline comparison, and a static Scenario Explorer deployed at `ethanvillalovoz.com/scenariolens`.
+- Shipped a tested portfolio demo with 94 Python unit tests, GitHub Actions CI, SVG trajectory rendering, deterministic dashboard data, lane-aware baseline comparison, a 100-scenario cross-shard Waymo Motion stability report, and a static Scenario Explorer deployed at `ethanvillalovoz.com/scenariolens`.
 
 Short project line:
 
@@ -122,7 +123,7 @@ Testing and verification:
 
 What I would build next:
 
-1. Download more Waymo Motion validation shards and rerun the stability study.
+1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
 3. Expand lane-aware comparisons across more real Waymo Motion slices.
 4. Add richer map and traffic-light summaries.

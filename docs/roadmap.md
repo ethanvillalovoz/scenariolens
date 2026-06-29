@@ -192,10 +192,12 @@ Goal: make the baseline failure analysis credible on more real data.
 Status: initial implementation complete for one local Waymo Motion validation
 shard in `docs/reports/waymo_motion_failure_study.md`, plus a 75-scenario
 windowed stability report in
-`docs/reports/waymo_motion_failure_stability.md`. Next work is to download more
-validation shards from `docs/reports/waymo_motion_shard_plan.md`, rerun
-`failure-study-stability` with multiple `--input` paths, and use the hardest
-scenario ids plus lane-aware comparison deltas to motivate a Waymax replay.
+`docs/reports/waymo_motion_failure_stability.md` and a 100-scenario cross-shard
+stability report across four validation shards in
+`docs/reports/waymo_motion_failure_stability_cross_shard.md`. Next work is to
+expand the shard set from `docs/reports/waymo_motion_shard_plan.md` and use the
+hardest scenario ids plus lane-aware comparison deltas to motivate a Waymax
+replay.
 
 ## Stretch Goals
 

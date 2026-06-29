@@ -41,6 +41,7 @@ class FailureStabilityTest(unittest.TestCase):
             self.assertIn("Failure Distribution Stability Study", markdown)
             self.assertIn("## Slice Distribution", markdown)
             self.assertIn("## Tag Stability", markdown)
+            self.assertIn("compares contiguous scenario windows", markdown)
 
     def test_generate_stability_study_writes_manifest_and_report(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -92,6 +93,8 @@ class FailureStabilityTest(unittest.TestCase):
             self.assertEqual(payload["slice_count"], 2)
             self.assertEqual(payload["comparison_mode"], "cross-input comparison")
             self.assertEqual(len(payload["sources"]), 2)
+            markdown = failure_stability_markdown(payload)
+            self.assertIn("each downloaded shard", markdown)
 
 
 def _study_scenarios() -> tuple[Scenario, ...]:

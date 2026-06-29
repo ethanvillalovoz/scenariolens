@@ -86,6 +86,7 @@ Then open `http://localhost:8000/demo/`.
 - [Waymo Motion validation summary](docs/reports/waymo_motion_validation_summary.md)
 - [Real-slice failure study](docs/reports/waymo_motion_failure_study.md)
 - [Failure distribution stability study](docs/reports/waymo_motion_failure_stability.md)
+- [Cross-shard failure stability study](docs/reports/waymo_motion_failure_stability_cross_shard.md)
 - [Lane-aware baseline comparison](docs/reports/lane_aware_baseline_study.md)
 - [No-auth baseline ablation study](docs/reports/baseline_ablation_study.md)
 - [Shard expansion plan](docs/reports/waymo_motion_shard_plan.md)
@@ -181,10 +182,9 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to download additional Waymo Motion validation shards,
-rerun the stability study with multiple `--input` paths, and use the new
-lane-aware comparison output to choose candidates for a small Waymax/JAX replay
-or perturbation experiment.
+The next milestone is to expand the cross-shard Waymo Motion stability run and
+use the hardest scenario ids plus lane-aware comparison output to choose
+candidates for a small Waymax/JAX replay or perturbation experiment.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -213,11 +213,14 @@ For tag-level ADE/FDE and miss-rate analysis, see the
 [Waymo Motion Real-Slice Failure Study](docs/reports/waymo_motion_failure_study.md).
 For windowed distribution stability over 75 real scenarios, see the
 [Waymo Motion Failure Distribution Stability Study](docs/reports/waymo_motion_failure_stability.md).
+For true cross-shard distribution stability over 100 real scenarios from four
+validation shards, see the
+[Waymo Motion Cross-Shard Failure Stability Study](docs/reports/waymo_motion_failure_stability_cross_shard.md).
 For the lane-aware prediction baseline comparison, see the
 [Lane-Aware Baseline Study](docs/reports/lane_aware_baseline_study.md).
 For the no-auth constant-velocity vs lane-aware sensitivity check, see the
 [Baseline Ablation Study](docs/reports/baseline_ablation_study.md).
-For the next gated Waymo shard downloads and cross-shard command, see the
+For the current local shard inventory and next expansion commands, see the
 [Waymo Motion Shard Expansion Plan](docs/reports/waymo_motion_shard_plan.md).
 Raw Waymo files and per-scenario outputs remain untracked.
 
@@ -411,8 +414,7 @@ PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-shard-plan \
 ```
 
 The shard plan inventories local files, lists the next official GCS shard URIs,
-and prints the cross-shard `failure-study-stability` command to run after the
-access-gated downloads complete.
+and prints the expanded cross-shard `failure-study-stability` command.
 
 See [docs/waymo_motion_slice_recipe.md](docs/waymo_motion_slice_recipe.md) for
 the laptop-friendly real-slice workflow.

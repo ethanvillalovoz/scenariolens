@@ -22,13 +22,16 @@ scenario IDs, tags, and reproducible commands.
   [`docs/reports/waymo_motion_failure_study.md`](../reports/waymo_motion_failure_study.md)
 - Failure distribution stability study:
   [`docs/reports/waymo_motion_failure_stability.md`](../reports/waymo_motion_failure_stability.md)
+- Cross-shard failure stability study:
+  [`docs/reports/waymo_motion_failure_stability_cross_shard.md`](../reports/waymo_motion_failure_stability_cross_shard.md)
 - Shard expansion plan:
   [`docs/reports/waymo_motion_shard_plan.md`](../reports/waymo_motion_shard_plan.md)
 
-The current local run covers 75 real scenarios and 309 evaluated prediction
-targets across three contiguous windows. It shows that overall mean FDE is
-fairly stable across the local windows, while tags such as cyclist interaction
-and objects of interest vary more.
+The current local evidence includes the original 75-scenario windowed study and
+a true cross-shard run over four validation shards, covering 100 real scenarios
+and 418 evaluated prediction targets. The cross-shard report shows mean FDE
+varying from 21.20 m to 28.89 m across sampled shards, with cyclist interaction
+the most variable shared tag.
 
 ## Why It Matters
 
@@ -39,6 +42,6 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-After authenticated Waymo access is available, download shards `00008`,
-`00009`, and `00010`, then rerun the stability workflow as a true cross-shard
-study.
+Expand beyond shards `00007` through `00010`, then use the hardest scenario ids
+from the cross-shard report as candidates for lane-aware analysis and a small
+Waymax/JAX replay prototype.

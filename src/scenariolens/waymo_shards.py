@@ -135,7 +135,7 @@ def waymo_motion_shard_plan_markdown(payload: dict[str, object]) -> str:
         "# ScenarioLens Waymo Motion Shard Expansion Plan",
         "",
         "This report inventories local Waymo Motion validation shards and lists "
-        "the next small downloads needed for a true cross-shard stability run. "
+        "the next small downloads needed for an expanded cross-shard stability run. "
         "Raw Waymo files remain outside git.",
         "",
         "## Current Inventory",

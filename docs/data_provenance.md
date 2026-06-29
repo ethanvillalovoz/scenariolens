@@ -57,6 +57,14 @@ the aggregate case study is checked in at
 the raw shard, normalized scenario JSON, and generated SVG gallery remain local
 ignored artifacts.
 
+A follow-up cross-shard stability run has also been completed over four local
+validation shards (`00007` through `00010`), covering 100 real scenarios and
+418 evaluated baseline targets. The public-safe aggregate report is checked in
+at
+[`docs/reports/waymo_motion_failure_stability_cross_shard.md`](reports/waymo_motion_failure_stability_cross_shard.md).
+The raw TFRecord files and per-scenario derived outputs remain ignored local
+artifacts.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark
@@ -65,5 +73,5 @@ ignored artifacts.
   spending time on large downloads.
 - Waymo-shaped fixtures prove field mapping and ingestion behavior, not dataset
   scale.
-- The checked-in validation summary documents a small local real-data run, not
-  a full Waymo benchmark submission.
+- The checked-in validation and stability reports document small local
+  real-data runs, not full Waymo benchmark submissions.
