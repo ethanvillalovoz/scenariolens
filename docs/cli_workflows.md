@@ -125,6 +125,21 @@ debug manifests under ignored `data/processed/` paths, plus a public-safe
 casebook with scenario IDs, metric summaries, fallback reasons, and
 interpretation.
 
+## Replay Candidate Plan
+
+```bash
+scenariolens replay-candidates \
+  --debug-manifest data/processed/waymo_lane_aware_debug_casebook/manifest.json \
+  --output-dir data/processed/waymo_replay_candidates \
+  --public-report docs/reports/waymo_replay_candidate_plan.md
+```
+
+This turns a `baseline-debug` manifest into a small Waymax/JAX replay candidate
+queue. It ranks the improvement, regression, and fallback-heavy examples by
+priority, records readiness labels, and separates replay-ready cases from
+map-match audits. It is a planning artifact for the next experiment, not a
+claim that ScenarioLens already runs replay simulation.
+
 ## Baseline Ablation
 
 ```bash

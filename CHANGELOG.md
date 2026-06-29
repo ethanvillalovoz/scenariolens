@@ -16,6 +16,8 @@ All notable changes to ScenarioLens are documented here.
 - `scenariolens baseline-debug` casebook workflow that selects improvement,
   regression, and fallback-heavy cases from a comparison study, writes local SVG
   overlays, and publishes a public-safe summary.
+- `scenariolens replay-candidates` workflow that converts a baseline-debug
+  manifest into a public-safe Waymax/JAX replay candidate queue.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

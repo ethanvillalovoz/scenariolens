@@ -81,6 +81,13 @@ scenario IDs, metric summaries, fallback reasons, and interpretation only; the
 local SVG overlays and per-case debug manifests remain ignored under
 `data/processed/waymo_lane_aware_debug_casebook/`.
 
+The replay candidate plan is checked in at
+[`docs/reports/waymo_replay_candidate_plan.md`](reports/waymo_replay_candidate_plan.md).
+It converts the debug casebook into a small queue for the next Waymax/JAX replay
+experiment. It is intentionally framed as planning evidence: two cases are
+ready for replay investigation and one fallback-heavy case is marked for
+map-match audit before replay should be trusted.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

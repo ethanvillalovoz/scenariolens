@@ -9,6 +9,7 @@ Dataset Adapter
 -> Metrics
 -> Baseline Evaluator
 -> Debug Casebook
+-> Replay Candidate Plan
 -> Reports
 -> Explorer
 ```
@@ -49,6 +50,14 @@ one improvement, one regression, and one fallback-heavy case by default. Local
 artifacts include SVG overlays, per-track error timelines, lane-match distance,
 and fallback reasons. Public copies keep the raw trajectories and local debug
 manifests out of git while preserving the interpretation.
+
+## Replay Candidate Plan
+
+The replay candidate plan is the bridge from scenario mining to simulation. It
+reads a debug casebook, ranks cases by replay priority, and labels each one as
+ready for improvement replay, ready for regression replay, or requiring a
+map-match audit first. It is a planning artifact for future Waymax/JAX work,
+not a claim that replay simulation is already complete.
 
 ## Reports
 

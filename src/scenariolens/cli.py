@@ -38,6 +38,7 @@ from scenariolens.ingest.waymo_motion import (
 from scenariolens.io import load_scenarios, save_scenarios
 from scenariolens.portfolio import generate_portfolio_report
 from scenariolens.report import json_report, markdown_report, ranked_scores
+from scenariolens.replay_candidates import generate_replay_candidate_plan
 from scenariolens.samples import synthetic_scenarios
 from scenariolens.schema import Scenario
 from scenariolens.slice_validation import validate_waymo_motion_slice
@@ -528,6 +529,32 @@ def baseline_debug_command(
         print("One or more debug cases are not ready. See manifest.json for details.")
         return 2
     print(f"Generated {result.case_count} baseline-debug case(s).")
+    return 0
+
+
+def replay_candidates_command(
+    debug_manifest: str,
+    output_dir: str,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_replay_candidate_plan(
+            debug_manifest_path=debug_manifest,
+            output_dir=output_dir,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote replay-candidates manifest to {result.manifest_path}")
+    print(f"Wrote replay-candidates report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("Replay-candidate plan is not ready. See manifest.json for details.")
+        return 2
+    print(f"Generated {result.candidate_count} replay candidate(s).")
     return 0
 
 
@@ -1034,6 +1061,28 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe casebook copy.",
     )
+    replay_candidates_parser = subparsers.add_parser(
+        "replay-candidates",
+        help=(
+            "Turn a baseline-debug manifest into a public-safe Waymax/JAX "
+            "replay candidate plan."
+        ),
+    )
+    replay_candidates_parser.add_argument(
+        "--debug-manifest",
+        required=True,
+        help="Manifest produced by scenariolens baseline-debug.",
+    )
+    replay_candidates_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_replay_candidates",
+        help="Directory for replay candidate manifest.json and report.md.",
+    )
+    replay_candidates_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe replay plan copy.",
+    )
     portfolio_parser = subparsers.add_parser(
         "portfolio-report",
         help="Generate the checked-in ScenarioLens portfolio report.",
@@ -1226,6 +1275,12 @@ def main() -> int:
             max_scenarios=args.max_scenarios,
             study_manifest=args.study_manifest,
             case_count=args.case_count,
+            public_report=args.public_report,
+        )
+    if args.command == "replay-candidates":
+        return replay_candidates_command(
+            debug_manifest=args.debug_manifest,
+            output_dir=args.output_dir,
             public_report=args.public_report,
         )
     if args.command == "portfolio-report":

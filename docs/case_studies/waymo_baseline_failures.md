@@ -42,6 +42,6 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Expand beyond shards `00007` through `00010`, then use the hardest scenario ids
-from the cross-shard report as candidates for lane-aware analysis and a small
-Waymax/JAX replay prototype.
+Expand beyond shards `00007` through `00010`, then implement a small
+Waymax/JAX replay prototype for the ranked candidates in
+`docs/reports/waymo_replay_candidate_plan.md`.

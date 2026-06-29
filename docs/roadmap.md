@@ -175,6 +175,24 @@ Status: implemented in `scenariolens baseline-debug`,
 `docs/reports/waymo_lane_aware_debug_casebook.md`. Raw Waymo files, local SVG
 overlays, and per-case debug manifests remain ignored under `data/processed/`.
 
+## Milestone 4E: Replay Candidate Planning
+
+Goal: make the bridge from scenario mining to simulation explicit before adding
+heavier Waymax/JAX dependencies.
+
+- read a baseline-debug manifest,
+- rank replay candidates by FDE delta, map usage, target count, and fallback
+  behavior,
+- label cases as improvement replay, regression replay, mixed fallback audit,
+  or map-match audit,
+- publish a public-safe plan that says what should be replayed next and what
+  should not be trusted yet.
+
+Status: implemented in `scenariolens replay-candidates`,
+`src/scenariolens/replay_candidates.py`, and
+`docs/reports/waymo_replay_candidate_plan.md`. This is not a completed replay
+simulator; it is the candidate queue for the next Waymax/JAX experiment.
+
 ## Milestone 4C: No-Auth Baseline Ablation
 
 Goal: keep technical progress visible even when Waymo shard auth is blocked.
@@ -220,10 +238,10 @@ stability report across four validation shards in
 `docs/reports/waymo_motion_failure_stability_cross_shard.md`. A matching
 100-scenario lane-aware baseline diagnostic is checked in at
 `docs/reports/waymo_lane_aware_baseline_cross_shard.md`, with a public-safe
-debug casebook at `docs/reports/waymo_lane_aware_debug_casebook.md`. Next work
-is to expand the shard set from `docs/reports/waymo_motion_shard_plan.md` and
-use the debug casebook's selected win/regression cases to motivate a Waymax
-replay.
+debug casebook at `docs/reports/waymo_lane_aware_debug_casebook.md` and replay
+candidate queue at `docs/reports/waymo_replay_candidate_plan.md`. Next work is
+to expand the shard set from `docs/reports/waymo_motion_shard_plan.md` and use
+the replay candidate queue to implement a small Waymax/JAX prototype.
 
 ## Stretch Goals
 

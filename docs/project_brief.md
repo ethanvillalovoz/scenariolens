@@ -59,8 +59,9 @@ corpus, native Waymo Motion JSON/proto/TFRecord ingestion, taxonomy,
 interaction component scoring, constant-velocity baseline ADE/FDE and miss-rate
 analysis, lane-aware baseline comparison, public-safe tag-level failure and
 stability studies, a baseline-debug casebook workflow, tests,
-Markdown/JSON reports, a local real-data validation packet workflow, static
-dashboard data, and 2D SVG trajectory rendering with forecast overlays.
+replay-candidate planning, Markdown/JSON reports, a local real-data validation
+packet workflow, static dashboard data, and 2D SVG trajectory rendering with
+forecast overlays.
 
 The stack is intentionally aligned with the public Waymo/autonomy ecosystem:
 Python for data and evaluation tooling, Waymo Motion `Scenario`-shaped records
