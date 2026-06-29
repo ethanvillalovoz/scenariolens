@@ -201,6 +201,7 @@ class CliTest(unittest.TestCase):
             debug_dir = root / "debug"
             public_report = root / "reports" / "debug_casebook.md"
             replay_dir = root / "replay"
+            prototype_dir = root / "prototype"
 
             subprocess.run(
                 [
@@ -285,6 +286,29 @@ class CliTest(unittest.TestCase):
             self.assertIn("Generated", replay_result.stdout)
             self.assertTrue((replay_dir / "manifest.json").exists())
             self.assertTrue((replay_dir / "report.md").exists())
+
+            prototype_result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "replay-prototype",
+                    "--candidate-manifest",
+                    str(replay_dir / "manifest.json"),
+                    "--output-dir",
+                    str(prototype_dir),
+                    "--top",
+                    "2",
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertIn("Generated", prototype_result.stdout)
+            self.assertTrue((prototype_dir / "manifest.json").exists())
+            self.assertTrue((prototype_dir / "report.md").exists())
 
     def test_ingest_csv_then_render_from_input(self) -> None:
         csv_text = (

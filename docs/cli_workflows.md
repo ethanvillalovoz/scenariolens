@@ -140,6 +140,24 @@ priority, records readiness labels, and separates replay-ready cases from
 map-match audits. It is a planning artifact for the next experiment, not a
 claim that ScenarioLens already runs replay simulation.
 
+## Open-Loop Replay Prototype
+
+```bash
+scenariolens replay-prototype \
+  --candidate-manifest data/processed/waymo_replay_candidates/manifest.json \
+  --output-dir data/processed/waymo_replay_prototype \
+  --top 2 \
+  --public-report docs/reports/waymo_open_loop_replay_prototype.md
+```
+
+This reloads the top replay-ready local scenarios, replays the
+constant-velocity and lane-aware open-loop rollouts from the same anchor state,
+and applies small deterministic anchor-velocity perturbations. The checked-in
+report publishes aggregate metrics only: the real run covers two Waymo Motion
+scenarios, four prediction targets, and eight perturbation trials. It is not a
+closed-loop simulator, not Waymax/JAX execution, and not a Waymo benchmark
+claim.
+
 ## Baseline Ablation
 
 ```bash

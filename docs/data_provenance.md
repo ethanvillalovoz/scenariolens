@@ -88,6 +88,14 @@ experiment. It is intentionally framed as planning evidence: two cases are
 ready for replay investigation and one fallback-heavy case is marked for
 map-match audit before replay should be trusted.
 
+The open-loop replay prototype is checked in at
+[`docs/reports/waymo_open_loop_replay_prototype.md`](reports/waymo_open_loop_replay_prototype.md).
+It reloads the two replay-ready local scenarios, evaluates four prediction
+targets, and runs eight deterministic anchor-velocity perturbation trials. The
+public report includes metric summaries and stability labels only; local replay
+packets, SVG overlays, and raw TFRecords remain ignored. This is diagnostic
+open-loop evidence, not Waymax/JAX execution or a closed-loop simulation claim.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

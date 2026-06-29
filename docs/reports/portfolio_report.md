@@ -15,6 +15,7 @@ The current pipeline supports synthetic scenarios, ScenarioLens JSON, row-wise C
 - Real lane-aware baseline diagnostic is checked in under `docs/reports/waymo_lane_aware_baseline_cross_shard.md`.
 - Baseline-debug casebook is checked in under `docs/reports/waymo_lane_aware_debug_casebook.md`.
 - Replay candidate plan is checked in under `docs/reports/waymo_replay_candidate_plan.md`.
+- Open-loop replay prototype is checked in under `docs/reports/waymo_open_loop_replay_prototype.md`.
 - Baseline comparison report is generated under `docs/reports/lane_aware_baseline_study.md`.
 - Baseline ablation report is generated under `docs/reports/baseline_ablation_study.md`.
 - Static dashboard data contract is generated under `docs/demo/`.
@@ -181,6 +182,7 @@ Full report: `docs/reports/lane_aware_baseline_study.md`.
 Real-data diagnostic: `docs/reports/waymo_lane_aware_baseline_cross_shard.md`.
 Debug casebook: `docs/reports/waymo_lane_aware_debug_casebook.md`.
 Replay candidate plan: `docs/reports/waymo_replay_candidate_plan.md`.
+Open-loop replay prototype: `docs/reports/waymo_open_loop_replay_prototype.md`.
 
 ## Native Waymo Motion JSON Mini-Slice
 
@@ -346,6 +348,7 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 
 - Expand the documented local-slice recipe across more Waymo Motion validation shards.
 - Compare baseline ADE/FDE distributions across more validation shards.
-- Implement a small Waymax/JAX prototype for the replay-candidate queue.
+- Improve map matching for fallback-heavy replay candidates.
+- Graduate stable open-loop replay candidates into an optional Waymax/JAX path.
 - Add traffic-light and richer lane-context features from native Motion records.
 - Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.

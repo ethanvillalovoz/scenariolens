@@ -18,6 +18,10 @@ All notable changes to ScenarioLens are documented here.
   overlays, and publishes a public-safe summary.
 - `scenariolens replay-candidates` workflow that converts a baseline-debug
   manifest into a public-safe Waymax/JAX replay candidate queue.
+- `scenariolens replay-prototype` workflow that reloads replay-ready local
+  scenarios, reruns open-loop baseline rollouts, and applies deterministic
+  anchor-velocity perturbations before publishing a public-safe stability
+  report.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

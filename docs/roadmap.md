@@ -193,6 +193,25 @@ Status: implemented in `scenariolens replay-candidates`,
 `docs/reports/waymo_replay_candidate_plan.md`. This is not a completed replay
 simulator; it is the candidate queue for the next Waymax/JAX experiment.
 
+## Milestone 4F: Open-Loop Replay Prototype
+
+Goal: make the replay queue executable without introducing heavyweight
+simulation dependencies.
+
+- read a replay-candidate manifest,
+- reload replay-ready local Waymo Motion scenarios,
+- replay constant-velocity and lane-aware rollouts from the same anchor state,
+- apply small deterministic anchor-velocity perturbations,
+- publish a public-safe report with stability labels while keeping local replay
+  packets and SVG overlays ignored.
+
+Status: implemented in `scenariolens replay-prototype`,
+`src/scenariolens/replay_prototype.py`, and
+`docs/reports/waymo_open_loop_replay_prototype.md`. The current real-data run
+evaluates two replay-ready Waymo Motion scenarios, four prediction targets, and
+eight perturbation trials. This is open-loop diagnostic evidence, not
+Waymax/JAX execution or closed-loop simulation.
+
 ## Milestone 4C: No-Auth Baseline Ablation
 
 Goal: keep technical progress visible even when Waymo shard auth is blocked.
@@ -239,9 +258,12 @@ stability report across four validation shards in
 100-scenario lane-aware baseline diagnostic is checked in at
 `docs/reports/waymo_lane_aware_baseline_cross_shard.md`, with a public-safe
 debug casebook at `docs/reports/waymo_lane_aware_debug_casebook.md` and replay
-candidate queue at `docs/reports/waymo_replay_candidate_plan.md`. Next work is
-to expand the shard set from `docs/reports/waymo_motion_shard_plan.md` and use
-the replay candidate queue to implement a small Waymax/JAX prototype.
+candidate queue at `docs/reports/waymo_replay_candidate_plan.md`. The first
+open-loop replay prototype is checked in at
+`docs/reports/waymo_open_loop_replay_prototype.md`. Next work is to expand the
+shard set from `docs/reports/waymo_motion_shard_plan.md`, improve map matching
+for fallback-heavy cases, and graduate stable replay candidates into an
+optional Waymax/JAX path.
 
 ## Stretch Goals
 

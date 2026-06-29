@@ -90,6 +90,7 @@ Then open `http://localhost:8000/demo/`.
 - [Real Waymo lane-aware baseline diagnostic](docs/reports/waymo_lane_aware_baseline_cross_shard.md)
 - [Lane-aware baseline debug casebook](docs/reports/waymo_lane_aware_debug_casebook.md)
 - [Replay candidate plan](docs/reports/waymo_replay_candidate_plan.md)
+- [Open-loop replay prototype](docs/reports/waymo_open_loop_replay_prototype.md)
 - [Fixture lane-aware baseline comparison](docs/reports/lane_aware_baseline_study.md)
 - [No-auth baseline ablation study](docs/reports/baseline_ablation_study.md)
 - [Shard expansion plan](docs/reports/waymo_motion_shard_plan.md)
@@ -185,13 +186,16 @@ smoke test. The prototype can:
   from four local Waymo Motion validation shards,
 - auto-select lane-aware improvement, regression, and fallback-heavy cases for
   local baseline debugging,
-- produce a replay candidate queue for the next Waymax/JAX experiment,
+- produce a replay candidate queue for downstream replay/simulation work,
+- run an open-loop replay and perturbation prototype for two replay-ready real
+  Waymo scenarios,
 - generate static dashboard data and SVG assets,
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to implement a small Waymax/JAX replay or perturbation
-prototype for the ranked replay-candidate queue.
+The next milestone is to use the replay prototype evidence to improve
+map-matching and then graduate the most stable candidates into an optional
+Waymax/JAX replay path.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -231,6 +235,8 @@ fallback-heavy cases from that study, see the
 [Waymo Lane-Aware Baseline Debug Casebook](docs/reports/waymo_lane_aware_debug_casebook.md).
 For the next experiment queue derived from those cases, see the
 [Waymo Replay Candidate Plan](docs/reports/waymo_replay_candidate_plan.md).
+For the first open-loop replay and perturbation run over that queue, see the
+[Waymo Open-Loop Replay Prototype](docs/reports/waymo_open_loop_replay_prototype.md).
 For the fixture-level lane-aware prediction baseline comparison, see the
 [Lane-Aware Baseline Study](docs/reports/lane_aware_baseline_study.md).
 For the no-auth constant-velocity vs lane-aware sensitivity check, see the
@@ -333,6 +339,16 @@ PYTHONPATH=src python3 -m scenariolens.cli replay-candidates \
   --debug-manifest data/processed/waymo_lane_aware_debug_casebook/manifest.json \
   --output-dir data/processed/waymo_replay_candidates \
   --public-report docs/reports/waymo_replay_candidate_plan.md
+```
+
+Run the laptop-safe open-loop replay prototype:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli replay-prototype \
+  --candidate-manifest data/processed/waymo_replay_candidates/manifest.json \
+  --output-dir data/processed/waymo_replay_prototype \
+  --top 2 \
+  --public-report docs/reports/waymo_open_loop_replay_prototype.md
 ```
 
 Run the no-auth baseline ablation:

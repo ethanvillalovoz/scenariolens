@@ -10,6 +10,7 @@ Dataset Adapter
 -> Baseline Evaluator
 -> Debug Casebook
 -> Replay Candidate Plan
+-> Open-Loop Replay Prototype
 -> Reports
 -> Explorer
 ```
@@ -59,6 +60,16 @@ ready for improvement replay, ready for regression replay, or requiring a
 map-match audit first. It is a planning artifact for future Waymax/JAX work,
 not a claim that replay simulation is already complete.
 
+## Open-Loop Replay Prototype
+
+The replay prototype is the first executable step after planning. It reloads
+the replay-ready local scenarios, reruns constant-velocity and lane-aware
+rollouts from the same anchor state, and applies small deterministic
+anchor-velocity perturbations. The output is a public-safe stability report:
+which diagnostics preserve their expected improvement/regression sign, which
+are sensitive to small state changes, and which cases should remain blocked on
+map matching. It is still open-loop evaluation, not closed-loop simulation.
+
 ## Reports
 
 Reports are public-safe artifacts. They summarize aggregate metrics, tag-level
@@ -77,5 +88,5 @@ score components, baseline failures, and links to the public reports.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
 - Add map-aware features or traffic-light summaries.
-- Add a Waymax/JAX replay path for selected hard scenarios.
+- Graduate stable replay-prototype candidates into an optional Waymax/JAX path.
 - Add additional public-safe report types.

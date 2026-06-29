@@ -42,6 +42,7 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Expand beyond shards `00007` through `00010`, then implement a small
-Waymax/JAX replay prototype for the ranked candidates in
-`docs/reports/waymo_replay_candidate_plan.md`.
+Expand beyond shards `00007` through `00010`, improve map matching for the
+fallback-heavy debug case, and graduate stable open-loop replay candidates from
+`docs/reports/waymo_open_loop_replay_prototype.md` into an optional Waymax/JAX
+path.

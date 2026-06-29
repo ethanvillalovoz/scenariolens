@@ -20,11 +20,13 @@ flowchart LR
     P --> Q["Baseline-debug casebook"]
     H --> Q
     Q --> R["Replay-candidate plan"]
+    R --> S["Open-loop replay prototype"]
     F --> I["Static dashboard payload"]
     I --> J["Scenario Explorer"]
     G --> K["Public-safe case studies"]
     Q --> K
     R --> K
+    S --> K
 ```
 
 ## Components
@@ -39,6 +41,7 @@ flowchart LR
 | Baseline comparison | `src/scenariolens/baseline_compare.py` | Generates public-safe Markdown/JSON comparison reports for constant-velocity versus lane-aware prediction baselines. |
 | Baseline debug | `src/scenariolens/baseline_debug.py` | Selects representative baseline-comparison cases and writes ignored local SVG overlays, per-track metric timelines, lane-match diagnostics, and public-safe casebook summaries. |
 | Replay candidates | `src/scenariolens/replay_candidates.py` | Converts baseline-debug manifests into a public-safe replay-readiness queue with priority scores, blockers, and next actions for Waymax/JAX follow-up work. |
+| Replay prototype | `src/scenariolens/replay_prototype.py` | Reloads replay-ready local scenarios, reruns open-loop baseline rollouts, applies deterministic anchor-velocity perturbations, and publishes public-safe stability summaries. |
 | Failure study | `src/scenariolens/failure_study.py` | Aggregates ADE/FDE, miss rate, tag-level failures, score-component failures, and hardest scenario ids without publishing raw data. |
 | Failure stability | `src/scenariolens/failure_stability.py` | Compares aggregate failure distributions across multiple inputs or contiguous scenario windows to show whether baseline failures are stable. |
 | Taxonomy | `src/scenariolens/taxonomy.py` | Normalizes scenario tags and adds category-level ranking signal. |
@@ -82,7 +85,8 @@ The public artifact path is:
 1. run ingestion or validation,
 2. normalize into ScenarioLens JSON,
 3. generate ranked reports, SVGs, aggregate failure studies, stability studies,
-   baseline-debug casebooks, and replay-candidate plans,
+   baseline-debug casebooks, replay-candidate plans, and open-loop replay
+   prototype packets,
 4. publish aggregate summaries, dashboard payloads, and public-safe study reports,
 5. keep raw data, local SVG debug overlays, and per-scenario downloaded outputs local.
 
