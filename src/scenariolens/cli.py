@@ -13,6 +13,10 @@ from scenariolens.baseline_compare import (
     markdown_baseline_ablation_report,
     markdown_baseline_comparison_report,
 )
+from scenariolens.baseline_compare_study import (
+    BASELINE_COMPARISON_STUDY_INPUT_FORMATS,
+    generate_baseline_comparison_study,
+)
 from scenariolens.dashboard import generate_dashboard_data
 from scenariolens.failure_study import (
     FAILURE_STUDY_INPUT_FORMATS,
@@ -451,6 +455,42 @@ def baseline_ablation(
     return 0
 
 
+def baseline_compare_study_command(
+    input_paths: list[str],
+    output_dir: str,
+    max_scenarios: int | None,
+    top: int,
+    input_format: str,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_baseline_comparison_study(
+            input_paths=tuple(input_paths),
+            output_dir=output_dir,
+            max_scenarios=max_scenarios,
+            top=top,
+            input_format=input_format,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote baseline-compare-study manifest to {result.manifest_path}")
+    print(f"Wrote baseline-compare-study report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("One or more inputs are not ready. See manifest.json for details.")
+        return 2
+    print(
+        f"Compared {result.source_count} source(s) across "
+        f"{result.scenario_count} scenario(s) and "
+        f"{result.evaluated_target_count} evaluated target(s)."
+    )
+    return 0
+
+
 def render(
     scenario_id: str | None,
     top: int | None,
@@ -850,6 +890,50 @@ def main() -> int:
         default=None,
         help="Optional path to write instead of printing to stdout.",
     )
+    baseline_compare_study_parser = subparsers.add_parser(
+        "baseline-compare-study",
+        help=(
+            "Compare constant-velocity and lane-aware baselines across one or "
+            "more Waymo Motion or ScenarioLens JSON inputs."
+        ),
+    )
+    baseline_compare_study_parser.add_argument(
+        "--input",
+        action="append",
+        required=True,
+        help=(
+            "Input Waymo Motion file/directory or ScenarioLens JSON file. "
+            "Repeat this flag to compare multiple downloaded shards."
+        ),
+    )
+    baseline_compare_study_parser.add_argument(
+        "--format",
+        choices=BASELINE_COMPARISON_STUDY_INPUT_FORMATS,
+        default="native",
+        help="Input representation. Native accepts Waymo Motion files.",
+    )
+    baseline_compare_study_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_lane_aware_baseline_cross_shard",
+        help="Directory for manifest.json and report.md.",
+    )
+    baseline_compare_study_parser.add_argument(
+        "--max-scenarios",
+        type=int,
+        default=25,
+        help="Maximum number of scenarios to ingest per input before analysis.",
+    )
+    baseline_compare_study_parser.add_argument(
+        "--top",
+        type=int,
+        default=10,
+        help="Number of improvement/regression rows to report.",
+    )
+    baseline_compare_study_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe report copy.",
+    )
     portfolio_parser = subparsers.add_parser(
         "portfolio-report",
         help="Generate the checked-in ScenarioLens portfolio report.",
@@ -1023,6 +1107,15 @@ def main() -> int:
             output_path=args.output,
             input_path=args.input,
             strict_lane_threshold_m=args.strict_lane_threshold,
+        )
+    if args.command == "baseline-compare-study":
+        return baseline_compare_study_command(
+            input_paths=args.input,
+            output_dir=args.output_dir,
+            max_scenarios=args.max_scenarios,
+            top=args.top,
+            input_format=args.format,
+            public_report=args.public_report,
         )
     if args.command == "portfolio-report":
         return portfolio_report(

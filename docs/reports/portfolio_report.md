@@ -12,6 +12,7 @@ The current pipeline supports synthetic scenarios, ScenarioLens JSON, row-wise C
 - Native Waymo-shaped JSON scenarios analyzed: 1
 - Normalized Waymo-shaped scenarios analyzed: 2
 - Unit tests cover schema I/O, ranking, taxonomy, ingestion, reporting, CLI flows, and SVG rendering.
+- Real lane-aware baseline diagnostic is checked in under `docs/reports/waymo_lane_aware_baseline_cross_shard.md`.
 - Baseline comparison report is generated under `docs/reports/lane_aware_baseline_study.md`.
 - Baseline ablation report is generated under `docs/reports/baseline_ablation_study.md`.
 - Static dashboard data contract is generated under `docs/demo/`.
@@ -175,6 +176,7 @@ This section compares the default constant-velocity predictor with a lightweight
 | 3 | `synthetic_dense_merge` | 0.000 m | 0.000 m | 0.000 m | 0 | 3 |
 
 Full report: `docs/reports/lane_aware_baseline_study.md`.
+Real-data diagnostic: `docs/reports/waymo_lane_aware_baseline_cross_shard.md`.
 
 ## Native Waymo Motion JSON Mini-Slice
 
@@ -340,6 +342,6 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 
 - Expand the documented local-slice recipe across more Waymo Motion validation shards.
 - Compare baseline ADE/FDE distributions across more validation shards.
-- Calibrate lane-aware comparison behavior on more real Motion slices.
+- Use lane-aware wins and regressions to select Waymax replay candidates.
 - Add traffic-light and richer lane-context features from native Motion records.
 - Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.

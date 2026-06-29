@@ -34,6 +34,7 @@ class PortfolioTest(unittest.TestCase):
         self.assertIn("Component scores", markdown)
         self.assertIn("Baseline FDE", markdown)
         self.assertIn("lane_aware_baseline_study.md", markdown)
+        self.assertIn("waymo_lane_aware_baseline_cross_shard.md", markdown)
 
     def test_generate_portfolio_report_writes_markdown_and_assets(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

@@ -141,6 +141,58 @@ class CliTest(unittest.TestCase):
             self.assertIn("Baseline Ablation Study", markdown)
             self.assertIn("lane_aware_strict", markdown)
 
+    def test_baseline_compare_study_writes_run_packet(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            input_path = root / "synthetic.json"
+            output_dir = root / "baseline_study"
+            public_report = root / "reports" / "lane_aware.md"
+
+            subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "export-synthetic",
+                    "--output",
+                    str(input_path),
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "baseline-compare-study",
+                    "--input",
+                    str(input_path),
+                    "--format",
+                    "scenariolens-json",
+                    "--output-dir",
+                    str(output_dir),
+                    "--max-scenarios",
+                    "4",
+                    "--top",
+                    "2",
+                    "--public-report",
+                    str(public_report),
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertIn("Compared 1 source(s)", result.stdout)
+            self.assertTrue((output_dir / "manifest.json").exists())
+            self.assertTrue((output_dir / "report.md").exists())
+            self.assertTrue(public_report.exists())
+            self.assertIn("Per-Source Summary", public_report.read_text())
+
     def test_ingest_csv_then_render_from_input(self) -> None:
         csv_text = (
             "scenario_id,agent_id,agent_type,t,x,y,vx,vy,ego_track_id,tags\n"

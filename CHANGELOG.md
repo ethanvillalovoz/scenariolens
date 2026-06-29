@@ -8,6 +8,11 @@ All notable changes to ScenarioLens are documented here.
 
 - Baseline ablation CLI/report comparing constant velocity, default lane-aware,
   and strict lane-aware variants without gated Waymo downloads.
+- `scenariolens baseline-compare-study` for repeated Waymo Motion or
+  ScenarioLens JSON inputs, with public-safe manifest/report outputs.
+- 100-scenario real Waymo lane-aware baseline diagnostic across four local
+  validation shards, including top improvements, top regressions, map-used
+  counts, and fallback reasons.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

@@ -88,6 +88,27 @@ baseline. Vehicles and cyclists use parsed lane polylines when map context is
 available; pedestrians, missing maps, low-speed tracks, and distant lane matches
 fall back to constant velocity.
 
+## Real Lane-Aware Baseline Study
+
+```bash
+scenariolens baseline-compare-study \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00007-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00008-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00009-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00010-of-00150 \
+  --output-dir data/processed/waymo_lane_aware_baseline_cross_shard \
+  --max-scenarios 25 \
+  --top 10 \
+  --public-report docs/reports/waymo_lane_aware_baseline_cross_shard.md
+```
+
+This writes an ignored local manifest/report packet and a public-safe Markdown
+copy. Use it to compare constant-velocity and lane-aware ADE/FDE/miss-rate
+estimates across repeated Waymo Motion inputs, including top improvements,
+top regressions, map-used counts, and fallback reasons. Negative improvement is
+valid diagnostic evidence: it shows where naive nearest-lane following needs a
+richer map, intent, or replay model.
+
 ## Baseline Ablation
 
 ```bash

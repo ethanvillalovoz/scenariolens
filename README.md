@@ -87,7 +87,8 @@ Then open `http://localhost:8000/demo/`.
 - [Real-slice failure study](docs/reports/waymo_motion_failure_study.md)
 - [Failure distribution stability study](docs/reports/waymo_motion_failure_stability.md)
 - [Cross-shard failure stability study](docs/reports/waymo_motion_failure_stability_cross_shard.md)
-- [Lane-aware baseline comparison](docs/reports/lane_aware_baseline_study.md)
+- [Real Waymo lane-aware baseline diagnostic](docs/reports/waymo_lane_aware_baseline_cross_shard.md)
+- [Fixture lane-aware baseline comparison](docs/reports/lane_aware_baseline_study.md)
 - [No-auth baseline ablation study](docs/reports/baseline_ablation_study.md)
 - [Shard expansion plan](docs/reports/waymo_motion_shard_plan.md)
 
@@ -178,13 +179,15 @@ smoke test. The prototype can:
 - export Markdown or JSON reports,
 - render 2D SVG trajectory views,
 - generate public-safe failure, distribution-stability, and baseline-comparison studies,
+- compare constant-velocity and lane-aware baselines across 100 real scenarios
+  from four local Waymo Motion validation shards,
 - generate static dashboard data and SVG assets,
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to expand the cross-shard Waymo Motion stability run and
-use the hardest scenario ids plus lane-aware comparison output to choose
-candidates for a small Waymax/JAX replay or perturbation experiment.
+The next milestone is to use the hardest cross-shard scenarios plus lane-aware
+win/regression deltas to choose candidates for a small Waymax/JAX replay or
+perturbation experiment.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -216,7 +219,10 @@ For windowed distribution stability over 75 real scenarios, see the
 For true cross-shard distribution stability over 100 real scenarios from four
 validation shards, see the
 [Waymo Motion Cross-Shard Failure Stability Study](docs/reports/waymo_motion_failure_stability_cross_shard.md).
-For the lane-aware prediction baseline comparison, see the
+For the real 100-scenario lane-aware diagnostic over the same four validation
+shards, see the
+[Waymo Lane-Aware Baseline Cross-Shard Study](docs/reports/waymo_lane_aware_baseline_cross_shard.md).
+For the fixture-level lane-aware prediction baseline comparison, see the
 [Lane-Aware Baseline Study](docs/reports/lane_aware_baseline_study.md).
 For the no-auth constant-velocity vs lane-aware sensitivity check, see the
 [Baseline Ablation Study](docs/reports/baseline_ablation_study.md).
@@ -285,6 +291,20 @@ PYTHONPATH=src python3 -m scenariolens.cli baseline-compare \
   --format markdown \
   --limit 8 \
   --output docs/reports/lane_aware_baseline_study.md
+```
+
+Run the real four-shard lane-aware diagnostic:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli baseline-compare-study \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00007-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00008-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00009-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00010-of-00150 \
+  --output-dir data/processed/waymo_lane_aware_baseline_cross_shard \
+  --max-scenarios 25 \
+  --top 10 \
+  --public-report docs/reports/waymo_lane_aware_baseline_cross_shard.md
 ```
 
 Run the no-auth baseline ablation:

@@ -10,7 +10,8 @@ robotics, AI/ML, and software engineering internship conversations.
 - Product strategy: `docs/project_strategy.md`
 - Architecture: `docs/architecture.md`
 - Portfolio report: `docs/reports/portfolio_report.md`
-- Lane-aware baseline study: `docs/reports/lane_aware_baseline_study.md`
+- Real lane-aware baseline diagnostic: `docs/reports/waymo_lane_aware_baseline_cross_shard.md`
+- Fixture lane-aware baseline study: `docs/reports/lane_aware_baseline_study.md`
 - Baseline ablation study: `docs/reports/baseline_ablation_study.md`
 - Cross-shard stability study: `docs/reports/waymo_motion_failure_stability_cross_shard.md`
 - Technical case study: `docs/case_studies/waymo_baseline_failures.md`
@@ -47,7 +48,7 @@ Use one bullet if space is tight:
 Use two bullets if the project gets a dedicated entry:
 
 - Built ScenarioLens, a local-first autonomy scenario evaluation tool that ingests synthetic, Waymo Motion-shaped JSON, normalized CSV, and small downloaded Waymo Motion TFRecord slices, then ranks long-tail cases using interpretable proximity, TTC, VRU, path-conflict, density, and taxonomy features.
-- Shipped a tested portfolio demo with 94 Python unit tests, GitHub Actions CI, SVG trajectory rendering, deterministic dashboard data, lane-aware baseline comparison, a 100-scenario cross-shard Waymo Motion stability report, and a static Scenario Explorer deployed at `ethanvillalovoz.com/scenariolens`.
+- Shipped a tested portfolio demo with 97 Python unit tests, GitHub Actions CI, SVG trajectory rendering, deterministic dashboard data, lane-aware baseline comparison, a 100-scenario cross-shard Waymo Motion stability report, a 100-scenario lane-aware diagnostic, and a static Scenario Explorer deployed at `ethanvillalovoz.com/scenariolens`.
 
 Short project line:
 
@@ -118,6 +119,9 @@ Testing and verification:
   dashboard data.
 - GitHub Actions runs the test suite, install smoke checks, dashboard JSON
   validation, and static JavaScript syntax check.
+- Public-safe reports include 100 real Waymo Motion scenarios across four local
+  validation shards, with 418 evaluated prediction targets for both failure
+  stability and lane-aware baseline diagnostics.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
@@ -125,7 +129,7 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Expand lane-aware comparisons across more real Waymo Motion slices.
+3. Use the lane-aware wins and regressions to choose replay candidates.
 4. Add richer map and traffic-light summaries.
 5. Integrate a Waymax/JAX replay or perturbation path for selected scenarios.
 

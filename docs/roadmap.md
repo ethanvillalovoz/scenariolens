@@ -147,10 +147,17 @@ remaining laptop-friendly.
   and distant lane matches,
 - add a curved-lane fixture with an obvious comparison win,
 - expose comparison metrics in CLI reports and the Scenario Explorer.
+- run the lane-aware comparison on downloaded Waymo Motion validation shards
+  and publish public-safe aggregate wins/regressions.
 
 Status: implemented in `src/scenariolens/prediction.py`,
 `src/scenariolens/baseline_compare.py`,
-`docs/reports/lane_aware_baseline_study.md`, and the static explorer payload.
+`src/scenariolens/baseline_compare_study.py`,
+`docs/reports/lane_aware_baseline_study.md`,
+`docs/reports/waymo_lane_aware_baseline_cross_shard.md`, and the static
+explorer payload. The four-shard diagnostic intentionally publishes both wins
+and regressions: the naive lane-aware baseline improves some scenarios but
+regresses overall, which makes the next richer-map or replay step concrete.
 
 ## Milestone 4C: No-Auth Baseline Ablation
 
@@ -194,9 +201,11 @@ shard in `docs/reports/waymo_motion_failure_study.md`, plus a 75-scenario
 windowed stability report in
 `docs/reports/waymo_motion_failure_stability.md` and a 100-scenario cross-shard
 stability report across four validation shards in
-`docs/reports/waymo_motion_failure_stability_cross_shard.md`. Next work is to
-expand the shard set from `docs/reports/waymo_motion_shard_plan.md` and use the
-hardest scenario ids plus lane-aware comparison deltas to motivate a Waymax
+`docs/reports/waymo_motion_failure_stability_cross_shard.md`. A matching
+100-scenario lane-aware baseline diagnostic is checked in at
+`docs/reports/waymo_lane_aware_baseline_cross_shard.md`. Next work is to expand
+the shard set from `docs/reports/waymo_motion_shard_plan.md` and use the
+hardest scenario ids plus lane-aware win/regression deltas to motivate a Waymax
 replay.
 
 ## Stretch Goals

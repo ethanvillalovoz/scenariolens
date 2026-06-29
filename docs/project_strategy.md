@@ -127,6 +127,8 @@ and links back to reports and provenance.
   [`docs/reports/waymo_motion_failure_stability.md`](reports/waymo_motion_failure_stability.md)
 - Lane-aware baseline comparison:
   [`docs/reports/lane_aware_baseline_study.md`](reports/lane_aware_baseline_study.md)
+- Real lane-aware cross-shard diagnostic:
+  [`docs/reports/waymo_lane_aware_baseline_cross_shard.md`](reports/waymo_lane_aware_baseline_cross_shard.md)
 - No-auth baseline ablation:
   [`docs/reports/baseline_ablation_study.md`](reports/baseline_ablation_study.md)
 - Shard expansion plan:

@@ -65,6 +65,14 @@ at
 The raw TFRecord files and per-scenario derived outputs remain ignored local
 artifacts.
 
+The same four-shard slice now has a lane-aware baseline diagnostic comparing
+constant-velocity and lightweight map-following forecasts over 418 evaluated
+prediction targets. The report is checked in at
+[`docs/reports/waymo_lane_aware_baseline_cross_shard.md`](reports/waymo_lane_aware_baseline_cross_shard.md).
+It publishes both improvements and regressions: in this run, the naive
+lane-aware baseline improved several individual scenarios but regressed overall,
+which is useful evidence for the next replay or richer-map baseline step.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark
