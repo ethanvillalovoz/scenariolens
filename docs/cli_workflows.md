@@ -213,6 +213,21 @@ overlays and per-case manifests comparing constant velocity, nearest-lane, and
 heading-aware forecasts, while the public report keeps only scenario IDs,
 metrics, fallback reasons, and interpretation.
 
+## Heading-Aware Replay Candidate Plan
+
+```bash
+scenariolens replay-candidates \
+  --debug-manifest data/processed/waymo_heading_aware_debug_casebook/manifest.json \
+  --output-dir data/processed/waymo_heading_aware_replay_candidates \
+  --public-report docs/reports/waymo_heading_aware_replay_candidate_plan.md
+```
+
+When the debug manifest comes from the heading-aware casebook, `replay-candidates`
+switches into a nearest-lane vs heading-aware planning mode. It ranks selector
+wins, regressions, and fallback-heavy cases, keeps constant velocity as context,
+and labels which cases are ready for a future heading-aware replay prototype
+versus which still need map-match or coordinate-frame audit.
+
 ## Baseline Ablation
 
 ```bash

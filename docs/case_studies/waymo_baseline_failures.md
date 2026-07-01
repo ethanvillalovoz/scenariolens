@@ -32,6 +32,8 @@ scenario IDs, tags, and reproducible commands.
   [`docs/reports/waymo_heading_aware_lane_selection_study.md`](../reports/waymo_heading_aware_lane_selection_study.md)
 - Heading-aware debug casebook:
   [`docs/reports/waymo_heading_aware_debug_casebook.md`](../reports/waymo_heading_aware_debug_casebook.md)
+- Heading-aware replay candidate plan:
+  [`docs/reports/waymo_heading_aware_replay_candidate_plan.md`](../reports/waymo_heading_aware_replay_candidate_plan.md)
 
 The current local evidence includes the original 75-scenario windowed study and
 a true cross-shard run over four validation shards, covering 100 real scenarios
@@ -45,7 +47,9 @@ step as an ablation: it improves mean FDE by 0.489 m relative to nearest-lane
 selection over the same 418 prediction targets, while still trailing constant
 velocity overall. The heading-aware debug casebook then connects six selected
 cases to ignored local SVG overlays, per-track metrics, heading-alignment
-diagnostics, and fallback reasons.
+diagnostics, and fallback reasons. The heading-aware replay candidate plan
+then ranks those six cases into replay-ready improvement/regression targets and
+a map-match audit case before making any heavier simulation claim.
 
 ## Why It Matters
 
@@ -56,8 +60,7 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Expand beyond shards `00007` through `00010`, convert heading-aware debug cases
-into replay-readiness candidates, and graduate stable open-loop replay
-candidates from
-`docs/reports/waymo_open_loop_replay_prototype.md` into an optional Waymax/JAX
-path.
+Expand beyond shards `00007` through `00010`, prototype nearest-lane vs
+heading-aware replay for the strongest candidates in
+`docs/reports/waymo_heading_aware_replay_candidate_plan.md`, and graduate stable
+open-loop replay candidates into an optional Waymax/JAX path.

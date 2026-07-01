@@ -258,6 +258,30 @@ surfaces public-safe improvement, regression, and fallback-heavy cases from this
 run, and `docs/reports/waymo_heading_aware_debug_casebook.md` connects six of
 those rows to ignored local SVG overlays and per-case manifests.
 
+## Milestone 4I: Heading-Aware Replay Candidate Planning
+
+Goal: turn heading-aware selector diagnostics into an explicit replay/debug
+queue before adding heavier simulation dependencies.
+
+- read a heading-aware `baseline-debug` manifest produced from
+  `lane-selection-study`,
+- rank nearest-lane vs heading-aware wins and regressions by FDE delta, target
+  count, map usage, fallback count, and worst track delta,
+- keep constant velocity as context so improvements over nearest-lane are not
+  overclaimed,
+- label cases as heading improvement replay, heading regression replay,
+  mixed fallback audit, or heading map-match audit,
+- publish a public-safe queue with scenario IDs, readiness labels, blockers,
+  and next actions while local manifests and overlays stay ignored.
+
+Status: implemented in `scenariolens replay-candidates`,
+`src/scenariolens/replay_candidates.py`, and
+`docs/reports/waymo_heading_aware_replay_candidate_plan.md`. The current
+four-shard run produces six heading-aware replay candidates: four improvement
+controls, one regression target, and one map-match audit case. This is a
+planning artifact for a future heading-aware replay prototype, not completed
+Waymax/JAX simulation.
+
 ## Milestone 4C: No-Auth Baseline Ablation
 
 Goal: keep technical progress visible even when Waymo shard auth is blocked.
@@ -311,9 +335,10 @@ map-match threshold audit is checked in at
 `docs/reports/waymo_map_match_audit.md`. The heading-aware lane-selection
 ablation is checked in at
 `docs/reports/waymo_heading_aware_lane_selection_study.md`. Next work is to
-expand the shard set from `docs/reports/waymo_motion_shard_plan.md`, debug the
-largest heading-aware wins/regressions, and graduate stable replay candidates
-into an optional Waymax/JAX path.
+use `docs/reports/waymo_heading_aware_replay_candidate_plan.md` to prototype
+nearest-lane vs heading-aware replay for the most stable cases, expand the shard
+set from `docs/reports/waymo_motion_shard_plan.md`, and graduate stable replay
+candidates into an optional Waymax/JAX path.
 
 ## Stretch Goals
 

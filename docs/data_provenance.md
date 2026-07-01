@@ -121,6 +121,13 @@ study. The public copy includes scenario IDs, metric summaries, fallback
 reasons, and interpretation only; local SVG overlays and per-case manifests
 stay ignored under `data/processed/waymo_heading_aware_debug_casebook/`.
 
+The heading-aware replay candidate plan is checked in at
+[`docs/reports/waymo_heading_aware_replay_candidate_plan.md`](reports/waymo_heading_aware_replay_candidate_plan.md).
+It reads the ignored heading-aware debug manifest and publishes only ranked
+scenario IDs, aggregate queue counts, FDE deltas, readiness labels, blockers,
+and recommended next actions. Local candidate manifests and overlays stay
+ignored under `data/processed/waymo_heading_aware_replay_candidates/`.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

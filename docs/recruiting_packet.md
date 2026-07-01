@@ -17,6 +17,7 @@ robotics, AI/ML, and software engineering internship conversations.
 - Map-match threshold audit: `docs/reports/waymo_map_match_audit.md`
 - Heading-aware lane-selection study: `docs/reports/waymo_heading_aware_lane_selection_study.md`
 - Heading-aware debug casebook: `docs/reports/waymo_heading_aware_debug_casebook.md`
+- Heading-aware replay candidate plan: `docs/reports/waymo_heading_aware_replay_candidate_plan.md`
 - Fixture lane-aware baseline study: `docs/reports/lane_aware_baseline_study.md`
 - Baseline ablation study: `docs/reports/baseline_ablation_study.md`
 - Cross-shard stability study: `docs/reports/waymo_motion_failure_stability_cross_shard.md`
@@ -54,7 +55,7 @@ Use one bullet if space is tight:
 Use two bullets if the project gets a dedicated entry:
 
 - Built ScenarioLens, a local-first autonomy scenario evaluation tool that ingests synthetic, Waymo Motion-shaped JSON, normalized CSV, and small downloaded Waymo Motion TFRecord slices, then ranks long-tail cases using interpretable proximity, TTC, VRU, path-conflict, density, and taxonomy features.
-- Shipped a tested portfolio demo with 100+ Python unit tests, GitHub Actions CI, SVG trajectory rendering, deterministic dashboard data, lane-aware baseline comparison, a 100-scenario cross-shard Waymo Motion stability report, a 100-scenario lane-aware diagnostic, a heading-aware lane-selection ablation, a baseline-debug casebook, a replay-candidate plan, an open-loop replay/perturbation prototype, a map-match threshold audit, and a static Scenario Explorer deployed at `ethanvillalovoz.com/scenariolens`.
+- Shipped a tested portfolio demo with 100+ Python unit tests, GitHub Actions CI, SVG trajectory rendering, deterministic dashboard data, lane-aware baseline comparison, a 100-scenario cross-shard Waymo Motion stability report, a 100-scenario lane-aware diagnostic, a heading-aware lane-selection ablation, baseline-debug casebooks, replay-candidate plans, an open-loop replay/perturbation prototype, a map-match threshold audit, and a static Scenario Explorer deployed at `ethanvillalovoz.com/scenariolens`.
 
 Short project line:
 
@@ -153,6 +154,9 @@ Testing and verification:
 - A heading-aware debug casebook connects six Explorer-facing cases to ignored
   local SVG overlays, per-track metrics, heading-alignment diagnostics, and
   fallback reasons.
+- A heading-aware replay candidate plan ranks those six cases into four
+  improvement controls, one regression target, and one map-match audit case
+  before any heavier simulation claim.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
@@ -160,7 +164,8 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Convert heading-aware debug cases into replay-readiness candidates.
+3. Prototype nearest-lane vs heading-aware replay for the strongest candidate
+   cases.
 4. Add richer map and traffic-light summaries.
 5. Graduate stable replay candidates into an optional Waymax/JAX path.
 

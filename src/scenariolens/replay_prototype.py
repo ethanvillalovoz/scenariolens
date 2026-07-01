@@ -123,15 +123,31 @@ def replay_prototype_payload(
     debug_cases = _required_list(debug_payload, "cases")
     debug_by_key = _debug_case_lookup(debug_cases)
     candidates = _required_list(candidate_payload, "candidates")
-    replay_ready = [
-        candidate
-        for candidate in candidates
-        if isinstance(candidate, dict)
-        and str(candidate.get("readiness", "")).startswith("ready_for_")
-    ][:top]
+    replay_ready = []
+    skipped_candidates = []
+    for candidate in candidates:
+        if not isinstance(candidate, dict):
+            continue
+        readiness = str(candidate.get("readiness", ""))
+        if readiness in {"ready_for_regression_replay", "ready_for_improvement_replay"}:
+            replay_ready.append(candidate)
+        elif readiness.startswith("ready_for_"):
+            skipped_candidates.append(
+                {
+                    "scenario_id": candidate.get("scenario_id"),
+                    "source_name": candidate.get("source_name"),
+                    "readiness": readiness,
+                    "comparison_mode": candidate.get("comparison_mode", "unknown"),
+                    "reason": (
+                        "unsupported_replay_candidate_mode: this prototype "
+                        "currently replays constant-velocity vs default "
+                        "lane-aware candidates only."
+                    ),
+                }
+            )
+    replay_ready = replay_ready[:top]
 
     replay_cases = []
-    skipped_candidates = []
     for rank, candidate in enumerate(replay_ready, start=1):
         assert isinstance(candidate, dict)
         case = _matching_debug_case(candidate, debug_by_key)

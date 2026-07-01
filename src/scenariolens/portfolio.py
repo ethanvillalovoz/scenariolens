@@ -115,6 +115,8 @@ def portfolio_markdown(
         "`docs/reports/waymo_heading_aware_lane_selection_study.md`.",
         "- Heading-aware debug casebook is checked in under "
         "`docs/reports/waymo_heading_aware_debug_casebook.md`.",
+        "- Heading-aware replay candidate plan is checked in under "
+        "`docs/reports/waymo_heading_aware_replay_candidate_plan.md`.",
         "- Baseline comparison report is generated under "
         "`docs/reports/lane_aware_baseline_study.md`.",
         "- Baseline ablation report is generated under "
@@ -168,13 +170,14 @@ def portfolio_markdown(
             "- The prediction baselines are intentionally simple; they are failure-mining screens, not benchmark claims.",
             "- The map-match audit is a threshold-sensitivity diagnostic, not a production map matcher.",
             "- The heading-aware lane selector is an ablation, not a replacement for the default scorer.",
+            "- The heading-aware replay candidate plan is a queue for the next experiment, not completed simulation.",
             "- The current renderer is 2D and focuses on agent trajectories, map context, and baseline overlays, not traffic-light logic.",
             "",
             "## Next Work",
             "",
             "- Expand the documented local-slice recipe across more Waymo Motion validation shards.",
             "- Compare baseline ADE/FDE distributions across more validation shards.",
-            "- Convert heading-aware debug cases into replay-readiness candidates.",
+            "- Prototype nearest-lane vs heading-aware replay for the strongest candidate cases.",
             "- Graduate stable open-loop replay candidates into an optional Waymax/JAX path.",
             "- Add traffic-light and richer lane-context features from native Motion records.",
             "- Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.",
@@ -228,6 +231,8 @@ def _lane_comparison_section(
             "`docs/reports/waymo_heading_aware_lane_selection_study.md`.",
             "Heading-aware debug casebook: "
             "`docs/reports/waymo_heading_aware_debug_casebook.md`.",
+            "Heading-aware replay candidate plan: "
+            "`docs/reports/waymo_heading_aware_replay_candidate_plan.md`.",
             "",
         ]
     )

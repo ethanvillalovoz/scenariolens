@@ -34,6 +34,9 @@ All notable changes to ScenarioLens are documented here.
 - Heading-aware debug casebook mode for `scenariolens baseline-debug`, including
   local CV/nearest/heading-aware SVG overlays and the public-safe
   `docs/reports/waymo_heading_aware_debug_casebook.md` report.
+- Heading-aware replay candidate planning in `scenariolens replay-candidates`,
+  including nearest-lane vs heading-aware readiness labels and the public-safe
+  `docs/reports/waymo_heading_aware_replay_candidate_plan.md` report.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

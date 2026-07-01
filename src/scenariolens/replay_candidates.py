@@ -7,6 +7,8 @@ from pathlib import Path
 from scenariolens.baseline_debug import BASELINE_DEBUG_FORMAT
 
 REPLAY_CANDIDATE_FORMAT = "scenariolens.replay_candidates.v1"
+_HEADING_SELECTION_MODE = "heading_lane_selection"
+_LANE_AWARE_MODE = "lane_aware"
 
 
 @dataclass(frozen=True)
@@ -67,9 +69,14 @@ def replay_candidate_payload(
         )
 
     debug_output_dir = Path(str(debug_payload.get("output_dir", ".")))
+    source_kind = str(debug_payload.get("source_kind", "baseline_compare_study"))
     cases = _required_list(debug_payload, "cases")
     candidates = [
-        _candidate_from_case(case, debug_output_dir=debug_output_dir)
+        _candidate_from_case(
+            case,
+            debug_output_dir=debug_output_dir,
+            source_kind=source_kind,
+        )
         for case in cases
         if isinstance(case, dict)
     ]
@@ -87,6 +94,7 @@ def replay_candidate_payload(
         "format": REPLAY_CANDIDATE_FORMAT,
         "source": str(debug_manifest_path),
         "source_format": debug_payload.get("format"),
+        "source_kind": source_kind,
         "output_dir": str(output_dir),
         "ready": ready,
         "case_count": len(cases),
@@ -105,18 +113,35 @@ def replay_candidate_markdown(payload: dict[str, object]) -> str:
 
     aggregate = _required_mapping(payload, "aggregate")
     candidates = _required_list(payload, "candidates")
+    heading_mode = _is_heading_payload(payload)
+    title = (
+        "# ScenarioLens Heading-Aware Replay Candidate Plan"
+        if heading_mode
+        else "# ScenarioLens Replay Candidate Plan"
+    )
+    intro = (
+        "This report turns the heading-aware debug casebook into a small, "
+        "honest candidate queue for the next replay/simulation or matcher "
+        "experiment. It does not claim that ScenarioLens already performs "
+        "heading-aware simulation replay. It identifies which nearest-lane vs "
+        "heading-aware cases should be replayed first, why they matter, and "
+        "what must be checked before treating replay results as evidence."
+        if heading_mode
+        else "This report turns the baseline-debug casebook into a small, "
+        "honest candidate queue for the next Waymax/JAX replay experiment. It "
+        "does not claim that ScenarioLens already performs simulation replay. "
+        "It identifies which cases should be replayed first, why they matter, "
+        "and what must be checked before treating replay results as evidence."
+    )
     lines = [
-        "# ScenarioLens Replay Candidate Plan",
+        title,
         "",
-        "This report turns the baseline-debug casebook into a small, honest "
-        "candidate queue for the next Waymax/JAX replay experiment. It does "
-        "not claim that ScenarioLens already performs simulation replay. It "
-        "identifies which cases should be replayed first, why they matter, and "
-        "what must be checked before treating replay results as evidence.",
+        intro,
         "",
         "## Scope",
         "",
         f"- Source debug manifest: `{payload['source']}`",
+        f"- Source kind: `{payload.get('source_kind', 'baseline_compare_study')}`",
         f"- Ready for planning: {payload['ready']}",
         f"- Debug cases read: {payload['case_count']}",
         f"- Replay candidates produced: {payload['candidate_count']}",
@@ -132,31 +157,64 @@ def replay_candidate_markdown(payload: dict[str, object]) -> str:
         f"| Improvement-focused candidates | {aggregate['improvement_candidate_count']} |",
         f"| Fallback-audit candidates | {aggregate['fallback_audit_count']} |",
         f"| Local overlay artifacts present | {aggregate['local_overlay_present_count']} |",
-        "",
-        "## Ranked Candidates",
-        "",
-        "| Rank | Scenario | Case | Readiness | Priority | FDE delta | Map used | Fallbacks | Main next action |",
-        "| ---: | --- | --- | --- | ---: | ---: | ---: | ---: | --- |",
     ]
+    if aggregate.get("heading_selection_candidate_count"):
+        lines.append(
+            f"| Heading-aware lane-selection candidates | {aggregate['heading_selection_candidate_count']} |"
+        )
+    lines.extend(["", "## Ranked Candidates", ""])
+
+    if heading_mode:
+        lines.extend(
+            [
+                "| Rank | Scenario | Case | Readiness | Priority | Heading vs nearest | Heading vs CV | Heading map used | Heading fallbacks | Main next action |",
+                "| ---: | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | --- |",
+            ]
+        )
+    else:
+        lines.extend(
+            [
+                "| Rank | Scenario | Case | Readiness | Priority | FDE delta | Map used | Fallbacks | Main next action |",
+                "| ---: | --- | --- | --- | ---: | ---: | ---: | ---: | --- |",
+            ]
+        )
 
     if not candidates:
-        lines.append("| n/a | n/a | n/a | n/a | 0.00 | n/a | 0 | 0 | n/a |")
+        if heading_mode:
+            lines.append("| n/a | n/a | n/a | n/a | 0.00 | n/a | n/a | 0 | 0 | n/a |")
+        else:
+            lines.append("| n/a | n/a | n/a | n/a | 0.00 | n/a | 0 | 0 | n/a |")
     for rank, candidate in enumerate(candidates, start=1):
         assert isinstance(candidate, dict)
         actions = _required_list(candidate, "next_actions")
         action = str(actions[0]) if actions else "Manual triage."
-        lines.append(
-            "| "
-            f"{rank} | "
-            f"`{candidate['scenario_id']}` | "
-            f"{candidate['case_label']} | "
-            f"`{candidate['readiness']}` | "
-            f"{float(candidate['priority_score']):.2f} | "
-            f"{_signed_meter_text(candidate['fde_improvement_m'])} | "
-            f"{candidate['map_used_count']} | "
-            f"{candidate['fallback_count']} | "
-            f"{action} |"
-        )
+        if str(candidate.get("comparison_mode")) == _HEADING_SELECTION_MODE:
+            lines.append(
+                "| "
+                f"{rank} | "
+                f"`{candidate['scenario_id']}` | "
+                f"{candidate['case_label']} | "
+                f"`{candidate['readiness']}` | "
+                f"{float(candidate['priority_score']):.2f} | "
+                f"{_signed_meter_text(candidate['fde_improvement_m'])} | "
+                f"{_signed_meter_text(candidate.get('heading_vs_constant_velocity_fde_improvement_m'))} | "
+                f"{candidate['map_used_count']} | "
+                f"{candidate['fallback_count']} | "
+                f"{action} |"
+            )
+        else:
+            lines.append(
+                "| "
+                f"{rank} | "
+                f"`{candidate['scenario_id']}` | "
+                f"{candidate['case_label']} | "
+                f"`{candidate['readiness']}` | "
+                f"{float(candidate['priority_score']):.2f} | "
+                f"{_signed_meter_text(candidate['fde_improvement_m'])} | "
+                f"{candidate['map_used_count']} | "
+                f"{candidate['fallback_count']} | "
+                f"{action} |"
+            )
 
     for candidate in candidates:
         assert isinstance(candidate, dict)
@@ -172,10 +230,30 @@ def replay_candidate_markdown(payload: dict[str, object]) -> str:
                 f"- Readiness: `{candidate['readiness']}`",
                 f"- Priority score: {float(candidate['priority_score']):.2f}",
                 f"- Why it matters: {candidate['why_it_matters']}",
-                f"- Constant-velocity FDE: {_meter_text(evidence['constant_velocity_fde_m'])}",
-                f"- Lane-aware FDE: {_meter_text(evidence['lane_aware_fde_m'])}",
-                f"- FDE delta: {_signed_meter_text(candidate['fde_improvement_m'])}",
-                f"- Worst track delta: {_signed_meter_text(evidence['worst_track_delta_m'])}",
+            ]
+        )
+        if str(candidate.get("comparison_mode")) == _HEADING_SELECTION_MODE:
+            lines.extend(
+                [
+                    f"- Constant-velocity FDE: {_meter_text(evidence['constant_velocity_fde_m'])}",
+                    f"- Nearest-lane FDE: {_meter_text(evidence['nearest_lane_fde_m'])}",
+                    f"- Heading-aware FDE: {_meter_text(evidence['heading_lane_fde_m'])}",
+                    f"- Heading improvement vs nearest-lane: {_signed_meter_text(candidate['fde_improvement_m'])}",
+                    f"- Heading improvement vs constant velocity: {_signed_meter_text(candidate.get('heading_vs_constant_velocity_fde_improvement_m'))}",
+                    f"- Worst track heading delta: {_signed_meter_text(evidence['worst_track_delta_m'])}",
+                ]
+            )
+        else:
+            lines.extend(
+                [
+                    f"- Constant-velocity FDE: {_meter_text(evidence['constant_velocity_fde_m'])}",
+                    f"- Lane-aware FDE: {_meter_text(evidence['lane_aware_fde_m'])}",
+                    f"- FDE delta: {_signed_meter_text(candidate['fde_improvement_m'])}",
+                    f"- Worst track delta: {_signed_meter_text(evidence['worst_track_delta_m'])}",
+                ]
+            )
+        lines.extend(
+            [
                 f"- Max lane distance: {_meter_text(evidence['max_lane_distance_m'])}",
                 f"- Local overlay available: {candidate['local_overlay_present']}",
                 "",
@@ -194,16 +272,40 @@ def replay_candidate_markdown(payload: dict[str, object]) -> str:
             "",
             "## Interpretation",
             "",
-            "- Improvement candidates test whether map-conditioned rollouts preserve the observed lane-aware advantage under replay.",
-            "- Regression candidates are higher-value debugging targets because they expose lane choice, direction, route, or intent assumptions.",
-            "- Fallback-audit candidates should not be replayed as model evidence until map matching, coordinate frames, and target eligibility are checked.",
-            "- This is a planning artifact for the next experiment, not a completed Waymax/JAX integration.",
         ]
     )
+    if heading_mode:
+        lines.extend(
+            [
+                "- Heading-improvement candidates test whether heading-aware lane selection preserves its nearest-lane advantage under replay.",
+                "- Heading-regression candidates are high-value debugging targets because they expose heading alignment, lane direction, route, or intent assumptions.",
+                "- Fallback-audit candidates should not be replayed as model evidence until map matching, coordinate frames, target eligibility, and heading thresholds are checked.",
+                "- This is a planning artifact for the next experiment, not a completed Waymax/JAX integration.",
+            ]
+        )
+    else:
+        lines.extend(
+            [
+                "- Improvement candidates test whether map-conditioned rollouts preserve the observed lane-aware advantage under replay.",
+                "- Regression candidates are higher-value debugging targets because they expose lane choice, direction, route, or intent assumptions.",
+                "- Fallback-audit candidates should not be replayed as model evidence until map matching, coordinate frames, and target eligibility are checked.",
+                "- This is a planning artifact for the next experiment, not a completed Waymax/JAX integration.",
+            ]
+        )
     return "\n".join(lines).rstrip() + "\n"
 
 
 def _candidate_from_case(
+    case: dict[str, object],
+    debug_output_dir: Path,
+    source_kind: str,
+) -> dict[str, object]:
+    if _is_heading_case(case, source_kind=source_kind):
+        return _heading_candidate_from_case(case, debug_output_dir=debug_output_dir)
+    return _lane_aware_candidate_from_case(case, debug_output_dir=debug_output_dir)
+
+
+def _lane_aware_candidate_from_case(
     case: dict[str, object],
     debug_output_dir: Path,
 ) -> dict[str, object]:
@@ -243,6 +345,7 @@ def _candidate_from_case(
     )
 
     return {
+        "comparison_mode": _LANE_AWARE_MODE,
         "case_label": str(case.get("case_label", "Case")),
         "scenario_id": str(case.get("scenario_id", "")),
         "source_name": str(case.get("source_name", "")),
@@ -259,6 +362,89 @@ def _candidate_from_case(
         "evidence": {
             "constant_velocity_fde_m": constant_fde,
             "lane_aware_fde_m": lane_fde,
+            "worst_track_delta_m": worst_track_delta,
+            "max_lane_distance_m": max_lane_distance,
+            "track_count": len(tracks),
+        },
+        "next_actions": actions,
+        "blockers": blockers,
+    }
+
+
+def _heading_candidate_from_case(
+    case: dict[str, object],
+    debug_output_dir: Path,
+) -> dict[str, object]:
+    summary = _required_mapping(case, "summary")
+    tracks = _required_list(case, "track_diagnostics")
+    heading_vs_nearest = (
+        _optional_float(summary.get("heading_vs_nearest_fde_improvement_m")) or 0.0
+    )
+    heading_vs_constant = _optional_float(
+        summary.get("heading_vs_constant_velocity_fde_improvement_m")
+    )
+    evaluated_targets = _optional_int(summary.get("evaluated_target_count")) or 0
+    map_used = _optional_int(summary.get("heading_map_used_count")) or 0
+    fallback_count = _optional_int(summary.get("heading_fallback_count")) or 0
+    constant_fde = _optional_float(summary.get("constant_velocity_fde_m"))
+    nearest_fde = _optional_float(summary.get("nearest_lane_fde_m"))
+    heading_fde = _optional_float(summary.get("heading_lane_fde_m"))
+    worst_track_delta = _worst_track_delta(
+        tracks,
+        key="heading_vs_nearest_fde_improvement_m",
+    )
+    max_lane_distance = _max_lane_distance(tracks)
+    local_svg = debug_output_dir / str(case.get("svg_path", ""))
+    readiness = _heading_readiness(
+        heading_vs_nearest=heading_vs_nearest,
+        evaluated_targets=evaluated_targets,
+        map_used=map_used,
+        fallback_count=fallback_count,
+    )
+    priority = _heading_priority_score(
+        heading_vs_nearest=heading_vs_nearest,
+        heading_vs_constant=heading_vs_constant,
+        constant_fde=constant_fde,
+        nearest_fde=nearest_fde,
+        heading_fde=heading_fde,
+        evaluated_targets=evaluated_targets,
+        map_used=map_used,
+        fallback_count=fallback_count,
+        worst_track_delta=worst_track_delta,
+    )
+    actions = _next_actions(readiness)
+    blockers = _blockers(
+        readiness=readiness,
+        evaluated_targets=evaluated_targets,
+        map_used=map_used,
+        fallback_count=fallback_count,
+        max_lane_distance=max_lane_distance,
+    )
+
+    return {
+        "comparison_mode": _HEADING_SELECTION_MODE,
+        "case_label": str(case.get("case_label", "Case")),
+        "scenario_id": str(case.get("scenario_id", "")),
+        "source_name": str(case.get("source_name", "")),
+        "readiness": readiness,
+        "priority_score": priority,
+        "why_it_matters": _why_it_matters(readiness),
+        "fde_improvement_m": round(heading_vs_nearest, 3),
+        "heading_vs_constant_velocity_fde_improvement_m": (
+            round(heading_vs_constant, 3)
+            if heading_vs_constant is not None
+            else None
+        ),
+        "evaluated_target_count": evaluated_targets,
+        "map_used_count": map_used,
+        "fallback_count": fallback_count,
+        "top_fallback_reason": summary.get("top_heading_fallback_reason", "none"),
+        "local_svg_path": str(local_svg),
+        "local_overlay_present": local_svg.exists(),
+        "evidence": {
+            "constant_velocity_fde_m": constant_fde,
+            "nearest_lane_fde_m": nearest_fde,
+            "heading_lane_fde_m": heading_fde,
             "worst_track_delta_m": worst_track_delta,
             "max_lane_distance_m": max_lane_distance,
             "track_count": len(tracks),
@@ -287,6 +473,25 @@ def _readiness(
     return "needs_manual_triage"
 
 
+def _heading_readiness(
+    heading_vs_nearest: float,
+    evaluated_targets: int,
+    map_used: int,
+    fallback_count: int,
+) -> str:
+    if evaluated_targets <= 0:
+        return "not_ready_no_targets"
+    if fallback_count >= evaluated_targets and fallback_count > 0:
+        return "needs_heading_map_match_audit"
+    if heading_vs_nearest < 0 and map_used > 0:
+        return "ready_for_heading_regression_replay"
+    if heading_vs_nearest > 0 and map_used > 0:
+        return "ready_for_heading_improvement_replay"
+    if fallback_count > 0:
+        return "mixed_heading_replay_with_fallback_audit"
+    return "needs_heading_manual_triage"
+
+
 def _priority_score(
     fde_improvement: float,
     constant_fde: float | None,
@@ -311,7 +516,59 @@ def _priority_score(
     return round(score, 3)
 
 
+def _heading_priority_score(
+    heading_vs_nearest: float,
+    heading_vs_constant: float | None,
+    constant_fde: float | None,
+    nearest_fde: float | None,
+    heading_fde: float | None,
+    evaluated_targets: int,
+    map_used: int,
+    fallback_count: int,
+    worst_track_delta: float | None,
+) -> float:
+    largest_fde = max(
+        value
+        for value in (constant_fde, nearest_fde, heading_fde, 0.0)
+        if value is not None
+    )
+    score = min(abs(heading_vs_nearest) / 8.0, 8.0)
+    score += min(abs(heading_vs_constant or 0.0) / 16.0, 3.0)
+    score += min(abs(worst_track_delta or 0.0) / 12.0, 4.0)
+    score += min(largest_fde / 40.0, 3.0)
+    score += min(evaluated_targets, 8) * 0.15
+    score += min(map_used, 4) * 0.35
+    if fallback_count >= evaluated_targets and fallback_count > 0:
+        score += 1.0
+    elif fallback_count > 0:
+        score += 0.45
+    return round(score, 3)
+
+
 def _next_actions(readiness: str) -> list[str]:
+    if readiness == "ready_for_heading_regression_replay":
+        return [
+            "Replay nearest-lane and heading-aware rollouts from the same anchor state.",
+            "Visualize selected lane direction, target heading, and nearby alternative lanes before changing thresholds.",
+            "Use replay output to decide whether route, intent, or lane-direction priors are needed.",
+        ]
+    if readiness == "ready_for_heading_improvement_replay":
+        return [
+            "Replay the scenario as a positive control for heading-aware lane selection.",
+            "Compare nearest-lane and heading-aware final displacement under the same anchor state.",
+            "Use the result to confirm the selector helps for the right reason before tuning harder regressions.",
+        ]
+    if readiness == "needs_heading_map_match_audit":
+        return [
+            "Audit heading alignment, lane distance, lane direction, and coordinate frame before replay.",
+            "Confirm vehicle/cyclist targets are near usable lane polylines with valid anchor velocity.",
+            "Rerun heading-aware baseline-debug after map matching is corrected, then reconsider replay.",
+        ]
+    if readiness == "mixed_heading_replay_with_fallback_audit":
+        return [
+            "Replay only heading-map-used targets first and keep fallback targets marked as unsupported.",
+            "Audit heading fallback reasons separately so replay evidence is not mixed with map-coverage failures.",
+        ]
     if readiness == "ready_for_regression_replay":
         return [
             "Replay the scenario with constant-velocity and lane-aware rollouts from the same anchor state.",
@@ -348,13 +605,24 @@ def _blockers(
     max_lane_distance: float | None,
 ) -> list[str]:
     blockers: list[str] = []
+    heading_case = "heading" in readiness
     if evaluated_targets <= 0:
         blockers.append("No evaluated prediction targets are available.")
-    if readiness == "needs_map_match_audit":
-        blockers.append("Lane-aware fallback was used for every evaluated target.")
+    if readiness in {"needs_map_match_audit", "needs_heading_map_match_audit"}:
+        if heading_case:
+            blockers.append(
+                "Heading-aware fallback was used for every evaluated target."
+            )
+        else:
+            blockers.append("Lane-aware fallback was used for every evaluated target.")
     if map_used == 0:
-        blockers.append("No target used lane-map context in the lane-aware baseline.")
-    if fallback_count > 0 and readiness != "needs_map_match_audit":
+        if heading_case:
+            blockers.append(
+                "No target used heading-aware lane-map context in the selector."
+            )
+        else:
+            blockers.append("No target used lane-map context in the lane-aware baseline.")
+    if fallback_count > 0 and not readiness.endswith("map_match_audit"):
         blockers.append("Some targets still require fallback-reason audit.")
     if max_lane_distance is not None and max_lane_distance > 25.0:
         blockers.append("At least one target is far from its nearest lane polyline.")
@@ -362,6 +630,16 @@ def _blockers(
 
 
 def _why_it_matters(readiness: str) -> str:
+    if readiness == "ready_for_heading_regression_replay":
+        return "A heading-aware lane choice regressed against nearest-lane selection, making this a high-value selector replay/debug target."
+    if readiness == "ready_for_heading_improvement_replay":
+        return "A heading-aware lane choice improved over nearest-lane selection, making this a positive replay control for heading alignment."
+    if readiness == "needs_heading_map_match_audit":
+        return "The case exposes heading-aware map-match coverage, alignment, or coordinate-frame limits before replay should be trusted."
+    if readiness == "mixed_heading_replay_with_fallback_audit":
+        return "The case combines heading-map-used evidence with fallback behavior and needs target-level separation."
+    if readiness == "needs_heading_manual_triage":
+        return "The heading-aware selector case needs manual review before it can support a replay experiment."
     if readiness == "ready_for_regression_replay":
         return "A map-used lane-aware forecast regressed sharply, making this a high-value replay/debug target."
     if readiness == "ready_for_improvement_replay":
@@ -379,27 +657,42 @@ def _aggregate_candidates(candidates: list[dict[str, object]]) -> dict[str, obje
             str(row["readiness"]).startswith("ready_for_") for row in candidates
         ),
         "regression_candidate_count": sum(
-            row["readiness"] == "ready_for_regression_replay"
+            str(row["readiness"]) in {
+                "ready_for_regression_replay",
+                "ready_for_heading_regression_replay",
+            }
             for row in candidates
         ),
         "improvement_candidate_count": sum(
-            row["readiness"] == "ready_for_improvement_replay"
+            str(row["readiness"]) in {
+                "ready_for_improvement_replay",
+                "ready_for_heading_improvement_replay",
+            }
             for row in candidates
         ),
         "fallback_audit_count": sum(
-            row["readiness"] == "needs_map_match_audit" for row in candidates
+            str(row["readiness"])
+            in {"needs_map_match_audit", "needs_heading_map_match_audit"}
+            for row in candidates
         ),
         "local_overlay_present_count": sum(
             bool(row["local_overlay_present"]) for row in candidates
         ),
+        "heading_selection_candidate_count": sum(
+            row.get("comparison_mode") == _HEADING_SELECTION_MODE
+            for row in candidates
+        ),
     }
 
 
-def _worst_track_delta(tracks: list[object]) -> float | None:
+def _worst_track_delta(
+    tracks: list[object],
+    key: str = "fde_improvement_m",
+) -> float | None:
     deltas = []
     for track in tracks:
-        if isinstance(track, dict) and track.get("fde_improvement_m") is not None:
-            deltas.append(float(track["fde_improvement_m"]))
+        if isinstance(track, dict) and track.get(key) is not None:
+            deltas.append(float(track[key]))
     if not deltas:
         return None
     return round(max(deltas, key=lambda value: abs(value)), 3)
@@ -410,15 +703,36 @@ def _max_lane_distance(tracks: list[object]) -> float | None:
     for track in tracks:
         if not isinstance(track, dict):
             continue
-        lane = track.get("lane_match")
-        if not isinstance(lane, dict):
-            continue
-        distance = lane.get("nearest_lane_distance_m")
-        if distance is not None:
-            distances.append(float(distance))
+        for lane_key in ("lane_match", "heading_lane_match"):
+            lane = track.get(lane_key)
+            if not isinstance(lane, dict):
+                continue
+            distance = lane.get("nearest_lane_distance_m")
+            if distance is not None:
+                distances.append(float(distance))
     if not distances:
         return None
     return round(max(distances), 3)
+
+
+def _is_heading_case(case: dict[str, object], source_kind: str) -> bool:
+    if source_kind == "lane_selection_study":
+        return True
+    if case.get("debug_mode") == "lane_selection_study":
+        return True
+    summary = case.get("summary")
+    return isinstance(summary, dict) and "heading_lane_fde_m" in summary
+
+
+def _is_heading_payload(payload: dict[str, object]) -> bool:
+    if payload.get("source_kind") == "lane_selection_study":
+        return True
+    candidates = payload.get("candidates")
+    return isinstance(candidates, list) and any(
+        isinstance(candidate, dict)
+        and candidate.get("comparison_mode") == _HEADING_SELECTION_MODE
+        for candidate in candidates
+    )
 
 
 def _meter_text(value: object) -> str:

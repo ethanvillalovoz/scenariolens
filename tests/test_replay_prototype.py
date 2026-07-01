@@ -4,9 +4,15 @@ import unittest
 from pathlib import Path
 
 from scenariolens.baseline_compare_study import generate_baseline_comparison_study
-from scenariolens.baseline_debug import generate_baseline_debug_casebook
+from scenariolens.baseline_debug import (
+    BASELINE_DEBUG_FORMAT,
+    generate_baseline_debug_casebook,
+)
 from scenariolens.io import save_scenarios
-from scenariolens.replay_candidates import generate_replay_candidate_plan
+from scenariolens.replay_candidates import (
+    REPLAY_CANDIDATE_FORMAT,
+    generate_replay_candidate_plan,
+)
 from scenariolens.replay_prototype import (
     REPLAY_PROTOTYPE_FORMAT,
     generate_replay_prototype,
@@ -77,6 +83,53 @@ class ReplayPrototypeTest(unittest.TestCase):
             for case in manifest["cases"]:
                 self.assertTrue(Path(case["local_packet_path"]).exists())
                 self.assertTrue(Path(case["local_svg_path"]).exists())
+
+    def test_replay_prototype_skips_heading_aware_candidate_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            debug_manifest = root / "heading_debug.json"
+            candidate_manifest = root / "heading_candidates.json"
+            debug_manifest.write_text(
+                json.dumps(
+                    {
+                        "format": BASELINE_DEBUG_FORMAT,
+                        "ready": True,
+                        "cases": [],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            candidate_manifest.write_text(
+                json.dumps(
+                    {
+                        "format": REPLAY_CANDIDATE_FORMAT,
+                        "source": str(debug_manifest),
+                        "ready": True,
+                        "candidates": [
+                            {
+                                "scenario_id": "heading_case",
+                                "source_name": "fixture",
+                                "comparison_mode": "heading_lane_selection",
+                                "readiness": "ready_for_heading_improvement_replay",
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            payload = replay_prototype_payload(
+                candidate_manifest_path=candidate_manifest,
+                output_dir=root / "prototype",
+                top=1,
+            )
+
+            self.assertFalse(payload["ready"])
+            self.assertEqual(payload["selected_candidate_count"], 0)
+            self.assertEqual(payload["skipped_candidate_count"], 1)
+            skipped = payload["skipped_candidates"][0]
+            self.assertEqual(skipped["comparison_mode"], "heading_lane_selection")
+            self.assertIn("unsupported_replay_candidate_mode", skipped["reason"])
 
 
 def _write_candidate_plan(root: Path) -> Path:

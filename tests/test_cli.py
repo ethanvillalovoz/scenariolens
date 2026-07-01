@@ -206,6 +206,7 @@ class CliTest(unittest.TestCase):
             lane_selection_dir = root / "lane_selection"
             heading_debug_dir = root / "heading_debug"
             heading_public_report = root / "reports" / "heading_debug_casebook.md"
+            heading_replay_dir = root / "heading_replay"
 
             subprocess.run(
                 [
@@ -390,6 +391,31 @@ class CliTest(unittest.TestCase):
             self.assertTrue((heading_debug_dir / "report.md").exists())
             self.assertTrue(heading_public_report.exists())
             self.assertIn("Heading-Aware Debug Casebook", heading_public_report.read_text())
+
+            heading_replay_result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "replay-candidates",
+                    "--debug-manifest",
+                    str(heading_debug_dir / "manifest.json"),
+                    "--output-dir",
+                    str(heading_replay_dir),
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertIn("Generated", heading_replay_result.stdout)
+            self.assertTrue((heading_replay_dir / "manifest.json").exists())
+            self.assertTrue((heading_replay_dir / "report.md").exists())
+            self.assertIn(
+                "Heading-Aware Replay Candidate Plan",
+                (heading_replay_dir / "report.md").read_text(),
+            )
 
     def test_ingest_csv_then_render_from_input(self) -> None:
         csv_text = (

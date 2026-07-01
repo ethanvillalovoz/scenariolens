@@ -57,8 +57,8 @@ ScenarioLens currently has four connected surfaces:
    prototype packets, map-match audits, lane-selection studies, and public-safe
    real-data case studies.
 4. **Explorer**: a static dashboard for filtering, sorting, inspecting scenario
-   evidence, and reviewing public-safe heading-aware case diagnostics without
-   requiring a backend.
+   evidence, and reviewing public-safe heading-aware case diagnostics and replay
+   planning links without requiring a backend.
 
 ## Why It Is Waymo-Aligned
 
@@ -145,6 +145,8 @@ and links back to reports and provenance.
   [`docs/reports/waymo_heading_aware_lane_selection_study.md`](reports/waymo_heading_aware_lane_selection_study.md)
 - Heading-aware debug casebook:
   [`docs/reports/waymo_heading_aware_debug_casebook.md`](reports/waymo_heading_aware_debug_casebook.md)
+- Heading-aware replay candidate plan:
+  [`docs/reports/waymo_heading_aware_replay_candidate_plan.md`](reports/waymo_heading_aware_replay_candidate_plan.md)
 - No-auth baseline ablation:
   [`docs/reports/baseline_ablation_study.md`](reports/baseline_ablation_study.md)
 - Shard expansion plan:
