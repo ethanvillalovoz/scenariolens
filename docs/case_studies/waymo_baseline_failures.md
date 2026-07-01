@@ -63,9 +63,9 @@ The route/intent audit then follows the stable warning and identifies a concrete
 lane-continuity follow-up: the target travels much farther than the remaining
 matched-lane polyline over the forecast horizon.
 The lane-link continuation prototype then tests that hypothesis. It proves the
-mechanism on a deterministic linked-lane fixture, but the real stable warning
-currently remains a topology-gap case because the selected feature's linked lane
-does not resolve in the parsed map features.
+mechanism on a deterministic linked-lane fixture and resolves the real stable
+warning's parsed lane chain `144 -> 190 -> 193`, cutting the clamped
+nearest-lane FDE by 63.578 m on that case.
 
 ## Why It Matters
 
@@ -76,6 +76,6 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Improve parsed lane-link coverage for the stable context topology-gap case;
-expand beyond shards `00007` through `00010`; and graduate stable open-loop
-replay candidates into an optional Waymax/JAX path.
+Turn the resolved lane-continuation case into a small validation set; expand
+beyond shards `00007` through `00010`; and graduate stable open-loop replay
+candidates into an optional Waymax/JAX path.

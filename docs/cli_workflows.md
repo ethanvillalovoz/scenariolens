@@ -374,8 +374,9 @@ scenariolens lane-continuation-prototype \
 
 This tests the route/intent audit's lane-continuity hypothesis without changing
 the default scorer. A deterministic fixture proves the prototype can follow
-parsed `exit_lanes`; the current real Waymo case reports a topology gap because
-the selected feature's continuation does not resolve to a parsed lane feature.
+parsed `exit_lanes`; the current real Waymo case resolves lane chain
+`144 -> 190 -> 193` and reduces the clamped nearest-lane FDE by 63.578 m while
+leaving the default scorer unchanged.
 
 ## Baseline Ablation
 

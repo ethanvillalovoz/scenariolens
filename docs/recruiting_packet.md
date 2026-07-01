@@ -188,8 +188,8 @@ Testing and verification:
   lane has 16.691 m remaining while the target travels 80.270 m through the
   forecast horizon.
 - A lane-link continuation prototype proves the linked-lane mechanism on a
-  deterministic fixture and reports the real stable warning as a topology gap,
-  with feature `144` not resolving to a usable parsed linked lane.
+  deterministic fixture, resolves the real stable warning's parsed lane chain
+  `144 -> 190 -> 193`, and cuts nearest-lane FDE by 63.578 m on that case.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
@@ -197,8 +197,8 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Improve parsed lane-topology coverage for unresolved linked-lane IDs, then
-   rerun the lane-continuation prototype before optional Waymax/JAX work.
+3. Build a small lane-continuation validation set from the resolved real case
+   before optional Waymax/JAX work.
 4. Create curated scenario collections for pedestrian, cyclist, merge, and
    unprotected-turn cases.
 

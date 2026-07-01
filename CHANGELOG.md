@@ -67,8 +67,10 @@ All notable changes to ScenarioLens are documented here.
   diagnostics without changing the default scorer.
 - `scenariolens lane-continuation-prototype` workflow and
   `docs/reports/waymo_lane_continuation_prototype.md`, testing parsed
-  `entry_lanes`/`exit_lanes` continuation for lane-continuity audit cases and
-  reporting unresolved topology gaps honestly.
+  `entry_lanes`/`exit_lanes` continuation for lane-continuity audit cases.
+- Waymo Motion ingestion now retains enough lightweight map features for the
+  current lane-continuation proof case to resolve chain `144 -> 190 -> 193`,
+  reducing nearest-lane FDE by 63.578 m in the checked-in diagnostic report.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

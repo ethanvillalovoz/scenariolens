@@ -375,6 +375,6 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 
 - Expand the documented local-slice recipe across more Waymo Motion validation shards.
 - Compare baseline ADE/FDE distributions across more validation shards.
-- Improve parsed lane-link coverage for unresolved topology-gap cases.
+- Expand the resolved lane-continuation case into a small validation set.
 - Graduate stable open-loop replay candidates into an optional Waymax/JAX path.
 - Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.

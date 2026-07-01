@@ -6,6 +6,7 @@ from math import hypot, isfinite
 from pathlib import Path
 
 from scenariolens.failure_study import load_failure_study_input
+from scenariolens.ingest.waymo_motion import MAX_MAP_FEATURES_PER_SCENARIO
 from scenariolens.prediction import (
     DEFAULT_MISS_THRESHOLD_M,
     LANE_MATCH_THRESHOLD_M,
@@ -163,6 +164,7 @@ def lane_continuation_payload(
         "case_count": len(cases),
         "max_lane_link_hops": 2,
         "lane_match_threshold_m": LANE_MATCH_THRESHOLD_M,
+        "map_feature_cap": MAX_MAP_FEATURES_PER_SCENARIO,
         "aggregate": aggregate,
         "cases": cases,
         "outputs": {
@@ -203,6 +205,7 @@ def lane_continuation_markdown(payload: dict[str, object]) -> str:
         f"- Cases evaluated: {payload['case_count']}",
         f"- Max lane-link hops: {payload['max_lane_link_hops']}",
         f"- Lane-match threshold: {_meter_text(payload['lane_match_threshold_m'])}",
+        f"- Waymo map feature cap: {payload['map_feature_cap']}",
         "- Raw Waymo files committed: no",
         "- Local lane-link packets committed: no",
         "",

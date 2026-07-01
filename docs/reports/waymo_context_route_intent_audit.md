@@ -40,7 +40,7 @@ It is intentionally scoped: this is not a route planner, not a matcher change, n
 - Primary diagnosis: **lane_continuity_or_route_link_needed**
 - Why: The target would run beyond the selected lane polyline during the forecast horizon.
 - Recommended next action: Inspect lane continuation links before trusting a lane-following rollout.
-- Scenario route links: 230 (entry 52, exit 52, neighbors 126)
+- Scenario route links: 634 (entry 152, exit 143, neighbors 339)
 - Local audit packet: `data/processed/waymo_context_route_intent_audit/cases/1-context-eval-seed-5-ef4c5d0e40fdea48/route_intent_audit.json`
 
 Track diagnostics:

@@ -371,10 +371,11 @@ deterministic perturbations. The follow-up route/intent audit is checked in at
 warning as a lane-continuity or route-link follow-up. The lane-link
 continuation prototype at
 `docs/reports/waymo_lane_continuation_prototype.md` proves linked-lane
-following on a deterministic fixture but reports the real stable warning as an
-unresolved topology gap. Next work is to expand the shard set from
-`docs/reports/waymo_motion_shard_plan.md`, improve parsed lane-link coverage,
-and graduate stable replay candidates into an optional Waymax/JAX path.
+following on a deterministic fixture and resolves the real stable warning's
+parsed lane chain, reducing the clamped nearest-lane FDE by 63.578 m. Next work
+is to expand the shard set from `docs/reports/waymo_motion_shard_plan.md`, turn
+that resolved case into a small lane-continuation validation set, and graduate
+stable replay candidates into an optional Waymax/JAX path.
 
 ## Stretch Goals
 

@@ -5,6 +5,7 @@ import tempfile
 from pathlib import Path
 
 from scenariolens.ingest.waymo_motion import (
+    MAX_MAP_FEATURES_PER_SCENARIO,
     WAYMO_OPEN_CHALLENGES_URL,
     WAYMO_OPEN_DATASET_URL,
     adapter_status,
@@ -257,6 +258,40 @@ def _scenario_proto() -> bytes:
     )
 
 
+def _scenario_proto_with_map_feature_count(feature_count: int) -> bytes:
+    vehicle = _track_proto(
+        10,
+        1,
+        _state_proto(0.0, 0.0, 5.0, 0.0),
+        _state_proto(0.5, 0.0, 5.0, 0.0),
+    )
+    pedestrian = _track_proto(
+        20,
+        2,
+        _state_proto(0.5, -1.0, 0.0, 1.0),
+        _state_proto(0.5, -0.9, 0.0, 1.0),
+    )
+    prediction = _int32(1, 1)
+    lane = _lane_proto(_map_point_proto(-1.0, 0.0), _map_point_proto(1.0, 0.0))
+    map_features = tuple(
+        _length_delimited(8, _map_feature_proto(feature_id, lane))
+        for feature_id in range(1, feature_count + 1)
+    )
+    return b"".join(
+        (
+            _double(1, 0.0),
+            _double(1, 0.1),
+            _length_delimited(2, vehicle),
+            _length_delimited(2, pedestrian),
+            _int32(4, 20),
+            _string(5, "waymo_many_map_features"),
+            _int32(6, 0),
+            *map_features,
+            _length_delimited(11, prediction),
+        )
+    )
+
+
 def _tfrecord(payload: bytes) -> bytes:
     return struct.pack("<Q", len(payload)) + b"\x00\x00\x00\x00" + payload + b"\x00\x00\x00\x00"
 
@@ -330,6 +365,20 @@ class WaymoMotionIngestTest(unittest.TestCase):
             {"LANE_STATE_STOP": 1},
         )
         self.assertEqual({track.agent_type for track in scenario.tracks}, {"vehicle", "pedestrian"})
+
+    def test_load_waymo_motion_keeps_later_lane_link_targets(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "validation.tfrecord-00007-of-00150"
+            path.write_bytes(_tfrecord(_scenario_proto_with_map_feature_count(190)))
+
+            scenarios = load_waymo_motion(path)
+
+        scenario = scenarios[0]
+        map_features = scenario.metadata["waymo_map_features"]
+        feature_ids = {feature["feature_id"] for feature in map_features}
+        self.assertGreaterEqual(MAX_MAP_FEATURES_PER_SCENARIO, 190)
+        self.assertEqual(scenario.metadata["waymo_map_summary"]["feature_count"], 190)
+        self.assertIn("190", feature_ids)
 
     def test_inspect_waymo_motion_slice_reports_missing_input(self) -> None:
         report = inspect_waymo_motion_slice("missing-waymo-dir")

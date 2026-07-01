@@ -180,10 +180,11 @@ local route/intent packets stay under `data/processed/`.
 The lane-link continuation prototype is checked in at
 [`docs/reports/waymo_lane_continuation_prototype.md`](reports/waymo_lane_continuation_prototype.md).
 It tests that follow-up without changing the default scorer. The fixture tests
-prove parsed `exit_lanes` can extend a lane-following rollout, while the real
-Waymo case currently reports a topology gap: feature `144` does not resolve to
-a usable linked lane in the lightweight parsed map features. Local prototype
-packets stay ignored under `data/processed/`.
+prove parsed `exit_lanes` can extend a lane-following rollout, and the real
+Waymo case resolves lane chain `144 -> 190 -> 193` after the lightweight reader
+retains 240 map features per scenario. That cuts the clamped nearest-lane FDE by
+63.578 m on the stable warning. Local prototype packets stay ignored under
+`data/processed/`.
 
 ## Interpretation Rules
 

@@ -221,8 +221,8 @@ smoke test. The prototype can:
   selection, and route/topology hints, identifying a concrete lane-continuation
   follow-up instead of widening the matcher,
 - run a lane-link continuation prototype that proves the linked-lane follow-up
-  on a deterministic fixture and diagnoses the real stable warning as an
-  unresolved parsed-topology gap,
+  on a deterministic fixture, resolves the real warning's parsed lane chain,
+  and cuts nearest-lane FDE by 63.578 m on that stable case,
 - expose public-safe heading-aware improvement, regression, and fallback-heavy
   cases in the live Scenario Explorer,
 - turn heading-aware debug cases into a replay-readiness queue for the next
@@ -234,9 +234,8 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to improve parsed lane-topology coverage for unresolved
-linked-lane IDs, then rerun the lane-continuation prototype before optional
-Waymax/JAX work.
+The next milestone is to turn the resolved lane-continuation case into a small
+validation set across more shards before optional Waymax/JAX work.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).

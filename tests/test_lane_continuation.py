@@ -5,6 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from scenariolens.ingest.waymo_motion import MAX_MAP_FEATURES_PER_SCENARIO
 from scenariolens.io import save_scenarios
 from scenariolens.lane_continuation import (
     LANE_CONTINUATION_FORMAT,
@@ -44,6 +45,7 @@ class LaneContinuationTest(unittest.TestCase):
 
             self.assertEqual(payload["format"], LANE_CONTINUATION_FORMAT)
             self.assertTrue(payload["ready"])
+            self.assertEqual(payload["map_feature_cap"], MAX_MAP_FEATURES_PER_SCENARIO)
             aggregate = payload["aggregate"]
             self.assertEqual(aggregate["evaluated_case_count"], 1)
             self.assertEqual(aggregate["evaluated_track_count"], 1)
@@ -61,6 +63,7 @@ class LaneContinuationTest(unittest.TestCase):
             markdown = lane_continuation_markdown(payload)
             self.assertIn("Lane-Link Continuation Prototype", markdown)
             self.assertIn("lane_link_improvement", markdown)
+            self.assertIn("Waymo map feature cap", markdown)
             self.assertIn("not route planning", markdown)
             self.assertIn("Raw Waymo files committed: no", markdown)
 
