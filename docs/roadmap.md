@@ -366,10 +366,12 @@ context replay-candidate queue at
 context cases now feed
 `docs/reports/waymo_context_open_loop_replay_prototype.md`, which preserves one
 stable regression warning and flags one sensitive positive control under
-deterministic perturbations. Next work is to expand the shard set from
-`docs/reports/waymo_motion_shard_plan.md`, add route/intent checks for the
-stable context warning, and graduate stable replay candidates into an optional
-Waymax/JAX path.
+deterministic perturbations. The follow-up route/intent audit is checked in at
+`docs/reports/waymo_context_route_intent_audit.md` and diagnoses the stable
+warning as a lane-continuity or route-link follow-up. Next work is to expand
+the shard set from `docs/reports/waymo_motion_shard_plan.md`, prototype
+lane-link continuation for that case, and graduate stable replay candidates
+into an optional Waymax/JAX path.
 
 ## Stretch Goals
 

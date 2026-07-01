@@ -14,6 +14,7 @@ robotics, AI/ML, and software engineering internship conversations.
 - Context eval debug casebook: `docs/reports/waymo_context_eval_debug_casebook.md`
 - Context replay candidate plan: `docs/reports/waymo_context_replay_candidate_plan.md`
 - Context open-loop replay prototype: `docs/reports/waymo_context_open_loop_replay_prototype.md`
+- Context route/intent audit: `docs/reports/waymo_context_route_intent_audit.md`
 - Real lane-aware baseline diagnostic: `docs/reports/waymo_lane_aware_baseline_cross_shard.md`
 - Lane-aware debug casebook: `docs/reports/waymo_lane_aware_debug_casebook.md`
 - Replay candidate plan: `docs/reports/waymo_replay_candidate_plan.md`
@@ -60,7 +61,7 @@ Use one bullet if space is tight:
 Use two bullets if the project gets a dedicated entry:
 
 - Built ScenarioLens, a local-first autonomy scenario evaluation tool that ingests synthetic, Waymo Motion-shaped JSON, normalized CSV, and small downloaded Waymo Motion TFRecord slices, then ranks long-tail cases using interpretable proximity, TTC, VRU, path-conflict, density, and taxonomy features.
-- Shipped a tested portfolio demo with 100+ Python unit tests, GitHub Actions CI, SVG trajectory rendering, deterministic dashboard data, lane-aware baseline comparison, a 100-scenario cross-shard Waymo Motion stability report, a 100-scenario lane-aware diagnostic, a heading-aware lane-selection ablation, baseline-debug casebooks, replay-candidate plans, open-loop replay/perturbation prototypes, a map-match threshold audit, and a static Scenario Explorer deployed at `ethanvillalovoz.com/scenariolens`.
+- Shipped a tested portfolio demo with 100+ Python unit tests, GitHub Actions CI, SVG trajectory rendering, deterministic dashboard data, lane-aware baseline comparison, a 100-scenario cross-shard Waymo Motion stability report, a 100-scenario lane-aware diagnostic, a heading-aware lane-selection ablation, baseline-debug casebooks, replay-candidate plans, open-loop replay/perturbation prototypes, route/intent and map-match audits, and a static Scenario Explorer deployed at `ethanvillalovoz.com/scenariolens`.
 
 Short project line:
 
@@ -110,8 +111,10 @@ Architecture:
 7. Open-loop replay and anchor-velocity perturbation prototype for replay-ready cases.
 8. Map-match threshold audit for fallback-heavy cases before matcher changes.
 9. Heading-aware lane-selection ablation for map-matching iteration.
-10. Report, portfolio, renderer, and dashboard exporters.
-11. Static Scenario Explorer backed by deterministic JSON and SVG assets.
+10. Route/intent audit for stable replay regressions that need lane-continuity
+    or route-link follow-up.
+11. Report, portfolio, renderer, and dashboard exporters.
+12. Static Scenario Explorer backed by deterministic JSON and SVG assets.
 
 Why it is Waymo-relevant:
 Waymo's public ecosystem includes Waymo Open Dataset, Waymo Motion, scenario
@@ -178,6 +181,10 @@ Testing and verification:
   a context replay-candidate plan separates two replay-ready cases from three
   map-match audits, and a context open-loop replay prototype evaluates those
   two ready cases across eight deterministic perturbation trials.
+- A context route/intent audit follows the stable replay regression one step
+  deeper and identifies a lane-continuity or route-link follow-up: the matched
+  lane has 16.691 m remaining while the target travels 80.270 m through the
+  forecast horizon.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
@@ -185,8 +192,8 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Graduate stable replay candidates into a route/intent or optional
-   Waymax/JAX path.
+3. Prototype lane-link continuation for the stable route/intent audit case,
+   then graduate stable candidates into an optional Waymax/JAX path.
 4. Create curated scenario collections for pedestrian, cyclist, merge, and
    unprotected-turn cases.
 

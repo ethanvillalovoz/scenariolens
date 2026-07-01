@@ -83,6 +83,15 @@ which diagnostics preserve their expected improvement/regression sign, which
 are sensitive to small state changes, and which cases should remain blocked on
 map matching. It is still open-loop evaluation, not closed-loop simulation.
 
+## Route/Intent Audit
+
+The route/intent audit follows stable replay regressions that survived
+perturbation checks. It reloads the local scenario, compares constant-velocity,
+nearest-lane, and heading-aware rollouts, and labels whether the case points to
+heading selection, lane continuity, route/topology hints, or manual review. It
+does not infer an official route or change the default scorer; it decides what
+the next engineering experiment should be.
+
 ## Map-Match Audit
 
 The map-match audit handles cases that are not ready to be treated as replay
@@ -112,7 +121,7 @@ and links to the public reports.
 - Add a dataset adapter for another public motion dataset.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
-- Add route/intent checks for the stable context replay warning.
+- Prototype lane-link continuation for the stable context route/intent audit.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.
 - Analyze heading-aware replay stability across more validation shards.

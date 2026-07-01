@@ -59,6 +59,9 @@ nearest-lane vs heading-aware rollouts with deterministic perturbations, and
 shows the expected selector sign is stable across the current local slice. The
 context replay prototype then executes the two context replay-ready eval seeds:
 one stable lane-aware regression warning and one sensitive positive control.
+The route/intent audit then follows the stable warning and identifies a concrete
+lane-continuity follow-up: the target travels much farther than the remaining
+matched-lane polyline over the forecast horizon.
 
 ## Why It Matters
 
@@ -69,6 +72,6 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Add route/intent checks for the stable context replay warning; expand beyond
-shards `00007` through `00010`; and graduate stable open-loop replay candidates
-into an optional Waymax/JAX path.
+Prototype lane-link continuation for the stable context route/intent audit;
+expand beyond shards `00007` through `00010`; and graduate stable open-loop
+replay candidates into an optional Waymax/JAX path.

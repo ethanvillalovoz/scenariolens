@@ -61,6 +61,7 @@ from scenariolens.portfolio import generate_portfolio_report
 from scenariolens.report import json_report, markdown_report, ranked_scores
 from scenariolens.replay_candidates import generate_replay_candidate_plan
 from scenariolens.replay_prototype import generate_replay_prototype
+from scenariolens.route_intent_audit import generate_route_intent_audit
 from scenariolens.samples import synthetic_scenarios
 from scenariolens.schema import Scenario
 from scenariolens.slice_validation import validate_waymo_motion_slice
@@ -645,6 +646,37 @@ def replay_prototype_command(
     print(
         f"Generated {result.case_count} replay case(s) across "
         f"{result.replay_track_count} target(s)."
+    )
+    return 0
+
+
+def route_intent_audit_command(
+    replay_manifest: str,
+    output_dir: str,
+    case_count: int,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_route_intent_audit(
+            replay_manifest_path=replay_manifest,
+            output_dir=output_dir,
+            case_count=case_count,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote route-intent-audit manifest to {result.manifest_path}")
+    print(f"Wrote route-intent-audit report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("Route/intent audit is not ready. See manifest.json for details.")
+        return 2
+    print(
+        f"Generated {result.case_count} route/intent audit case(s) across "
+        f"{result.audited_track_count} track(s)."
     )
     return 0
 
@@ -1423,6 +1455,34 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe replay prototype copy.",
     )
+    route_intent_parser = subparsers.add_parser(
+        "route-intent-audit",
+        help=(
+            "Audit stable replay regressions for route, intent, lane-continuity, "
+            "and heading-selection failure modes."
+        ),
+    )
+    route_intent_parser.add_argument(
+        "--replay-manifest",
+        required=True,
+        help="Manifest produced by scenariolens replay-prototype.",
+    )
+    route_intent_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_route_intent_audit",
+        help="Directory for route/intent audit manifest, report, and local packets.",
+    )
+    route_intent_parser.add_argument(
+        "--case-count",
+        type=int,
+        default=3,
+        help="Maximum stable replay regression cases to audit.",
+    )
+    route_intent_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe route/intent audit copy.",
+    )
     heading_replay_parser = subparsers.add_parser(
         "heading-replay-prototype",
         help=(
@@ -1819,6 +1879,13 @@ def main() -> int:
             candidate_manifest=args.candidate_manifest,
             output_dir=args.output_dir,
             top=args.top,
+            public_report=args.public_report,
+        )
+    if args.command == "route-intent-audit":
+        return route_intent_audit_command(
+            replay_manifest=args.replay_manifest,
+            output_dir=args.output_dir,
+            case_count=args.case_count,
             public_report=args.public_report,
         )
     if args.command == "heading-replay-prototype":

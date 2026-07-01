@@ -168,6 +168,15 @@ readiness labels, blockers, replay stability counts, and next actions only.
 Local SVG overlays, replay packets, per-track manifests, and raw Waymo files
 remain ignored under `data/processed/` and `data/raw/`.
 
+The context route/intent audit is checked in at
+[`docs/reports/waymo_context_route_intent_audit.md`](reports/waymo_context_route_intent_audit.md).
+It follows the stable context replay warning one step deeper by comparing
+constant-velocity, nearest-lane, and heading-aware rollouts and publishing only
+diagnosis labels, aggregate metrics, and route/topology hints. The current case
+points to lane-continuity or route-link follow-up: the selected lane has
+16.691 m remaining while the target travels 80.270 m over the horizon. Ignored
+local route/intent packets stay under `data/processed/`.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

@@ -346,6 +346,22 @@ constant-velocity and lane-aware open-loop rollouts, and runs four deterministic
 anchor perturbations per case. It publishes only public-safe stability metrics;
 local replay packets, SVG overlays, and raw Waymo records stay ignored.
 
+## Context Route/Intent Audit
+
+```bash
+scenariolens route-intent-audit \
+  --replay-manifest data/processed/waymo_context_replay_prototype/manifest.json \
+  --output-dir data/processed/waymo_context_route_intent_audit \
+  --case-count 3 \
+  --public-report docs/reports/waymo_context_route_intent_audit.md
+```
+
+This follows stable context replay regressions one diagnostic step deeper. The
+current checked-in report reloads the stable warning case, compares
+constant-velocity, nearest-lane, and heading-aware rollouts, and identifies a
+lane-continuity or route-link follow-up before changing the matcher or making a
+closed-loop simulation claim.
+
 ## Baseline Ablation
 
 ```bash

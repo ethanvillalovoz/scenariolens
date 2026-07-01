@@ -93,6 +93,7 @@ Then open `http://localhost:8000/demo/`.
 - [Context eval debug casebook](docs/reports/waymo_context_eval_debug_casebook.md)
 - [Context replay candidate plan](docs/reports/waymo_context_replay_candidate_plan.md)
 - [Context open-loop replay prototype](docs/reports/waymo_context_open_loop_replay_prototype.md)
+- [Context route/intent audit](docs/reports/waymo_context_route_intent_audit.md)
 - [Real Waymo lane-aware baseline diagnostic](docs/reports/waymo_lane_aware_baseline_cross_shard.md)
 - [Lane-aware baseline debug casebook](docs/reports/waymo_lane_aware_debug_casebook.md)
 - [Replay candidate plan](docs/reports/waymo_replay_candidate_plan.md)
@@ -215,6 +216,9 @@ smoke test. The prototype can:
 - run a context open-loop replay prototype over those two replay-ready cases,
   preserving one stable regression warning and flagging one sensitive positive
   control under deterministic anchor perturbations,
+- audit the stable context replay warning for lane continuity, heading
+  selection, and route/topology hints, identifying a concrete lane-continuation
+  follow-up instead of widening the matcher,
 - expose public-safe heading-aware improvement, regression, and fallback-heavy
   cases in the live Scenario Explorer,
 - turn heading-aware debug cases into a replay-readiness queue for the next
@@ -226,9 +230,9 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to graduate the stable context replay warning into a
-route/intent or optional Waymax/JAX follow-up, while keeping the sensitive
-positive control as a calibration case.
+The next milestone is to turn the lane-continuity finding from the context
+route/intent audit into a route-link continuation prototype, while keeping the
+sensitive positive control as a calibration case for optional Waymax/JAX work.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -448,6 +452,17 @@ PYTHONPATH=src python3 -m scenariolens.cli heading-replay-prototype \
   --output-dir data/processed/waymo_heading_aware_replay_prototype \
   --top 5 \
   --public-report docs/reports/waymo_heading_aware_replay_prototype.md
+```
+
+Audit stable context replay regressions for lane-continuity and route-link
+follow-up:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli route-intent-audit \
+  --replay-manifest data/processed/waymo_context_replay_prototype/manifest.json \
+  --output-dir data/processed/waymo_context_route_intent_audit \
+  --case-count 3 \
+  --public-report docs/reports/waymo_context_route_intent_audit.md
 ```
 
 Run the no-auth baseline ablation:

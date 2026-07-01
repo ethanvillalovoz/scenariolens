@@ -61,6 +61,10 @@ All notable changes to ScenarioLens are documented here.
   `docs/reports/waymo_context_open_loop_replay_prototype.md` publishing
   public-safe perturbation stability results for the replay-ready context eval
   seeds.
+- `scenariolens route-intent-audit` workflow and
+  `docs/reports/waymo_context_route_intent_audit.md`, following the stable
+  context replay warning into lane-continuity, route/topology, and heading
+  diagnostics without changing the default scorer.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.
