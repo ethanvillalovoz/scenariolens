@@ -362,10 +362,14 @@ failure study at
 context evaluation set at `docs/reports/waymo_context_eval_set.md`, a context
 debug casebook at `docs/reports/waymo_context_eval_debug_casebook.md`, and a
 context replay-candidate queue at
-`docs/reports/waymo_context_replay_candidate_plan.md`. Next work is to run
-replay prototypes over the context replay-ready cases, expand the shard set from
-`docs/reports/waymo_motion_shard_plan.md`, and graduate stable replay candidates
-into an optional Waymax/JAX path.
+`docs/reports/waymo_context_replay_candidate_plan.md`. The replay-ready
+context cases now feed
+`docs/reports/waymo_context_open_loop_replay_prototype.md`, which preserves one
+stable regression warning and flags one sensitive positive control under
+deterministic perturbations. Next work is to expand the shard set from
+`docs/reports/waymo_motion_shard_plan.md`, add route/intent checks for the
+stable context warning, and graduate stable replay candidates into an optional
+Waymax/JAX path.
 
 ## Stretch Goals
 

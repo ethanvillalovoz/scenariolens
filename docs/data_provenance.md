@@ -156,14 +156,17 @@ It is derived from the ignored context-failure manifest and publishes grouped
 scenario IDs, selection reasons, metrics, and acceptance checks only. It does
 not include raw trajectories, map packets, or per-scenario derived files.
 
-The context eval debug casebook and replay-candidate plan are checked in at
+The context eval debug casebook, replay-candidate plan, and open-loop replay
+prototype are checked in at
 [`docs/reports/waymo_context_eval_debug_casebook.md`](reports/waymo_context_eval_debug_casebook.md)
 and
-[`docs/reports/waymo_context_replay_candidate_plan.md`](reports/waymo_context_replay_candidate_plan.md).
+[`docs/reports/waymo_context_replay_candidate_plan.md`](reports/waymo_context_replay_candidate_plan.md)
+and
+[`docs/reports/waymo_context_open_loop_replay_prototype.md`](reports/waymo_context_open_loop_replay_prototype.md).
 They reload selected context-eval scenario IDs locally and publish metrics,
-readiness labels, blockers, and next actions only. Local SVG overlays,
-per-track manifests, and raw Waymo files remain ignored under `data/processed/`
-and `data/raw/`.
+readiness labels, blockers, replay stability counts, and next actions only.
+Local SVG overlays, replay packets, per-track manifests, and raw Waymo files
+remain ignored under `data/processed/` and `data/raw/`.
 
 ## Interpretation Rules
 

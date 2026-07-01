@@ -57,6 +57,10 @@ All notable changes to ScenarioLens are documented here.
   `docs/reports/waymo_context_eval_debug_casebook.md` and
   `docs/reports/waymo_context_replay_candidate_plan.md` publishing a
   context-derived debug/replay queue.
+- Context replay prototype support in `scenariolens replay-prototype`, with
+  `docs/reports/waymo_context_open_loop_replay_prototype.md` publishing
+  public-safe perturbation stability results for the replay-ready context eval
+  seeds.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

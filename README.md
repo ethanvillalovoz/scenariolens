@@ -92,6 +92,7 @@ Then open `http://localhost:8000/demo/`.
 - [Context evaluation set](docs/reports/waymo_context_eval_set.md)
 - [Context eval debug casebook](docs/reports/waymo_context_eval_debug_casebook.md)
 - [Context replay candidate plan](docs/reports/waymo_context_replay_candidate_plan.md)
+- [Context open-loop replay prototype](docs/reports/waymo_context_open_loop_replay_prototype.md)
 - [Real Waymo lane-aware baseline diagnostic](docs/reports/waymo_lane_aware_baseline_cross_shard.md)
 - [Lane-aware baseline debug casebook](docs/reports/waymo_lane_aware_debug_casebook.md)
 - [Replay candidate plan](docs/reports/waymo_replay_candidate_plan.md)
@@ -211,6 +212,9 @@ smoke test. The prototype can:
   with signal, route/topology, lane-regression, and fallback-stress groups,
 - reload the top context evaluation seeds into a public-safe debug casebook and
   replay-candidate queue with two replay-ready cases and three map-match audits,
+- run a context open-loop replay prototype over those two replay-ready cases,
+  preserving one stable regression warning and flagging one sensitive positive
+  control under deterministic anchor perturbations,
 - expose public-safe heading-aware improvement, regression, and fallback-heavy
   cases in the live Scenario Explorer,
 - turn heading-aware debug cases into a replay-readiness queue for the next
@@ -222,9 +226,9 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to run replay prototypes over the context replay-ready
-cases, then graduate stable replay candidates toward an optional Waymax/JAX
-integration path.
+The next milestone is to graduate the stable context replay warning into a
+route/intent or optional Waymax/JAX follow-up, while keeping the sensitive
+positive control as a calibration case.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).

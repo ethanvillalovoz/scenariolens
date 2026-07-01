@@ -36,6 +36,8 @@ scenario IDs, tags, and reproducible commands.
   [`docs/reports/waymo_heading_aware_replay_candidate_plan.md`](../reports/waymo_heading_aware_replay_candidate_plan.md)
 - Heading-aware replay prototype:
   [`docs/reports/waymo_heading_aware_replay_prototype.md`](../reports/waymo_heading_aware_replay_prototype.md)
+- Context open-loop replay prototype:
+  [`docs/reports/waymo_context_open_loop_replay_prototype.md`](../reports/waymo_context_open_loop_replay_prototype.md)
 
 The current local evidence includes the original 75-scenario windowed study and
 a true cross-shard run over four validation shards, covering 100 real scenarios
@@ -54,7 +56,9 @@ then ranks those six cases into replay-ready improvement/regression targets and
 a map-match audit case before making any heavier simulation claim. The
 heading-aware replay prototype then reloads all five heading-ready cases, runs
 nearest-lane vs heading-aware rollouts with deterministic perturbations, and
-shows the expected selector sign is stable across the current local slice.
+shows the expected selector sign is stable across the current local slice. The
+context replay prototype then executes the two context replay-ready eval seeds:
+one stable lane-aware regression warning and one sensitive positive control.
 
 ## Why It Matters
 
@@ -65,6 +69,6 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Run replay prototypes over the context replay-ready cases; expand beyond shards
-`00007` through `00010`; and graduate stable open-loop replay candidates into an
-optional Waymax/JAX path.
+Add route/intent checks for the stable context replay warning; expand beyond
+shards `00007` through `00010`; and graduate stable open-loop replay candidates
+into an optional Waymax/JAX path.

@@ -21,6 +21,7 @@ The current pipeline supports synthetic scenarios, ScenarioLens JSON, row-wise C
 - Context evaluation set is checked in under `docs/reports/waymo_context_eval_set.md`.
 - Context eval debug casebook is checked in under `docs/reports/waymo_context_eval_debug_casebook.md`.
 - Context replay candidate plan is checked in under `docs/reports/waymo_context_replay_candidate_plan.md`.
+- Context open-loop replay prototype is checked in under `docs/reports/waymo_context_open_loop_replay_prototype.md`.
 - Heading-aware debug casebook is checked in under `docs/reports/waymo_heading_aware_debug_casebook.md`.
 - Heading-aware replay candidate plan is checked in under `docs/reports/waymo_heading_aware_replay_candidate_plan.md`.
 - Heading-aware replay prototype is checked in under `docs/reports/waymo_heading_aware_replay_prototype.md`.
@@ -360,6 +361,7 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 - The context-joined failure study is diagnostic grouping evidence, not a causal claim about map or signal features.
 - The context evaluation set is a curated scenario-ID packet, not an official benchmark split.
 - The context replay candidate plan is a readiness queue, not completed simulation.
+- The context replay prototype is open-loop diagnostic evidence, not closed-loop simulation.
 - The heading-aware lane selector is an ablation, not a replacement for the default scorer.
 - The heading-aware replay candidate plan is a queue for replay experiments, not completed simulation.
 - The heading-aware replay prototype is open-loop diagnostic evidence, not closed-loop simulation.
@@ -369,6 +371,6 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 
 - Expand the documented local-slice recipe across more Waymo Motion validation shards.
 - Compare baseline ADE/FDE distributions across more validation shards.
-- Run replay prototypes over the context replay-ready cases.
+- Add route/intent checks for the stable context replay warning.
 - Graduate stable open-loop replay candidates into an optional Waymax/JAX path.
 - Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.

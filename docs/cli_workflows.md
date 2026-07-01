@@ -330,6 +330,22 @@ checked-in report identifies two replay-ready candidates and three map-match
 audits while preserving the context-eval grouping instead of collapsing every
 case into one aggregate score.
 
+## Context Open-Loop Replay Prototype
+
+```bash
+scenariolens replay-prototype \
+  --candidate-manifest data/processed/waymo_context_replay_candidates/manifest.json \
+  --output-dir data/processed/waymo_context_replay_prototype \
+  --top 2 \
+  --public-report docs/reports/waymo_context_open_loop_replay_prototype.md
+```
+
+This executes the replay-ready portion of the context queue. The checked-in
+report reloads two context eval seeds from local Waymo shards, compares
+constant-velocity and lane-aware open-loop rollouts, and runs four deterministic
+anchor perturbations per case. It publishes only public-safe stability metrics;
+local replay packets, SVG overlays, and raw Waymo records stay ignored.
+
 ## Baseline Ablation
 
 ```bash

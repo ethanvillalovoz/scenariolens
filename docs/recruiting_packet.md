@@ -13,6 +13,7 @@ robotics, AI/ML, and software engineering internship conversations.
 - Context evaluation set: `docs/reports/waymo_context_eval_set.md`
 - Context eval debug casebook: `docs/reports/waymo_context_eval_debug_casebook.md`
 - Context replay candidate plan: `docs/reports/waymo_context_replay_candidate_plan.md`
+- Context open-loop replay prototype: `docs/reports/waymo_context_open_loop_replay_prototype.md`
 - Real lane-aware baseline diagnostic: `docs/reports/waymo_lane_aware_baseline_cross_shard.md`
 - Lane-aware debug casebook: `docs/reports/waymo_lane_aware_debug_casebook.md`
 - Replay candidate plan: `docs/reports/waymo_replay_candidate_plan.md`
@@ -174,18 +175,19 @@ Testing and verification:
   grouped by signal context, route/topology, lane-aware regression, and fallback
   stress, with acceptance checks for follow-up experiments.
 - A context eval debug casebook reloads five eval seeds into local diagnostics,
-  and a context replay-candidate plan separates two replay-ready cases from
-  three map-match audits.
+  a context replay-candidate plan separates two replay-ready cases from three
+  map-match audits, and a context open-loop replay prototype evaluates those
+  two ready cases across eight deterministic perturbation trials.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
 What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
-2. Run replay prototypes over the context replay-ready cases.
-3. Compare distribution stability across true shards and scenario tags.
-4. Graduate stable replay candidates into an optional Waymax/JAX path.
-5. Create curated scenario collections for pedestrian, cyclist, merge, and
+2. Compare distribution stability across true shards and scenario tags.
+3. Graduate stable replay candidates into a route/intent or optional
+   Waymax/JAX path.
+4. Create curated scenario collections for pedestrian, cyclist, merge, and
    unprotected-turn cases.
 
 ## Claims To Keep Honest

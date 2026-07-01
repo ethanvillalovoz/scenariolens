@@ -113,6 +113,7 @@ def replay_prototype_payload(
             "Expected a replay-candidates manifest with format "
             f"{REPLAY_CANDIDATE_FORMAT}."
         )
+    source_kind = str(candidate_payload.get("source_kind", "baseline_compare_study"))
 
     debug_manifest_path = Path(str(candidate_payload.get("source", "")))
     if not debug_manifest_path.exists():
@@ -179,6 +180,7 @@ def replay_prototype_payload(
         "format": REPLAY_PROTOTYPE_FORMAT,
         "candidate_manifest": str(candidate_manifest_path),
         "candidate_format": candidate_payload.get("format"),
+        "source_kind": source_kind,
         "debug_manifest": str(debug_manifest_path),
         "output_dir": str(output_dir),
         "ready": ready,
@@ -210,14 +212,28 @@ def replay_prototype_markdown(payload: dict[str, object]) -> str:
     cases = _required_list(payload, "cases")
     perturbations = _required_list(payload, "perturbations")
     skipped = _required_list(payload, "skipped_candidates")
+    context_mode = str(payload.get("source_kind")) == "context_eval_set"
     lines = [
-        "# ScenarioLens Open-Loop Replay Prototype",
+        "# ScenarioLens Context Open-Loop Replay Prototype"
+        if context_mode
+        else "# ScenarioLens Open-Loop Replay Prototype",
         "",
-        "This report takes the replay-candidate queue one step further: it "
-        "reloads selected local Waymo Motion scenarios, replays the "
-        "constant-velocity and lane-aware open-loop rollouts from the same "
-        "anchor state, and applies small deterministic anchor-velocity "
-        "perturbations to test whether each diagnostic remains stable.",
+        (
+            "This report executes the replay-ready portion of the context "
+            "replay queue. It reloads selected context-evaluation seeds from "
+            "local Waymo Motion shards, replays constant-velocity and "
+            "lane-aware open-loop rollouts from the same anchor state, and "
+            "applies small deterministic anchor-velocity perturbations to test "
+            "whether each context-derived diagnostic remains stable."
+        )
+        if context_mode
+        else (
+            "This report takes the replay-candidate queue one step further: it "
+            "reloads selected local Waymo Motion scenarios, replays the "
+            "constant-velocity and lane-aware open-loop rollouts from the same "
+            "anchor state, and applies small deterministic anchor-velocity "
+            "perturbations to test whether each diagnostic remains stable."
+        ),
         "",
         "It is intentionally scoped: this is not a closed-loop simulator, not "
         "Waymax/JAX execution, and not a Waymo benchmark claim. Raw Waymo files "
@@ -226,6 +242,7 @@ def replay_prototype_markdown(payload: dict[str, object]) -> str:
         "## Scope",
         "",
         f"- Candidate manifest: `{payload['candidate_manifest']}`",
+        f"- Source kind: `{payload.get('source_kind', 'baseline_compare_study')}`",
         f"- Debug manifest: `{payload['debug_manifest']}`",
         f"- Ready for replay analysis: {payload['ready']}",
         f"- Requested top candidates: {payload['requested_top']}",
@@ -359,6 +376,12 @@ def replay_prototype_markdown(payload: dict[str, object]) -> str:
             "- Stable improvement candidates are useful positive controls for the lane-aware baseline.",
             "- Stable regression candidates are useful debugging targets because the warning persists under small anchor-state changes.",
             "- Sensitive candidates are still valuable: they identify cases where evaluation conclusions depend on small state-estimation differences.",
+            "- Context-derived candidates keep their eval-set seed labels so "
+            "signal, topology, regression, and fallback follow-up does not "
+            "collapse into one aggregate score."
+            if context_mode
+            else "- Candidate labels should stay attached to replay packets so "
+            "follow-up work can trace results back to the debug casebook.",
             "- Fallback-heavy candidates remain outside this replay prototype until map matching and coordinate-frame checks are resolved.",
             "- This is open-loop diagnostic evidence, not a production prediction model or closed-loop autonomy simulator.",
         ]
