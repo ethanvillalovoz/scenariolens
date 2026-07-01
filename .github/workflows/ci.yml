@@ -68,3 +68,6 @@ jobs:
         run: |
           scenariolens render --input /tmp/scenariolens-synthetic.json --top 3 --output-dir /tmp/scenariolens-gallery
           test -f /tmp/scenariolens-gallery/synthetic_dense_intersection_vru.svg
+
+      - name: Check local documentation links
+        run: python scripts/check_links.py
