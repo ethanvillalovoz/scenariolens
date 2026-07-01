@@ -8,6 +8,7 @@ from scenariolens.prediction import (
     PredictionBaselineSummary,
     PredictionTrackResult,
     constant_velocity_baseline,
+    heading_aware_lane_baseline,
     lane_aware_baseline,
 )
 from scenariolens.schema import AgentTrack, Scenario, ScenarioScore, State
@@ -40,6 +41,7 @@ MAP_EDGE = "#64748b"
 MAP_POLYGON = "#e0f2fe"
 CONSTANT_FORECAST = "#334155"
 LANE_AWARE_FORECAST = "#0f766e"
+HEADING_AWARE_FORECAST = "#b45309"
 MAX_TRACK_LABELS = 10
 
 PlotRect = tuple[float, float, float, float]
@@ -92,6 +94,7 @@ def scenario_svg(
     height: int = 640,
     padding: int = 56,
     show_lane_aware_baseline: bool = False,
+    show_heading_aware_baseline: bool = False,
 ) -> str:
     """Render a scenario as a standalone SVG string."""
 
@@ -103,6 +106,11 @@ def scenario_svg(
         prediction_summaries = (
             constant_summary,
             lane_aware_baseline(display_scenario),
+        )
+    if show_heading_aware_baseline:
+        prediction_summaries = (
+            *prediction_summaries,
+            heading_aware_lane_baseline(display_scenario),
         )
     raw_min_x, raw_min_y, raw_max_x, raw_max_y = scenario_bounds(
         display_scenario,
@@ -168,7 +176,7 @@ def scenario_svg(
             )
         )
 
-    comparison_mode = show_lane_aware_baseline
+    comparison_mode = show_lane_aware_baseline or show_heading_aware_baseline
     for summary in prediction_summaries:
         for result in summary.track_results:
             elements.append(
@@ -189,6 +197,7 @@ def scenario_svg(
                     summary.track_results for summary in prediction_summaries
                 ),
                 show_lane_aware=show_lane_aware_baseline,
+                show_heading_aware=show_heading_aware_baseline,
             ),
             "</svg>",
         ]
@@ -296,6 +305,7 @@ def _legend(
     height: int,
     show_prediction: bool = False,
     show_lane_aware: bool = False,
+    show_heading_aware: bool = False,
 ) -> str:
     present_types = tuple(
         agent_type
@@ -355,6 +365,17 @@ def _legend(
                 f'stroke-linecap="round" stroke-dasharray="4 6" opacity="0.90" />',
                 f'<text x="{x + 44}" y="{y + 4}" fill="{MUTED}" font-size="12" '
                 f'font-family="Inter, Arial, sans-serif" font-weight="700">lane-aware</text>',
+            ]
+        )
+    if show_heading_aware:
+        x += 158
+        pieces.extend(
+            [
+                f'<line x1="{x}" y1="{y}" x2="{x + 34}" y2="{y}" '
+                f'stroke="{HEADING_AWARE_FORECAST}" stroke-width="3.4" '
+                f'stroke-linecap="round" stroke-dasharray="2 5" opacity="0.94" />',
+                f'<text x="{x + 44}" y="{y + 4}" fill="{MUTED}" font-size="12" '
+                f'font-family="Inter, Arial, sans-serif" font-weight="700">heading-aware</text>',
             ]
         )
     return "\n".join(pieces)
@@ -421,6 +442,11 @@ def _prediction_path(
         dash = "4 6"
         width = "3.4"
         opacity = "0.92"
+    if comparison_mode and result.baseline_name == "lane_aware_heading":
+        color = HEADING_AWARE_FORECAST
+        dash = "2 5"
+        width = "3.4"
+        opacity = "0.94"
     return "\n".join(
         [
             f'<g class="baseline-prediction baseline-{result.baseline_name} '

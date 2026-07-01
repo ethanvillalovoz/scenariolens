@@ -114,6 +114,13 @@ run, heading-aware selection improves mean FDE by 0.489 m over nearest-lane
 selection, but still trails constant velocity overall; that makes it an honest
 ablation for matcher design, not a production model claim.
 
+A companion heading-aware debug casebook is checked in at
+[`docs/reports/waymo_heading_aware_debug_casebook.md`](reports/waymo_heading_aware_debug_casebook.md).
+It selects six improvement, regression, and fallback-heavy cases from the same
+study. The public copy includes scenario IDs, metric summaries, fallback
+reasons, and interpretation only; local SVG overlays and per-case manifests
+stay ignored under `data/processed/waymo_heading_aware_debug_casebook/`.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

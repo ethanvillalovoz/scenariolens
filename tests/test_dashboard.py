@@ -34,6 +34,7 @@ class DashboardDataTest(unittest.TestCase):
         self.assertIn('../reports/waymo_motion_failure_stability.md', html)
         self.assertIn('../reports/waymo_motion_shard_plan.md', html)
         self.assertIn('../reports/waymo_heading_aware_lane_selection_study.md', html)
+        self.assertIn('../reports/waymo_heading_aware_debug_casebook.md', html)
         self.assertTrue((docs_root / "data_provenance.md").exists())
         self.assertTrue((docs_root / "reports" / "waymo_motion_failure_stability.md").exists())
         self.assertTrue((docs_root / "reports" / "waymo_motion_shard_plan.md").exists())
@@ -163,6 +164,10 @@ class DashboardDataTest(unittest.TestCase):
         self.assertEqual(diagnostics["format"], CASE_DIAGNOSTICS_FORMAT)
         self.assertEqual(diagnostics["scenario_count"], 2)
         self.assertEqual(diagnostics["summary"]["heading_lane_fde_m"], 9.0)
+        self.assertEqual(
+            diagnostics["debug_report_path"],
+            "../reports/waymo_heading_aware_debug_casebook.md",
+        )
         self.assertEqual(diagnostics["fallback_reasons"][0]["reason"], "target_too_far_from_lane")
         self.assertEqual(len(diagnostics["groups"]), 3)
         first_case = diagnostics["groups"][0]["cases"][0]

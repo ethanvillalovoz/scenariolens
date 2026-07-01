@@ -93,6 +93,7 @@ Then open `http://localhost:8000/demo/`.
 - [Open-loop replay prototype](docs/reports/waymo_open_loop_replay_prototype.md)
 - [Map-match threshold audit](docs/reports/waymo_map_match_audit.md)
 - [Heading-aware lane selection study](docs/reports/waymo_heading_aware_lane_selection_study.md)
+- [Heading-aware debug casebook](docs/reports/waymo_heading_aware_debug_casebook.md)
 - [Fixture lane-aware baseline comparison](docs/reports/lane_aware_baseline_study.md)
 - [No-auth baseline ablation study](docs/reports/baseline_ablation_study.md)
 - [Shard expansion plan](docs/reports/waymo_motion_shard_plan.md)
@@ -201,9 +202,9 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to connect those case diagnostics to richer local debug
-artifacts, then graduate the most stable candidates into an optional Waymax/JAX
-replay path.
+The next milestone is to turn the heading-aware debug artifacts into
+replay-readiness signals, then graduate the most stable candidates into an
+optional Waymax/JAX replay path.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -388,6 +389,16 @@ PYTHONPATH=src python3 -m scenariolens.cli lane-selection-study \
   --max-scenarios 25 \
   --top 10 \
   --public-report docs/reports/waymo_heading_aware_lane_selection_study.md
+```
+
+Generate the heading-aware debug casebook and local artifacts:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli baseline-debug \
+  --study-manifest data/processed/waymo_lane_selection_study/manifest.json \
+  --output-dir data/processed/waymo_heading_aware_debug_casebook \
+  --case-count 6 \
+  --public-report docs/reports/waymo_heading_aware_debug_casebook.md
 ```
 
 Run the no-auth baseline ablation:

@@ -18,6 +18,7 @@ The current pipeline supports synthetic scenarios, ScenarioLens JSON, row-wise C
 - Open-loop replay prototype is checked in under `docs/reports/waymo_open_loop_replay_prototype.md`.
 - Map-match threshold audit is checked in under `docs/reports/waymo_map_match_audit.md`.
 - Heading-aware lane-selection study is checked in under `docs/reports/waymo_heading_aware_lane_selection_study.md`.
+- Heading-aware debug casebook is checked in under `docs/reports/waymo_heading_aware_debug_casebook.md`.
 - Baseline comparison report is generated under `docs/reports/lane_aware_baseline_study.md`.
 - Baseline ablation report is generated under `docs/reports/baseline_ablation_study.md`.
 - Static dashboard data contract is generated under `docs/demo/`.
@@ -187,6 +188,7 @@ Replay candidate plan: `docs/reports/waymo_replay_candidate_plan.md`.
 Open-loop replay prototype: `docs/reports/waymo_open_loop_replay_prototype.md`.
 Map-match threshold audit: `docs/reports/waymo_map_match_audit.md`.
 Heading-aware lane-selection study: `docs/reports/waymo_heading_aware_lane_selection_study.md`.
+Heading-aware debug casebook: `docs/reports/waymo_heading_aware_debug_casebook.md`.
 
 ## Native Waymo Motion JSON Mini-Slice
 
@@ -354,7 +356,7 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 
 - Expand the documented local-slice recipe across more Waymo Motion validation shards.
 - Compare baseline ADE/FDE distributions across more validation shards.
-- Debug the largest heading-aware lane-selection wins and regressions.
+- Convert heading-aware debug cases into replay-readiness candidates.
 - Graduate stable open-loop replay candidates into an optional Waymax/JAX path.
 - Add traffic-light and richer lane-context features from native Motion records.
 - Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.

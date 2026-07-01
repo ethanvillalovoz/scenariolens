@@ -1171,16 +1171,16 @@ def main() -> int:
     baseline_debug_parser = subparsers.add_parser(
         "baseline-debug",
         help=(
-            "Generate local SVG/debug artifacts for selected baseline "
-            "comparison cases."
+            "Generate local SVG/debug artifacts for selected baseline or "
+            "lane-selection cases."
         ),
     )
     baseline_debug_parser.add_argument(
         "--study-manifest",
         default=None,
         help=(
-            "Optional baseline-compare-study manifest to auto-select "
-            "improvement, regression, and fallback-heavy cases."
+            "Optional baseline-compare-study or lane-selection-study manifest "
+            "to auto-select improvement, regression, and fallback-heavy cases."
         ),
     )
     baseline_debug_parser.add_argument(

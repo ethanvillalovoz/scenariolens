@@ -11,16 +11,22 @@ from scenariolens.failure_study import (
     FAILURE_STUDY_INPUT_FORMATS,
     load_failure_study_input,
 )
+from scenariolens.lane_selection_study import LANE_SELECTION_STUDY_FORMAT
 from scenariolens.prediction import (
+    HEADING_AWARE_MIN_ALIGNMENT,
     LANE_MATCH_THRESHOLD_M,
     MIN_LANE_AWARE_SPEED_MPS,
     PredictionBaselineComparison,
+    PredictionBaselineSummary,
     PredictionTrackResult,
     _anchor_index,
+    _lane_heading_alignment,
     _lane_polylines,
     _nearest_lane_projection,
+    _select_lane_projection,
     compare_prediction_baselines,
     constant_velocity_baseline,
+    heading_aware_lane_baseline,
     lane_aware_baseline,
 )
 from scenariolens.schema import AgentTrack, Scenario, State
@@ -110,6 +116,12 @@ def baseline_debug_casebook_markdown(
     public_safe: bool = True,
 ) -> str:
     """Return a Markdown casebook for selected baseline-debug scenarios."""
+
+    if payload.get("source_kind") == "lane_selection_study":
+        return _lane_selection_debug_casebook_markdown(
+            payload,
+            public_safe=public_safe,
+        )
 
     cases = _required_list(payload, "cases")
     lines = [
@@ -242,19 +254,170 @@ def baseline_debug_casebook_markdown(
     return "\n".join(lines).rstrip() + "\n"
 
 
+def _lane_selection_debug_casebook_markdown(
+    payload: dict[str, object],
+    public_safe: bool = True,
+) -> str:
+    cases = _required_list(payload, "cases")
+    lines = [
+        "# ScenarioLens Heading-Aware Debug Casebook",
+        "",
+        "This casebook explains selected nearest-lane vs heading-aware "
+        "lane-selection outcomes. It turns the aggregate heading-aware study "
+        "into debuggable evidence: where heading alignment helps, where it "
+        "regresses, and where the matcher intentionally falls back.",
+        "",
+        "## Scope",
+        "",
+        f"- Source: `{payload['source']}`",
+        f"- Input format: `{payload['input_format']}`",
+        f"- Ready for analysis: {payload['ready']}",
+        f"- Cases selected: {len(cases)}",
+        "- Raw Waymo files committed: no",
+        "- Raw trajectories, local SVG overlays, and per-case debug manifests committed: no",
+        "",
+    ]
+    if public_safe:
+        lines.append(
+            "The public copy reports scenario IDs, metric summaries, fallback "
+            "reasons, and interpretation only. Local SVG overlays and per-track "
+            "debug manifests stay under ignored `data/processed/` paths."
+        )
+    else:
+        lines.append(
+            "The local copy links to rendered SVG overlays and per-case manifests "
+            "under the ignored output directory."
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Selected Cases",
+            "",
+            "| Case | Source | Scenario | Targets | CV FDE | Nearest FDE | Heading FDE | Heading vs nearest | Heading map used | Heading fallbacks | Top heading fallback |"
+            + ("" if public_safe else " Local SVG |"),
+            "| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |"
+            + ("" if public_safe else " --- |"),
+        ]
+    )
+    for case in cases:
+        assert isinstance(case, dict)
+        summary = _required_mapping(case, "summary")
+        row = (
+            "| "
+            f"{case['case_label']} | "
+            f"`{case['source_name']}` | "
+            f"`{case['scenario_id']}` | "
+            f"{summary['evaluated_target_count']} | "
+            f"{_meter_text(summary['constant_velocity_fde_m'])} | "
+            f"{_meter_text(summary['nearest_lane_fde_m'])} | "
+            f"{_meter_text(summary['heading_lane_fde_m'])} | "
+            f"{_signed_meter_text(summary['heading_vs_nearest_fde_improvement_m'])} | "
+            f"{summary['heading_map_used_count']} | "
+            f"{summary['heading_fallback_count']} | "
+            f"`{summary['top_heading_fallback_reason']}` |"
+        )
+        if not public_safe:
+            row += f" [{case['svg_path']}]({case['svg_path']}) |"
+        lines.append(row)
+
+    for case in cases:
+        assert isinstance(case, dict)
+        summary = _required_mapping(case, "summary")
+        tracks = _required_list(case, "track_diagnostics")
+        lines.extend(
+            [
+                "",
+                f"## {case['case_label']}: `{case['scenario_id']}`",
+                "",
+                f"- Source: `{case['source_input']}`",
+                f"- Why selected: {case['selection_reason']}",
+                f"- Constant-velocity FDE: {_meter_text(summary['constant_velocity_fde_m'])}",
+                f"- Nearest-lane FDE: {_meter_text(summary['nearest_lane_fde_m'])}",
+                f"- Heading-aware FDE: {_meter_text(summary['heading_lane_fde_m'])}",
+                f"- Heading improvement vs nearest lane: {_signed_meter_text(summary['heading_vs_nearest_fde_improvement_m'])}",
+                f"- Heading improvement vs constant velocity: {_signed_meter_text(summary['heading_vs_constant_velocity_fde_improvement_m'])}",
+                f"- Heading map-used / fallback targets: {summary['heading_map_used_count']} / {summary['heading_fallback_count']}",
+            ]
+        )
+        if not public_safe:
+            lines.append(f"- Local SVG overlay: `{case['svg_path']}`")
+            lines.append(f"- Local case manifest: `{case['manifest_path']}`")
+
+        lines.extend(
+            [
+                "",
+                "| Track | Type | CV FDE | Nearest FDE | Heading FDE | Heading vs nearest | Nearest fallback | Heading fallback | Nearest lane distance | Heading match |",
+                "| --- | --- | ---: | ---: | ---: | ---: | --- | --- | ---: | --- |",
+            ]
+        )
+        for track in tracks:
+            assert isinstance(track, dict)
+            nearest_lane = _required_mapping(track, "lane_match")
+            heading_lane = _required_mapping(track, "heading_lane_match")
+            lines.append(
+                "| "
+                f"`{track['track_id']}` | "
+                f"`{track['agent_type']}` | "
+                f"{_meter_text(track['constant_velocity_fde_m'])} | "
+                f"{_meter_text(track['nearest_lane_fde_m'])} | "
+                f"{_meter_text(track['heading_lane_fde_m'])} | "
+                f"{_signed_meter_text(track['heading_vs_nearest_fde_improvement_m'])} | "
+                f"`{track['nearest_lane_fallback_reason'] or 'none'}` | "
+                f"`{track['heading_lane_fallback_reason'] or 'none'}` | "
+                f"{_meter_text(nearest_lane['nearest_lane_distance_m'])} | "
+                f"`{heading_lane['status']}` |"
+            )
+
+        if not public_safe:
+            lines.extend(["", "Metric-only error timeline:"])
+            for track in tracks:
+                assert isinstance(track, dict)
+                cv_series = _series_text(_required_list(track, "constant_velocity_errors"))
+                nearest_series = _series_text(_required_list(track, "nearest_lane_errors"))
+                heading_series = _series_text(_required_list(track, "heading_lane_errors"))
+                lines.append(
+                    f"- `{track['track_id']}` CV `{cv_series}`; nearest `{nearest_series}`; heading `{heading_series}`"
+                )
+
+    lines.extend(
+        [
+            "",
+            "## Interpretation",
+            "",
+            "- The improvement case shows where heading alignment can avoid a worse nearest-lane hypothesis.",
+            "- The regression case is the useful warning: heading alignment can still be wrong when intent, lane direction, or parsed map context is ambiguous.",
+            "- The fallback-heavy case shows the matcher recording why it declines map-following and returns to the fallback forecast.",
+            "- This remains a diagnostic ablation, not a production map matcher, production prediction model, or Waymo benchmark claim.",
+        ]
+    )
+    return "\n".join(lines).rstrip() + "\n"
+
+
 def _payload_from_study_manifest(
     study_manifest_path: Path,
     output_dir: Path,
     case_count: int,
 ) -> dict[str, object]:
     study_payload = json.loads(study_manifest_path.read_text(encoding="utf-8"))
-    if study_payload.get("format") != BASELINE_COMPARISON_STUDY_FORMAT:
+    study_format = study_payload.get("format")
+    if study_format not in {BASELINE_COMPARISON_STUDY_FORMAT, LANE_SELECTION_STUDY_FORMAT}:
         raise ValueError(
-            "Expected a baseline-compare-study manifest with format "
-            f"{BASELINE_COMPARISON_STUDY_FORMAT}."
+            "Expected a baseline-compare-study or lane-selection-study "
+            f"manifest with format {BASELINE_COMPARISON_STUDY_FORMAT} or "
+            f"{LANE_SELECTION_STUDY_FORMAT}."
         )
 
-    specs = _case_specs_from_study(study_payload, case_count=case_count)
+    source_kind = (
+        "lane_selection_study"
+        if study_format == LANE_SELECTION_STUDY_FORMAT
+        else "baseline_compare_study"
+    )
+    specs = (
+        _case_specs_from_lane_selection_study(study_payload, case_count=case_count)
+        if source_kind == "lane_selection_study"
+        else _case_specs_from_study(study_payload, case_count=case_count)
+    )
     cases = []
     ready = bool(study_payload.get("ready", False))
     for spec in specs:
@@ -263,6 +426,7 @@ def _payload_from_study_manifest(
             input_format=str(study_payload.get("input_format", "native")),
             max_scenarios=_optional_int(study_payload.get("max_scenarios_per_input")),
             output_dir=output_dir,
+            debug_mode=source_kind,
         )
         cases.append(case)
         ready = ready and bool(case["ready"])
@@ -271,7 +435,7 @@ def _payload_from_study_manifest(
     return {
         "format": BASELINE_DEBUG_FORMAT,
         "source": str(study_manifest_path),
-        "source_kind": "baseline_compare_study",
+        "source_kind": source_kind,
         "input_format": str(study_payload.get("input_format", "native")),
         "max_scenarios": study_payload.get("max_scenarios_per_input"),
         "ready": ready,
@@ -404,11 +568,77 @@ def _case_specs_from_study(
     return specs[:case_count]
 
 
+def _case_specs_from_lane_selection_study(
+    study_payload: dict[str, object],
+    case_count: int,
+) -> list[dict[str, object]]:
+    specs: list[dict[str, object]] = []
+    seen: set[tuple[str, str]] = set()
+
+    def add_case(label: str, reason: str, rows: object) -> None:
+        if len(specs) >= case_count or not isinstance(rows, list):
+            return
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            key = (str(row.get("source_input", "")), str(row.get("scenario_id", "")))
+            if key in seen or not key[0] or not key[1]:
+                continue
+            specs.append({**row, "case_label": label, "selection_reason": reason})
+            seen.add(key)
+            return
+
+    add_case(
+        "Largest heading improvement",
+        "Highest positive FDE improvement from heading-aware lane selection versus nearest-lane selection.",
+        study_payload.get("top_heading_improvements"),
+    )
+    add_case(
+        "Largest heading regression",
+        "Most negative FDE delta from heading-aware lane selection versus nearest-lane selection.",
+        study_payload.get("top_heading_regressions"),
+    )
+    add_case(
+        "Heading fallback-heavy case",
+        "Most heading-aware fallback-heavy scenario in the lane-selection study.",
+        study_payload.get("top_heading_fallbacks"),
+    )
+
+    for label, key in (
+        ("Additional heading improvement", "top_heading_improvements"),
+        ("Additional heading regression", "top_heading_regressions"),
+        ("Additional heading fallback case", "top_heading_fallbacks"),
+    ):
+        rows = study_payload.get(key)
+        if len(specs) >= case_count or not isinstance(rows, list):
+            continue
+        for row in rows:
+            if len(specs) >= case_count or not isinstance(row, dict):
+                continue
+            key_value = (
+                str(row.get("source_input", "")),
+                str(row.get("scenario_id", "")),
+            )
+            if key_value in seen or not key_value[0] or not key_value[1]:
+                continue
+            specs.append(
+                {
+                    **row,
+                    "case_label": label,
+                    "selection_reason": f"Additional selected row from `{key}`.",
+                }
+            )
+            seen.add(key_value)
+
+    return specs[:case_count]
+
+
 def _case_from_spec(
     spec: dict[str, object],
     input_format: str,
     max_scenarios: int | None,
     output_dir: Path,
+    debug_mode: str = "baseline_compare_study",
 ) -> dict[str, object]:
     source = Path(str(spec["source_input"]))
     ready, preflight, scenarios = load_failure_study_input(
@@ -428,6 +658,7 @@ def _case_from_spec(
         scenario_index=_optional_int(spec.get("scenario_index")) or 1,
         preflight=preflight,
         input_ready=ready,
+        debug_mode=debug_mode,
     )
 
 
@@ -443,6 +674,7 @@ def _case_from_loaded_scenarios(
     scenario_index: int,
     preflight: dict[str, object] | None,
     input_ready: bool,
+    debug_mode: str = "baseline_compare_study",
 ) -> dict[str, object]:
     scenario = _find_scenario(scenarios, scenario_id)
     case_slug = _safe_slug(f"{case_label}-{source_index}-{scenario_index}-{scenario_id}")
@@ -465,6 +697,7 @@ def _case_from_loaded_scenarios(
             "source_index": source_index,
             "scenario_index": scenario_index,
             "preflight": preflight or {},
+            "debug_mode": debug_mode,
             "error": "scenario_not_found",
             "summary": _empty_summary(),
             "track_diagnostics": [],
@@ -474,15 +707,34 @@ def _case_from_loaded_scenarios(
         _write_json(manifest_path, case)
         return case
 
-    comparison = compare_prediction_baselines(scenario)
-    constant_summary = constant_velocity_baseline(scenario)
-    lane_summary = lane_aware_baseline(scenario)
-    track_diagnostics = _track_diagnostics(
-        scenario=scenario,
-        comparison=comparison,
-        constant_results=constant_summary.track_results,
-        lane_results=lane_summary.track_results,
-    )
+    if debug_mode == "lane_selection_study":
+        constant_summary = constant_velocity_baseline(scenario)
+        nearest_summary = lane_aware_baseline(scenario)
+        heading_summary = heading_aware_lane_baseline(scenario)
+        summary = _lane_selection_summary(
+            constant=constant_summary,
+            nearest=nearest_summary,
+            heading=heading_summary,
+        )
+        track_diagnostics = _lane_selection_track_diagnostics(
+            scenario=scenario,
+            constant_results=constant_summary.track_results,
+            nearest_results=nearest_summary.track_results,
+            heading_results=heading_summary.track_results,
+        )
+        show_heading_aware = True
+    else:
+        comparison = compare_prediction_baselines(scenario)
+        constant_summary = constant_velocity_baseline(scenario)
+        lane_summary = lane_aware_baseline(scenario)
+        summary = _comparison_summary(comparison)
+        track_diagnostics = _track_diagnostics(
+            scenario=scenario,
+            comparison=comparison,
+            constant_results=constant_summary.track_results,
+            lane_results=lane_summary.track_results,
+        )
+        show_heading_aware = False
     case = {
         "ready": bool(input_ready),
         "case_label": case_label,
@@ -494,14 +746,19 @@ def _case_from_loaded_scenarios(
         "source_index": source_index,
         "scenario_index": scenario_index,
         "preflight": preflight or {},
-        "summary": _comparison_summary(comparison),
+        "debug_mode": debug_mode,
+        "summary": summary,
         "track_diagnostics": track_diagnostics,
         "manifest_path": str(relative_manifest),
         "svg_path": str(relative_svg),
     }
     _write_json(manifest_path, case)
     svg_path.write_text(
-        scenario_svg(scenario, show_lane_aware_baseline=True),
+        scenario_svg(
+            scenario,
+            show_lane_aware_baseline=True,
+            show_heading_aware_baseline=show_heading_aware,
+        ),
         encoding="utf-8",
     )
     return case
@@ -549,6 +806,64 @@ def _track_diagnostics(
     return rows
 
 
+def _lane_selection_track_diagnostics(
+    scenario: Scenario,
+    constant_results: tuple[PredictionTrackResult, ...],
+    nearest_results: tuple[PredictionTrackResult, ...],
+    heading_results: tuple[PredictionTrackResult, ...],
+) -> list[dict[str, object]]:
+    tracks_by_id = {track.agent_id: track for track in scenario.tracks}
+    constant_by_id = {result.track_id: result for result in constant_results}
+    nearest_by_id = {result.track_id: result for result in nearest_results}
+    heading_by_id = {result.track_id: result for result in heading_results}
+    rows = []
+    for track_id, constant in constant_by_id.items():
+        track = tracks_by_id.get(track_id)
+        nearest = nearest_by_id.get(track_id)
+        heading = heading_by_id.get(track_id)
+        if track is None or nearest is None or heading is None:
+            continue
+        constant_errors = _error_series(track=track, scenario=scenario, result=constant)
+        nearest_errors = _error_series(track=track, scenario=scenario, result=nearest)
+        heading_errors = _error_series(track=track, scenario=scenario, result=heading)
+        rows.append(
+            {
+                "track_id": track_id,
+                "agent_type": track.agent_type,
+                "constant_velocity_ade_m": constant.ade_m,
+                "constant_velocity_fde_m": constant.fde_m,
+                "nearest_lane_ade_m": nearest.ade_m,
+                "nearest_lane_fde_m": nearest.fde_m,
+                "heading_lane_ade_m": heading.ade_m,
+                "heading_lane_fde_m": heading.fde_m,
+                "heading_vs_nearest_fde_improvement_m": round(
+                    nearest.fde_m - heading.fde_m,
+                    3,
+                ),
+                "heading_vs_constant_velocity_fde_improvement_m": round(
+                    constant.fde_m - heading.fde_m,
+                    3,
+                ),
+                "nearest_lane_map_used": nearest.map_used,
+                "nearest_lane_fallback_reason": nearest.fallback_reason,
+                "heading_lane_map_used": heading.map_used,
+                "heading_lane_fallback_reason": heading.fallback_reason,
+                "anchor_time_s": constant.anchor_time_s,
+                "horizon_s": constant.horizon_s,
+                "future_state_count": constant.future_state_count,
+                "constant_velocity_errors": constant_errors,
+                "nearest_lane_errors": nearest_errors,
+                "heading_lane_errors": heading_errors,
+                "constant_velocity_last_error_m": _last_error(constant_errors),
+                "nearest_lane_last_error_m": _last_error(nearest_errors),
+                "heading_lane_last_error_m": _last_error(heading_errors),
+                "lane_match": _lane_match_diagnostic(track, scenario),
+                "heading_lane_match": _heading_lane_match_diagnostic(track, scenario),
+            }
+        )
+    return rows
+
+
 def _comparison_summary(comparison: PredictionBaselineComparison) -> dict[str, object]:
     reasons = fallback_reason_counts((comparison,))
     top_reason = "none"
@@ -572,11 +887,69 @@ def _comparison_summary(comparison: PredictionBaselineComparison) -> dict[str, o
     }
 
 
+def _lane_selection_summary(
+    constant: PredictionBaselineSummary,
+    nearest: PredictionBaselineSummary,
+    heading: PredictionBaselineSummary,
+) -> dict[str, object]:
+    return {
+        "target_source": constant.target_source,
+        "requested_target_count": constant.requested_target_count,
+        "evaluated_target_count": min(
+            constant.evaluated_track_count,
+            nearest.evaluated_track_count,
+            heading.evaluated_track_count,
+        ),
+        "constant_velocity_ade_m": constant.ade_m,
+        "constant_velocity_fde_m": constant.fde_m,
+        "constant_velocity_miss_rate": constant.miss_rate,
+        "nearest_lane_ade_m": nearest.ade_m,
+        "nearest_lane_fde_m": nearest.fde_m,
+        "nearest_lane_miss_rate": nearest.miss_rate,
+        "heading_lane_ade_m": heading.ade_m,
+        "heading_lane_fde_m": heading.fde_m,
+        "heading_lane_miss_rate": heading.miss_rate,
+        "heading_vs_nearest_fde_improvement_m": _optional_delta(
+            nearest.fde_m,
+            heading.fde_m,
+        ),
+        "heading_vs_constant_velocity_fde_improvement_m": _optional_delta(
+            constant.fde_m,
+            heading.fde_m,
+        ),
+        "nearest_map_used_count": nearest.map_used_count,
+        "heading_map_used_count": heading.map_used_count,
+        "nearest_fallback_count": nearest.fallback_count,
+        "heading_fallback_count": heading.fallback_count,
+        "top_heading_fallback_reason": _top_fallback_reason(heading.track_results),
+    }
+
+
+def _optional_delta(before: float | None, after: float | None) -> float | None:
+    if before is None or after is None:
+        return None
+    return round(before - after, 3)
+
+
+def _top_fallback_reason(results: tuple[PredictionTrackResult, ...]) -> str:
+    counts: dict[str, int] = {}
+    for result in results:
+        if result.fallback_reason is None:
+            continue
+        counts[result.fallback_reason] = counts.get(result.fallback_reason, 0) + 1
+    if not counts:
+        return "none"
+    reason, count = sorted(counts.items(), key=lambda item: (-item[1], item[0]))[0]
+    return f"{reason} ({count})"
+
+
 def _lane_match_diagnostic(
     track: AgentTrack,
     scenario: Scenario,
     lane_match_threshold_m: float = LANE_MATCH_THRESHOLD_M,
 ) -> dict[str, object]:
+    if track.agent_type not in {"vehicle", "cyclist"}:
+        return _lane_match_status("non_vehicle_or_cyclist_target")
     states = tuple(sorted(track.states, key=lambda state: state.t))
     if len(states) < 2:
         return _lane_match_status("insufficient_track_states")
@@ -607,6 +980,56 @@ def _lane_match_diagnostic(
         "anchor_speed_mps": round(anchor_speed, 3) if isfinite(anchor_speed) else None,
         "lane_segment_index": projection.segment_index,
         "lane_point_count": len(projection.lane),
+    }
+
+
+def _heading_lane_match_diagnostic(
+    track: AgentTrack,
+    scenario: Scenario,
+    lane_match_threshold_m: float = LANE_MATCH_THRESHOLD_M,
+    lane_heading_min_alignment: float = HEADING_AWARE_MIN_ALIGNMENT,
+) -> dict[str, object]:
+    if track.agent_type not in {"vehicle", "cyclist"}:
+        return _lane_match_status("non_vehicle_or_cyclist_target")
+    states = tuple(sorted(track.states, key=lambda state: state.t))
+    if len(states) < 2:
+        return _lane_match_status("insufficient_track_states")
+    anchor = states[_anchor_index(states, scenario)]
+    anchor_speed = hypot(anchor.vx, anchor.vy)
+    lanes = _lane_polylines(scenario)
+    if not lanes:
+        return _lane_match_status(
+            "no_lane_map_features",
+            anchor_speed_mps=anchor_speed,
+        )
+    if not isfinite(anchor_speed) or anchor_speed < MIN_LANE_AWARE_SPEED_MPS:
+        return _lane_match_status(
+            "low_or_invalid_anchor_speed",
+            anchor_speed_mps=anchor_speed,
+        )
+
+    projection, fallback_reason = _select_lane_projection(
+        anchor=anchor,
+        lanes=lanes,
+        lane_selection="heading",
+        lane_match_threshold_m=lane_match_threshold_m,
+        lane_heading_min_alignment=lane_heading_min_alignment,
+    )
+    if projection is None:
+        return _lane_match_status(
+            fallback_reason or "no_usable_lane_polyline",
+            anchor_speed_mps=anchor_speed,
+        )
+
+    return {
+        "status": "lane_matched",
+        "nearest_lane_distance_m": round(projection.distance_m, 3),
+        "lane_match_threshold_m": lane_match_threshold_m,
+        "anchor_speed_mps": round(anchor_speed, 3),
+        "lane_segment_index": projection.segment_index,
+        "lane_point_count": len(projection.lane),
+        "heading_alignment": round(_lane_heading_alignment(anchor, projection), 3),
+        "heading_min_alignment": lane_heading_min_alignment,
     }
 
 

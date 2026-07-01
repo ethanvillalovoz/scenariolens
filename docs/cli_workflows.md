@@ -197,6 +197,22 @@ small FDE improvement over nearest-lane selection while still trailing constant
 velocity overall, which makes it useful as an honest map-matching ablation
 rather than a production prediction claim.
 
+## Heading-Aware Debug Casebook
+
+```bash
+scenariolens baseline-debug \
+  --study-manifest data/processed/waymo_lane_selection_study/manifest.json \
+  --output-dir data/processed/waymo_heading_aware_debug_casebook \
+  --case-count 6 \
+  --public-report docs/reports/waymo_heading_aware_debug_casebook.md
+```
+
+When the study manifest comes from `lane-selection-study`, `baseline-debug`
+switches into a heading-aware casebook mode. It writes ignored local SVG
+overlays and per-case manifests comparing constant velocity, nearest-lane, and
+heading-aware forecasts, while the public report keeps only scenario IDs,
+metrics, fallback reasons, and interpretation.
+
 ## Baseline Ablation
 
 ```bash

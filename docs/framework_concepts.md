@@ -58,11 +58,12 @@ prediction claim.
 
 ## Debug Casebook
 
-The debug casebook turns a baseline comparison study into selected examples:
-one improvement, one regression, and one fallback-heavy case by default. Local
+The debug casebook turns a baseline comparison or lane-selection study into
+selected examples: improvements, regressions, and fallback-heavy cases. Local
 artifacts include SVG overlays, per-track error timelines, lane-match distance,
-and fallback reasons. Public copies keep the raw trajectories and local debug
-manifests out of git while preserving the interpretation.
+heading-alignment diagnostics, and fallback reasons. Public copies keep the raw
+trajectories and local debug manifests out of git while preserving the
+interpretation.
 
 ## Replay Candidate Plan
 
@@ -112,8 +113,7 @@ and links to the public reports.
   public data.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.
-- Connect Explorer case diagnostics to richer local debug artifacts and replay
-  candidates.
+- Turn heading-aware debug casebook outputs into replay-readiness candidates.
 - Add map-aware features or traffic-light summaries.
 - Graduate stable replay-prototype candidates into an optional Waymax/JAX path.
 - Add additional public-safe report types.

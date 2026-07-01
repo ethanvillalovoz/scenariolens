@@ -31,6 +31,9 @@ All notable changes to ScenarioLens are documented here.
 - Public-safe heading-aware case diagnostics in the static Scenario Explorer,
   including improvement, regression, and fallback-heavy cases from the local
   100-scenario study.
+- Heading-aware debug casebook mode for `scenariolens baseline-debug`, including
+  local CV/nearest/heading-aware SVG overlays and the public-safe
+  `docs/reports/waymo_heading_aware_debug_casebook.md` report.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

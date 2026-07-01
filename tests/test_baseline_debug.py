@@ -10,6 +10,7 @@ from scenariolens.baseline_debug import (
     generate_baseline_debug_casebook,
 )
 from scenariolens.io import save_scenarios
+from scenariolens.lane_selection_study import generate_lane_selection_study
 from scenariolens.samples import synthetic_scenarios
 
 
@@ -62,6 +63,56 @@ class BaselineDebugTest(unittest.TestCase):
             local_markdown = baseline_debug_casebook_markdown(manifest, public_safe=False)
             self.assertIn("Local SVG overlay", local_markdown)
             self.assertIn("Metric-only error timeline", local_markdown)
+
+    def test_debug_casebook_accepts_lane_selection_study_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            input_path = root / "synthetic.json"
+            study_dir = root / "lane_study"
+            debug_dir = root / "heading_debug"
+            public_report = root / "reports" / "heading_debug_casebook.md"
+            save_scenarios(input_path, synthetic_scenarios())
+            study = generate_lane_selection_study(
+                input_paths=(input_path,),
+                output_dir=study_dir,
+                input_format="scenariolens-json",
+                max_scenarios=11,
+                top=6,
+            )
+
+            result = generate_baseline_debug_casebook(
+                study_manifest_path=study.manifest_path,
+                output_dir=debug_dir,
+                case_count=3,
+                public_report_path=public_report,
+            )
+            manifest = json.loads(result.manifest_path.read_text(encoding="utf-8"))
+
+            self.assertTrue(result.ready)
+            self.assertEqual(result.case_count, 3)
+            self.assertEqual(manifest["format"], BASELINE_DEBUG_FORMAT)
+            self.assertEqual(manifest["source_kind"], "lane_selection_study")
+            self.assertIn("Heading-Aware Debug Casebook", public_report.read_text())
+
+            labels = [case["case_label"] for case in manifest["cases"]]
+            self.assertIn("Largest heading improvement", labels)
+            self.assertIn("Largest heading regression", labels)
+            self.assertIn("Heading fallback-heavy case", labels)
+
+            for case in manifest["cases"]:
+                summary = case["summary"]
+                self.assertIn("nearest_lane_fde_m", summary)
+                self.assertIn("heading_lane_fde_m", summary)
+                self.assertIn("heading_vs_nearest_fde_improvement_m", summary)
+                svg = (debug_dir / case["svg_path"]).read_text(encoding="utf-8")
+                self.assertIn("baseline-constant_velocity", svg)
+                self.assertIn("baseline-lane_aware", svg)
+                self.assertIn("baseline-lane_aware_heading", svg)
+
+                track = case["track_diagnostics"][0]
+                self.assertIn("nearest_lane_fde_m", track)
+                self.assertIn("heading_lane_fde_m", track)
+                self.assertIn("heading_lane_match", track)
 
     def test_debug_casebook_supports_direct_scenario_selection(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:

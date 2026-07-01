@@ -254,8 +254,9 @@ four-shard run covers 100 scenarios and 418 evaluated prediction targets.
 Heading-aware selection improves mean FDE by 0.489 m relative to nearest-lane
 selection, while still trailing constant velocity overall. That makes it a
 useful matcher ablation, not a production prediction claim. The live Explorer
-now surfaces public-safe improvement, regression, and fallback-heavy cases from
-this run; next work is connecting those rows to richer local debug artifacts.
+surfaces public-safe improvement, regression, and fallback-heavy cases from this
+run, and `docs/reports/waymo_heading_aware_debug_casebook.md` connects six of
+those rows to ignored local SVG overlays and per-case manifests.
 
 ## Milestone 4C: No-Auth Baseline Ablation
 

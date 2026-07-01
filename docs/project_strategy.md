@@ -143,6 +143,8 @@ and links back to reports and provenance.
   [`docs/reports/waymo_map_match_audit.md`](reports/waymo_map_match_audit.md)
 - Heading-aware lane-selection study:
   [`docs/reports/waymo_heading_aware_lane_selection_study.md`](reports/waymo_heading_aware_lane_selection_study.md)
+- Heading-aware debug casebook:
+  [`docs/reports/waymo_heading_aware_debug_casebook.md`](reports/waymo_heading_aware_debug_casebook.md)
 - No-auth baseline ablation:
   [`docs/reports/baseline_ablation_study.md`](reports/baseline_ablation_study.md)
 - Shard expansion plan:

@@ -19,6 +19,7 @@ flowchart LR
     F --> N["Failure-stability comparison report"]
     P --> U["Heading-aware lane-selection study"]
     U --> V["Explorer case diagnostics"]
+    U --> W["Heading-aware debug casebook"]
     P --> Q["Baseline-debug casebook"]
     H --> Q
     Q --> R["Replay-candidate plan"]
@@ -33,6 +34,7 @@ flowchart LR
     S --> K
     T --> K
     U --> K
+    W --> K
 ```
 
 ## Components
@@ -46,7 +48,7 @@ flowchart LR
 | Prediction baseline | `src/scenariolens/prediction.py` | Evaluates constant-velocity and lane-aware forecasts on Waymo prediction targets or non-ego fixture tracks, producing ADE/FDE, miss rate, failure score, and comparison deltas. |
 | Baseline comparison | `src/scenariolens/baseline_compare.py` | Generates public-safe Markdown/JSON comparison reports for constant-velocity versus lane-aware prediction baselines. |
 | Lane-selection study | `src/scenariolens/lane_selection_study.py` | Compares nearest-lane and heading-aware lane-selection variants across local slices without changing the default scoring baseline. |
-| Baseline debug | `src/scenariolens/baseline_debug.py` | Selects representative baseline-comparison cases and writes ignored local SVG overlays, per-track metric timelines, lane-match diagnostics, and public-safe casebook summaries. |
+| Baseline debug | `src/scenariolens/baseline_debug.py` | Selects representative baseline-comparison or lane-selection cases and writes ignored local SVG overlays, per-track metric timelines, lane-match diagnostics, and public-safe casebook summaries. |
 | Replay candidates | `src/scenariolens/replay_candidates.py` | Converts baseline-debug manifests into a public-safe replay-readiness queue with priority scores, blockers, and next actions for Waymax/JAX follow-up work. |
 | Replay prototype | `src/scenariolens/replay_prototype.py` | Reloads replay-ready local scenarios, reruns open-loop baseline rollouts, applies deterministic anchor-velocity perturbations, and publishes public-safe stability summaries. |
 | Map-match audit | `src/scenariolens/map_match_audit.py` | Reloads fallback-heavy debug cases, sweeps lane-match thresholds, and publishes public-safe evidence about whether wider lane acceptance improves or worsens FDE before changing matcher behavior. |

@@ -29,6 +29,9 @@ CASE_DIAGNOSTICS_FORMAT = "scenariolens.dashboard.case_diagnostics.v1"
 CASE_DIAGNOSTICS_REPORT_PATH = (
     "../reports/waymo_heading_aware_lane_selection_study.md"
 )
+CASE_DIAGNOSTICS_DEBUG_REPORT_PATH = (
+    "../reports/waymo_heading_aware_debug_casebook.md"
+)
 
 _CASE_GROUPS = (
     (
@@ -180,6 +183,7 @@ def dashboard_payload(
 def load_lane_selection_case_diagnostics(
     manifest_path: str | Path | None = DEFAULT_LANE_SELECTION_MANIFEST,
     report_path: str = CASE_DIAGNOSTICS_REPORT_PATH,
+    debug_report_path: str = CASE_DIAGNOSTICS_DEBUG_REPORT_PATH,
     limit_per_group: int = 6,
 ) -> dict[str, object] | None:
     """Load public-safe real-data lane-selection diagnostics for the Explorer."""
@@ -211,6 +215,7 @@ def load_lane_selection_case_diagnostics(
         "format": CASE_DIAGNOSTICS_FORMAT,
         "study": "Heading-aware lane selection",
         "report_path": report_path,
+        "debug_report_path": debug_report_path,
         "scope_note": manifest.get(
             "scope_note",
             "Heading-aware lane selection is a diagnostic ablation, not a production prediction model.",

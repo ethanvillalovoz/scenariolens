@@ -204,6 +204,8 @@ class CliTest(unittest.TestCase):
             prototype_dir = root / "prototype"
             map_audit_dir = root / "map_audit"
             lane_selection_dir = root / "lane_selection"
+            heading_debug_dir = root / "heading_debug"
+            heading_public_report = root / "reports" / "heading_debug_casebook.md"
 
             subprocess.run(
                 [
@@ -361,6 +363,33 @@ class CliTest(unittest.TestCase):
             self.assertIn("Compared", lane_selection_result.stdout)
             self.assertTrue((lane_selection_dir / "manifest.json").exists())
             self.assertTrue((lane_selection_dir / "report.md").exists())
+
+            heading_debug_result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "baseline-debug",
+                    "--study-manifest",
+                    str(lane_selection_dir / "manifest.json"),
+                    "--output-dir",
+                    str(heading_debug_dir),
+                    "--case-count",
+                    "3",
+                    "--public-report",
+                    str(heading_public_report),
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertIn("Generated 3 baseline-debug case(s)", heading_debug_result.stdout)
+            self.assertTrue((heading_debug_dir / "manifest.json").exists())
+            self.assertTrue((heading_debug_dir / "report.md").exists())
+            self.assertTrue(heading_public_report.exists())
+            self.assertIn("Heading-Aware Debug Casebook", heading_public_report.read_text())
 
     def test_ingest_csv_then_render_from_input(self) -> None:
         csv_text = (

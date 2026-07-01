@@ -16,6 +16,7 @@ robotics, AI/ML, and software engineering internship conversations.
 - Open-loop replay prototype: `docs/reports/waymo_open_loop_replay_prototype.md`
 - Map-match threshold audit: `docs/reports/waymo_map_match_audit.md`
 - Heading-aware lane-selection study: `docs/reports/waymo_heading_aware_lane_selection_study.md`
+- Heading-aware debug casebook: `docs/reports/waymo_heading_aware_debug_casebook.md`
 - Fixture lane-aware baseline study: `docs/reports/lane_aware_baseline_study.md`
 - Baseline ablation study: `docs/reports/baseline_ablation_study.md`
 - Cross-shard stability study: `docs/reports/waymo_motion_failure_stability_cross_shard.md`
@@ -149,6 +150,9 @@ Testing and verification:
   overall.
 - The live Explorer now exposes public-safe heading-aware improvement,
   regression, and fallback-heavy case diagnostics from that 100-scenario run.
+- A heading-aware debug casebook connects six Explorer-facing cases to ignored
+  local SVG overlays, per-track metrics, heading-alignment diagnostics, and
+  fallback reasons.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
@@ -156,8 +160,7 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Connect Explorer diagnostics to richer local debug artifacts for the largest
-   heading-aware wins and regressions.
+3. Convert heading-aware debug cases into replay-readiness candidates.
 4. Add richer map and traffic-light summaries.
 5. Graduate stable replay candidates into an optional Waymax/JAX path.
 
