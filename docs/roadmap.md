@@ -299,10 +299,10 @@ heavy simulation dependencies.
 Status: implemented in `scenariolens heading-replay-prototype`,
 `src/scenariolens/heading_replay_prototype.py`, and
 `docs/reports/waymo_heading_aware_replay_prototype.md`. The current real-data
-run evaluates two heading-ready cases, 15 prediction targets, and eight
-perturbation trials; both the positive-control improvement and the regression
-target preserve their expected sign under the perturbations. This is open-loop
-diagnostic evidence, not Waymax/JAX execution or closed-loop simulation.
+run evaluates five heading-ready cases, 30 prediction targets, and 20
+perturbation trials; all improvement and regression cases preserve their
+expected selector sign under the perturbations. This is open-loop diagnostic
+evidence, not Waymax/JAX execution or closed-loop simulation.
 
 ## Milestone 4C: No-Auth Baseline Ablation
 
@@ -357,9 +357,9 @@ map-match threshold audit is checked in at
 `docs/reports/waymo_map_match_audit.md`. The heading-aware lane-selection
 ablation is checked in at
 `docs/reports/waymo_heading_aware_lane_selection_study.md`. Next work is to
-expand the heading-aware replay prototype beyond the current top two cases,
-expand the shard set from `docs/reports/waymo_motion_shard_plan.md`, and
-graduate stable replay candidates into an optional Waymax/JAX path.
+add richer map, traffic-light, and route-context summaries, expand the shard
+set from `docs/reports/waymo_motion_shard_plan.md`, and graduate stable replay
+candidates into an optional Waymax/JAX path.
 
 ## Stretch Goals
 

@@ -1335,7 +1335,7 @@ def main() -> int:
     heading_replay_parser.add_argument(
         "--top",
         type=int,
-        default=2,
+        default=5,
         help="Maximum heading-ready candidates to evaluate.",
     )
     heading_replay_parser.add_argument(

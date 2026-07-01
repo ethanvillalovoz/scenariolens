@@ -113,8 +113,8 @@ and links to the public reports.
   public data.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.
-- Expand nearest-lane vs heading-aware replay beyond the current top two
-  candidate cases.
-- Add map-aware features or traffic-light summaries.
+- Add map-aware, route-context, and traffic-light summaries from native Motion
+  records.
+- Analyze heading-aware replay stability across more validation shards.
 - Graduate stable replay-prototype candidates into an optional Waymax/JAX path.
 - Add additional public-safe report types.

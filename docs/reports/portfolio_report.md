@@ -362,7 +362,6 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 
 - Expand the documented local-slice recipe across more Waymo Motion validation shards.
 - Compare baseline ADE/FDE distributions across more validation shards.
-- Expand nearest-lane vs heading-aware replay beyond the current top two candidate cases.
+- Add route-context and traffic-light summaries from native Motion records.
 - Graduate stable open-loop replay candidates into an optional Waymax/JAX path.
-- Add traffic-light and richer lane-context features from native Motion records.
 - Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.

@@ -158,9 +158,9 @@ Testing and verification:
 - A heading-aware replay candidate plan ranks those six cases into four
   improvement controls, one regression target, and one map-match audit case
   before any heavier simulation claim.
-- A heading-aware replay prototype reloads the top improvement and regression
-  cases, evaluates 15 targets, and preserves the expected selector sign across
-  eight deterministic perturbation trials.
+- A heading-aware replay prototype reloads all five heading-ready cases,
+  evaluates 30 targets, and preserves the expected selector sign across 20
+  deterministic perturbation trials.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
@@ -168,9 +168,11 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Expand the heading-aware replay prototype beyond the current top two cases.
-4. Add richer map and traffic-light summaries.
-5. Graduate stable replay candidates into an optional Waymax/JAX path.
+3. Add richer map, traffic-light, and route-context summaries to the real-data
+   diagnostics.
+4. Graduate stable replay candidates into an optional Waymax/JAX path.
+5. Create curated scenario collections for pedestrian, cyclist, merge, and
+   unprotected-turn cases.
 
 ## Claims To Keep Honest
 

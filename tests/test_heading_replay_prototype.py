@@ -54,6 +54,25 @@ class HeadingReplayPrototypeTest(unittest.TestCase):
             self.assertIn("nearest-lane and heading-aware", markdown)
             self.assertIn("not Waymax/JAX execution", markdown)
 
+    def test_heading_replay_payload_defaults_to_five_candidates(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            candidate_manifest = _write_heading_candidate_fixture(root, candidate_count=6)
+
+            payload = heading_replay_prototype_payload(
+                candidate_manifest_path=candidate_manifest,
+                output_dir=root / "prototype",
+            )
+
+            self.assertEqual(payload["selected_candidate_count"], 5)
+            self.assertEqual(payload["replayed_case_count"], 5)
+            skipped_reasons = {
+                skipped["reason"]
+                for skipped in payload["skipped_candidates"]
+                if isinstance(skipped, dict)
+            }
+            self.assertIn("not_selected_due_to_top_limit", skipped_reasons)
+
     def test_heading_replay_cli_writes_manifest_and_public_report(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -90,7 +109,7 @@ class HeadingReplayPrototypeTest(unittest.TestCase):
             self.assertIn("Replay Summary", public_report.read_text())
 
 
-def _write_heading_candidate_fixture(root: Path) -> Path:
+def _write_heading_candidate_fixture(root: Path, candidate_count: int = 1) -> Path:
     scenario_path = root / "heading_fixture.json"
     debug_manifest = root / "heading_debug_manifest.json"
     candidate_manifest = root / "heading_candidate_manifest.json"
@@ -135,6 +154,7 @@ def _write_heading_candidate_fixture(root: Path) -> Path:
                         "comparison_mode": "heading_lane_selection",
                         "readiness": "ready_for_heading_improvement_replay",
                     }
+                    for _ in range(candidate_count)
                 ],
             }
         )

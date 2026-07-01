@@ -68,7 +68,7 @@ class HeadingReplayPrototypeResult:
 def generate_heading_replay_prototype(
     candidate_manifest_path: str | Path,
     output_dir: str | Path,
-    top: int = 2,
+    top: int = 5,
     public_report_path: str | Path | None = None,
 ) -> HeadingReplayPrototypeResult:
     """Generate a laptop-safe nearest-lane vs heading-aware replay packet."""
@@ -107,7 +107,7 @@ def generate_heading_replay_prototype(
 def heading_replay_prototype_payload(
     candidate_manifest_path: Path,
     output_dir: Path,
-    top: int,
+    top: int = 5,
 ) -> dict[str, object]:
     """Return deterministic heading-aware replay evidence for selected cases."""
 
@@ -407,7 +407,7 @@ def _select_heading_candidates(
                 "reason": "not_selected_due_to_top_limit",
             }
         )
-    return selected[:top], skipped
+    return selected, skipped
 
 
 def _heading_replay_case(

@@ -52,9 +52,9 @@ cases to ignored local SVG overlays, per-track metrics, heading-alignment
 diagnostics, and fallback reasons. The heading-aware replay candidate plan
 then ranks those six cases into replay-ready improvement/regression targets and
 a map-match audit case before making any heavier simulation claim. The
-heading-aware replay prototype then reloads the top improvement and regression
-cases, runs nearest-lane vs heading-aware rollouts with four deterministic
-perturbations each, and shows both signs are stable in this local slice.
+heading-aware replay prototype then reloads all five heading-ready cases, runs
+nearest-lane vs heading-aware rollouts with deterministic perturbations, and
+shows the expected selector sign is stable across the current local slice.
 
 ## Why It Matters
 

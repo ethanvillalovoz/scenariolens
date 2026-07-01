@@ -94,6 +94,8 @@ Then open `http://localhost:8000/demo/`.
 - [Map-match threshold audit](docs/reports/waymo_map_match_audit.md)
 - [Heading-aware lane selection study](docs/reports/waymo_heading_aware_lane_selection_study.md)
 - [Heading-aware debug casebook](docs/reports/waymo_heading_aware_debug_casebook.md)
+- [Heading-aware replay candidate plan](docs/reports/waymo_heading_aware_replay_candidate_plan.md)
+- [Heading-aware replay prototype](docs/reports/waymo_heading_aware_replay_prototype.md)
 - [Fixture lane-aware baseline comparison](docs/reports/lane_aware_baseline_study.md)
 - [No-auth baseline ablation study](docs/reports/baseline_ablation_study.md)
 - [Shard expansion plan](docs/reports/waymo_motion_shard_plan.md)
@@ -140,9 +142,9 @@ the full rationale.
 
 The checked-in demo currently uses synthetic scenarios plus tiny Waymo
 Motion-shaped fixtures. Synthetic data is the test harness, not the final
-claim. A separate checked-in summary documents one local smoke run on a
-downloaded Waymo Motion validation shard, while raw dataset files and
-local per-case debug artifacts stay outside git.
+claim. Separate checked-in reports document public-safe local Waymo Motion
+validation slices, lane-aware diagnostics, and replay-readiness experiments,
+while raw dataset files and local per-case debug artifacts stay outside git.
 
 See [docs/data_provenance.md](docs/data_provenance.md) for the exact fixture
 inventory and [docs/waymo_motion_slice_recipe.md](docs/waymo_motion_slice_recipe.md)
@@ -200,15 +202,16 @@ smoke test. The prototype can:
   cases in the live Scenario Explorer,
 - turn heading-aware debug cases into a replay-readiness queue for the next
   nearest-lane vs heading-aware replay experiment,
-- run a heading-aware open-loop replay prototype over selected real Waymo
-  cases with deterministic perturbation stability checks,
+- run a heading-aware open-loop replay prototype over all five current
+  heading-ready real Waymo cases with deterministic perturbation stability
+  checks,
 - generate static dashboard data and SVG assets,
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to expand the heading-aware replay prototype across more
-stable candidates, then graduate that path toward optional Waymax/JAX
-integration.
+The next milestone is to add richer map, traffic-light, and route-context
+summaries to the real-data diagnostics, then graduate stable replay candidates
+toward an optional Waymax/JAX integration path.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -426,7 +429,7 @@ Run the heading-aware replay prototype:
 PYTHONPATH=src python3 -m scenariolens.cli heading-replay-prototype \
   --candidate-manifest data/processed/waymo_heading_aware_replay_candidates/manifest.json \
   --output-dir data/processed/waymo_heading_aware_replay_prototype \
-  --top 2 \
+  --top 5 \
   --public-report docs/reports/waymo_heading_aware_replay_prototype.md
 ```
 

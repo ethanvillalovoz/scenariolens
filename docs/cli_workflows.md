@@ -234,16 +234,17 @@ versus which still need map-match or coordinate-frame audit.
 scenariolens heading-replay-prototype \
   --candidate-manifest data/processed/waymo_heading_aware_replay_candidates/manifest.json \
   --output-dir data/processed/waymo_heading_aware_replay_prototype \
-  --top 2 \
+  --top 5 \
   --public-report docs/reports/waymo_heading_aware_replay_prototype.md
 ```
 
 This reloads the selected local scenarios from the heading-aware replay
 candidate queue, reruns nearest-lane and heading-aware open-loop rollouts from
 the same anchor state, and applies deterministic speed/heading perturbations.
-The public report keeps only scenario IDs, aggregate stability counts, metric
-deltas, and local artifact pointers; raw Waymo files and replay packets stay
-ignored under `data/processed/`.
+The checked-in real-data run covers all five heading-ready cases from the
+current queue. The public report keeps only scenario IDs, aggregate stability
+counts, metric deltas, and local artifact pointers; raw Waymo files and replay
+packets stay ignored under `data/processed/`.
 
 ## Baseline Ablation
 

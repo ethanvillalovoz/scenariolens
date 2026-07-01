@@ -9,8 +9,8 @@ It is intentionally scoped: this is not a closed-loop simulator, not Waymax/JAX 
 - Candidate manifest: `data/processed/waymo_heading_aware_replay_candidates/manifest.json`
 - Debug manifest: `data/processed/waymo_heading_aware_debug_casebook/manifest.json`
 - Ready for replay analysis: True
-- Requested top candidates: 2
-- Heading replay cases evaluated: 2
+- Requested top candidates: 5
+- Heading replay cases evaluated: 5
 - Perturbations per case: 4
 - Raw Waymo files committed: no
 - Local replay packets and SVG overlays committed: no
@@ -19,15 +19,15 @@ It is intentionally scoped: this is not a closed-loop simulator, not Waymax/JAX 
 
 | Metric | Value |
 | --- | ---: |
-| Replayed cases | 2 |
-| Replayed targets | 15 |
-| Perturbation trials | 8 |
-| Sign-preserving trials | 8 |
+| Replayed cases | 5 |
+| Replayed targets | 30 |
+| Perturbation trials | 20 |
+| Sign-preserving trials | 20 |
 | Sign-preservation rate | 100.0% |
-| Heading improvement cases replayed | 1 |
+| Heading improvement cases replayed | 4 |
 | Heading regression cases replayed | 1 |
-| Heading map-used targets | 7 |
-| Heading fallback targets | 8 |
+| Heading map-used targets | 16 |
+| Heading fallback targets | 14 |
 
 ## Perturbation Set
 
@@ -42,6 +42,9 @@ It is intentionally scoped: this is not a closed-loop simulator, not Waymax/JAX 
 | ---: | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | 1 | `d30e6448f14e4c75` | Largest heading improvement | `ready_for_heading_improvement_replay` | 8 | 27.509 m | 48.599 m | 36.443 m | +12.156 m | 4/4 | 2.292 m |
 | 2 | `706fecd25045c8d` | Largest heading regression | `ready_for_heading_regression_replay` | 7 | 32.547 m | 31.232 m | 35.605 m | -4.373 m | 4/4 | 0.001 m |
+| 3 | `7912ee9523cb6fd` | Additional heading improvement | `ready_for_heading_improvement_replay` | 4 | 26.353 m | 41.547 m | 33.623 m | +7.924 m | 4/4 | 0.682 m |
+| 4 | `e3f6a29b59e42c1` | Additional heading improvement | `ready_for_heading_improvement_replay` | 5 | 50.124 m | 53.824 m | 48.816 m | +5.008 m | 4/4 | 0.001 m |
+| 5 | `46c1c1fbe5ef29d1` | Additional heading improvement | `ready_for_heading_improvement_replay` | 6 | 20.759 m | 41.729 m | 36.241 m | +5.488 m | 4/4 | 2.871 m |
 
 ## `d30e6448f14e4c75`
 
@@ -114,12 +117,108 @@ Perturbation trials:
 | `heading_left_5deg` | -4.373 m | True | 31.197 m | 31.532 m | 35.905 m |
 | `heading_right_5deg` | -4.372 m | True | 34.045 m | 30.953 m | 35.325 m |
 
+## `7912ee9523cb6fd`
+
+- Case: Additional heading improvement
+- Source: `validation.tfrecord-00008-of-00150`
+- Readiness: `ready_for_heading_improvement_replay`
+- Why replayed: Heading improvement candidate: replay checks whether the heading-aware selector advantage survives small anchor-state perturbations.
+- Nominal selector winner: heading_aware
+- Heading vs nearest FDE delta: +7.924 m
+- Heading vs constant-velocity FDE delta: -7.270 m
+- Perturbation stability label: `stable`
+- Sign-preservation rate: 100.0%
+- Local replay packet: `data/processed/waymo_heading_aware_replay_prototype/cases/3-additional-heading-improvement-7912ee9523cb6fd/heading_replay_packet.json`
+- Local SVG overlay: `data/processed/waymo_heading_aware_replay_prototype/cases/3-additional-heading-improvement-7912ee9523cb6fd/heading_replay.svg`
+
+Target replay rows:
+
+| Track | Type | CV FDE | Nearest FDE | Heading FDE | Heading vs nearest | Nearest map | Heading map | Heading fallback |
+| --- | --- | ---: | ---: | ---: | ---: | --- | --- | --- |
+| `1840` | `cyclist` | 8.875 m | 40.574 m | 8.875 m | +31.699 m | True | False | `lane_heading_misaligned` |
+| `946` | `vehicle` | 36.226 m | 33.418 m | 33.418 m | 0.000 m | True | True | `none` |
+| `944` | `vehicle` | 38.011 m | 69.897 m | 69.897 m | 0.000 m | True | True | `none` |
+| `947` | `vehicle` | 22.301 m | 22.301 m | 22.301 m | 0.000 m | False | False | `target_too_far_from_lane` |
+
+Perturbation trials:
+
+| Trial | Heading vs nearest | Preserves expected sign | CV FDE | Nearest FDE | Heading FDE |
+| --- | ---: | --- | ---: | ---: | ---: |
+| `speed_minus_10pct` | +7.242 m | True | 27.907 m | 41.548 m | 34.306 m |
+| `speed_plus_10pct` | +8.555 m | True | 24.829 m | 41.505 m | 32.950 m |
+| `heading_left_5deg` | +7.709 m | True | 27.091 m | 41.552 m | 33.843 m |
+| `heading_right_5deg` | +7.956 m | True | 26.033 m | 41.552 m | 33.596 m |
+
+## `e3f6a29b59e42c1`
+
+- Case: Additional heading improvement
+- Source: `validation.tfrecord-00008-of-00150`
+- Readiness: `ready_for_heading_improvement_replay`
+- Why replayed: Heading improvement candidate: replay checks whether the heading-aware selector advantage survives small anchor-state perturbations.
+- Nominal selector winner: heading_aware
+- Heading vs nearest FDE delta: +5.008 m
+- Heading vs constant-velocity FDE delta: +1.308 m
+- Perturbation stability label: `stable`
+- Sign-preservation rate: 100.0%
+- Local replay packet: `data/processed/waymo_heading_aware_replay_prototype/cases/4-additional-heading-improvement-e3f6a29b59e42c1/heading_replay_packet.json`
+- Local SVG overlay: `data/processed/waymo_heading_aware_replay_prototype/cases/4-additional-heading-improvement-e3f6a29b59e42c1/heading_replay.svg`
+
+Target replay rows:
+
+| Track | Type | CV FDE | Nearest FDE | Heading FDE | Heading vs nearest | Nearest map | Heading map | Heading fallback |
+| --- | --- | ---: | ---: | ---: | ---: | --- | --- | --- |
+| `752` | `vehicle` | 54.431 m | 104.956 m | 79.918 m | +25.038 m | True | True | `none` |
+| `745` | `vehicle` | 64.254 m | 48.339 m | 48.339 m | 0.000 m | True | True | `none` |
+| `741` | `vehicle` | 58.947 m | 15.869 m | 15.869 m | 0.000 m | True | True | `none` |
+| `749` | `vehicle` | 48.516 m | 48.516 m | 48.516 m | 0.000 m | False | False | `target_too_far_from_lane` |
+| `755` | `vehicle` | 24.473 m | 51.438 m | 51.438 m | 0.000 m | True | True | `none` |
+
+Perturbation trials:
+
+| Trial | Heading vs nearest | Preserves expected sign | CV FDE | Nearest FDE | Heading FDE |
+| --- | ---: | --- | ---: | ---: | ---: |
+| `speed_minus_10pct` | +5.007 m | True | 46.679 m | 54.347 m | 49.340 m |
+| `speed_plus_10pct` | +5.007 m | True | 53.791 m | 53.345 m | 48.338 m |
+| `heading_left_5deg` | +5.008 m | True | 49.039 m | 54.428 m | 49.420 m |
+| `heading_right_5deg` | +5.007 m | True | 51.595 m | 53.277 m | 48.270 m |
+
+## `46c1c1fbe5ef29d1`
+
+- Case: Additional heading improvement
+- Source: `validation.tfrecord-00007-of-00150`
+- Readiness: `ready_for_heading_improvement_replay`
+- Why replayed: Heading improvement candidate: replay checks whether the heading-aware selector advantage survives small anchor-state perturbations.
+- Nominal selector winner: heading_aware
+- Heading vs nearest FDE delta: +5.488 m
+- Heading vs constant-velocity FDE delta: -15.482 m
+- Perturbation stability label: `stable`
+- Sign-preservation rate: 100.0%
+- Local replay packet: `data/processed/waymo_heading_aware_replay_prototype/cases/5-additional-heading-improvement-46c1c1fbe5ef29d1/heading_replay_packet.json`
+- Local SVG overlay: `data/processed/waymo_heading_aware_replay_prototype/cases/5-additional-heading-improvement-46c1c1fbe5ef29d1/heading_replay.svg`
+
+Target replay rows:
+
+| Track | Type | CV FDE | Nearest FDE | Heading FDE | Heading vs nearest | Nearest map | Heading map | Heading fallback |
+| --- | --- | ---: | ---: | ---: | ---: | --- | --- | --- |
+| `236` | `vehicle` | 5.826 m | 5.826 m | 5.826 m | 0.000 m | False | False | `target_too_far_from_lane` |
+| `244` | `vehicle` | 33.565 m | 33.565 m | 33.565 m | 0.000 m | False | False | `target_too_far_from_lane` |
+| `246` | `vehicle` | 40.145 m | 29.077 m | 11.848 m | +17.229 m | True | True | `none` |
+| `245` | `vehicle` | 6.930 m | 53.530 m | 53.530 m | 0.000 m | True | True | `none` |
+| `249` | `vehicle` | 18.945 m | 109.232 m | 93.531 m | +15.701 m | True | True | `none` |
+| `218` | `vehicle` | 19.144 m | 19.144 m | 19.144 m | 0.000 m | False | False | `low_or_invalid_anchor_speed` |
+
+Perturbation trials:
+
+| Trial | Heading vs nearest | Preserves expected sign | CV FDE | Nearest FDE | Heading FDE |
+| --- | ---: | --- | ---: | ---: | ---: |
+| `speed_minus_10pct` | +5.488 m | True | 22.330 m | 40.896 m | 35.408 m |
+| `speed_plus_10pct` | +5.488 m | True | 19.722 m | 42.654 m | 37.166 m |
+| `heading_left_5deg` | +7.527 m | True | 21.408 m | 44.143 m | 36.616 m |
+| `heading_right_5deg` | +2.617 m | True | 22.087 m | 41.733 m | 39.116 m |
+
 ## Skipped Candidates
 
 - `2f035a284480e981`: not_heading_replay_ready
-- `7912ee9523cb6fd`: not_selected_due_to_top_limit
-- `e3f6a29b59e42c1`: not_selected_due_to_top_limit
-- `46c1c1fbe5ef29d1`: not_selected_due_to_top_limit
 
 ## Interpretation
 
