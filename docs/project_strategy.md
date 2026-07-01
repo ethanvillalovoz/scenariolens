@@ -49,11 +49,13 @@ ScenarioLens currently has four connected surfaces:
    slices.
 2. **Evaluation core**: a compact schema, quality filtering, taxonomy tags,
    constant-velocity baseline ADE/FDE, lane-aware baseline comparison, and
-   interpretable score components for density, VRUs, proximity, TTC, path
-   conflict, dynamics, baseline failure, and scenario category.
+   heading-aware lane-selection ablation, plus interpretable score components
+   for density, VRUs, proximity, TTC, path conflict, dynamics, baseline failure,
+   and scenario category.
 3. **Artifacts**: Markdown/JSON reports, SVG trajectory previews, validation
    packets, baseline-debug casebooks, replay-candidate plans, open-loop replay
-   prototype packets, map-match audits, and public-safe real-data case studies.
+   prototype packets, map-match audits, lane-selection studies, and public-safe
+   real-data case studies.
 4. **Explorer**: a static dashboard for filtering, sorting, and inspecting the
    scenario evidence without requiring a backend.
 
@@ -138,6 +140,8 @@ and links back to reports and provenance.
   [`docs/reports/waymo_open_loop_replay_prototype.md`](reports/waymo_open_loop_replay_prototype.md)
 - Map-match threshold audit:
   [`docs/reports/waymo_map_match_audit.md`](reports/waymo_map_match_audit.md)
+- Heading-aware lane-selection study:
+  [`docs/reports/waymo_heading_aware_lane_selection_study.md`](reports/waymo_heading_aware_lane_selection_study.md)
 - No-auth baseline ablation:
   [`docs/reports/baseline_ablation_study.md`](reports/baseline_ablation_study.md)
 - Shard expansion plan:

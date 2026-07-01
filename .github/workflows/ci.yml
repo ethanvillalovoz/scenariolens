@@ -45,6 +45,7 @@ jobs:
           scenariolens replay-candidates --debug-manifest /tmp/scenariolens-debug/manifest.json --output-dir /tmp/scenariolens-replay-candidates
           scenariolens replay-prototype --candidate-manifest /tmp/scenariolens-replay-candidates/manifest.json --output-dir /tmp/scenariolens-replay-prototype --top 2
           scenariolens map-match-audit --debug-manifest /tmp/scenariolens-debug/manifest.json --output-dir /tmp/scenariolens-map-match-audit --case-count 3
+          scenariolens lane-selection-study --input /tmp/scenariolens-synthetic.json --format scenariolens-json --output-dir /tmp/scenariolens-lane-selection --max-scenarios 11 --top 6
 
       - name: Smoke test CSV ingestion
         run: |

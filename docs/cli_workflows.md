@@ -176,6 +176,27 @@ made the lane-aware baseline worse, so the right next step is lane-set,
 coordinate-frame, and lane-selection auditing rather than a larger default
 radius.
 
+## Heading-Aware Lane Selection Study
+
+```bash
+scenariolens lane-selection-study \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00007-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00008-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00009-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00010-of-00150 \
+  --output-dir data/processed/waymo_lane_selection_study \
+  --max-scenarios 25 \
+  --top 10 \
+  --public-report docs/reports/waymo_heading_aware_lane_selection_study.md
+```
+
+This compares the existing nearest-lane selector with a heading-aware selector
+that prefers lane tangents aligned with the target's anchor velocity. It keeps
+the default ScenarioLens scorer unchanged. The current real-data report shows a
+small FDE improvement over nearest-lane selection while still trailing constant
+velocity overall, which makes it useful as an honest map-matching ablation
+rather than a production prediction claim.
+
 ## Baseline Ablation
 
 ```bash

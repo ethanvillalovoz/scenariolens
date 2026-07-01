@@ -36,6 +36,10 @@ from scenariolens.ingest.waymo_motion import (
     waymo_motion_slice_ready,
 )
 from scenariolens.io import load_scenarios, save_scenarios
+from scenariolens.lane_selection_study import (
+    LANE_SELECTION_STUDY_INPUT_FORMATS,
+    generate_lane_selection_study,
+)
 from scenariolens.map_match_audit import (
     DEFAULT_AUDIT_THRESHOLDS_M,
     generate_map_match_audit,
@@ -488,6 +492,42 @@ def baseline_compare_study_command(
 
     print(f"Wrote baseline-compare-study manifest to {result.manifest_path}")
     print(f"Wrote baseline-compare-study report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("One or more inputs are not ready. See manifest.json for details.")
+        return 2
+    print(
+        f"Compared {result.source_count} source(s) across "
+        f"{result.scenario_count} scenario(s) and "
+        f"{result.evaluated_target_count} evaluated target(s)."
+    )
+    return 0
+
+
+def lane_selection_study_command(
+    input_paths: list[str],
+    output_dir: str,
+    max_scenarios: int | None,
+    top: int,
+    input_format: str,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_lane_selection_study(
+            input_paths=tuple(input_paths),
+            output_dir=output_dir,
+            max_scenarios=max_scenarios,
+            top=top,
+            input_format=input_format,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote lane-selection-study manifest to {result.manifest_path}")
+    print(f"Wrote lane-selection-study report to {result.report_path}")
     if result.public_report_path is not None:
         print(f"Wrote public report copy to {result.public_report_path}")
     if not result.ready:
@@ -1079,6 +1119,50 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe report copy.",
     )
+    lane_selection_study_parser = subparsers.add_parser(
+        "lane-selection-study",
+        help=(
+            "Compare nearest-lane and heading-aware lane-selection baselines "
+            "across one or more inputs."
+        ),
+    )
+    lane_selection_study_parser.add_argument(
+        "--input",
+        action="append",
+        required=True,
+        help=(
+            "Input Waymo Motion file/directory or ScenarioLens JSON file. "
+            "Repeat this flag to compare multiple downloaded shards."
+        ),
+    )
+    lane_selection_study_parser.add_argument(
+        "--format",
+        choices=LANE_SELECTION_STUDY_INPUT_FORMATS,
+        default="native",
+        help="Input representation. Native accepts Waymo Motion files.",
+    )
+    lane_selection_study_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_lane_selection_study",
+        help="Directory for manifest.json and report.md.",
+    )
+    lane_selection_study_parser.add_argument(
+        "--max-scenarios",
+        type=int,
+        default=25,
+        help="Maximum number of scenarios to ingest per input before analysis.",
+    )
+    lane_selection_study_parser.add_argument(
+        "--top",
+        type=int,
+        default=10,
+        help="Number of improvement/regression rows to report.",
+    )
+    lane_selection_study_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe report copy.",
+    )
     baseline_debug_parser = subparsers.add_parser(
         "baseline-debug",
         help=(
@@ -1398,6 +1482,15 @@ def main() -> int:
         )
     if args.command == "baseline-compare-study":
         return baseline_compare_study_command(
+            input_paths=args.input,
+            output_dir=args.output_dir,
+            max_scenarios=args.max_scenarios,
+            top=args.top,
+            input_format=args.format,
+            public_report=args.public_report,
+        )
+    if args.command == "lane-selection-study":
+        return lane_selection_study_command(
             input_paths=args.input,
             output_dir=args.output_dir,
             max_scenarios=args.max_scenarios,

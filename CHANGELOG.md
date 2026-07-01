@@ -25,6 +25,9 @@ All notable changes to ScenarioLens are documented here.
 - `scenariolens map-match-audit` workflow that reloads fallback-heavy debug
   cases, sweeps lane-match thresholds, and publishes a public-safe diagnostic
   before changing matcher behavior.
+- `scenariolens lane-selection-study` workflow and heading-aware lane-selection
+  baseline variant comparing nearest-lane and heading-aware map matching across
+  the 100-scenario local Waymo slice.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

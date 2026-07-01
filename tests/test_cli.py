@@ -203,6 +203,7 @@ class CliTest(unittest.TestCase):
             replay_dir = root / "replay"
             prototype_dir = root / "prototype"
             map_audit_dir = root / "map_audit"
+            lane_selection_dir = root / "lane_selection"
 
             subprocess.run(
                 [
@@ -333,6 +334,33 @@ class CliTest(unittest.TestCase):
             self.assertIn("Generated", map_audit_result.stdout)
             self.assertTrue((map_audit_dir / "manifest.json").exists())
             self.assertTrue((map_audit_dir / "report.md").exists())
+
+            lane_selection_result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "lane-selection-study",
+                    "--input",
+                    str(input_path),
+                    "--format",
+                    "scenariolens-json",
+                    "--output-dir",
+                    str(lane_selection_dir),
+                    "--max-scenarios",
+                    "11",
+                    "--top",
+                    "6",
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertIn("Compared", lane_selection_result.stdout)
+            self.assertTrue((lane_selection_dir / "manifest.json").exists())
+            self.assertTrue((lane_selection_dir / "report.md").exists())
 
     def test_ingest_csv_then_render_from_input(self) -> None:
         csv_text = (

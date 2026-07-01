@@ -3,6 +3,7 @@ import unittest
 from scenariolens.prediction import (
     compare_prediction_baselines,
     constant_velocity_baseline,
+    heading_aware_lane_baseline,
     lane_aware_baseline,
 )
 from scenariolens.samples import synthetic_scenarios
@@ -121,6 +122,69 @@ class PredictionBaselineTest(unittest.TestCase):
         self.assertEqual(summary.map_used_count, 0)
         self.assertEqual(summary.fallback_count, 1)
         self.assertEqual(summary.track_results[0].fallback_reason, "no_lane_map_features")
+
+    def test_heading_aware_lane_baseline_prefers_aligned_lane(self) -> None:
+        scenario = Scenario(
+            scenario_id="crossing_lane_choice",
+            metadata={
+                "waymo_current_time_index": 1,
+                "waymo_tracks_to_predict_track_ids": ["target"],
+                "waymo_map_features": [
+                    {"kind": "lane", "points": [[1.0, -5.0], [1.0, 5.0]]},
+                    {"kind": "lane", "points": [[0.0, 0.0], [10.0, 0.0]]},
+                ],
+            },
+            tracks=(
+                _track(
+                    "target",
+                    "vehicle",
+                    (
+                        (0, 0, 0.2, 1, 0),
+                        (1, 1, 0.2, 1, 0),
+                        (2, 2, 0.2, 1, 0),
+                        (3, 3, 0.2, 1, 0),
+                    ),
+                ),
+            ),
+        )
+
+        nearest = lane_aware_baseline(scenario)
+        heading = heading_aware_lane_baseline(scenario)
+
+        self.assertEqual(nearest.map_used_count, 1)
+        self.assertEqual(heading.baseline_name, "lane_aware_heading")
+        self.assertEqual(heading.map_used_count, 1)
+        self.assertLess(heading.fde_m or 999.0, nearest.fde_m or 0.0)
+
+    def test_heading_aware_lane_baseline_falls_back_for_misaligned_lane(self) -> None:
+        scenario = Scenario(
+            scenario_id="misaligned_lane_choice",
+            metadata={
+                "waymo_current_time_index": 1,
+                "waymo_tracks_to_predict_track_ids": ["target"],
+                "waymo_map_features": [
+                    {"kind": "lane", "points": [[1.0, -5.0], [1.0, 5.0]]}
+                ],
+            },
+            tracks=(
+                _track(
+                    "target",
+                    "vehicle",
+                    (
+                        (0, 0, 0.2, 1, 0),
+                        (1, 1, 0.2, 1, 0),
+                        (2, 2, 0.2, 1, 0),
+                    ),
+                ),
+            ),
+        )
+
+        summary = heading_aware_lane_baseline(scenario)
+
+        self.assertEqual(summary.map_used_count, 0)
+        self.assertEqual(summary.fallback_count, 1)
+        self.assertEqual(summary.track_results[0].fallback_reason, "lane_heading_misaligned")
+        self.assertEqual(summary.fde_m, 0.0)
 
 
 def _scenario_by_id(scenario_id: str) -> Scenario:

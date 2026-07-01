@@ -105,6 +105,15 @@ worsened FDE, which keeps the public claim honest: the next step is auditing
 coordinate frames, lane coverage, and lane-selection logic, not simply
 loosening the matcher.
 
+The heading-aware lane-selection study is checked in at
+[`docs/reports/waymo_heading_aware_lane_selection_study.md`](reports/waymo_heading_aware_lane_selection_study.md).
+It compares the existing nearest-lane map baseline with a heading-aware selector
+over the same four-shard, 100-scenario slice. The public report publishes
+aggregate FDE deltas, map-used/fallback counts, and scenario IDs only. In this
+run, heading-aware selection improves mean FDE by 0.489 m over nearest-lane
+selection, but still trails constant velocity overall; that makes it an honest
+ablation for matcher design, not a production model claim.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

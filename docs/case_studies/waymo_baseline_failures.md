@@ -28,6 +28,8 @@ scenario IDs, tags, and reproducible commands.
   [`docs/reports/waymo_motion_shard_plan.md`](../reports/waymo_motion_shard_plan.md)
 - Map-match threshold audit:
   [`docs/reports/waymo_map_match_audit.md`](../reports/waymo_map_match_audit.md)
+- Heading-aware lane-selection study:
+  [`docs/reports/waymo_heading_aware_lane_selection_study.md`](../reports/waymo_heading_aware_lane_selection_study.md)
 
 The current local evidence includes the original 75-scenario windowed study and
 a true cross-shard run over four validation shards, covering 100 real scenarios
@@ -36,7 +38,10 @@ varying from 21.20 m to 28.89 m across sampled shards, with cyclist interaction
 the most variable shared tag. The follow-up map-match audit shows that simply
 widening the lane-match threshold on a fallback-heavy case makes FDE worse, so
 the next matcher work should focus on lane coverage, coordinate frames, heading,
-and route/intent priors.
+and route/intent priors. The heading-aware lane-selection study takes that next
+step as an ablation: it improves mean FDE by 0.489 m relative to nearest-lane
+selection over the same 418 prediction targets, while still trailing constant
+velocity overall.
 
 ## Why It Matters
 
@@ -47,8 +52,8 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Expand beyond shards `00007` through `00010`, improve map matching with
-heading-aware lane selection and coordinate-frame checks, and graduate stable
+Expand beyond shards `00007` through `00010`, build a case-level debug pass for
+the largest heading-aware lane-selection wins/regressions, and graduate stable
 open-loop replay candidates from
 `docs/reports/waymo_open_loop_replay_prototype.md` into an optional Waymax/JAX
 path.

@@ -8,6 +8,8 @@ from scenariolens.schema import AgentTrack, AgentType, Scenario, State
 DEFAULT_MISS_THRESHOLD_M = 2.0
 LANE_MATCH_THRESHOLD_M = 3.5
 MIN_LANE_AWARE_SPEED_MPS = 0.25
+HEADING_AWARE_MIN_ALIGNMENT = 0.5
+HEADING_AWARE_ALIGNMENT_PENALTY_M = 3.5
 
 
 @dataclass(frozen=True)
@@ -133,6 +135,9 @@ def lane_aware_baseline(
     scenario: Scenario,
     miss_threshold_m: float = DEFAULT_MISS_THRESHOLD_M,
     lane_match_threshold_m: float = LANE_MATCH_THRESHOLD_M,
+    lane_selection: str = "nearest",
+    lane_heading_min_alignment: float = HEADING_AWARE_MIN_ALIGNMENT,
+    baseline_name: str = "lane_aware",
 ) -> PredictionBaselineSummary:
     """Evaluate a lightweight lane-following forecast when map context exists.
 
@@ -158,13 +163,16 @@ def lane_aware_baseline(
             scenario=scenario,
             miss_threshold_m=miss_threshold_m,
             lane_match_threshold_m=lane_match_threshold_m,
+            lane_selection=lane_selection,
+            lane_heading_min_alignment=lane_heading_min_alignment,
+            baseline_name=baseline_name,
         )
         if result is None:
             fallback = _evaluate_track(
                 track=track,
                 scenario=scenario,
                 miss_threshold_m=miss_threshold_m,
-                baseline_name="lane_aware",
+                baseline_name=baseline_name,
                 map_used=False,
                 fallback_reason=fallback_reason,
             )
@@ -180,9 +188,34 @@ def lane_aware_baseline(
         target_source=target_source,
         requested_target_count=len(target_ids),
         results=tuple(results),
-        baseline_name="lane_aware",
+        baseline_name=baseline_name,
         map_used_count=map_used_count,
         fallback_count=fallback_count,
+    )
+
+
+def heading_aware_lane_baseline(
+    scenario: Scenario,
+    miss_threshold_m: float = DEFAULT_MISS_THRESHOLD_M,
+    lane_match_threshold_m: float = LANE_MATCH_THRESHOLD_M,
+    lane_heading_min_alignment: float = HEADING_AWARE_MIN_ALIGNMENT,
+) -> PredictionBaselineSummary:
+    """Evaluate lane following with heading-aware lane selection.
+
+    This variant keeps the same fallback discipline as the default lane-aware
+    baseline, but when several lane polylines are close to the target it prefers
+    lanes whose local tangent is aligned with the target's anchor velocity. It
+    is an experiment for diagnosing nearest-lane regressions, not the default
+    scoring baseline.
+    """
+
+    return lane_aware_baseline(
+        scenario,
+        miss_threshold_m=miss_threshold_m,
+        lane_match_threshold_m=lane_match_threshold_m,
+        lane_selection="heading",
+        lane_heading_min_alignment=lane_heading_min_alignment,
+        baseline_name="lane_aware_heading",
     )
 
 
@@ -361,6 +394,9 @@ def _evaluate_lane_aware_track(
     scenario: Scenario,
     miss_threshold_m: float,
     lane_match_threshold_m: float,
+    lane_selection: str,
+    lane_heading_min_alignment: float,
+    baseline_name: str,
 ) -> tuple[PredictionTrackResult | None, str | None]:
     if track.agent_type not in {"vehicle", "cyclist"}:
         return None, "non_vehicle_or_cyclist_target"
@@ -385,11 +421,15 @@ def _evaluate_lane_aware_track(
     if not isfinite(anchor_speed) or anchor_speed < MIN_LANE_AWARE_SPEED_MPS:
         return None, "low_or_invalid_anchor_speed"
 
-    projection = _nearest_lane_projection(anchor.x, anchor.y, lanes)
+    projection, projection_fallback_reason = _select_lane_projection(
+        anchor=anchor,
+        lanes=lanes,
+        lane_selection=lane_selection,
+        lane_match_threshold_m=lane_match_threshold_m,
+        lane_heading_min_alignment=lane_heading_min_alignment,
+    )
     if projection is None:
-        return None, "no_usable_lane_polyline"
-    if projection.distance_m > lane_match_threshold_m:
-        return None, "target_too_far_from_lane"
+        return None, projection_fallback_reason or "no_usable_lane_polyline"
 
     direction = _lane_direction(anchor, projection)
     predictions = tuple(
@@ -421,7 +461,7 @@ def _evaluate_lane_aware_track(
             fde_m=round(fde, 3),
             miss=fde > miss_threshold_m,
             predicted_states=(anchor, *predictions),
-            baseline_name="lane_aware",
+            baseline_name=baseline_name,
             map_used=True,
             fallback_reason=None,
         ),
@@ -496,6 +536,57 @@ def _nearest_lane_projection(
     return best
 
 
+def _select_lane_projection(
+    anchor: State,
+    lanes: tuple[tuple[tuple[float, float], ...], ...],
+    lane_selection: str,
+    lane_match_threshold_m: float,
+    lane_heading_min_alignment: float,
+) -> tuple[_LaneProjection | None, str | None]:
+    if lane_selection == "nearest":
+        projection = _nearest_lane_projection(anchor.x, anchor.y, lanes)
+        if projection is None:
+            return None, "no_usable_lane_polyline"
+        if projection.distance_m > lane_match_threshold_m:
+            return None, "target_too_far_from_lane"
+        return projection, None
+
+    if lane_selection != "heading":
+        raise ValueError(
+            "Unsupported lane selection mode: "
+            f"{lane_selection}. Expected 'nearest' or 'heading'."
+        )
+
+    projections = tuple(
+        projection
+        for lane in lanes
+        if (projection := _project_to_lane(anchor.x, anchor.y, lane)) is not None
+    )
+    if not projections:
+        return None, "no_usable_lane_polyline"
+
+    in_range = tuple(
+        projection
+        for projection in projections
+        if projection.distance_m <= lane_match_threshold_m
+    )
+    if not in_range:
+        return None, "target_too_far_from_lane"
+
+    aligned = tuple(
+        projection
+        for projection in in_range
+        if _lane_heading_alignment(anchor, projection) >= lane_heading_min_alignment
+    )
+    if not aligned:
+        return None, "lane_heading_misaligned"
+
+    return (
+        min(aligned, key=lambda projection: _heading_selection_score(anchor, projection)),
+        None,
+    )
+
+
 def _project_to_lane(
     x: float,
     y: float,
@@ -526,6 +617,25 @@ def _project_to_lane(
             best = projection
         accumulated += length
     return best
+
+
+def _lane_heading_alignment(anchor: State, projection: _LaneProjection) -> float:
+    anchor_speed = hypot(anchor.vx, anchor.vy)
+    if anchor_speed <= 0.0 or projection.segment_length_m <= 0.0:
+        return 0.0
+    tangent_x = projection.segment_dx / projection.segment_length_m
+    tangent_y = projection.segment_dy / projection.segment_length_m
+    return abs(
+        ((anchor.vx / anchor_speed) * tangent_x)
+        + ((anchor.vy / anchor_speed) * tangent_y)
+    )
+
+
+def _heading_selection_score(anchor: State, projection: _LaneProjection) -> float:
+    alignment = _lane_heading_alignment(anchor, projection)
+    return projection.distance_m + (
+        HEADING_AWARE_ALIGNMENT_PENALTY_M * (1.0 - alignment)
+    )
 
 
 def _lane_direction(anchor: State, projection: _LaneProjection) -> float:

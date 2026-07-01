@@ -8,6 +8,7 @@ Dataset Adapter
 -> Scenario Schema
 -> Metrics
 -> Baseline Evaluator
+-> Lane-Selection Study
 -> Debug Casebook
 -> Replay Candidate Plan
 -> Open-Loop Replay Prototype
@@ -44,6 +45,16 @@ vehicle/cyclist targets when map context is available, then falls back to
 constant velocity for pedestrians, missing maps, low-speed tracks, or distant
 lane matches. This keeps the core baseline stable while showing how map context
 can reduce forecast error on curved-road cases.
+
+## Lane-Selection Study
+
+The lane-selection study is an ablation for improving the map baseline without
+changing the default scorer. It compares the existing nearest-lane selector
+against a heading-aware selector that prefers lane tangents aligned with the
+target's anchor velocity. The current real-data study shows a small FDE
+improvement over nearest-lane selection while still trailing constant velocity
+overall, so it is evidence for matcher iteration rather than a production
+prediction claim.
 
 ## Debug Casebook
 
@@ -100,6 +111,7 @@ score components, baseline failures, and links to the public reports.
   public data.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.
+- Turn heading-aware wins and regressions into a case-level debug casebook.
 - Add map-aware features or traffic-light summaries.
 - Graduate stable replay-prototype candidates into an optional Waymax/JAX path.
 - Add additional public-safe report types.

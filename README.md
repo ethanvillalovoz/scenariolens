@@ -92,6 +92,7 @@ Then open `http://localhost:8000/demo/`.
 - [Replay candidate plan](docs/reports/waymo_replay_candidate_plan.md)
 - [Open-loop replay prototype](docs/reports/waymo_open_loop_replay_prototype.md)
 - [Map-match threshold audit](docs/reports/waymo_map_match_audit.md)
+- [Heading-aware lane selection study](docs/reports/waymo_heading_aware_lane_selection_study.md)
 - [Fixture lane-aware baseline comparison](docs/reports/lane_aware_baseline_study.md)
 - [No-auth baseline ablation study](docs/reports/baseline_ablation_study.md)
 - [Shard expansion plan](docs/reports/waymo_motion_shard_plan.md)
@@ -192,13 +193,15 @@ smoke test. The prototype can:
   Waymo scenarios,
 - audit a fallback-heavy real Waymo case with a map-match threshold sweep before
   changing matcher behavior,
+- compare nearest-lane and heading-aware lane selection across 100 real Waymo
+  scenarios without changing the default scoring baseline,
 - generate static dashboard data and SVG assets,
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to use the replay and map-match audit evidence to improve
-lane selection, coordinate-frame checks, and richer map context before
-graduating the most stable candidates into an optional Waymax/JAX replay path.
+The next milestone is to turn the heading-aware lane-selection results into
+case-level matcher diagnostics, then graduate the most stable candidates into an
+optional Waymax/JAX replay path.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -242,6 +245,9 @@ For the first open-loop replay and perturbation run over that queue, see the
 [Waymo Open-Loop Replay Prototype](docs/reports/waymo_open_loop_replay_prototype.md).
 For the fallback-heavy threshold-sensitivity audit, see the
 [Waymo Map-Match Audit](docs/reports/waymo_map_match_audit.md).
+For the heading-aware lane-selection ablation over the same 100-scenario slice,
+see the
+[Waymo Heading-Aware Lane Selection Study](docs/reports/waymo_heading_aware_lane_selection_study.md).
 For the fixture-level lane-aware prediction baseline comparison, see the
 [Lane-Aware Baseline Study](docs/reports/lane_aware_baseline_study.md).
 For the no-auth constant-velocity vs lane-aware sensitivity check, see the
@@ -364,6 +370,20 @@ PYTHONPATH=src python3 -m scenariolens.cli map-match-audit \
   --output-dir data/processed/waymo_map_match_audit \
   --case-count 1 \
   --public-report docs/reports/waymo_map_match_audit.md
+```
+
+Run the real heading-aware lane-selection ablation:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli lane-selection-study \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00007-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00008-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00009-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00010-of-00150 \
+  --output-dir data/processed/waymo_lane_selection_study \
+  --max-scenarios 25 \
+  --top 10 \
+  --public-report docs/reports/waymo_heading_aware_lane_selection_study.md
 ```
 
 Run the no-auth baseline ablation:

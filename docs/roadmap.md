@@ -234,6 +234,28 @@ widening the match radius uses more lanes but worsens FDE. That makes the next
 engineering step more specific: improve map matching with heading, coverage,
 coordinate-frame, and intent checks instead of loosening the default threshold.
 
+## Milestone 4H: Heading-Aware Lane Selection Study
+
+Goal: turn the map-match audit conclusion into a tested map-selection ablation.
+
+- keep constant velocity as the default scoring baseline,
+- keep the existing nearest-lane baseline for comparison,
+- add a heading-aware lane-selection variant that prefers lane tangents aligned
+  with the target's anchor velocity,
+- preserve fallback behavior for pedestrians, missing maps, low-speed targets,
+  distant lanes, and poorly aligned lanes,
+- publish a real 100-scenario study that compares constant velocity,
+  nearest-lane, and heading-aware lane selection without raw data.
+
+Status: implemented in `scenariolens lane-selection-study`,
+`src/scenariolens/lane_selection_study.py`, and
+`docs/reports/waymo_heading_aware_lane_selection_study.md`. The current
+four-shard run covers 100 scenarios and 418 evaluated prediction targets.
+Heading-aware selection improves mean FDE by 0.489 m relative to nearest-lane
+selection, while still trailing constant velocity overall. That makes it a
+useful matcher ablation, not a production prediction claim. Next work is a
+case-level debug pass over the largest heading-aware wins and regressions.
+
 ## Milestone 4C: No-Auth Baseline Ablation
 
 Goal: keep technical progress visible even when Waymo shard auth is blocked.
@@ -284,10 +306,12 @@ candidate queue at `docs/reports/waymo_replay_candidate_plan.md`. The first
 open-loop replay prototype is checked in at
 `docs/reports/waymo_open_loop_replay_prototype.md`, and the fallback-heavy
 map-match threshold audit is checked in at
-`docs/reports/waymo_map_match_audit.md`. Next work is to expand the shard set
-from `docs/reports/waymo_motion_shard_plan.md`, improve map matching with
-heading/route-aware lane selection, and graduate stable replay candidates into
-an optional Waymax/JAX path.
+`docs/reports/waymo_map_match_audit.md`. The heading-aware lane-selection
+ablation is checked in at
+`docs/reports/waymo_heading_aware_lane_selection_study.md`. Next work is to
+expand the shard set from `docs/reports/waymo_motion_shard_plan.md`, debug the
+largest heading-aware wins/regressions, and graduate stable replay candidates
+into an optional Waymax/JAX path.
 
 ## Stretch Goals
 
