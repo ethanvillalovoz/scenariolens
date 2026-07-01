@@ -65,6 +65,6 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Turn the context-joined failure rows into curated evaluation sets and replay
-candidates; expand beyond shards `00007` through `00010`; and graduate stable
-open-loop replay candidates into an optional Waymax/JAX path.
+Use the context evaluation set to drive casebook and replay-candidate queues;
+expand beyond shards `00007` through `00010`; and graduate stable open-loop
+replay candidates into an optional Waymax/JAX path.

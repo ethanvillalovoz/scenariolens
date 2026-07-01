@@ -49,6 +49,10 @@ All notable changes to ScenarioLens are documented here.
   `docs/reports/waymo_context_failure_study_cross_shard.md`, joining map/signal
   context with ScenarioLens scores, constant-velocity FDE, lane-aware deltas,
   fallback counts, and context-rich failure rankings.
+- `scenariolens context-eval-set` workflow and
+  `docs/reports/waymo_context_eval_set.md`, turning context-failure rankings
+  into grouped public-safe scenario IDs with acceptance checks for follow-up
+  experiments.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

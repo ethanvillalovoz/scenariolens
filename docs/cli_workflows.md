@@ -284,6 +284,22 @@ map/signal context summaries. The checked-in report highlights context-rich
 constant-velocity failures, signal-heavy failures, route-topology failures, and
 lane-aware regressions with rich context.
 
+## Context Evaluation Set
+
+```bash
+scenariolens context-eval-set \
+  --context-failure-manifest data/processed/waymo_context_failure_study_cross_shard/manifest.json \
+  --output-dir data/processed/waymo_context_eval_set \
+  --top-per-group 5 \
+  --public-report docs/reports/waymo_context_eval_set.md
+```
+
+This turns the context-joined failure manifest into a public-safe evaluation
+set with grouped scenario IDs, acceptance checks, and follow-up experiment
+hooks. The checked-in report contains 14 unique scenario IDs across signal,
+route/topology, lane-regression, and fallback-stress groups. It is not an
+official benchmark and does not include raw Waymo data.
+
 ## Baseline Ablation
 
 ```bash

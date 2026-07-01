@@ -17,6 +17,8 @@ flowchart LR
     P --> H
     F --> L["Failure-study aggregate report"]
     F --> N["Failure-stability comparison report"]
+    F --> X["Context-failure study"]
+    X --> Y["Context evaluation set"]
     P --> U["Heading-aware lane-selection study"]
     U --> V["Explorer case diagnostics"]
     U --> W["Heading-aware debug casebook"]
@@ -35,6 +37,8 @@ flowchart LR
     T --> K
     U --> K
     W --> K
+    X --> K
+    Y --> K
 ```
 
 ## Components
@@ -48,6 +52,7 @@ flowchart LR
 | Prediction baseline | `src/scenariolens/prediction.py` | Evaluates constant-velocity and lane-aware forecasts on Waymo prediction targets or non-ego fixture tracks, producing ADE/FDE, miss rate, failure score, and comparison deltas. |
 | Context study | `src/scenariolens/context_study.py` | Aggregates public-safe map-feature, traffic-signal, stop-point, and lane-topology coverage from local Waymo Motion slices. |
 | Context-failure study | `src/scenariolens/context_failure_study.py` | Joins parsed map/signal context with ScenarioLens scores, baseline FDE, lane-aware deltas, and fallback counts for context-rich case selection. |
+| Context evaluation set | `src/scenariolens/context_eval_set.py` | Converts context-failure rankings into grouped, public-safe scenario ID sets with selection reasons, acceptance checks, and follow-up experiment hooks. |
 | Baseline comparison | `src/scenariolens/baseline_compare.py` | Generates public-safe Markdown/JSON comparison reports for constant-velocity versus lane-aware prediction baselines. |
 | Lane-selection study | `src/scenariolens/lane_selection_study.py` | Compares nearest-lane and heading-aware lane-selection variants across local slices without changing the default scoring baseline. |
 | Baseline debug | `src/scenariolens/baseline_debug.py` | Selects representative baseline-comparison or lane-selection cases and writes ignored local SVG overlays, per-track metric timelines, lane-match diagnostics, and public-safe casebook summaries. |
@@ -98,8 +103,8 @@ The public artifact path is:
 1. run ingestion or validation,
 2. normalize into ScenarioLens JSON,
 3. generate ranked reports, SVGs, aggregate failure studies, stability studies,
-   lane-selection studies, baseline-debug casebooks, replay-candidate plans,
-   open-loop replay prototype packets, and map-match audits,
+   lane-selection studies, context evaluation sets, baseline-debug casebooks,
+   replay-candidate plans, open-loop replay prototype packets, and map-match audits,
 4. publish aggregate summaries, dashboard payloads, and public-safe study reports,
 5. keep raw data, local SVG debug overlays, and per-scenario downloaded outputs local.
 

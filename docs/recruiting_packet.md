@@ -10,6 +10,7 @@ robotics, AI/ML, and software engineering internship conversations.
 - Product strategy: `docs/project_strategy.md`
 - Architecture: `docs/architecture.md`
 - Portfolio report: `docs/reports/portfolio_report.md`
+- Context evaluation set: `docs/reports/waymo_context_eval_set.md`
 - Real lane-aware baseline diagnostic: `docs/reports/waymo_lane_aware_baseline_cross_shard.md`
 - Lane-aware debug casebook: `docs/reports/waymo_lane_aware_debug_casebook.md`
 - Replay candidate plan: `docs/reports/waymo_replay_candidate_plan.md`
@@ -167,14 +168,16 @@ Testing and verification:
 - A context-joined failure study connects those map/signal summaries to 418
   evaluated prediction targets, constant-velocity FDE, lane-aware deltas,
   fallback counts, and ranked context-rich failure cases.
+- A context evaluation set turns those ranked rows into 14 unique scenario IDs
+  grouped by signal context, route/topology, lane-aware regression, and fallback
+  stress, with acceptance checks for follow-up experiments.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
 What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
-2. Turn context-joined failure rows into curated evaluation sets and replay
-   candidate queues.
+2. Use the context evaluation set to drive casebook and replay-candidate queues.
 3. Compare distribution stability across true shards and scenario tags.
 4. Graduate stable replay candidates into an optional Waymax/JAX path.
 5. Create curated scenario collections for pedestrian, cyclist, merge, and

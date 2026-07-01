@@ -150,6 +150,12 @@ FDE, lane-aware deltas, map-used counts, and fallback counts. It is still a
 public-safe diagnostic: raw records, local manifests, and per-scenario packets
 stay ignored.
 
+The context evaluation set is checked in at
+[`docs/reports/waymo_context_eval_set.md`](reports/waymo_context_eval_set.md).
+It is derived from the ignored context-failure manifest and publishes grouped
+scenario IDs, selection reasons, metrics, and acceptance checks only. It does
+not include raw trajectories, map packets, or per-scenario derived files.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

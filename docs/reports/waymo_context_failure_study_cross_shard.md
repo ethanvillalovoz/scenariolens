@@ -120,4 +120,4 @@ Negative lane delta means the lane-aware baseline had higher FDE than constant v
 - This is a diagnostic join, not a causal claim that traffic lights or route links caused a baseline failure.
 - Signal-context and route-context buckets help select cases for casebooks, replay, and future route/intent features.
 - Lane-aware regressions remain valuable: they show where simple lane following is not enough even when rich context is available.
-- The next technical step is to turn these joined rows into curated evaluation sets and replay candidates.
+- These joined rows feed `scenariolens context-eval-set`, which turns ranked context failures into curated scenario groups for casebook and replay-candidate selection.

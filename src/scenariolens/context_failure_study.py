@@ -315,8 +315,9 @@ def context_failure_study_markdown(payload: dict[str, object]) -> str:
             "casebooks, replay, and future route/intent features.",
             "- Lane-aware regressions remain valuable: they show where simple lane "
             "following is not enough even when rich context is available.",
-            "- The next technical step is to turn these joined rows into curated "
-            "evaluation sets and replay candidates.",
+            "- These joined rows feed `scenariolens context-eval-set`, which "
+            "turns ranked context failures into curated scenario groups for "
+            "casebook and replay-candidate selection.",
         ]
     )
     return "\n".join(lines).rstrip() + "\n"

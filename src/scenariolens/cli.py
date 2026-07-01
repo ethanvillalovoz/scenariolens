@@ -29,6 +29,7 @@ from scenariolens.context_failure_study import (
     CONTEXT_FAILURE_STUDY_INPUT_FORMATS,
     generate_context_failure_study,
 )
+from scenariolens.context_eval_set import generate_context_eval_set
 from scenariolens.dashboard import (
     DEFAULT_LANE_SELECTION_MANIFEST,
     generate_dashboard_data,
@@ -777,6 +778,38 @@ def context_failure_study_command(
     print(
         f"Joined context and failure metrics for {result.scenario_count} "
         f"scenario(s) across {result.source_count} source(s)."
+    )
+    return 0
+
+
+def context_eval_set_command(
+    context_failure_manifest: str,
+    output_dir: str,
+    top_per_group: int,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_context_eval_set(
+            context_failure_manifest_path=context_failure_manifest,
+            output_dir=output_dir,
+            top_per_group=top_per_group,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote context-eval-set manifest to {result.manifest_path}")
+    print(f"Wrote context-eval-set report to {result.report_path}")
+    print(f"Wrote context-eval-set scenario IDs to {result.scenario_ids_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("Context eval set is not ready. See manifest.json for details.")
+        return 2
+    print(
+        f"Generated {result.group_count} eval group(s) with "
+        f"{result.unique_scenario_count} unique scenario(s)."
     )
     return 0
 
@@ -1536,6 +1569,34 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe context-failure report copy.",
     )
+    context_eval_parser = subparsers.add_parser(
+        "context-eval-set",
+        help=(
+            "Turn a context-failure-study manifest into a curated public-safe "
+            "evaluation set."
+        ),
+    )
+    context_eval_parser.add_argument(
+        "--context-failure-manifest",
+        required=True,
+        help="Manifest produced by scenariolens context-failure-study.",
+    )
+    context_eval_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_context_eval_set",
+        help="Directory for eval-set manifest, report, and scenario_ids.txt.",
+    )
+    context_eval_parser.add_argument(
+        "--top-per-group",
+        type=int,
+        default=5,
+        help="Maximum ranked cases to keep in each eval group.",
+    )
+    context_eval_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe eval-set report copy.",
+    )
     portfolio_parser = subparsers.add_parser(
         "portfolio-report",
         help="Generate the checked-in ScenarioLens portfolio report.",
@@ -1791,6 +1852,13 @@ def main() -> int:
             max_scenarios=args.max_scenarios,
             top=args.top,
             input_format=args.format,
+            public_report=args.public_report,
+        )
+    if args.command == "context-eval-set":
+        return context_eval_set_command(
+            context_failure_manifest=args.context_failure_manifest,
+            output_dir=args.output_dir,
+            top_per_group=args.top_per_group,
             public_report=args.public_report,
         )
     if args.command == "portfolio-report":
