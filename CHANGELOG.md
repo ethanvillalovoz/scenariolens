@@ -45,6 +45,10 @@ All notable changes to ScenarioLens are documented here.
   `docs/reports/waymo_context_study_cross_shard.md`, summarizing public-safe
   map-feature, traffic-signal, stop-point, and lane-topology coverage over the
   100-scenario local Waymo slice.
+- `scenariolens context-failure-study` workflow and
+  `docs/reports/waymo_context_failure_study_cross_shard.md`, joining map/signal
+  context with ScenarioLens scores, constant-velocity FDE, lane-aware deltas,
+  fallback counts, and context-rich failure rankings.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

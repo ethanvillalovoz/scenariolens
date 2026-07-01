@@ -25,6 +25,10 @@ from scenariolens.context_study import (
     CONTEXT_STUDY_INPUT_FORMATS,
     generate_context_study,
 )
+from scenariolens.context_failure_study import (
+    CONTEXT_FAILURE_STUDY_INPUT_FORMATS,
+    generate_context_failure_study,
+)
 from scenariolens.dashboard import (
     DEFAULT_LANE_SELECTION_MANIFEST,
     generate_dashboard_data,
@@ -738,6 +742,41 @@ def context_study_command(
     print(
         f"Analyzed {result.scenario_count} scenario(s) across "
         f"{result.source_count} source(s)."
+    )
+    return 0
+
+
+def context_failure_study_command(
+    input_paths: list[str],
+    output_dir: str,
+    max_scenarios: int | None,
+    top: int,
+    input_format: str,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_context_failure_study(
+            input_paths=tuple(input_paths),
+            output_dir=output_dir,
+            max_scenarios=max_scenarios,
+            top=top,
+            input_format=input_format,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote context-failure-study manifest to {result.manifest_path}")
+    print(f"Wrote context-failure-study report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("Context-failure study is not ready. See manifest.json for details.")
+        return 2
+    print(
+        f"Joined context and failure metrics for {result.scenario_count} "
+        f"scenario(s) across {result.source_count} source(s)."
     )
     return 0
 
@@ -1456,6 +1495,47 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe context-study copy.",
     )
+    context_failure_parser = subparsers.add_parser(
+        "context-failure-study",
+        help=(
+            "Join map/signal context summaries with baseline failure metrics "
+            "for public-safe real-data diagnostics."
+        ),
+    )
+    context_failure_parser.add_argument(
+        "--input",
+        action="append",
+        required=True,
+        help="Input Waymo Motion file/directory or ScenarioLens JSON file. Repeat for shards.",
+    )
+    context_failure_parser.add_argument(
+        "--format",
+        choices=CONTEXT_FAILURE_STUDY_INPUT_FORMATS,
+        default="native",
+        help="Input representation.",
+    )
+    context_failure_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_context_failure_study",
+        help="Directory for context-failure manifest.json and report.md.",
+    )
+    context_failure_parser.add_argument(
+        "--max-scenarios",
+        type=int,
+        default=25,
+        help="Maximum scenarios to load per input.",
+    )
+    context_failure_parser.add_argument(
+        "--top",
+        type=int,
+        default=10,
+        help="Number of ranked joined-diagnostic rows to include.",
+    )
+    context_failure_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe context-failure report copy.",
+    )
     portfolio_parser = subparsers.add_parser(
         "portfolio-report",
         help="Generate the checked-in ScenarioLens portfolio report.",
@@ -1697,6 +1777,15 @@ def main() -> int:
         )
     if args.command == "context-study":
         return context_study_command(
+            input_paths=args.input,
+            output_dir=args.output_dir,
+            max_scenarios=args.max_scenarios,
+            top=args.top,
+            input_format=args.format,
+            public_report=args.public_report,
+        )
+    if args.command == "context-failure-study":
+        return context_failure_study_command(
             input_paths=args.input,
             output_dir=args.output_dir,
             max_scenarios=args.max_scenarios,

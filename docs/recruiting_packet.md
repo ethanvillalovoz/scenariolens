@@ -164,14 +164,17 @@ Testing and verification:
 - A map and signal context study parses 15,453 static map features, 60,583
   traffic-signal lane states, and 27,065 lane-topology links from the same
   100-scenario real-data slice without publishing raw Waymo records.
+- A context-joined failure study connects those map/signal summaries to 418
+  evaluated prediction targets, constant-velocity FDE, lane-aware deltas,
+  fallback counts, and ranked context-rich failure cases.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
 What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
-2. Join map/signal context summaries with baseline failure, fallback, and
-   replay diagnostics.
+2. Turn context-joined failure rows into curated evaluation sets and replay
+   candidate queues.
 3. Compare distribution stability across true shards and scenario tags.
 4. Graduate stable replay candidates into an optional Waymax/JAX path.
 5. Create curated scenario collections for pedestrian, cyclist, merge, and

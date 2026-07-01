@@ -88,6 +88,7 @@ Then open `http://localhost:8000/demo/`.
 - [Failure distribution stability study](docs/reports/waymo_motion_failure_stability.md)
 - [Cross-shard failure stability study](docs/reports/waymo_motion_failure_stability_cross_shard.md)
 - [Waymo map and signal context study](docs/reports/waymo_context_study_cross_shard.md)
+- [Context-joined failure study](docs/reports/waymo_context_failure_study_cross_shard.md)
 - [Real Waymo lane-aware baseline diagnostic](docs/reports/waymo_lane_aware_baseline_cross_shard.md)
 - [Lane-aware baseline debug casebook](docs/reports/waymo_lane_aware_debug_casebook.md)
 - [Replay candidate plan](docs/reports/waymo_replay_candidate_plan.md)
@@ -201,6 +202,8 @@ smoke test. The prototype can:
   scenarios without changing the default scoring baseline,
 - summarize static map features, traffic-signal lane states, stop points, and
   lane-topology hints across the same 100-scenario local Waymo slice,
+- join map/signal context with baseline failure, lane-aware fallback, and
+  lane-regression diagnostics for context-rich case selection,
 - expose public-safe heading-aware improvement, regression, and fallback-heavy
   cases in the live Scenario Explorer,
 - turn heading-aware debug cases into a replay-readiness queue for the next
@@ -212,9 +215,9 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to join map/signal context summaries with baseline
-failures, then graduate stable replay candidates toward an optional Waymax/JAX
-integration path.
+The next milestone is to turn context-joined failure rows into curated
+evaluation sets and replay candidates, then graduate stable replay candidates
+toward an optional Waymax/JAX integration path.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).

@@ -265,6 +265,25 @@ coverage from local Waymo Motion records. The checked-in report covers the
 same 100-scenario, four-shard local slice as the other real-data diagnostics
 and publishes aggregate counts plus scenario IDs only.
 
+## Context-Joined Failure Study
+
+```bash
+scenariolens context-failure-study \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00007-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00008-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00009-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00010-of-00150 \
+  --output-dir data/processed/waymo_context_failure_study_cross_shard \
+  --max-scenarios 25 \
+  --top 10 \
+  --public-report docs/reports/waymo_context_failure_study_cross_shard.md
+```
+
+This joins ScenarioLens scores and prediction-baseline errors with the parsed
+map/signal context summaries. The checked-in report highlights context-rich
+constant-velocity failures, signal-heavy failures, route-topology failures, and
+lane-aware regressions with rich context.
+
 ## Baseline Ablation
 
 ```bash

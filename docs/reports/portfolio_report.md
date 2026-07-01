@@ -354,6 +354,7 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 - The prediction baselines are intentionally simple; they are failure-mining screens, not benchmark claims.
 - The map-match audit is a threshold-sensitivity diagnostic, not a production map matcher.
 - The map/signal context study is aggregate coverage evidence, not a route planner or traffic-light quality audit.
+- The context-joined failure study is diagnostic grouping evidence, not a causal claim about map or signal features.
 - The heading-aware lane selector is an ablation, not a replacement for the default scorer.
 - The heading-aware replay candidate plan is a queue for replay experiments, not completed simulation.
 - The heading-aware replay prototype is open-loop diagnostic evidence, not closed-loop simulation.
@@ -363,6 +364,6 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 
 - Expand the documented local-slice recipe across more Waymo Motion validation shards.
 - Compare baseline ADE/FDE distributions across more validation shards.
-- Join map/signal context summaries with baseline failure and replay diagnostics.
+- Turn context-joined failure rows into curated evaluation sets and replay candidates.
 - Graduate stable open-loop replay candidates into an optional Waymax/JAX path.
 - Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.

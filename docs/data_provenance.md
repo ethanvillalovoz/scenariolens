@@ -143,6 +143,13 @@ and lane-topology hints over the same four local validation shards used by the
 other 100-scenario diagnostics. The public report includes aggregate counts
 and scenario IDs only; raw TFRecords and local manifests remain ignored.
 
+The context-joined failure study is checked in at
+[`docs/reports/waymo_context_failure_study_cross_shard.md`](reports/waymo_context_failure_study_cross_shard.md).
+It joins those context summaries with ScenarioLens scores, constant-velocity
+FDE, lane-aware deltas, map-used counts, and fallback counts. It is still a
+public-safe diagnostic: raw records, local manifests, and per-scenario packets
+stay ignored.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

@@ -65,6 +65,6 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Join the map/signal context study with baseline failure, fallback, and replay
-diagnostics; expand beyond shards `00007` through `00010`; and graduate stable
+Turn the context-joined failure rows into curated evaluation sets and replay
+candidates; expand beyond shards `00007` through `00010`; and graduate stable
 open-loop replay candidates into an optional Waymax/JAX path.

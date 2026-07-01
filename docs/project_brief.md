@@ -63,8 +63,9 @@ replay-candidate planning, an open-loop replay/perturbation prototype,
 fallback-heavy map-match threshold auditing, a heading-aware lane-selection
 ablation, a heading-aware debug casebook, a heading-aware replay candidate
 queue, a heading-aware replay prototype, a 100-scenario map/signal context
-study, Markdown/JSON reports, a local real-data validation packet workflow,
-static dashboard data, and 2D SVG trajectory rendering with forecast overlays.
+study, a context-joined failure diagnostic, Markdown/JSON reports, a local
+real-data validation packet workflow, static dashboard data, and 2D SVG
+trajectory rendering with forecast overlays.
 
 The stack is intentionally aligned with the public Waymo/autonomy ecosystem:
 Python for data and evaluation tooling, Waymo Motion `Scenario`-shaped records

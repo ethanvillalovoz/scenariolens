@@ -357,11 +357,11 @@ map-match threshold audit is checked in at
 `docs/reports/waymo_map_match_audit.md`. The heading-aware lane-selection
 ablation is checked in at
 `docs/reports/waymo_heading_aware_lane_selection_study.md`. Next work is to
-join the map/signal context study at
-`docs/reports/waymo_context_study_cross_shard.md` with baseline failure and
-replay diagnostics, expand the shard set from
-`docs/reports/waymo_motion_shard_plan.md`, and graduate stable replay
-candidates into an optional Waymax/JAX path.
+turn the context-joined failure study at
+`docs/reports/waymo_context_failure_study_cross_shard.md` into curated
+evaluation sets and replay candidates, expand the shard set from
+`docs/reports/waymo_motion_shard_plan.md`, and graduate stable replay candidates
+into an optional Waymax/JAX path.
 
 ## Stretch Goals
 
