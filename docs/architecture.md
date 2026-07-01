@@ -30,6 +30,7 @@ flowchart LR
     S --> Z["Route/intent audit"]
     Z --> AA["Lane-link continuation prototype"]
     AA --> AB["Lane-continuation validation study"]
+    AB --> AC["Continuation replay/audit queue"]
     Q --> T["Map-match threshold audit"]
     F --> I["Static dashboard payload"]
     V --> I
@@ -66,6 +67,7 @@ flowchart LR
 | Replay prototype | `src/scenariolens/replay_prototype.py` | Reloads baseline or context replay-ready local scenarios, reruns open-loop baseline rollouts, applies deterministic anchor-velocity perturbations, and publishes public-safe stability summaries. |
 | Route/intent audit | `src/scenariolens/route_intent_audit.py` | Reloads stable replay regressions and diagnoses whether nearest-lane failures are better explained by heading selection, lane continuity, route/topology hints, or manual follow-up. |
 | Lane-link continuation | `src/scenariolens/lane_continuation.py` | Prototypes and validates parsed `entry_lanes`/`exit_lanes` continuation for lane-continuity candidates, while keeping the default scoring baseline unchanged. |
+| Lane-continuation candidates | `src/scenariolens/lane_continuation_candidates.py` | Turns continuation-study rows into public-safe replay controls, regression debug targets, and topology-audit blockers. |
 | Heading replay prototype | `src/scenariolens/heading_replay_prototype.py` | Reloads heading-ready local scenarios, compares nearest-lane and heading-aware open-loop rollouts, applies deterministic perturbations, and publishes selector stability summaries. |
 | Map-match audit | `src/scenariolens/map_match_audit.py` | Reloads fallback-heavy debug cases, sweeps lane-match thresholds, and publishes public-safe evidence about whether wider lane acceptance improves or worsens FDE before changing matcher behavior. |
 | Failure study | `src/scenariolens/failure_study.py` | Aggregates ADE/FDE, miss rate, tag-level failures, score-component failures, and hardest scenario ids without publishing raw data. |
@@ -114,7 +116,7 @@ The public artifact path is:
    lane-selection studies, context evaluation sets, baseline-debug casebooks,
    replay-candidate plans, context replay prototypes, open-loop replay prototype
    packets, route/intent audits, lane-link continuation prototypes and studies,
-   and map-match audits,
+   continuation replay/audit queues, and map-match audits,
 4. publish aggregate summaries, dashboard payloads, and public-safe study reports,
 5. keep raw data, local SVG debug overlays, and per-scenario downloaded outputs local.
 

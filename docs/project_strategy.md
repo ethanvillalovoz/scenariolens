@@ -149,6 +149,8 @@ and links back to reports and provenance.
   [`docs/reports/waymo_heading_aware_replay_candidate_plan.md`](reports/waymo_heading_aware_replay_candidate_plan.md)
 - Heading-aware replay prototype:
   [`docs/reports/waymo_heading_aware_replay_prototype.md`](reports/waymo_heading_aware_replay_prototype.md)
+- Lane-continuation candidate plan:
+  [`docs/reports/waymo_lane_continuation_candidate_plan.md`](reports/waymo_lane_continuation_candidate_plan.md)
 - No-auth baseline ablation:
   [`docs/reports/baseline_ablation_study.md`](reports/baseline_ablation_study.md)
 - Shard expansion plan:

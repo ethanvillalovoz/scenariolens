@@ -75,6 +75,9 @@ All notable changes to ScenarioLens are documented here.
   `docs/reports/waymo_lane_continuation_study.md`, scanning the 100-scenario
   local Waymo slice for lane-end clamp candidates and publishing linked-lane
   improvements, regressions, and topology gaps.
+- `scenariolens lane-continuation-candidates` workflow and
+  `docs/reports/waymo_lane_continuation_candidate_plan.md`, turning the study
+  into replay controls, regression debug targets, and topology-audit blockers.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

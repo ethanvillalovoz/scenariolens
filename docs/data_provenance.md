@@ -193,6 +193,12 @@ publishes aggregate/ranked diagnostics only: 178 candidate tracks, 145 linked
 lane rollouts, 96 improvements, 47 regressions, and 33 topology gaps. Raw
 Waymo files and ignored local manifests remain outside git.
 
+The lane-continuation candidate plan is checked in at
+[`docs/reports/waymo_lane_continuation_candidate_plan.md`](reports/waymo_lane_continuation_candidate_plan.md).
+It reads the ignored local study manifest and publishes only a public-safe
+queue of 15 scenario/track IDs: five replay controls, five regression debug
+targets, and five topology-audit blockers.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

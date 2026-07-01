@@ -375,10 +375,12 @@ following on a deterministic fixture and resolves the real stable warning's
 parsed lane chain, reducing the clamped nearest-lane FDE by 63.578 m. The
 validation study at `docs/reports/waymo_lane_continuation_study.md` then scans
 100 local Waymo scenarios and finds 178 lane-continuation candidates, including
-96 linked-lane improvements, 47 regressions, and 33 topology gaps. Next work is
-to expand the shard set from `docs/reports/waymo_motion_shard_plan.md` and
-graduate the strongest candidates into richer replay or optional Waymax/JAX
-experiments.
+96 linked-lane improvements, 47 regressions, and 33 topology gaps. The
+candidate plan at `docs/reports/waymo_lane_continuation_candidate_plan.md`
+promotes 15 of those rows into replay controls, regression debug targets, and
+topology-audit blockers. Next work is to expand the shard set from
+`docs/reports/waymo_motion_shard_plan.md` and execute the strongest candidates
+in richer replay or optional Waymax/JAX experiments.
 
 ## Stretch Goals
 

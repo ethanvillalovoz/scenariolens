@@ -58,6 +58,9 @@ from scenariolens.lane_continuation import (
     generate_lane_continuation_prototype,
     generate_lane_continuation_study,
 )
+from scenariolens.lane_continuation_candidates import (
+    generate_lane_continuation_candidate_plan,
+)
 from scenariolens.map_match_audit import (
     DEFAULT_AUDIT_THRESHOLDS_M,
     generate_map_match_audit,
@@ -749,6 +752,38 @@ def lane_continuation_study_command(
         f"Scanned {result.source_count} source(s) across "
         f"{result.scenario_count} scenario(s) and "
         f"{result.candidate_track_count} lane-continuation candidate target(s)."
+    )
+    return 0
+
+
+def lane_continuation_candidates_command(
+    study_manifest: str,
+    output_dir: str,
+    top_per_bucket: int,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_lane_continuation_candidate_plan(
+            study_manifest_path=study_manifest,
+            output_dir=output_dir,
+            top_per_bucket=top_per_bucket,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote lane-continuation-candidates manifest to {result.manifest_path}")
+    print(f"Wrote lane-continuation-candidates report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("Lane-continuation candidate plan is not ready. See manifest.json.")
+        return 2
+    print(
+        f"Generated {result.candidate_count} lane-continuation candidate(s): "
+        f"{result.replay_candidate_count} replay candidate(s), "
+        f"{result.audit_candidate_count} topology audit candidate(s)."
     )
     return 0
 
@@ -1627,6 +1662,34 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe lane-continuation study copy.",
     )
+    lane_continuation_candidates_parser = subparsers.add_parser(
+        "lane-continuation-candidates",
+        help=(
+            "Turn a lane-continuation study manifest into replay and topology "
+            "audit candidate queues."
+        ),
+    )
+    lane_continuation_candidates_parser.add_argument(
+        "--study-manifest",
+        required=True,
+        help="Manifest produced by scenariolens lane-continuation-study.",
+    )
+    lane_continuation_candidates_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_lane_continuation_candidates",
+        help="Directory for candidate manifest.json and report.md.",
+    )
+    lane_continuation_candidates_parser.add_argument(
+        "--top-per-bucket",
+        type=int,
+        default=5,
+        help="Maximum improvement, regression, and topology rows to queue.",
+    )
+    lane_continuation_candidates_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe candidate plan copy.",
+    )
     heading_replay_parser = subparsers.add_parser(
         "heading-replay-prototype",
         help=(
@@ -2046,6 +2109,13 @@ def main() -> int:
             max_scenarios=args.max_scenarios,
             top=args.top,
             input_format=args.format,
+            public_report=args.public_report,
+        )
+    if args.command == "lane-continuation-candidates":
+        return lane_continuation_candidates_command(
+            study_manifest=args.study_manifest,
+            output_dir=args.output_dir,
+            top_per_bucket=args.top_per_bucket,
             public_report=args.public_report,
         )
     if args.command == "heading-replay-prototype":

@@ -398,6 +398,20 @@ nearest-lane rollout would clamp at the end of a selected lane. The checked-in
 report keeps both sides of the diagnostic: 96 linked-lane improvements, 47
 regressions, and 33 topology gaps.
 
+## Lane-Continuation Candidate Plan
+
+```bash
+scenariolens lane-continuation-candidates \
+  --study-manifest data/processed/waymo_lane_continuation_study/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_candidates \
+  --top-per-bucket 5 \
+  --public-report docs/reports/waymo_lane_continuation_candidate_plan.md
+```
+
+This turns the validation study into a queue for follow-up work: positive
+replay controls, regression replay/debug targets, and topology-audit blockers.
+It is still a planning artifact, not a completed Waymax/JAX integration.
+
 ## Baseline Ablation
 
 ```bash
