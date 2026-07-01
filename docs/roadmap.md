@@ -279,8 +279,30 @@ Status: implemented in `scenariolens replay-candidates`,
 `docs/reports/waymo_heading_aware_replay_candidate_plan.md`. The current
 four-shard run produces six heading-aware replay candidates: four improvement
 controls, one regression target, and one map-match audit case. This is a
-planning artifact for a future heading-aware replay prototype, not completed
-Waymax/JAX simulation.
+planning artifact for heading-aware replay experiments, not completed Waymax/JAX
+simulation.
+
+## Milestone 4J: Heading-Aware Open-Loop Replay Prototype
+
+Goal: execute the strongest heading-aware selector candidates without adding
+heavy simulation dependencies.
+
+- read a heading-aware replay-candidate manifest,
+- reload selected local Waymo Motion scenarios,
+- replay nearest-lane and heading-aware open-loop rollouts from the same anchor
+  state,
+- keep constant velocity as context without making it the comparison target,
+- apply small deterministic speed and heading perturbations,
+- publish a public-safe stability report while keeping local replay packets and
+  SVG overlays ignored.
+
+Status: implemented in `scenariolens heading-replay-prototype`,
+`src/scenariolens/heading_replay_prototype.py`, and
+`docs/reports/waymo_heading_aware_replay_prototype.md`. The current real-data
+run evaluates two heading-ready cases, 15 prediction targets, and eight
+perturbation trials; both the positive-control improvement and the regression
+target preserve their expected sign under the perturbations. This is open-loop
+diagnostic evidence, not Waymax/JAX execution or closed-loop simulation.
 
 ## Milestone 4C: No-Auth Baseline Ablation
 
@@ -335,10 +357,9 @@ map-match threshold audit is checked in at
 `docs/reports/waymo_map_match_audit.md`. The heading-aware lane-selection
 ablation is checked in at
 `docs/reports/waymo_heading_aware_lane_selection_study.md`. Next work is to
-use `docs/reports/waymo_heading_aware_replay_candidate_plan.md` to prototype
-nearest-lane vs heading-aware replay for the most stable cases, expand the shard
-set from `docs/reports/waymo_motion_shard_plan.md`, and graduate stable replay
-candidates into an optional Waymax/JAX path.
+expand the heading-aware replay prototype beyond the current top two cases,
+expand the shard set from `docs/reports/waymo_motion_shard_plan.md`, and
+graduate stable replay candidates into an optional Waymax/JAX path.
 
 ## Stretch Goals
 

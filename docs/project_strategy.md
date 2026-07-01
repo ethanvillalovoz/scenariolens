@@ -54,8 +54,8 @@ ScenarioLens currently has four connected surfaces:
    and scenario category.
 3. **Artifacts**: Markdown/JSON reports, SVG trajectory previews, validation
    packets, baseline-debug casebooks, replay-candidate plans, open-loop replay
-   prototype packets, map-match audits, lane-selection studies, and public-safe
-   real-data case studies.
+   prototype packets, heading-aware replay packets, map-match audits,
+   lane-selection studies, and public-safe real-data case studies.
 4. **Explorer**: a static dashboard for filtering, sorting, inspecting scenario
    evidence, and reviewing public-safe heading-aware case diagnostics and replay
    planning links without requiring a backend.
@@ -147,6 +147,8 @@ and links back to reports and provenance.
   [`docs/reports/waymo_heading_aware_debug_casebook.md`](reports/waymo_heading_aware_debug_casebook.md)
 - Heading-aware replay candidate plan:
   [`docs/reports/waymo_heading_aware_replay_candidate_plan.md`](reports/waymo_heading_aware_replay_candidate_plan.md)
+- Heading-aware replay prototype:
+  [`docs/reports/waymo_heading_aware_replay_prototype.md`](reports/waymo_heading_aware_replay_prototype.md)
 - No-auth baseline ablation:
   [`docs/reports/baseline_ablation_study.md`](reports/baseline_ablation_study.md)
 - Shard expansion plan:

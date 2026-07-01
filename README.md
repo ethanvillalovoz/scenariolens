@@ -200,13 +200,15 @@ smoke test. The prototype can:
   cases in the live Scenario Explorer,
 - turn heading-aware debug cases into a replay-readiness queue for the next
   nearest-lane vs heading-aware replay experiment,
+- run a heading-aware open-loop replay prototype over selected real Waymo
+  cases with deterministic perturbation stability checks,
 - generate static dashboard data and SVG assets,
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to replay the most stable heading-aware candidates with a
-laptop-safe nearest-lane vs heading-aware prototype, then graduate that path
-toward optional Waymax/JAX integration.
+The next milestone is to expand the heading-aware replay prototype across more
+stable candidates, then graduate that path toward optional Waymax/JAX
+integration.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -256,6 +258,9 @@ see the
 For the replay-readiness queue derived from those heading-aware debug cases,
 see the
 [Waymo Heading-Aware Replay Candidate Plan](docs/reports/waymo_heading_aware_replay_candidate_plan.md).
+For the open-loop nearest-lane vs heading-aware replay run over selected
+candidates, see the
+[Waymo Heading-Aware Replay Prototype](docs/reports/waymo_heading_aware_replay_prototype.md).
 For the fixture-level lane-aware prediction baseline comparison, see the
 [Lane-Aware Baseline Study](docs/reports/lane_aware_baseline_study.md).
 For the no-auth constant-velocity vs lane-aware sensitivity check, see the
@@ -413,6 +418,16 @@ PYTHONPATH=src python3 -m scenariolens.cli replay-candidates \
   --debug-manifest data/processed/waymo_heading_aware_debug_casebook/manifest.json \
   --output-dir data/processed/waymo_heading_aware_replay_candidates \
   --public-report docs/reports/waymo_heading_aware_replay_candidate_plan.md
+```
+
+Run the heading-aware replay prototype:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli heading-replay-prototype \
+  --candidate-manifest data/processed/waymo_heading_aware_replay_candidates/manifest.json \
+  --output-dir data/processed/waymo_heading_aware_replay_prototype \
+  --top 2 \
+  --public-report docs/reports/waymo_heading_aware_replay_prototype.md
 ```
 
 Run the no-auth baseline ablation:

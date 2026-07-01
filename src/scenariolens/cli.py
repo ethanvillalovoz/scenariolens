@@ -30,6 +30,7 @@ from scenariolens.failure_study import (
     generate_failure_study,
 )
 from scenariolens.failure_stability import generate_failure_stability_study
+from scenariolens.heading_replay_prototype import generate_heading_replay_prototype
 from scenariolens.ingest.csv_tracks import save_track_csv_as_scenarios
 from scenariolens.ingest.waymo_motion import (
     adapter_status,
@@ -634,6 +635,39 @@ def replay_prototype_command(
         return 2
     print(
         f"Generated {result.case_count} replay case(s) across "
+        f"{result.replay_track_count} target(s)."
+    )
+    return 0
+
+
+def heading_replay_prototype_command(
+    candidate_manifest: str,
+    output_dir: str,
+    top: int,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_heading_replay_prototype(
+            candidate_manifest_path=candidate_manifest,
+            output_dir=output_dir,
+            top=top,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote heading-replay-prototype manifest to {result.manifest_path}")
+    print(f"Wrote heading-replay-prototype report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print(
+            "Heading replay prototype is not ready. See manifest.json for details."
+        )
+        return 2
+    print(
+        f"Generated {result.case_count} heading replay case(s) across "
         f"{result.replay_track_count} target(s)."
     )
     return 0
@@ -1278,6 +1312,37 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe replay prototype copy.",
     )
+    heading_replay_parser = subparsers.add_parser(
+        "heading-replay-prototype",
+        help=(
+            "Run a laptop-safe nearest-lane vs heading-aware replay prototype "
+            "for heading-ready candidates."
+        ),
+    )
+    heading_replay_parser.add_argument(
+        "--candidate-manifest",
+        required=True,
+        help="Heading-aware manifest produced by scenariolens replay-candidates.",
+    )
+    heading_replay_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_heading_aware_replay_prototype",
+        help=(
+            "Directory for heading replay prototype manifest, report, and "
+            "local artifacts."
+        ),
+    )
+    heading_replay_parser.add_argument(
+        "--top",
+        type=int,
+        default=2,
+        help="Maximum heading-ready candidates to evaluate.",
+    )
+    heading_replay_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe heading replay copy.",
+    )
     map_match_audit_parser = subparsers.add_parser(
         "map-match-audit",
         help=(
@@ -1530,6 +1595,13 @@ def main() -> int:
         )
     if args.command == "replay-prototype":
         return replay_prototype_command(
+            candidate_manifest=args.candidate_manifest,
+            output_dir=args.output_dir,
+            top=args.top,
+            public_report=args.public_report,
+        )
+    if args.command == "heading-replay-prototype":
+        return heading_replay_prototype_command(
             candidate_manifest=args.candidate_manifest,
             output_dir=args.output_dir,
             top=args.top,

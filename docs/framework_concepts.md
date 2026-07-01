@@ -113,8 +113,8 @@ and links to the public reports.
   public data.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.
-- Prototype nearest-lane vs heading-aware replay for the strongest candidate
-  cases.
+- Expand nearest-lane vs heading-aware replay beyond the current top two
+  candidate cases.
 - Add map-aware features or traffic-light summaries.
 - Graduate stable replay-prototype candidates into an optional Waymax/JAX path.
 - Add additional public-safe report types.

@@ -37,6 +37,10 @@ All notable changes to ScenarioLens are documented here.
 - Heading-aware replay candidate planning in `scenariolens replay-candidates`,
   including nearest-lane vs heading-aware readiness labels and the public-safe
   `docs/reports/waymo_heading_aware_replay_candidate_plan.md` report.
+- `scenariolens heading-replay-prototype` workflow that reloads selected
+  heading-ready cases, compares nearest-lane and heading-aware open-loop
+  rollouts, applies deterministic perturbations, and publishes
+  `docs/reports/waymo_heading_aware_replay_prototype.md`.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

@@ -20,6 +20,7 @@ The current pipeline supports synthetic scenarios, ScenarioLens JSON, row-wise C
 - Heading-aware lane-selection study is checked in under `docs/reports/waymo_heading_aware_lane_selection_study.md`.
 - Heading-aware debug casebook is checked in under `docs/reports/waymo_heading_aware_debug_casebook.md`.
 - Heading-aware replay candidate plan is checked in under `docs/reports/waymo_heading_aware_replay_candidate_plan.md`.
+- Heading-aware replay prototype is checked in under `docs/reports/waymo_heading_aware_replay_prototype.md`.
 - Baseline comparison report is generated under `docs/reports/lane_aware_baseline_study.md`.
 - Baseline ablation report is generated under `docs/reports/baseline_ablation_study.md`.
 - Static dashboard data contract is generated under `docs/demo/`.
@@ -191,6 +192,7 @@ Map-match threshold audit: `docs/reports/waymo_map_match_audit.md`.
 Heading-aware lane-selection study: `docs/reports/waymo_heading_aware_lane_selection_study.md`.
 Heading-aware debug casebook: `docs/reports/waymo_heading_aware_debug_casebook.md`.
 Heading-aware replay candidate plan: `docs/reports/waymo_heading_aware_replay_candidate_plan.md`.
+Heading-aware replay prototype: `docs/reports/waymo_heading_aware_replay_prototype.md`.
 
 ## Native Waymo Motion JSON Mini-Slice
 
@@ -352,14 +354,15 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 - The prediction baselines are intentionally simple; they are failure-mining screens, not benchmark claims.
 - The map-match audit is a threshold-sensitivity diagnostic, not a production map matcher.
 - The heading-aware lane selector is an ablation, not a replacement for the default scorer.
-- The heading-aware replay candidate plan is a queue for the next experiment, not completed simulation.
+- The heading-aware replay candidate plan is a queue for replay experiments, not completed simulation.
+- The heading-aware replay prototype is open-loop diagnostic evidence, not closed-loop simulation.
 - The current renderer is 2D and focuses on agent trajectories, map context, and baseline overlays, not traffic-light logic.
 
 ## Next Work
 
 - Expand the documented local-slice recipe across more Waymo Motion validation shards.
 - Compare baseline ADE/FDE distributions across more validation shards.
-- Prototype nearest-lane vs heading-aware replay for the strongest candidate cases.
+- Expand nearest-lane vs heading-aware replay beyond the current top two candidate cases.
 - Graduate stable open-loop replay candidates into an optional Waymax/JAX path.
 - Add traffic-light and richer lane-context features from native Motion records.
 - Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.

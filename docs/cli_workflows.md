@@ -225,8 +225,25 @@ scenariolens replay-candidates \
 When the debug manifest comes from the heading-aware casebook, `replay-candidates`
 switches into a nearest-lane vs heading-aware planning mode. It ranks selector
 wins, regressions, and fallback-heavy cases, keeps constant velocity as context,
-and labels which cases are ready for a future heading-aware replay prototype
+and labels which cases are ready for the heading-aware replay prototype
 versus which still need map-match or coordinate-frame audit.
+
+## Heading-Aware Replay Prototype
+
+```bash
+scenariolens heading-replay-prototype \
+  --candidate-manifest data/processed/waymo_heading_aware_replay_candidates/manifest.json \
+  --output-dir data/processed/waymo_heading_aware_replay_prototype \
+  --top 2 \
+  --public-report docs/reports/waymo_heading_aware_replay_prototype.md
+```
+
+This reloads the selected local scenarios from the heading-aware replay
+candidate queue, reruns nearest-lane and heading-aware open-loop rollouts from
+the same anchor state, and applies deterministic speed/heading perturbations.
+The public report keeps only scenario IDs, aggregate stability counts, metric
+deltas, and local artifact pointers; raw Waymo files and replay packets stay
+ignored under `data/processed/`.
 
 ## Baseline Ablation
 

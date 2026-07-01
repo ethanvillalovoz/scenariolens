@@ -128,6 +128,13 @@ scenario IDs, aggregate queue counts, FDE deltas, readiness labels, blockers,
 and recommended next actions. Local candidate manifests and overlays stay
 ignored under `data/processed/waymo_heading_aware_replay_candidates/`.
 
+The heading-aware replay prototype is checked in at
+[`docs/reports/waymo_heading_aware_replay_prototype.md`](reports/waymo_heading_aware_replay_prototype.md).
+It reloads two selected heading-ready local scenarios, compares nearest-lane and
+heading-aware open-loop rollouts, and publishes aggregate perturbation
+stability counts only. Local replay packets and SVG overlays remain ignored
+under `data/processed/waymo_heading_aware_replay_prototype/`.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark
