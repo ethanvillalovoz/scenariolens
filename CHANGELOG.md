@@ -65,6 +65,10 @@ All notable changes to ScenarioLens are documented here.
   `docs/reports/waymo_context_route_intent_audit.md`, following the stable
   context replay warning into lane-continuity, route/topology, and heading
   diagnostics without changing the default scorer.
+- `scenariolens lane-continuation-prototype` workflow and
+  `docs/reports/waymo_lane_continuation_prototype.md`, testing parsed
+  `entry_lanes`/`exit_lanes` continuation for lane-continuity audit cases and
+  reporting unresolved topology gaps honestly.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

@@ -53,6 +53,7 @@ from scenariolens.lane_selection_study import (
     LANE_SELECTION_STUDY_INPUT_FORMATS,
     generate_lane_selection_study,
 )
+from scenariolens.lane_continuation import generate_lane_continuation_prototype
 from scenariolens.map_match_audit import (
     DEFAULT_AUDIT_THRESHOLDS_M,
     generate_map_match_audit,
@@ -677,6 +678,37 @@ def route_intent_audit_command(
     print(
         f"Generated {result.case_count} route/intent audit case(s) across "
         f"{result.audited_track_count} track(s)."
+    )
+    return 0
+
+
+def lane_continuation_prototype_command(
+    audit_manifest: str,
+    output_dir: str,
+    case_count: int,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_lane_continuation_prototype(
+            audit_manifest_path=audit_manifest,
+            output_dir=output_dir,
+            case_count=case_count,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote lane-continuation-prototype manifest to {result.manifest_path}")
+    print(f"Wrote lane-continuation-prototype report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("Lane-continuation prototype is not ready. See manifest.json for details.")
+        return 2
+    print(
+        f"Generated {result.case_count} lane-continuation case(s) across "
+        f"{result.evaluated_track_count} track(s)."
     )
     return 0
 
@@ -1483,6 +1515,37 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe route/intent audit copy.",
     )
+    lane_continuation_parser = subparsers.add_parser(
+        "lane-continuation-prototype",
+        help=(
+            "Prototype lane-link continuation for route/intent audit cases "
+            "that were diagnosed as lane-continuity risks."
+        ),
+    )
+    lane_continuation_parser.add_argument(
+        "--audit-manifest",
+        required=True,
+        help="Manifest produced by scenariolens route-intent-audit.",
+    )
+    lane_continuation_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_lane_continuation_prototype",
+        help=(
+            "Directory for lane-continuation prototype manifest, report, "
+            "and local packets."
+        ),
+    )
+    lane_continuation_parser.add_argument(
+        "--case-count",
+        type=int,
+        default=3,
+        help="Maximum lane-continuity audit cases to evaluate.",
+    )
+    lane_continuation_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe lane-continuation report copy.",
+    )
     heading_replay_parser = subparsers.add_parser(
         "heading-replay-prototype",
         help=(
@@ -1884,6 +1947,13 @@ def main() -> int:
     if args.command == "route-intent-audit":
         return route_intent_audit_command(
             replay_manifest=args.replay_manifest,
+            output_dir=args.output_dir,
+            case_count=args.case_count,
+            public_report=args.public_report,
+        )
+    if args.command == "lane-continuation-prototype":
+        return lane_continuation_prototype_command(
+            audit_manifest=args.audit_manifest,
             output_dir=args.output_dir,
             case_count=args.case_count,
             public_report=args.public_report,

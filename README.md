@@ -94,6 +94,7 @@ Then open `http://localhost:8000/demo/`.
 - [Context replay candidate plan](docs/reports/waymo_context_replay_candidate_plan.md)
 - [Context open-loop replay prototype](docs/reports/waymo_context_open_loop_replay_prototype.md)
 - [Context route/intent audit](docs/reports/waymo_context_route_intent_audit.md)
+- [Lane-link continuation prototype](docs/reports/waymo_lane_continuation_prototype.md)
 - [Real Waymo lane-aware baseline diagnostic](docs/reports/waymo_lane_aware_baseline_cross_shard.md)
 - [Lane-aware baseline debug casebook](docs/reports/waymo_lane_aware_debug_casebook.md)
 - [Replay candidate plan](docs/reports/waymo_replay_candidate_plan.md)
@@ -219,6 +220,9 @@ smoke test. The prototype can:
 - audit the stable context replay warning for lane continuity, heading
   selection, and route/topology hints, identifying a concrete lane-continuation
   follow-up instead of widening the matcher,
+- run a lane-link continuation prototype that proves the linked-lane follow-up
+  on a deterministic fixture and diagnoses the real stable warning as an
+  unresolved parsed-topology gap,
 - expose public-safe heading-aware improvement, regression, and fallback-heavy
   cases in the live Scenario Explorer,
 - turn heading-aware debug cases into a replay-readiness queue for the next
@@ -230,9 +234,9 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to turn the lane-continuity finding from the context
-route/intent audit into a route-link continuation prototype, while keeping the
-sensitive positive control as a calibration case for optional Waymax/JAX work.
+The next milestone is to improve parsed lane-topology coverage for unresolved
+linked-lane IDs, then rerun the lane-continuation prototype before optional
+Waymax/JAX work.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -463,6 +467,16 @@ PYTHONPATH=src python3 -m scenariolens.cli route-intent-audit \
   --output-dir data/processed/waymo_context_route_intent_audit \
   --case-count 3 \
   --public-report docs/reports/waymo_context_route_intent_audit.md
+```
+
+Prototype lane-link continuation for those audit cases:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-prototype \
+  --audit-manifest data/processed/waymo_context_route_intent_audit/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_prototype \
+  --case-count 3 \
+  --public-report docs/reports/waymo_lane_continuation_prototype.md
 ```
 
 Run the no-auth baseline ablation:

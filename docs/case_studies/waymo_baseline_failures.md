@@ -62,6 +62,10 @@ one stable lane-aware regression warning and one sensitive positive control.
 The route/intent audit then follows the stable warning and identifies a concrete
 lane-continuity follow-up: the target travels much farther than the remaining
 matched-lane polyline over the forecast horizon.
+The lane-link continuation prototype then tests that hypothesis. It proves the
+mechanism on a deterministic linked-lane fixture, but the real stable warning
+currently remains a topology-gap case because the selected feature's linked lane
+does not resolve in the parsed map features.
 
 ## Why It Matters
 
@@ -72,6 +76,6 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Prototype lane-link continuation for the stable context route/intent audit;
+Improve parsed lane-link coverage for the stable context topology-gap case;
 expand beyond shards `00007` through `00010`; and graduate stable open-loop
 replay candidates into an optional Waymax/JAX path.

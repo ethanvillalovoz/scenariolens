@@ -362,6 +362,21 @@ constant-velocity, nearest-lane, and heading-aware rollouts, and identifies a
 lane-continuity or route-link follow-up before changing the matcher or making a
 closed-loop simulation claim.
 
+## Lane-Link Continuation Prototype
+
+```bash
+scenariolens lane-continuation-prototype \
+  --audit-manifest data/processed/waymo_context_route_intent_audit/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_prototype \
+  --case-count 3 \
+  --public-report docs/reports/waymo_lane_continuation_prototype.md
+```
+
+This tests the route/intent audit's lane-continuity hypothesis without changing
+the default scorer. A deterministic fixture proves the prototype can follow
+parsed `exit_lanes`; the current real Waymo case reports a topology gap because
+the selected feature's continuation does not resolve to a parsed lane feature.
+
 ## Baseline Ablation
 
 ```bash

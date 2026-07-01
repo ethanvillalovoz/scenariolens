@@ -177,6 +177,14 @@ points to lane-continuity or route-link follow-up: the selected lane has
 16.691 m remaining while the target travels 80.270 m over the horizon. Ignored
 local route/intent packets stay under `data/processed/`.
 
+The lane-link continuation prototype is checked in at
+[`docs/reports/waymo_lane_continuation_prototype.md`](reports/waymo_lane_continuation_prototype.md).
+It tests that follow-up without changing the default scorer. The fixture tests
+prove parsed `exit_lanes` can extend a lane-following rollout, while the real
+Waymo case currently reports a topology gap: feature `144` does not resolve to
+a usable linked lane in the lightweight parsed map features. Local prototype
+packets stay ignored under `data/processed/`.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

@@ -92,6 +92,16 @@ heading selection, lane continuity, route/topology hints, or manual review. It
 does not infer an official route or change the default scorer; it decides what
 the next engineering experiment should be.
 
+## Lane-Link Continuation Prototype
+
+The lane-link continuation prototype is that next experiment for
+lane-continuity cases. It follows parsed `exit_lanes` or `entry_lanes` for a
+small number of hops and compares the result against constant velocity,
+nearest-lane, and heading-aware rollouts. If it improves FDE, the diagnosis
+becomes a validation case for linked-lane following. If it cannot resolve the
+linked feature, the case becomes topology coverage work rather than a baseline
+tuning claim.
+
 ## Map-Match Audit
 
 The map-match audit handles cases that are not ready to be treated as replay
@@ -121,7 +131,7 @@ and links to the public reports.
 - Add a dataset adapter for another public motion dataset.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
-- Prototype lane-link continuation for the stable context route/intent audit.
+- Improve parsed lane-topology coverage for unresolved lane-link IDs.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.
 - Analyze heading-aware replay stability across more validation shards.
