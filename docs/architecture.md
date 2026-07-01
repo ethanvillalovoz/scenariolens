@@ -18,12 +18,14 @@ flowchart LR
     F --> L["Failure-study aggregate report"]
     F --> N["Failure-stability comparison report"]
     P --> U["Heading-aware lane-selection study"]
+    U --> V["Explorer case diagnostics"]
     P --> Q["Baseline-debug casebook"]
     H --> Q
     Q --> R["Replay-candidate plan"]
     R --> S["Open-loop replay prototype"]
     Q --> T["Map-match threshold audit"]
     F --> I["Static dashboard payload"]
+    V --> I
     I --> J["Scenario Explorer"]
     G --> K["Public-safe case studies"]
     Q --> K
@@ -53,7 +55,7 @@ flowchart LR
 | Taxonomy | `src/scenariolens/taxonomy.py` | Normalizes scenario tags and adds category-level ranking signal. |
 | Reports | `src/scenariolens/report.py`, `src/scenariolens/portfolio.py` | Generates Markdown/JSON summaries for humans and downstream tools. |
 | Rendering | `src/scenariolens/visualize.py` | Produces dependency-free SVG trajectory previews with map context when available. |
-| Dashboard | `src/scenariolens/dashboard.py`, `docs/demo/` | Builds and presents deterministic static explorer data. |
+| Dashboard | `src/scenariolens/dashboard.py`, `docs/demo/` | Builds and presents deterministic static explorer data, including public-safe lane-selection diagnostic cases when a study manifest is available. |
 
 ## Data Trust Boundary
 

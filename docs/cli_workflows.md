@@ -238,8 +238,14 @@ scenariolens waymo-motion-shard-plan \
 ```bash
 scenariolens dashboard-data \
   --output docs/demo/scenarios.json \
-  --assets-dir docs/demo/assets
+  --assets-dir docs/demo/assets \
+  --lane-selection-manifest data/processed/waymo_lane_selection_study/manifest.json
 ```
+
+If the lane-selection manifest is present, the dashboard payload includes
+public-safe heading-aware improvement, regression, and fallback-heavy cases for
+the Explorer diagnostics panel. If the manifest is absent, the dashboard still
+regenerates with the small fixture scenarios only.
 
 Then preview:
 

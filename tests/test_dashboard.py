@@ -4,10 +4,12 @@ import unittest
 from pathlib import Path
 
 from scenariolens.dashboard import (
+    CASE_DIAGNOSTICS_FORMAT,
     DASHBOARD_FORMAT,
     DashboardScenarioSet,
     dashboard_payload,
     generate_dashboard_data,
+    load_lane_selection_case_diagnostics,
 )
 from scenariolens.samples import synthetic_scenarios
 
@@ -28,13 +30,20 @@ class DashboardDataTest(unittest.TestCase):
         self.assertIn('id="heroScenarioCount"', html)
         self.assertIn('id="heroMaxFde"', html)
         self.assertIn('id="baselineCard"', html)
+        self.assertIn('id="diagnosticRows"', html)
         self.assertIn('../reports/waymo_motion_failure_stability.md', html)
         self.assertIn('../reports/waymo_motion_shard_plan.md', html)
+        self.assertIn('../reports/waymo_heading_aware_lane_selection_study.md', html)
         self.assertTrue((docs_root / "data_provenance.md").exists())
         self.assertTrue((docs_root / "reports" / "waymo_motion_failure_stability.md").exists())
         self.assertTrue((docs_root / "reports" / "waymo_motion_shard_plan.md").exists())
         self.assertTrue((root / "assets" / "scenariolens-explorer.png").exists())
         self.assertEqual(payload["format"], DASHBOARD_FORMAT)
+        self.assertIn("case_diagnostics", payload)
+        self.assertEqual(
+            payload["case_diagnostics"]["format"],
+            CASE_DIAGNOSTICS_FORMAT,
+        )
         for item in payload["scenarios"]:
             self.assertTrue((root / item["svg_path"]).exists())
 
@@ -80,6 +89,90 @@ class DashboardDataTest(unittest.TestCase):
         self.assertIn("lane_aware_map_used_count", first["metrics"])
         self.assertIn("lane_aware_fallback_reasons", first["metrics"])
 
+    def test_dashboard_payload_can_include_case_diagnostics(self) -> None:
+        diagnostics = {
+            "format": CASE_DIAGNOSTICS_FORMAT,
+            "groups": [],
+        }
+        payload = dashboard_payload(
+            scenario_sets=(
+                DashboardScenarioSet(
+                    dataset_id="synthetic_test",
+                    label="Synthetic test",
+                    scenarios=synthetic_scenarios()[:1],
+                ),
+            ),
+            asset_prefix=Path("assets"),
+            case_diagnostics=diagnostics,
+        )
+
+        self.assertEqual(payload["case_diagnostics"], diagnostics)
+
+    def test_load_lane_selection_case_diagnostics_is_public_safe(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            manifest = Path(tmpdir) / "manifest.json"
+            manifest.write_text(
+                json.dumps(
+                    {
+                        "format": "scenariolens.lane_selection_study.v1",
+                        "source_count": 1,
+                        "scenario_count": 2,
+                        "aggregate": {
+                            "evaluated_target_count": 4,
+                            "constant_velocity_fde_m": 12.0,
+                            "nearest_lane_fde_m": 11.0,
+                            "heading_lane_fde_m": 9.0,
+                            "heading_vs_nearest_fde_improvement_m": 2.0,
+                            "heading_vs_constant_velocity_fde_improvement_m": 3.0,
+                        },
+                        "heading_fallback_reasons": {
+                            "target_too_far_from_lane": 3,
+                            "lane_heading_misaligned": 1,
+                        },
+                        "sources": [
+                            {
+                                "input_path": "data/raw/private.tfrecord",
+                                "source_name": "validation.tfrecord-00008-of-00150",
+                                "ready": True,
+                                "scenario_count": 2,
+                                "evaluated_target_count": 4,
+                                "constant_velocity_fde_m": 12.0,
+                                "nearest_lane_fde_m": 11.0,
+                                "heading_lane_fde_m": 9.0,
+                            }
+                        ],
+                        "top_heading_improvements": [
+                            _diagnostic_case("improved_case", 2.0)
+                        ],
+                        "top_heading_regressions": [
+                            _diagnostic_case("regressed_case", -1.0)
+                        ],
+                        "top_heading_fallbacks": [
+                            _diagnostic_case("fallback_case", 0.0)
+                        ],
+                        "scope_note": "diagnostic only",
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            diagnostics = load_lane_selection_case_diagnostics(manifest)
+
+        self.assertIsNotNone(diagnostics)
+        assert diagnostics is not None
+        self.assertEqual(diagnostics["format"], CASE_DIAGNOSTICS_FORMAT)
+        self.assertEqual(diagnostics["scenario_count"], 2)
+        self.assertEqual(diagnostics["summary"]["heading_lane_fde_m"], 9.0)
+        self.assertEqual(diagnostics["fallback_reasons"][0]["reason"], "target_too_far_from_lane")
+        self.assertEqual(len(diagnostics["groups"]), 3)
+        first_case = diagnostics["groups"][0]["cases"][0]
+        self.assertEqual(first_case["scenario_id"], "improved_case")
+        self.assertNotIn("source_input", first_case)
+        self.assertNotIn("input_path", diagnostics["sources"][0])
+
+    def test_load_lane_selection_case_diagnostics_ignores_missing_manifest(self) -> None:
+        self.assertIsNone(load_lane_selection_case_diagnostics("missing-manifest.json"))
+
     def test_generate_dashboard_data_writes_json_and_svg_assets(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -89,6 +182,7 @@ class DashboardDataTest(unittest.TestCase):
             generate_dashboard_data(
                 output_path=output,
                 assets_dir=assets,
+                lane_selection_manifest_path=None,
                 limit=3,
             )
             payload = json.loads(output.read_text(encoding="utf-8"))
@@ -108,6 +202,7 @@ class DashboardDataTest(unittest.TestCase):
             generate_dashboard_data(
                 output_path=output,
                 assets_dir=assets,
+                lane_selection_manifest_path=None,
                 limit=1,
             )
             payload = json.loads(output.read_text(encoding="utf-8"))
@@ -135,6 +230,27 @@ class DashboardDataTest(unittest.TestCase):
                 ),
                 asset_prefix=Path("assets"),
             )
+
+
+def _diagnostic_case(scenario_id: str, improvement: float) -> dict[str, object]:
+    return {
+        "source_input": "data/raw/private.tfrecord",
+        "source_name": "validation.tfrecord-00008-of-00150",
+        "source_index": 1,
+        "scenario_index": 2,
+        "scenario_id": scenario_id,
+        "evaluated_target_count": 4,
+        "constant_velocity_fde_m": 12.0,
+        "nearest_lane_fde_m": 11.0,
+        "heading_lane_fde_m": 9.0,
+        "heading_vs_nearest_fde_improvement_m": improvement,
+        "heading_vs_constant_velocity_fde_improvement_m": 3.0,
+        "nearest_map_used_count": 2,
+        "nearest_fallback_count": 2,
+        "heading_map_used_count": 3,
+        "heading_fallback_count": 1,
+        "top_heading_fallback_reason": "target_too_far_from_lane (1)",
+    }
 
 
 if __name__ == "__main__":

@@ -21,7 +21,10 @@ from scenariolens.baseline_debug import (
     BASELINE_DEBUG_INPUT_FORMATS,
     generate_baseline_debug_casebook,
 )
-from scenariolens.dashboard import generate_dashboard_data
+from scenariolens.dashboard import (
+    DEFAULT_LANE_SELECTION_MANIFEST,
+    generate_dashboard_data,
+)
 from scenariolens.failure_study import (
     FAILURE_STUDY_INPUT_FORMATS,
     generate_failure_study,
@@ -393,6 +396,7 @@ def dashboard_data(
     assets_dir: str,
     waymo_normalized_path: str,
     waymo_native_path: str,
+    lane_selection_manifest_path: str | None,
     limit: int | None,
 ) -> int:
     generate_dashboard_data(
@@ -400,6 +404,7 @@ def dashboard_data(
         assets_dir=assets_dir,
         waymo_normalized_path=waymo_normalized_path,
         waymo_native_path=waymo_native_path,
+        lane_selection_manifest_path=lane_selection_manifest_path,
         limit=limit,
     )
     print(f"Generated dashboard data at {output_path}")
@@ -1361,6 +1366,14 @@ def main() -> int:
         help="Native protobuf-shaped Waymo Motion JSON fixture.",
     )
     dashboard_parser.add_argument(
+        "--lane-selection-manifest",
+        default=str(DEFAULT_LANE_SELECTION_MANIFEST),
+        help=(
+            "Optional lane-selection study manifest used to add public-safe "
+            "case diagnostics to the dashboard payload."
+        ),
+    )
+    dashboard_parser.add_argument(
         "--limit",
         type=int,
         default=None,
@@ -1544,6 +1557,7 @@ def main() -> int:
             assets_dir=args.assets_dir,
             waymo_normalized_path=args.waymo_normalized,
             waymo_native_path=args.waymo_native,
+            lane_selection_manifest_path=args.lane_selection_manifest,
             limit=args.limit,
         )
     if args.command == "render":

@@ -102,7 +102,8 @@ IDs without publishing raw gated dataset records.
 
 The static explorer consumes deterministic JSON and SVG assets. It is the
 portfolio front door for the framework: filters, rankings, trajectory previews,
-score components, baseline failures, and links to the public reports.
+score components, baseline failures, public-safe heading-aware case diagnostics,
+and links to the public reports.
 
 ## Extension Points
 
@@ -111,7 +112,8 @@ score components, baseline failures, and links to the public reports.
   public data.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.
-- Turn heading-aware wins and regressions into a case-level debug casebook.
+- Connect Explorer case diagnostics to richer local debug artifacts and replay
+  candidates.
 - Add map-aware features or traffic-light summaries.
 - Graduate stable replay-prototype candidates into an optional Waymax/JAX path.
 - Add additional public-safe report types.

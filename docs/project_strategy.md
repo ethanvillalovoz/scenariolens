@@ -56,8 +56,9 @@ ScenarioLens currently has four connected surfaces:
    packets, baseline-debug casebooks, replay-candidate plans, open-loop replay
    prototype packets, map-match audits, lane-selection studies, and public-safe
    real-data case studies.
-4. **Explorer**: a static dashboard for filtering, sorting, and inspecting the
-   scenario evidence without requiring a backend.
+4. **Explorer**: a static dashboard for filtering, sorting, inspecting scenario
+   evidence, and reviewing public-safe heading-aware case diagnostics without
+   requiring a backend.
 
 ## Why It Is Waymo-Aligned
 

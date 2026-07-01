@@ -21,7 +21,35 @@ from scenariolens.visualize import scenario_svg
 
 DEFAULT_DASHBOARD_OUTPUT = Path("docs/demo/scenarios.json")
 DEFAULT_DASHBOARD_ASSETS_DIR = Path("docs/demo/assets")
+DEFAULT_LANE_SELECTION_MANIFEST = Path(
+    "data/processed/waymo_lane_selection_study/manifest.json"
+)
 DASHBOARD_FORMAT = "scenariolens.dashboard.v1"
+CASE_DIAGNOSTICS_FORMAT = "scenariolens.dashboard.case_diagnostics.v1"
+CASE_DIAGNOSTICS_REPORT_PATH = (
+    "../reports/waymo_heading_aware_lane_selection_study.md"
+)
+
+_CASE_GROUPS = (
+    (
+        "improvements",
+        "Largest improvements",
+        "Heading-aware lane selection reduced final displacement error versus nearest-lane selection.",
+        "top_heading_improvements",
+    ),
+    (
+        "regressions",
+        "Largest regressions",
+        "Heading-aware lane selection increased final displacement error versus nearest-lane selection.",
+        "top_heading_regressions",
+    ),
+    (
+        "fallbacks",
+        "Fallback-heavy cases",
+        "The lane selector fell back often enough to expose map coverage, distance threshold, or target-type limits.",
+        "top_heading_fallbacks",
+    ),
+)
 
 
 @dataclass(frozen=True)
@@ -61,6 +89,7 @@ def generate_dashboard_data(
     assets_dir: str | Path = DEFAULT_DASHBOARD_ASSETS_DIR,
     waymo_normalized_path: str | Path = DEFAULT_WAYMO_NORMALIZED_PATH,
     waymo_native_path: str | Path = DEFAULT_WAYMO_NATIVE_PATH,
+    lane_selection_manifest_path: str | Path | None = DEFAULT_LANE_SELECTION_MANIFEST,
     limit: int | None = None,
 ) -> None:
     """Generate static dashboard JSON and SVG assets."""
@@ -76,6 +105,9 @@ def generate_dashboard_data(
     payload = dashboard_payload(
         scenario_sets=scenario_sets,
         asset_prefix=Path(os.path.relpath(assets, start=target.parent)),
+        case_diagnostics=load_lane_selection_case_diagnostics(
+            lane_selection_manifest_path,
+        ),
         limit=limit,
     )
 
@@ -94,6 +126,7 @@ def generate_dashboard_data(
 def dashboard_payload(
     scenario_sets: tuple[DashboardScenarioSet, ...],
     asset_prefix: str | Path,
+    case_diagnostics: dict[str, object] | None = None,
     limit: int | None = None,
 ) -> dict[str, object]:
     scenario_lookup = _scenario_lookup(scenario_sets)
@@ -118,7 +151,7 @@ def dashboard_payload(
         for rank, score in enumerate(scores, start=1)
     ]
 
-    return {
+    payload: dict[str, object] = {
         "format": DASHBOARD_FORMAT,
         "scenario_count": len(scenario_lookup),
         "reported_count": len(scenarios),
@@ -138,6 +171,65 @@ def dashboard_payload(
             ),
         },
         "scenarios": scenarios,
+    }
+    if case_diagnostics is not None:
+        payload["case_diagnostics"] = case_diagnostics
+    return payload
+
+
+def load_lane_selection_case_diagnostics(
+    manifest_path: str | Path | None = DEFAULT_LANE_SELECTION_MANIFEST,
+    report_path: str = CASE_DIAGNOSTICS_REPORT_PATH,
+    limit_per_group: int = 6,
+) -> dict[str, object] | None:
+    """Load public-safe real-data lane-selection diagnostics for the Explorer."""
+
+    if manifest_path is None:
+        return None
+    path = Path(manifest_path)
+    if not path.exists():
+        return None
+
+    manifest = json.loads(path.read_text(encoding="utf-8"))
+    aggregate = _public_metrics(manifest.get("aggregate", {}))
+    groups = []
+    for group_id, label, description, manifest_key in _CASE_GROUPS:
+        cases = [
+            _public_case(row)
+            for row in manifest.get(manifest_key, [])[:limit_per_group]
+        ]
+        groups.append(
+            {
+                "group_id": group_id,
+                "label": label,
+                "description": description,
+                "cases": cases,
+            }
+        )
+
+    return {
+        "format": CASE_DIAGNOSTICS_FORMAT,
+        "study": "Heading-aware lane selection",
+        "report_path": report_path,
+        "scope_note": manifest.get(
+            "scope_note",
+            "Heading-aware lane selection is a diagnostic ablation, not a production prediction model.",
+        ),
+        "source_count": manifest.get("source_count", len(manifest.get("sources", []))),
+        "scenario_count": manifest.get("scenario_count", 0),
+        "summary": aggregate,
+        "fallback_reasons": [
+            {"reason": reason, "count": count}
+            for reason, count in sorted(
+                manifest.get("heading_fallback_reasons", {}).items(),
+                key=lambda item: (-item[1], item[0]),
+            )
+        ],
+        "sources": [
+            _public_source_summary(source)
+            for source in manifest.get("sources", [])
+        ],
+        "groups": groups,
     }
 
 
@@ -232,6 +324,68 @@ def _round_optional(value: float | None) -> float | None:
     if value is None:
         return None
     return round(value, 3)
+
+
+def _public_case(row: dict[str, object]) -> dict[str, object]:
+    return {
+        "scenario_id": row.get("scenario_id"),
+        "source_name": row.get("source_name"),
+        "source_index": row.get("source_index"),
+        "scenario_index": row.get("scenario_index"),
+        "evaluated_target_count": row.get("evaluated_target_count"),
+        **_public_metrics(row),
+        "nearest_map_used_count": row.get("nearest_map_used_count"),
+        "nearest_fallback_count": row.get("nearest_fallback_count"),
+        "heading_map_used_count": row.get("heading_map_used_count"),
+        "heading_fallback_count": row.get("heading_fallback_count"),
+        "top_heading_fallback_reason": row.get(
+            "top_heading_fallback_reason",
+            "none",
+        ),
+    }
+
+
+def _public_source_summary(row: dict[str, object]) -> dict[str, object]:
+    return {
+        "source_name": row.get("source_name"),
+        "ready": row.get("ready"),
+        "scenario_count": row.get("scenario_count"),
+        "evaluated_target_count": row.get("evaluated_target_count"),
+        **_public_metrics(row),
+        "heading_map_used_count": row.get("heading_map_used_count"),
+        "heading_fallback_count": row.get("heading_fallback_count"),
+    }
+
+
+def _public_metrics(row: dict[str, object]) -> dict[str, object]:
+    metric_names = (
+        "evaluated_target_count",
+        "constant_velocity_fde_m",
+        "nearest_lane_fde_m",
+        "heading_lane_fde_m",
+        "heading_vs_nearest_fde_improvement_m",
+        "heading_vs_constant_velocity_fde_improvement_m",
+        "constant_velocity_miss_rate",
+        "nearest_lane_miss_rate",
+        "heading_lane_miss_rate",
+        "nearest_map_used_count",
+        "heading_map_used_count",
+        "nearest_fallback_count",
+        "heading_fallback_count",
+    )
+    return {
+        name: _round_json_number(row.get(name))
+        for name in metric_names
+        if name in row
+    }
+
+
+def _round_json_number(value: object) -> object:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, float):
+        return round(value, 3)
+    return value
 
 
 def _fallback_reasons(baseline_comparison: object) -> list[str]:

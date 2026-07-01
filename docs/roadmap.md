@@ -253,8 +253,9 @@ Status: implemented in `scenariolens lane-selection-study`,
 four-shard run covers 100 scenarios and 418 evaluated prediction targets.
 Heading-aware selection improves mean FDE by 0.489 m relative to nearest-lane
 selection, while still trailing constant velocity overall. That makes it a
-useful matcher ablation, not a production prediction claim. Next work is a
-case-level debug pass over the largest heading-aware wins and regressions.
+useful matcher ablation, not a production prediction claim. The live Explorer
+now surfaces public-safe improvement, regression, and fallback-heavy cases from
+this run; next work is connecting those rows to richer local debug artifacts.
 
 ## Milestone 4C: No-Auth Baseline Ablation
 

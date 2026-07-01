@@ -28,6 +28,9 @@ All notable changes to ScenarioLens are documented here.
 - `scenariolens lane-selection-study` workflow and heading-aware lane-selection
   baseline variant comparing nearest-lane and heading-aware map matching across
   the 100-scenario local Waymo slice.
+- Public-safe heading-aware case diagnostics in the static Scenario Explorer,
+  including improvement, regression, and fallback-heavy cases from the local
+  100-scenario study.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

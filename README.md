@@ -47,7 +47,7 @@ ScenarioLens builds a small but polished pipeline that can:
 | Working framework | Python package, installable CLI, schema, metrics, reports, rendering, dashboard exporter |
 | Real-data path | Native Waymo Motion JSON/proto/TFRecord slice reader with local preflight and validation |
 | Baseline evidence | Constant-velocity ADE/FDE, miss rate, lane-aware comparison, map-match audit, tag studies, and stability studies |
-| Public demo | Static Scenario Explorer with filters, SVG trajectories, score components, and failure cards |
+| Public demo | Static Scenario Explorer with filters, SVG trajectories, score components, failure cards, and real-data diagnostic cases |
 | Repo quality | MIT license, contributor docs, changelog, citation, issue templates, CI, and release checklist |
 
 ## Quick Start
@@ -195,13 +195,15 @@ smoke test. The prototype can:
   changing matcher behavior,
 - compare nearest-lane and heading-aware lane selection across 100 real Waymo
   scenarios without changing the default scoring baseline,
+- expose public-safe heading-aware improvement, regression, and fallback-heavy
+  cases in the live Scenario Explorer,
 - generate static dashboard data and SVG assets,
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to turn the heading-aware lane-selection results into
-case-level matcher diagnostics, then graduate the most stable candidates into an
-optional Waymax/JAX replay path.
+The next milestone is to connect those case diagnostics to richer local debug
+artifacts, then graduate the most stable candidates into an optional Waymax/JAX
+replay path.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -261,8 +263,10 @@ Raw Waymo files and per-scenario outputs remain untracked.
 Live demo: [ethanvillalovoz.com/scenariolens](https://ethanvillalovoz.com/scenariolens/)
 
 The static Scenario Explorer lives in [docs/demo](docs/demo). It consumes the
-checked-in dashboard payload and SVG assets. Preview the local `docs/`
-entrypoint:
+checked-in dashboard payload and SVG assets. It also embeds public-safe
+heading-aware lane-selection case diagnostics from the local 100-scenario Waymo
+study, without exposing raw Waymo records or per-scenario packets. Preview the
+local `docs/` entrypoint:
 
 ```bash
 python3 -m http.server 8000 --directory docs
@@ -546,7 +550,8 @@ Generate the Scenario Explorer dashboard data contract:
 ```bash
 PYTHONPATH=src python3 -m scenariolens.cli dashboard-data \
   --output docs/demo/scenarios.json \
-  --assets-dir docs/demo/assets
+  --assets-dir docs/demo/assets \
+  --lane-selection-manifest data/processed/waymo_lane_selection_study/manifest.json
 ```
 
 Run tests with only the Python standard library:

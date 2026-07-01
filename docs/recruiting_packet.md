@@ -147,6 +147,8 @@ Testing and verification:
   heading-aware map matching over the same 100-scenario slice; it improves mean
   FDE by 0.489 m over nearest lane but remains worse than constant velocity
   overall.
+- The live Explorer now exposes public-safe heading-aware improvement,
+  regression, and fallback-heavy case diagnostics from that 100-scenario run.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
@@ -154,7 +156,8 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Debug the largest heading-aware lane-selection wins and regressions.
+3. Connect Explorer diagnostics to richer local debug artifacts for the largest
+   heading-aware wins and regressions.
 4. Add richer map and traffic-light summaries.
 5. Graduate stable replay candidates into an optional Waymax/JAX path.
 
