@@ -111,10 +111,10 @@ and links to the public reports.
 - Add a dataset adapter for another public motion dataset.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
+- Join map/signal context summaries with failure, replay, and fallback
+  diagnostics.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.
-- Add map-aware, route-context, and traffic-light summaries from native Motion
-  records.
 - Analyze heading-aware replay stability across more validation shards.
 - Graduate stable replay-prototype candidates into an optional Waymax/JAX path.
 - Add additional public-safe report types.

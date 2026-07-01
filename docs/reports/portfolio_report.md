@@ -353,6 +353,7 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 - The TTC value is a screened constant-velocity proxy, not a certified safety metric.
 - The prediction baselines are intentionally simple; they are failure-mining screens, not benchmark claims.
 - The map-match audit is a threshold-sensitivity diagnostic, not a production map matcher.
+- The map/signal context study is aggregate coverage evidence, not a route planner or traffic-light quality audit.
 - The heading-aware lane selector is an ablation, not a replacement for the default scorer.
 - The heading-aware replay candidate plan is a queue for replay experiments, not completed simulation.
 - The heading-aware replay prototype is open-loop diagnostic evidence, not closed-loop simulation.
@@ -362,6 +363,6 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 
 - Expand the documented local-slice recipe across more Waymo Motion validation shards.
 - Compare baseline ADE/FDE distributions across more validation shards.
-- Add route-context and traffic-light summaries from native Motion records.
+- Join map/signal context summaries with baseline failure and replay diagnostics.
 - Graduate stable open-loop replay candidates into an optional Waymax/JAX path.
 - Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.

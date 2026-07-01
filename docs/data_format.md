@@ -62,7 +62,8 @@ PYTHONPATH=src python3 -m scenariolens.cli render \
   ingest, such as Waymo SDC indices, current time indices, tracks to predict, and
   objects of interest. When available, `waymo_map_features` stores simplified
   lane, road-line, road-edge, crosswalk, speed-bump, and driveway geometry for
-  SVG rendering.
+  SVG rendering; `waymo_map_summary` and `waymo_dynamic_map_summary` store
+  aggregate lane-topology and traffic-signal context for public-safe reports.
 - The format is intentionally compact and laptop-friendly.
 - Raw dataset files should remain outside git; derived JSON slices can be
   regenerated from ingestion scripts.

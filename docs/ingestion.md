@@ -164,8 +164,8 @@ Optional fields:
 | `objectsOfInterest` / `objects_of_interest` | Adds an explanatory `objects_of_interest` tag and stores ids in scenario metadata. |
 | `tracksToPredict` / `tracks_to_predict` | Adds an explanatory `tracks_to_predict` tag and stores resolved track ids in scenario metadata. |
 | `currentTimeIndex` / `current_time_index` | Stored in scenario metadata when present. |
-| `mapFeatures` / `map_features` | Adds an explanatory `map_context` tag and stores simplified renderable map geometry in scenario metadata. |
-| `dynamicMapStates` / `dynamic_map_states` | Adds an explanatory `traffic_signal_context` tag. |
+| `mapFeatures` / `map_features` | Adds an explanatory `map_context` tag and stores simplified renderable map geometry plus lane speed/topology summaries in scenario metadata. |
+| `dynamicMapStates` / `dynamic_map_states` | Adds an explanatory `traffic_signal_context` tag and stores aggregate traffic-signal lane-state, stop-point, and state-count summaries. |
 
 ### Normalized Waymo Motion CSV Columns
 

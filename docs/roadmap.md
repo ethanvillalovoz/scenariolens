@@ -59,8 +59,8 @@ Goal: make the real-data adapter credible without making the repo heavy.
 Status: implemented for native JSON mini-slices, binary Scenario protos, and
 sharded TFRecord slices. Local slice preflight, the downloaded-slice recipe, the
 validation packet command, prediction-target metadata, object-of-interest
-metadata, and coarse map-feature extraction are implemented. Richer
-traffic-light feature extraction remains next work.
+metadata, map-feature extraction, lane-topology summaries, and traffic-signal
+lane-state summaries are implemented.
 
 ## Milestone 3: Searchable Demo
 
@@ -357,8 +357,10 @@ map-match threshold audit is checked in at
 `docs/reports/waymo_map_match_audit.md`. The heading-aware lane-selection
 ablation is checked in at
 `docs/reports/waymo_heading_aware_lane_selection_study.md`. Next work is to
-add richer map, traffic-light, and route-context summaries, expand the shard
-set from `docs/reports/waymo_motion_shard_plan.md`, and graduate stable replay
+join the map/signal context study at
+`docs/reports/waymo_context_study_cross_shard.md` with baseline failure and
+replay diagnostics, expand the shard set from
+`docs/reports/waymo_motion_shard_plan.md`, and graduate stable replay
 candidates into an optional Waymax/JAX path.
 
 ## Stretch Goals

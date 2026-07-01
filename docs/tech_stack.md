@@ -51,8 +51,9 @@ PYTHONPATH=src python3 -m scenariolens.cli waymo-motion-preflight \
 
 ScenarioLens only needs a narrow subset of the public Motion `Scenario` proto:
 scenario id, timestamps, tracks, object types, states, SDC index, prediction
-targets, and coarse map/traffic-light presence. The built-in parser reads those
-fields directly from downloaded TFRecord shards. Pinning TensorFlow or
+targets, simplified map features, lane topology hints, and aggregate
+traffic-signal lane states. The built-in parser reads those fields directly
+from downloaded TFRecord shards. Pinning TensorFlow or
 Waymo-specific wheels would make the first-run experience heavier without
 improving this project milestone.
 

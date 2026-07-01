@@ -246,6 +246,25 @@ current queue. The public report keeps only scenario IDs, aggregate stability
 counts, metric deltas, and local artifact pointers; raw Waymo files and replay
 packets stay ignored under `data/processed/`.
 
+## Map And Signal Context Study
+
+```bash
+scenariolens context-study \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00007-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00008-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00009-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00010-of-00150 \
+  --output-dir data/processed/waymo_context_study_cross_shard \
+  --max-scenarios 25 \
+  --top 10 \
+  --public-report docs/reports/waymo_context_study_cross_shard.md
+```
+
+This summarizes public-safe map, traffic-signal, stop-point, and lane-topology
+coverage from local Waymo Motion records. The checked-in report covers the
+same 100-scenario, four-shard local slice as the other real-data diagnostics
+and publishes aggregate counts plus scenario IDs only.
+
 ## Baseline Ablation
 
 ```bash

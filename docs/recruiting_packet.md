@@ -161,15 +161,18 @@ Testing and verification:
 - A heading-aware replay prototype reloads all five heading-ready cases,
   evaluates 30 targets, and preserves the expected selector sign across 20
   deterministic perturbation trials.
+- A map and signal context study parses 15,453 static map features, 60,583
+  traffic-signal lane states, and 27,065 lane-topology links from the same
+  100-scenario real-data slice without publishing raw Waymo records.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
 What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
-2. Compare distribution stability across true shards and scenario tags.
-3. Add richer map, traffic-light, and route-context summaries to the real-data
-   diagnostics.
+2. Join map/signal context summaries with baseline failure, fallback, and
+   replay diagnostics.
+3. Compare distribution stability across true shards and scenario tags.
 4. Graduate stable replay candidates into an optional Waymax/JAX path.
 5. Create curated scenario collections for pedestrian, cyclist, merge, and
    unprotected-turn cases.

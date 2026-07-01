@@ -38,7 +38,11 @@ NATIVE_JSON_FIXTURE = """{
     {
       "id": 1001,
       "lane": {
+        "speedLimitMph": 35.0,
         "type": "TYPE_SURFACE_STREET",
+        "entryLanes": [9001],
+        "exitLanes": [9002],
+        "leftNeighbors": [{"featureId": 1003}],
         "polyline": [
           {"x": -1.0, "y": 0.0},
           {"x": 1.0, "y": 0.0}
@@ -55,6 +59,26 @@ NATIVE_JSON_FIXTURE = """{
           {"x": -0.2, "y": 1.0}
         ]
       }
+    }
+  ],
+  "dynamicMapStates": [
+    {
+      "laneStates": [
+        {
+          "lane": 1001,
+          "state": "LANE_STATE_STOP",
+          "stopPoint": {"x": 0.5, "y": 0.0}
+        }
+      ]
+    },
+    {
+      "laneStates": [
+        {
+          "lane": 1001,
+          "state": "LANE_STATE_GO",
+          "stopPoint": {"x": 0.5, "y": 0.0}
+        }
+      ]
     }
   ],
   "tracks": [
@@ -164,11 +188,38 @@ def _map_point_proto(x: float, y: float) -> bytes:
 
 
 def _lane_proto(*points: bytes) -> bytes:
-    return b"".join((_int32(2, 2), *(_length_delimited(8, point) for point in points)))
+    return b"".join(
+        (
+            _double(1, 35.0),
+            _int32(2, 2),
+            *(_length_delimited(8, point) for point in points),
+            _int32(9, 9001),
+            _int32(10, 9002),
+            _length_delimited(11, b""),
+        )
+    )
 
 
 def _map_feature_proto(feature_id: int, lane: bytes) -> bytes:
     return b"".join((_int32(1, feature_id), _length_delimited(3, lane)))
+
+
+def _traffic_signal_lane_state_proto(
+    lane_id: int,
+    state: int,
+    stop_point: bytes,
+) -> bytes:
+    return b"".join(
+        (
+            _int32(1, lane_id),
+            _int32(2, state),
+            _length_delimited(3, stop_point),
+        )
+    )
+
+
+def _dynamic_map_state_proto(*lane_states: bytes) -> bytes:
+    return b"".join(_length_delimited(1, lane_state) for lane_state in lane_states)
 
 
 def _scenario_proto() -> bytes:
@@ -187,6 +238,9 @@ def _scenario_proto() -> bytes:
     prediction = _int32(1, 1)
     lane = _lane_proto(_map_point_proto(-1.0, 0.0), _map_point_proto(1.0, 0.0))
     map_feature = _map_feature_proto(1001, lane)
+    signal_state = _dynamic_map_state_proto(
+        _traffic_signal_lane_state_proto(1001, 4, _map_point_proto(0.5, 0.0))
+    )
     return b"".join(
         (
             _double(1, 0.0),
@@ -196,6 +250,7 @@ def _scenario_proto() -> bytes:
             _int32(4, 20),
             _string(5, "waymo_binary_fixture"),
             _int32(6, 0),
+            _length_delimited(7, signal_state),
             _length_delimited(8, map_feature),
             _length_delimited(11, prediction),
         )
@@ -269,6 +324,11 @@ class WaymoMotionIngestTest(unittest.TestCase):
         self.assertEqual(scenario.metadata["waymo_tracks_to_predict_track_ids"], ["20"])
         self.assertEqual(scenario.metadata["waymo_objects_of_interest_track_ids"], ["20"])
         self.assertEqual(scenario.metadata["waymo_map_features"][0]["kind"], "lane")
+        self.assertEqual(scenario.metadata["waymo_map_summary"]["route_link_count"], 3)
+        self.assertEqual(
+            scenario.metadata["waymo_dynamic_map_summary"]["state_counts"],
+            {"LANE_STATE_STOP": 1},
+        )
         self.assertEqual({track.agent_type for track in scenario.tracks}, {"vehicle", "pedestrian"})
 
     def test_inspect_waymo_motion_slice_reports_missing_input(self) -> None:
@@ -296,6 +356,16 @@ class WaymoMotionIngestTest(unittest.TestCase):
         self.assertEqual(
             [feature["kind"] for feature in scenario.metadata["waymo_map_features"]],
             ["lane", "crosswalk"],
+        )
+        self.assertEqual(scenario.metadata["waymo_map_features"][0]["entry_lanes"], [9001])
+        self.assertEqual(scenario.metadata["waymo_map_summary"]["route_link_count"], 3)
+        self.assertEqual(
+            scenario.metadata["waymo_dynamic_map_summary"]["state_counts"],
+            {"LANE_STATE_GO": 1, "LANE_STATE_STOP": 1},
+        )
+        self.assertEqual(
+            scenario.metadata["waymo_dynamic_map_summary"]["stop_point_count"],
+            2,
         )
         pedestrian = next(track for track in scenario.tracks if track.agent_id == "7")
         self.assertEqual(pedestrian.agent_type, "pedestrian")

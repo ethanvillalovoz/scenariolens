@@ -46,6 +46,7 @@ flowchart LR
 | Readiness and validation | `src/scenariolens/waymo_readiness.py`, `src/scenariolens/slice_validation.py` | Checks local dataset setup and produces reproducible validation packets. |
 | Metrics | `src/scenariolens/metrics.py` | Computes interpretable interaction features such as density, proximity, TTC, VRU context, path conflict, and dynamics. |
 | Prediction baseline | `src/scenariolens/prediction.py` | Evaluates constant-velocity and lane-aware forecasts on Waymo prediction targets or non-ego fixture tracks, producing ADE/FDE, miss rate, failure score, and comparison deltas. |
+| Context study | `src/scenariolens/context_study.py` | Aggregates public-safe map-feature, traffic-signal, stop-point, and lane-topology coverage from local Waymo Motion slices. |
 | Baseline comparison | `src/scenariolens/baseline_compare.py` | Generates public-safe Markdown/JSON comparison reports for constant-velocity versus lane-aware prediction baselines. |
 | Lane-selection study | `src/scenariolens/lane_selection_study.py` | Compares nearest-lane and heading-aware lane-selection variants across local slices without changing the default scoring baseline. |
 | Baseline debug | `src/scenariolens/baseline_debug.py` | Selects representative baseline-comparison or lane-selection cases and writes ignored local SVG overlays, per-track metric timelines, lane-match diagnostics, and public-safe casebook summaries. |

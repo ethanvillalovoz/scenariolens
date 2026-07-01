@@ -136,6 +136,13 @@ aggregate perturbation stability counts only. Local replay packets and SVG
 overlays remain ignored under
 `data/processed/waymo_heading_aware_replay_prototype/`.
 
+The map and signal context study is checked in at
+[`docs/reports/waymo_context_study_cross_shard.md`](reports/waymo_context_study_cross_shard.md).
+It summarizes static map features, traffic-signal lane states, stop points,
+and lane-topology hints over the same four local validation shards used by the
+other 100-scenario diagnostics. The public report includes aggregate counts
+and scenario IDs only; raw TFRecords and local manifests remain ignored.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

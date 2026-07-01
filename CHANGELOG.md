@@ -41,6 +41,10 @@ All notable changes to ScenarioLens are documented here.
   heading-ready cases, compares nearest-lane and heading-aware open-loop
   rollouts, applies deterministic perturbations, and publishes
   `docs/reports/waymo_heading_aware_replay_prototype.md`.
+- `scenariolens context-study` workflow and
+  `docs/reports/waymo_context_study_cross_shard.md`, summarizing public-safe
+  map-feature, traffic-signal, stop-point, and lane-topology coverage over the
+  100-scenario local Waymo slice.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

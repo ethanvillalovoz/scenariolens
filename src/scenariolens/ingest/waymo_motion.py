@@ -17,6 +17,10 @@ WAYMO_SCENARIO_PROTO_URL = (
     "https://github.com/waymo-research/waymo-open-dataset/blob/master/"
     "src/waymo_open_dataset/protos/scenario.proto"
 )
+WAYMO_MAP_PROTO_URL = (
+    "https://github.com/waymo-research/waymo-open-dataset/blob/master/"
+    "src/waymo_open_dataset/protos/map.proto"
+)
 OPTIONAL_PACKAGE = "waymo_open_dataset"
 OPTIONAL_TF_PACKAGE = "tensorflow"
 NORMALIZED_REQUIRED_COLUMNS = (
@@ -43,6 +47,24 @@ NATIVE_SUPPORTED_INPUT_PATTERNS = tuple(
 )
 MAX_MAP_FEATURES_PER_SCENARIO = 160
 MAX_MAP_POINTS_PER_FEATURE = 80
+
+TRAFFIC_SIGNAL_STATE_NAMES = {
+    0: "LANE_STATE_UNKNOWN",
+    1: "LANE_STATE_ARROW_STOP",
+    2: "LANE_STATE_ARROW_CAUTION",
+    3: "LANE_STATE_ARROW_GO",
+    4: "LANE_STATE_STOP",
+    5: "LANE_STATE_CAUTION",
+    6: "LANE_STATE_GO",
+    7: "LANE_STATE_FLASHING_STOP",
+    8: "LANE_STATE_FLASHING_CAUTION",
+}
+LANE_TYPE_NAMES = {
+    0: "TYPE_UNDEFINED",
+    1: "TYPE_FREEWAY",
+    2: "TYPE_SURFACE_STREET",
+    3: "TYPE_BIKE_LANE",
+}
 
 OBJECT_TYPE_MAP = {
     0: "unknown",
@@ -734,6 +756,10 @@ def _waymo_metadata(
     map_features = _waymo_map_features(mapping)
     if map_features:
         metadata["waymo_map_features"] = map_features
+        metadata["waymo_map_summary"] = _waymo_map_summary(map_features)
+    dynamic_map_summary = _waymo_dynamic_map_summary(mapping)
+    if dynamic_map_summary["timestep_count"]:
+        metadata["waymo_dynamic_map_summary"] = dynamic_map_summary
     return metadata
 
 
@@ -766,6 +792,102 @@ def _waymo_map_features(mapping: dict[str, Any]) -> list[dict[str, object]]:
     return features
 
 
+def _waymo_map_summary(map_features: list[dict[str, object]]) -> dict[str, object]:
+    kind_counts: dict[str, int] = {}
+    lane_type_counts: dict[str, int] = {}
+    speed_limits: list[float] = []
+    entry_link_count = 0
+    exit_link_count = 0
+    neighbor_link_count = 0
+
+    for feature in map_features:
+        kind = str(feature.get("kind", "unknown"))
+        kind_counts[kind] = kind_counts.get(kind, 0) + 1
+        if kind != "lane":
+            continue
+        lane_type = feature.get("feature_type")
+        if lane_type is not None:
+            lane_type_name = str(lane_type)
+            lane_type_counts[lane_type_name] = lane_type_counts.get(lane_type_name, 0) + 1
+        speed_limit = _optional_float(feature.get("speed_limit_mph"))
+        if speed_limit is not None:
+            speed_limits.append(speed_limit)
+        entry_link_count += len(_as_list(feature.get("entry_lanes")))
+        exit_link_count += len(_as_list(feature.get("exit_lanes")))
+        neighbor_link_count += int(feature.get("left_neighbor_count", 0) or 0)
+        neighbor_link_count += int(feature.get("right_neighbor_count", 0) or 0)
+
+    lane_count = kind_counts.get("lane", 0)
+    route_link_count = entry_link_count + exit_link_count + neighbor_link_count
+    return {
+        "feature_count": len(map_features),
+        "kind_counts": dict(sorted(kind_counts.items())),
+        "lane_count": lane_count,
+        "lane_type_counts": dict(sorted(lane_type_counts.items())),
+        "lane_speed_limit_count": len(speed_limits),
+        "mean_lane_speed_limit_mph": _mean_rounded(speed_limits),
+        "entry_link_count": entry_link_count,
+        "exit_link_count": exit_link_count,
+        "neighbor_link_count": neighbor_link_count,
+        "route_link_count": route_link_count,
+        "has_route_context": route_link_count > 0,
+    }
+
+
+def _waymo_dynamic_map_summary(mapping: dict[str, Any]) -> dict[str, object]:
+    payload = _field(mapping, "dynamic_map_states", "dynamicMapStates", default=[])
+    if not isinstance(payload, list):
+        payload = []
+
+    state_counts: dict[str, int] = {}
+    controlled_lanes: set[str] = set()
+    lane_state_count = 0
+    stop_point_count = 0
+    observed_timestep_count = 0
+
+    for dynamic_state in payload:
+        if not isinstance(dynamic_state, dict):
+            continue
+        lane_states = _field(dynamic_state, "lane_states", "laneStates", default=[])
+        if not isinstance(lane_states, list):
+            continue
+        if lane_states:
+            observed_timestep_count += 1
+        for lane_state in lane_states:
+            if not isinstance(lane_state, dict):
+                continue
+            lane_state_count += 1
+            lane_id = _field(lane_state, "lane", default=None)
+            if lane_id is not None:
+                controlled_lanes.add(str(lane_id))
+            state_name = _traffic_signal_state_name(
+                _field(lane_state, "state", default=None)
+            )
+            state_counts[state_name] = state_counts.get(state_name, 0) + 1
+            stop_point = _field(lane_state, "stop_point", "stopPoint", default=None)
+            if _point_from_mapping(stop_point) is not None:
+                stop_point_count += 1
+
+    return {
+        "timestep_count": len(payload),
+        "observed_timestep_count": observed_timestep_count,
+        "lane_state_count": lane_state_count,
+        "controlled_lane_count": len(controlled_lanes),
+        "stop_point_count": stop_point_count,
+        "state_counts": dict(sorted(state_counts.items())),
+        "stop_state_count": sum(
+            count for state, count in state_counts.items() if "STOP" in state
+        ),
+        "caution_state_count": sum(
+            count for state, count in state_counts.items() if "CAUTION" in state
+        ),
+        "go_state_count": sum(
+            count for state, count in state_counts.items() if state.endswith("_GO")
+        ),
+        "unknown_state_count": state_counts.get("LANE_STATE_UNKNOWN", 0),
+    }
+
+
 def _map_feature_from_mapping(mapping: dict[str, Any]) -> dict[str, object] | None:
     feature_id = _field(mapping, "id", default=None)
     feature_specs = (
@@ -792,7 +914,42 @@ def _map_feature_from_mapping(mapping: dict[str, Any]) -> dict[str, object] | No
         if type_field is not None:
             feature_type = _field(payload, type_field, default=None)
             if feature_type is not None:
-                feature["feature_type"] = str(feature_type)
+                feature["feature_type"] = (
+                    _lane_type_name(feature_type)
+                    if kind == "lane"
+                    else str(feature_type)
+                )
+        if kind == "lane":
+            speed_limit = _optional_float(
+                _field(payload, "speed_limit_mph", "speedLimitMph", default=None)
+            )
+            if speed_limit is not None:
+                feature["speed_limit_mph"] = round(speed_limit, 3)
+            interpolating = _optional_bool(
+                _field(payload, "interpolating", default=None)
+            )
+            if interpolating is not None:
+                feature["interpolating"] = interpolating
+            entry_lanes = _int_list_field(payload, "entry_lanes", "entryLanes")
+            if entry_lanes:
+                feature["entry_lanes"] = entry_lanes
+            exit_lanes = _int_list_field(payload, "exit_lanes", "exitLanes")
+            if exit_lanes:
+                feature["exit_lanes"] = exit_lanes
+            left_neighbor_count = _list_length_field(
+                payload,
+                "left_neighbors",
+                "leftNeighbors",
+            )
+            if left_neighbor_count:
+                feature["left_neighbor_count"] = left_neighbor_count
+            right_neighbor_count = _list_length_field(
+                payload,
+                "right_neighbors",
+                "rightNeighbors",
+            )
+            if right_neighbor_count:
+                feature["right_neighbor_count"] = right_neighbor_count
         return feature
     return None
 
@@ -831,6 +988,88 @@ def _point_from_mapping(value: Any) -> list[float] | None:
         return [round(float(x_value), 3), round(float(y_value), 3)]
     except (TypeError, ValueError):
         return None
+
+
+def _traffic_signal_state_name(value: Any) -> str:
+    if value is None or value == "":
+        return "LANE_STATE_UNKNOWN"
+    if isinstance(value, str):
+        stripped = value.strip()
+        if not stripped:
+            return "LANE_STATE_UNKNOWN"
+        if stripped.isdigit():
+            return TRAFFIC_SIGNAL_STATE_NAMES.get(int(stripped), f"LANE_STATE_{stripped}")
+        return stripped.upper()
+    try:
+        return TRAFFIC_SIGNAL_STATE_NAMES.get(int(value), f"LANE_STATE_{int(value)}")
+    except (TypeError, ValueError):
+        return "LANE_STATE_UNKNOWN"
+
+
+def _lane_type_name(value: Any) -> str:
+    if isinstance(value, str):
+        stripped = value.strip()
+        if stripped.isdigit():
+            return LANE_TYPE_NAMES.get(int(stripped), f"TYPE_LANE_{stripped}")
+        return stripped
+    try:
+        return LANE_TYPE_NAMES.get(int(value), f"TYPE_LANE_{int(value)}")
+    except (TypeError, ValueError):
+        return str(value)
+
+
+def _optional_float(value: Any) -> float | None:
+    if value is None or value == "":
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _optional_bool(value: Any) -> bool | None:
+    if value is None or value == "":
+        return None
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return bool(value)
+    if isinstance(value, str):
+        lowered = value.strip().lower()
+        if lowered in {"1", "true", "yes", "y"}:
+            return True
+        if lowered in {"0", "false", "no", "n"}:
+            return False
+    return None
+
+
+def _int_list_field(mapping: dict[str, Any], *names: str) -> list[int]:
+    values = _field(mapping, *names, default=[])
+    result: list[int] = []
+    for value in _as_list(values):
+        try:
+            result.append(int(value))
+        except (TypeError, ValueError):
+            continue
+    return result
+
+
+def _list_length_field(mapping: dict[str, Any], *names: str) -> int:
+    return len(_as_list(_field(mapping, *names, default=[])))
+
+
+def _as_list(value: Any) -> list[Any]:
+    if isinstance(value, list):
+        return value
+    if isinstance(value, tuple):
+        return list(value)
+    return []
+
+
+def _mean_rounded(values: list[float]) -> float | None:
+    if not values:
+        return None
+    return round(sum(values) / len(values), 3)
 
 
 def _load_motion_proto(path: Path) -> list[Scenario]:
@@ -879,7 +1118,7 @@ def _scenario_mapping_from_proto_bytes(data: bytes) -> dict[str, Any]:
     objects_of_interest: list[int] = []
     tracks_to_predict: list[dict[str, int]] = []
     map_features: list[dict[str, Any]] = []
-    has_dynamic_map_states = False
+    dynamic_map_states: list[dict[str, Any]] = []
 
     for field_number, wire_type, value in _iter_proto_fields(data):
         if field_number == 1:
@@ -899,7 +1138,7 @@ def _scenario_mapping_from_proto_bytes(data: bytes) -> dict[str, Any]:
         elif field_number == 6 and wire_type == 0:
             mapping["sdc_track_index"] = value
         elif field_number == 7 and wire_type == 2:
-            has_dynamic_map_states = True
+            dynamic_map_states.append(_dynamic_map_state_from_proto_bytes(value))
         elif field_number == 8 and wire_type == 2:
             feature = _map_feature_mapping_from_proto_bytes(value)
             if feature is not None:
@@ -914,8 +1153,8 @@ def _scenario_mapping_from_proto_bytes(data: bytes) -> dict[str, Any]:
         mapping["objects_of_interest"] = objects_of_interest
     if tracks_to_predict:
         mapping["tracks_to_predict"] = tracks_to_predict
-    if has_dynamic_map_states:
-        mapping["dynamic_map_states"] = [{}]
+    if dynamic_map_states:
+        mapping["dynamic_map_states"] = dynamic_map_states
     if map_features:
         mapping["map_features"] = map_features
     return mapping
@@ -957,6 +1196,26 @@ def _required_prediction_from_proto_bytes(data: bytes) -> dict[str, int]:
     return mapping
 
 
+def _dynamic_map_state_from_proto_bytes(data: bytes) -> dict[str, Any]:
+    lane_states: list[dict[str, Any]] = []
+    for field_number, wire_type, value in _iter_proto_fields(data):
+        if field_number == 1 and wire_type == 2:
+            lane_states.append(_traffic_signal_lane_state_from_proto_bytes(value))
+    return {"lane_states": lane_states}
+
+
+def _traffic_signal_lane_state_from_proto_bytes(data: bytes) -> dict[str, Any]:
+    mapping: dict[str, Any] = {}
+    for field_number, wire_type, value in _iter_proto_fields(data):
+        if field_number == 1 and wire_type == 0:
+            mapping["lane"] = value
+        elif field_number == 2 and wire_type == 0:
+            mapping["state"] = _traffic_signal_state_name(value)
+        elif field_number == 3 and wire_type == 2:
+            mapping["stop_point"] = _map_point_from_proto_bytes(value)
+    return mapping
+
+
 def _map_feature_mapping_from_proto_bytes(data: bytes) -> dict[str, Any] | None:
     mapping: dict[str, Any] = {}
     for field_number, wire_type, value in _iter_proto_fields(data):
@@ -980,10 +1239,22 @@ def _map_feature_mapping_from_proto_bytes(data: bytes) -> dict[str, Any] | None:
 def _lane_mapping_from_proto_bytes(data: bytes) -> dict[str, Any]:
     mapping: dict[str, Any] = {"polyline": []}
     for field_number, wire_type, value in _iter_proto_fields(data):
-        if field_number == 2 and wire_type == 0:
+        if field_number == 1 and wire_type == 1:
+            mapping["speed_limit_mph"] = _wire_double(value)
+        elif field_number == 2 and wire_type == 0:
             mapping["type"] = value
+        elif field_number == 3 and wire_type == 0:
+            mapping["interpolating"] = bool(value)
         elif field_number == 8 and wire_type == 2:
             mapping["polyline"].append(_map_point_from_proto_bytes(value))
+        elif field_number == 9:
+            _append_varints(mapping, "entry_lanes", wire_type, value)
+        elif field_number == 10:
+            _append_varints(mapping, "exit_lanes", wire_type, value)
+        elif field_number == 11 and wire_type == 2:
+            mapping.setdefault("left_neighbors", []).append({})
+        elif field_number == 12 and wire_type == 2:
+            mapping.setdefault("right_neighbors", []).append({})
     return mapping
 
 
@@ -1084,6 +1355,21 @@ def _packed_varints(value: bytes) -> tuple[int, ...]:
         item, offset = _read_varint(value, offset)
         values.append(item)
     return tuple(values)
+
+
+def _append_varints(
+    mapping: dict[str, Any],
+    key: str,
+    wire_type: int,
+    value: int | bytes,
+) -> None:
+    target = mapping.setdefault(key, [])
+    if not isinstance(target, list):
+        return
+    if wire_type == 0 and isinstance(value, int):
+        target.append(value)
+    elif wire_type == 2 and isinstance(value, bytes):
+        target.extend(_packed_varints(value))
 
 
 def _field(mapping: dict[str, Any], *names: str, default: Any = None) -> Any:

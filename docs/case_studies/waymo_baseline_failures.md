@@ -65,7 +65,6 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Expand beyond shards `00007` through `00010`, replay more heading-aware
-candidates from `docs/reports/waymo_heading_aware_replay_candidate_plan.md`,
-and graduate stable open-loop replay candidates into an optional Waymax/JAX
-path.
+Join the map/signal context study with baseline failure, fallback, and replay
+diagnostics; expand beyond shards `00007` through `00010`; and graduate stable
+open-loop replay candidates into an optional Waymax/JAX path.

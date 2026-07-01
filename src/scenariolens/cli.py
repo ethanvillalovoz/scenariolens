@@ -21,6 +21,10 @@ from scenariolens.baseline_debug import (
     BASELINE_DEBUG_INPUT_FORMATS,
     generate_baseline_debug_casebook,
 )
+from scenariolens.context_study import (
+    CONTEXT_STUDY_INPUT_FORMATS,
+    generate_context_study,
+)
 from scenariolens.dashboard import (
     DEFAULT_LANE_SELECTION_MANIFEST,
     generate_dashboard_data,
@@ -703,6 +707,41 @@ def map_match_audit_command(
     return 0
 
 
+def context_study_command(
+    input_paths: list[str],
+    output_dir: str,
+    max_scenarios: int | None,
+    top: int,
+    input_format: str,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_context_study(
+            input_paths=tuple(input_paths),
+            output_dir=output_dir,
+            max_scenarios=max_scenarios,
+            top=top,
+            input_format=input_format,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote context-study manifest to {result.manifest_path}")
+    print(f"Wrote context-study report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("Context study is not ready. See manifest.json for details.")
+        return 2
+    print(
+        f"Analyzed {result.scenario_count} scenario(s) across "
+        f"{result.source_count} source(s)."
+    )
+    return 0
+
+
 def _parse_thresholds(value: str) -> tuple[float, ...]:
     thresholds = []
     for item in value.split(","):
@@ -1376,6 +1415,47 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe map-match audit copy.",
     )
+    context_study_parser = subparsers.add_parser(
+        "context-study",
+        help=(
+            "Summarize public-safe map, traffic-signal, and lane-topology "
+            "context from Waymo Motion slices."
+        ),
+    )
+    context_study_parser.add_argument(
+        "--input",
+        action="append",
+        required=True,
+        help="Input Waymo Motion file/directory or ScenarioLens JSON file. Repeat for shards.",
+    )
+    context_study_parser.add_argument(
+        "--format",
+        choices=CONTEXT_STUDY_INPUT_FORMATS,
+        default="native",
+        help="Input representation.",
+    )
+    context_study_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_context_study",
+        help="Directory for context-study manifest.json and report.md.",
+    )
+    context_study_parser.add_argument(
+        "--max-scenarios",
+        type=int,
+        default=25,
+        help="Maximum scenarios to load per input.",
+    )
+    context_study_parser.add_argument(
+        "--top",
+        type=int,
+        default=10,
+        help="Number of context-heavy scenarios to include in ranked tables.",
+    )
+    context_study_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe context-study copy.",
+    )
     portfolio_parser = subparsers.add_parser(
         "portfolio-report",
         help="Generate the checked-in ScenarioLens portfolio report.",
@@ -1613,6 +1693,15 @@ def main() -> int:
             output_dir=args.output_dir,
             thresholds=args.thresholds,
             case_count=args.case_count,
+            public_report=args.public_report,
+        )
+    if args.command == "context-study":
+        return context_study_command(
+            input_paths=args.input,
+            output_dir=args.output_dir,
+            max_scenarios=args.max_scenarios,
+            top=args.top,
+            input_format=args.format,
             public_report=args.public_report,
         )
     if args.command == "portfolio-report":
