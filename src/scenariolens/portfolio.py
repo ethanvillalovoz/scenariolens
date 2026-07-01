@@ -129,6 +129,8 @@ def portfolio_markdown(
         "`docs/reports/waymo_lane_continuation_study.md`.",
         "- Lane-continuation candidate plan is checked in under "
         "`docs/reports/waymo_lane_continuation_candidate_plan.md`.",
+        "- Lane-continuation replay prototype is checked in under "
+        "`docs/reports/waymo_lane_continuation_replay_prototype.md`.",
         "- Heading-aware debug casebook is checked in under "
         "`docs/reports/waymo_heading_aware_debug_casebook.md`.",
         "- Heading-aware replay candidate plan is checked in under "
@@ -193,7 +195,7 @@ def portfolio_markdown(
             "- The context replay candidate plan is a readiness queue, not completed simulation.",
             "- The context replay prototype is open-loop diagnostic evidence, not closed-loop simulation.",
             "- The context route/intent audit is a diagnostic follow-up, not a route planner.",
-            "- The lane-link continuation prototype, validation study, and candidate plan are topology diagnostic evidence, not route planning.",
+            "- The lane-link continuation prototype, validation study, candidate plan, and replay prototype are topology diagnostic evidence, not route planning.",
             "- The heading-aware lane selector is an ablation, not a replacement for the default scorer.",
             "- The heading-aware replay candidate plan is a queue for replay experiments, not completed simulation.",
             "- The heading-aware replay prototype is open-loop diagnostic evidence, not closed-loop simulation.",
@@ -203,7 +205,7 @@ def portfolio_markdown(
             "",
             "- Expand the documented local-slice recipe across more Waymo Motion validation shards.",
             "- Compare baseline ADE/FDE distributions across more validation shards.",
-            "- Execute lane-continuation replay controls, regression targets, and topology-audit blockers.",
+            "- Use replayed lane-continuation regressions and topology blockers for richer route-choice diagnostics.",
             "- Graduate stable open-loop replay candidates into an optional Waymax/JAX path.",
             "- Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.",
             "",

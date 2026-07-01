@@ -199,6 +199,13 @@ It reads the ignored local study manifest and publishes only a public-safe
 queue of 15 scenario/track IDs: five replay controls, five regression debug
 targets, and five topology-audit blockers.
 
+The lane-continuation replay prototype is checked in at
+[`docs/reports/waymo_lane_continuation_replay_prototype.md`](reports/waymo_lane_continuation_replay_prototype.md).
+It reloads the same local source shards through the ignored candidate manifest,
+publishes 10 target-track replay summaries, 40 deterministic perturbation
+trials, and 5 topology probes, and keeps local replay packets under ignored
+`data/processed/` paths.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

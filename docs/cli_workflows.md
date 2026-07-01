@@ -412,6 +412,24 @@ This turns the validation study into a queue for follow-up work: positive
 replay controls, regression replay/debug targets, and topology-audit blockers.
 It is still a planning artifact, not a completed Waymax/JAX integration.
 
+## Lane-Continuation Replay Prototype
+
+```bash
+scenariolens lane-continuation-replay-prototype \
+  --candidate-manifest data/processed/waymo_lane_continuation_candidates/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_replay_prototype \
+  --top-per-bucket 5 \
+  --format native \
+  --max-scenarios-per-source 25 \
+  --public-report docs/reports/waymo_lane_continuation_replay_prototype.md
+```
+
+This executes the queued continuation controls and regressions in a lightweight
+open-loop replay pass, then re-probes topology-audit rows as blockers. The
+checked-in report covers 10 target-track replays, 40 deterministic
+perturbation trials, and 5 topology probes while keeping raw Waymo data and
+local replay packets ignored.
+
 ## Baseline Ablation
 
 ```bash

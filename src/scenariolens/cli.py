@@ -61,6 +61,10 @@ from scenariolens.lane_continuation import (
 from scenariolens.lane_continuation_candidates import (
     generate_lane_continuation_candidate_plan,
 )
+from scenariolens.lane_continuation_replay import (
+    LANE_CONTINUATION_REPLAY_INPUT_FORMATS,
+    generate_lane_continuation_replay_prototype,
+)
 from scenariolens.map_match_audit import (
     DEFAULT_AUDIT_THRESHOLDS_M,
     generate_map_match_audit,
@@ -784,6 +788,42 @@ def lane_continuation_candidates_command(
         f"Generated {result.candidate_count} lane-continuation candidate(s): "
         f"{result.replay_candidate_count} replay candidate(s), "
         f"{result.audit_candidate_count} topology audit candidate(s)."
+    )
+    return 0
+
+
+def lane_continuation_replay_command(
+    candidate_manifest: str,
+    output_dir: str,
+    top_per_bucket: int,
+    input_format: str,
+    max_scenarios_per_source: int | None,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_lane_continuation_replay_prototype(
+            candidate_manifest_path=candidate_manifest,
+            output_dir=output_dir,
+            top_per_bucket=top_per_bucket,
+            input_format=input_format,
+            max_scenarios_per_source=max_scenarios_per_source,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote lane-continuation-replay manifest to {result.manifest_path}")
+    print(f"Wrote lane-continuation-replay report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("Lane-continuation replay prototype is not ready. See manifest.json.")
+        return 2
+    print(
+        f"Generated {result.case_count} lane-continuation replay/audit case(s): "
+        f"{result.replay_case_count} replay case(s), "
+        f"{result.topology_case_count} topology probe(s)."
     )
     return 0
 
@@ -1690,6 +1730,49 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe candidate plan copy.",
     )
+    lane_continuation_replay_parser = subparsers.add_parser(
+        "lane-continuation-replay-prototype",
+        help=(
+            "Execute queued lane-continuation replay controls, regression "
+            "debug targets, and topology probes."
+        ),
+    )
+    lane_continuation_replay_parser.add_argument(
+        "--candidate-manifest",
+        required=True,
+        help="Manifest produced by scenariolens lane-continuation-candidates.",
+    )
+    lane_continuation_replay_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_lane_continuation_replay_prototype",
+        help=(
+            "Directory for lane-continuation replay manifest, report, and "
+            "local packets."
+        ),
+    )
+    lane_continuation_replay_parser.add_argument(
+        "--top-per-bucket",
+        type=int,
+        default=5,
+        help="Maximum improvement, regression, and topology candidates to replay/probe.",
+    )
+    lane_continuation_replay_parser.add_argument(
+        "--format",
+        choices=LANE_CONTINUATION_REPLAY_INPUT_FORMATS,
+        default="native",
+        help="Input representation for candidate source paths.",
+    )
+    lane_continuation_replay_parser.add_argument(
+        "--max-scenarios-per-source",
+        type=int,
+        default=25,
+        help="Maximum scenarios to load from each candidate source.",
+    )
+    lane_continuation_replay_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe replay prototype copy.",
+    )
     heading_replay_parser = subparsers.add_parser(
         "heading-replay-prototype",
         help=(
@@ -2116,6 +2199,15 @@ def main() -> int:
             study_manifest=args.study_manifest,
             output_dir=args.output_dir,
             top_per_bucket=args.top_per_bucket,
+            public_report=args.public_report,
+        )
+    if args.command == "lane-continuation-replay-prototype":
+        return lane_continuation_replay_command(
+            candidate_manifest=args.candidate_manifest,
+            output_dir=args.output_dir,
+            top_per_bucket=args.top_per_bucket,
+            input_format=args.format,
+            max_scenarios_per_source=args.max_scenarios_per_source,
             public_report=args.public_report,
         )
     if args.command == "heading-replay-prototype":

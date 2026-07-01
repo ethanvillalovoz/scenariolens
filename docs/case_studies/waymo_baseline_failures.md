@@ -72,6 +72,10 @@ lanes, 47 regress, and 33 remain topology gaps.
 The candidate plan then promotes 15 rows into concrete follow-up queues: five
 replay controls, five regression debug targets, and five topology-audit
 blockers.
+The lane-continuation replay prototype executes those queued rows as 10
+target-track replay cases, 40 deterministic perturbation trials, and five
+topology probes. The replay pass preserves the expected improvement/regression
+signs on all perturbation trials while keeping topology gaps framed as blockers.
 
 ## Why It Matters
 
@@ -82,6 +86,7 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Execute the lane-continuation candidate queue in richer replay or optional
-Waymax/JAX work; expand beyond shards `00007` through `00010`; and continue
-curating stable open-loop replay candidates.
+Use the replayed lane-continuation regressions and topology blockers to
+prototype richer route-choice or optional Waymax/JAX work; expand beyond shards
+`00007` through `00010`; and continue curating stable open-loop replay
+candidates.
