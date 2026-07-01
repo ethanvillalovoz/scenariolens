@@ -9,9 +9,13 @@ from scenariolens.ingest.waymo_motion import MAX_MAP_FEATURES_PER_SCENARIO
 from scenariolens.io import save_scenarios
 from scenariolens.lane_continuation import (
     LANE_CONTINUATION_FORMAT,
+    LANE_CONTINUATION_STUDY_FORMAT,
     generate_lane_continuation_prototype,
+    generate_lane_continuation_study,
     lane_continuation_markdown,
     lane_continuation_payload,
+    lane_continuation_study_payload,
+    lane_continuation_study_markdown,
     lane_link_baseline,
 )
 from scenariolens.prediction import lane_aware_baseline
@@ -91,6 +95,64 @@ class LaneContinuationTest(unittest.TestCase):
             self.assertTrue(Path(manifest["cases"][0]["local_packet_path"]).exists())
             self.assertIn("Prototype Summary", public_report.read_text())
 
+    def test_lane_continuation_study_payload_ranks_validation_candidates(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            input_path = root / "linked_lane_fixture.json"
+            save_scenarios(input_path, (_linked_lane_scenario(),))
+
+            payload = lane_continuation_study_payload(
+                input_paths=(input_path,),
+                output_dir=root / "lane_continuation_study",
+                max_scenarios=10,
+                top=3,
+                input_format="scenariolens-json",
+            )
+
+            self.assertEqual(payload["format"], LANE_CONTINUATION_STUDY_FORMAT)
+            self.assertTrue(payload["ready"])
+            self.assertEqual(payload["candidate_case_count"], 1)
+            self.assertEqual(payload["candidate_track_count"], 1)
+            aggregate = payload["aggregate"]
+            self.assertEqual(aggregate["linked_lane_track_count"], 1)
+            self.assertEqual(aggregate["improved_over_nearest_count"], 1)
+            self.assertEqual(aggregate["topology_gap_count"], 0)
+            improvement = payload["top_improvements"][0]
+            self.assertEqual(improvement["scenario_id"], "linked_lane_fixture")
+            self.assertGreater(improvement["lane_link_improvement_over_nearest_m"], 7.0)
+
+            markdown = lane_continuation_study_markdown(payload)
+            self.assertIn("Lane-Continuation Validation Study", markdown)
+            self.assertIn("Largest Lane-Link Improvements", markdown)
+            self.assertIn("not route planning", markdown)
+
+    def test_generate_lane_continuation_study_writes_outputs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            input_path = root / "linked_lane_fixture.json"
+            save_scenarios(input_path, (_linked_lane_scenario(),))
+            output_dir = root / "lane_continuation_study"
+            public_report = root / "reports" / "lane_continuation_study.md"
+
+            result = generate_lane_continuation_study(
+                input_paths=(input_path,),
+                output_dir=output_dir,
+                max_scenarios=10,
+                top=3,
+                input_format="scenariolens-json",
+                public_report_path=public_report,
+            )
+            manifest = json.loads(result.manifest_path.read_text(encoding="utf-8"))
+
+            self.assertTrue(result.ready)
+            self.assertEqual(result.source_count, 1)
+            self.assertEqual(result.scenario_count, 1)
+            self.assertEqual(result.candidate_track_count, 1)
+            self.assertTrue(result.report_path.exists())
+            self.assertTrue(public_report.exists())
+            self.assertEqual(manifest["format"], LANE_CONTINUATION_STUDY_FORMAT)
+            self.assertIn("Validation Study", public_report.read_text())
+
     def test_lane_continuation_cli_writes_run_packet(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -120,6 +182,44 @@ class LaneContinuationTest(unittest.TestCase):
             )
 
             self.assertIn("Generated 1 lane-continuation case", result.stdout)
+            self.assertTrue((output_dir / "manifest.json").exists())
+            self.assertTrue((output_dir / "report.md").exists())
+            self.assertTrue(public_report.exists())
+
+    def test_lane_continuation_study_cli_writes_run_packet(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            input_path = root / "linked_lane_fixture.json"
+            save_scenarios(input_path, (_linked_lane_scenario(),))
+            output_dir = root / "lane_continuation_study"
+            public_report = root / "reports" / "lane_continuation_study.md"
+
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "scenariolens.cli",
+                    "lane-continuation-study",
+                    "--input",
+                    str(input_path),
+                    "--format",
+                    "scenariolens-json",
+                    "--output-dir",
+                    str(output_dir),
+                    "--max-scenarios",
+                    "10",
+                    "--top",
+                    "3",
+                    "--public-report",
+                    str(public_report),
+                ],
+                check=True,
+                env={"PYTHONPATH": "src"},
+                capture_output=True,
+                text=True,
+            )
+
+            self.assertIn("lane-continuation candidate target", result.stdout)
             self.assertTrue((output_dir / "manifest.json").exists())
             self.assertTrue((output_dir / "report.md").exists())
             self.assertTrue(public_report.exists())

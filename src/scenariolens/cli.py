@@ -53,7 +53,11 @@ from scenariolens.lane_selection_study import (
     LANE_SELECTION_STUDY_INPUT_FORMATS,
     generate_lane_selection_study,
 )
-from scenariolens.lane_continuation import generate_lane_continuation_prototype
+from scenariolens.lane_continuation import (
+    LANE_CONTINUATION_STUDY_INPUT_FORMATS,
+    generate_lane_continuation_prototype,
+    generate_lane_continuation_study,
+)
 from scenariolens.map_match_audit import (
     DEFAULT_AUDIT_THRESHOLDS_M,
     generate_map_match_audit,
@@ -709,6 +713,42 @@ def lane_continuation_prototype_command(
     print(
         f"Generated {result.case_count} lane-continuation case(s) across "
         f"{result.evaluated_track_count} track(s)."
+    )
+    return 0
+
+
+def lane_continuation_study_command(
+    input_paths: list[str],
+    output_dir: str,
+    max_scenarios: int | None,
+    top: int,
+    input_format: str,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_lane_continuation_study(
+            input_paths=tuple(input_paths),
+            output_dir=output_dir,
+            max_scenarios=max_scenarios,
+            top=top,
+            input_format=input_format,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote lane-continuation-study manifest to {result.manifest_path}")
+    print(f"Wrote lane-continuation-study report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("One or more inputs are not ready. See manifest.json for details.")
+        return 2
+    print(
+        f"Scanned {result.source_count} source(s) across "
+        f"{result.scenario_count} scenario(s) and "
+        f"{result.candidate_track_count} lane-continuation candidate target(s)."
     )
     return 0
 
@@ -1546,6 +1586,47 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe lane-continuation report copy.",
     )
+    lane_continuation_study_parser = subparsers.add_parser(
+        "lane-continuation-study",
+        help=(
+            "Scan scenario inputs for lane-end clamp candidates and compare "
+            "nearest-lane vs linked-lane continuation."
+        ),
+    )
+    lane_continuation_study_parser.add_argument(
+        "--input",
+        action="append",
+        required=True,
+        help="Input Waymo Motion file/directory or ScenarioLens JSON file. Repeat for shards.",
+    )
+    lane_continuation_study_parser.add_argument(
+        "--format",
+        choices=LANE_CONTINUATION_STUDY_INPUT_FORMATS,
+        default="native",
+        help="Input representation.",
+    )
+    lane_continuation_study_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_lane_continuation_study",
+        help="Directory for lane-continuation study manifest.json and report.md.",
+    )
+    lane_continuation_study_parser.add_argument(
+        "--max-scenarios",
+        type=int,
+        default=25,
+        help="Maximum scenarios to load per input.",
+    )
+    lane_continuation_study_parser.add_argument(
+        "--top",
+        type=int,
+        default=10,
+        help="Number of ranked lane-continuation rows to include.",
+    )
+    lane_continuation_study_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe lane-continuation study copy.",
+    )
     heading_replay_parser = subparsers.add_parser(
         "heading-replay-prototype",
         help=(
@@ -1956,6 +2037,15 @@ def main() -> int:
             audit_manifest=args.audit_manifest,
             output_dir=args.output_dir,
             case_count=args.case_count,
+            public_report=args.public_report,
+        )
+    if args.command == "lane-continuation-study":
+        return lane_continuation_study_command(
+            input_paths=args.input,
+            output_dir=args.output_dir,
+            max_scenarios=args.max_scenarios,
+            top=args.top,
+            input_format=args.format,
             public_report=args.public_report,
         )
     if args.command == "heading-replay-prototype":

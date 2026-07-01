@@ -66,6 +66,9 @@ The lane-link continuation prototype then tests that hypothesis. It proves the
 mechanism on a deterministic linked-lane fixture and resolves the real stable
 warning's parsed lane chain `144 -> 190 -> 193`, cutting the clamped
 nearest-lane FDE by 63.578 m on that case.
+The lane-continuation validation study then scans the same 100-scenario local
+Waymo slice and finds 178 lane-end clamp candidates: 96 improve with linked
+lanes, 47 regress, and 33 remain topology gaps.
 
 ## Why It Matters
 
@@ -76,6 +79,6 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Turn the resolved lane-continuation case into a small validation set; expand
-beyond shards `00007` through `00010`; and graduate stable open-loop replay
-candidates into an optional Waymax/JAX path.
+Promote the strongest lane-continuation wins, regressions, and topology gaps
+into richer replay or optional Waymax/JAX work; expand beyond shards `00007`
+through `00010`; and continue curating stable open-loop replay candidates.

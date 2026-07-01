@@ -378,6 +378,26 @@ parsed `exit_lanes`; the current real Waymo case resolves lane chain
 `144 -> 190 -> 193` and reduces the clamped nearest-lane FDE by 63.578 m while
 leaving the default scorer unchanged.
 
+## Lane-Continuation Validation Study
+
+```bash
+scenariolens lane-continuation-study \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00007-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00008-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00009-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00010-of-00150 \
+  --format native \
+  --output-dir data/processed/waymo_lane_continuation_study \
+  --max-scenarios 25 \
+  --top 10 \
+  --public-report docs/reports/waymo_lane_continuation_study.md
+```
+
+This scans the same 100-scenario local Waymo slice for targets whose
+nearest-lane rollout would clamp at the end of a selected lane. The checked-in
+report keeps both sides of the diagnostic: 96 linked-lane improvements, 47
+regressions, and 33 topology gaps.
+
 ## Baseline Ablation
 
 ```bash

@@ -186,6 +186,13 @@ retains 240 map features per scenario. That cuts the clamped nearest-lane FDE by
 63.578 m on the stable warning. Local prototype packets stay ignored under
 `data/processed/`.
 
+The lane-continuation validation study is checked in at
+[`docs/reports/waymo_lane_continuation_study.md`](reports/waymo_lane_continuation_study.md).
+It scans the same 100-scenario local slice for lane-end clamp candidates and
+publishes aggregate/ranked diagnostics only: 178 candidate tracks, 145 linked
+lane rollouts, 96 improvements, 47 regressions, and 33 topology gaps. Raw
+Waymo files and ignored local manifests remain outside git.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

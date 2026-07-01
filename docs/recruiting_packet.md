@@ -16,6 +16,7 @@ robotics, AI/ML, and software engineering internship conversations.
 - Context open-loop replay prototype: `docs/reports/waymo_context_open_loop_replay_prototype.md`
 - Context route/intent audit: `docs/reports/waymo_context_route_intent_audit.md`
 - Lane-link continuation prototype: `docs/reports/waymo_lane_continuation_prototype.md`
+- Lane-continuation validation study: `docs/reports/waymo_lane_continuation_study.md`
 - Real lane-aware baseline diagnostic: `docs/reports/waymo_lane_aware_baseline_cross_shard.md`
 - Lane-aware debug casebook: `docs/reports/waymo_lane_aware_debug_casebook.md`
 - Replay candidate plan: `docs/reports/waymo_replay_candidate_plan.md`
@@ -114,7 +115,7 @@ Architecture:
 9. Heading-aware lane-selection ablation for map-matching iteration.
 10. Route/intent audit for stable replay regressions that need lane-continuity
     or route-link follow-up.
-11. Lane-link continuation prototype for parsed entry/exit lane topology.
+11. Lane-link continuation prototype and validation study for parsed entry/exit lane topology.
 12. Report, portfolio, renderer, and dashboard exporters.
 13. Static Scenario Explorer backed by deterministic JSON and SVG assets.
 
@@ -190,6 +191,9 @@ Testing and verification:
 - A lane-link continuation prototype proves the linked-lane mechanism on a
   deterministic fixture, resolves the real stable warning's parsed lane chain
   `144 -> 190 -> 193`, and cuts nearest-lane FDE by 63.578 m on that case.
+- A lane-continuation validation study scans 100 real local Waymo scenarios and
+  finds 178 lane-end clamp candidates: 96 linked-lane improvements, 47
+  regressions, and 33 topology gaps for follow-up audit work.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
@@ -197,8 +201,8 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Build a small lane-continuation validation set from the resolved real case
-   before optional Waymax/JAX work.
+3. Promote the strongest lane-continuation wins, regressions, and topology gaps
+   into richer replay or optional Waymax/JAX work.
 4. Create curated scenario collections for pedestrian, cyclist, merge, and
    unprotected-turn cases.
 

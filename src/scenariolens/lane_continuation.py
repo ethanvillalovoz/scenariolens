@@ -32,6 +32,8 @@ from scenariolens.route_intent_audit import ROUTE_INTENT_AUDIT_FORMAT
 from scenariolens.schema import AgentTrack, Scenario, State
 
 LANE_CONTINUATION_FORMAT = "scenariolens.lane_continuation_prototype.v1"
+LANE_CONTINUATION_STUDY_FORMAT = "scenariolens.lane_continuation_study.v1"
+LANE_CONTINUATION_STUDY_INPUT_FORMATS = ("native", "scenariolens-json")
 
 
 @dataclass(frozen=True)
@@ -41,6 +43,20 @@ class LaneContinuationPrototypeResult:
     ready: bool
     case_count: int
     evaluated_track_count: int
+    output_dir: Path
+    manifest_path: Path
+    report_path: Path
+    public_report_path: Path | None
+
+
+@dataclass(frozen=True)
+class LaneContinuationStudyResult:
+    """Files produced by a public-safe lane-continuation validation study."""
+
+    ready: bool
+    source_count: int
+    scenario_count: int
+    candidate_track_count: int
     output_dir: Path
     manifest_path: Path
     report_path: Path
@@ -119,6 +135,48 @@ def generate_lane_continuation_prototype(
     )
 
 
+def generate_lane_continuation_study(
+    input_paths: tuple[str | Path, ...],
+    output_dir: str | Path,
+    max_scenarios: int | None = 25,
+    top: int = 10,
+    input_format: str = "native",
+    public_report_path: str | Path | None = None,
+) -> LaneContinuationStudyResult:
+    """Generate a public-safe lane-link continuation validation study."""
+
+    target = Path(output_dir)
+    target.mkdir(parents=True, exist_ok=True)
+    manifest_path = target / "manifest.json"
+    report_path = target / "report.md"
+    copied_report_path = Path(public_report_path) if public_report_path else None
+
+    payload = lane_continuation_study_payload(
+        input_paths=tuple(Path(path) for path in input_paths),
+        output_dir=target,
+        max_scenarios=max_scenarios,
+        top=top,
+        input_format=input_format,
+    )
+    report = lane_continuation_study_markdown(payload)
+    _write_json(manifest_path, payload)
+    report_path.write_text(report, encoding="utf-8")
+    if copied_report_path is not None:
+        copied_report_path.parent.mkdir(parents=True, exist_ok=True)
+        copied_report_path.write_text(report, encoding="utf-8")
+
+    return LaneContinuationStudyResult(
+        ready=bool(payload["ready"]),
+        source_count=int(payload["source_count"]),
+        scenario_count=int(payload["scenario_count"]),
+        candidate_track_count=int(payload["candidate_track_count"]),
+        output_dir=target,
+        manifest_path=manifest_path,
+        report_path=report_path,
+        public_report_path=copied_report_path,
+    )
+
+
 def lane_continuation_payload(
     audit_manifest_path: Path,
     output_dir: Path,
@@ -176,6 +234,119 @@ def lane_continuation_payload(
             "Lane-link continuation prototype only; this is not route planning, "
             "not closed-loop simulation, not a default scorer change, and not a "
             "Waymo benchmark claim."
+        ),
+    }
+
+
+def lane_continuation_study_payload(
+    input_paths: tuple[Path, ...],
+    output_dir: Path,
+    max_scenarios: int | None,
+    top: int,
+    input_format: str,
+) -> dict[str, object]:
+    """Return deterministic public-safe lane-continuation validation metadata."""
+
+    if not input_paths:
+        raise ValueError("At least one input path is required for lane-continuation study.")
+    if input_format not in LANE_CONTINUATION_STUDY_INPUT_FORMATS:
+        raise ValueError(
+            "Unsupported lane-continuation-study input format: "
+            f"{input_format}. Expected one of: "
+            f"{', '.join(LANE_CONTINUATION_STUDY_INPUT_FORMATS)}"
+        )
+    if top < 1:
+        raise ValueError("top must be at least 1.")
+
+    ready = True
+    sources: list[dict[str, object]] = []
+    cases: list[dict[str, object]] = []
+    tracks: list[dict[str, object]] = []
+    scenario_count = 0
+
+    for source_index, source in enumerate(input_paths, start=1):
+        input_ready, preflight, scenarios = load_failure_study_input(
+            source=source,
+            input_format=input_format,
+            max_scenarios=max_scenarios,
+        )
+        if not input_ready:
+            ready = False
+            sources.append(
+                {
+                    "input_path": str(source),
+                    "source_name": _source_name(source),
+                    "ready": False,
+                    "scenario_count": 0,
+                    "candidate_case_count": 0,
+                    "candidate_track_count": 0,
+                    "preflight": preflight or {},
+                    **_aggregate_tracks(()),
+                }
+            )
+            continue
+
+        scenario_count += len(scenarios)
+        source_cases: list[dict[str, object]] = []
+        source_tracks: list[dict[str, object]] = []
+        for scenario_index, scenario in enumerate(scenarios, start=1):
+            case = _study_case(
+                source=source,
+                source_index=source_index,
+                scenario_index=scenario_index,
+                scenario=scenario,
+            )
+            if not case:
+                continue
+            case["rank"] = len(cases) + len(source_cases) + 1
+            source_cases.append(case)
+            source_tracks.extend(_required_list(case, "track_results"))
+
+        cases.extend(source_cases)
+        tracks.extend(track for track in source_tracks if isinstance(track, dict))
+        sources.append(
+            {
+                "input_path": str(source),
+                "source_name": _source_name(source),
+                "ready": True,
+                "scenario_count": len(scenarios),
+                "candidate_case_count": len(source_cases),
+                "candidate_track_count": len(source_tracks),
+                "preflight": preflight or {},
+                **_aggregate_tracks(tuple(source_tracks)),
+            }
+        )
+
+    track_tuple = tuple(tracks)
+    return {
+        "format": LANE_CONTINUATION_STUDY_FORMAT,
+        "input_paths": [str(path) for path in input_paths],
+        "output_dir": str(output_dir),
+        "input_format": input_format,
+        "max_scenarios_per_input": max_scenarios,
+        "top": top,
+        "ready": ready,
+        "source_count": len(input_paths),
+        "scenario_count": scenario_count,
+        "candidate_case_count": len(cases),
+        "candidate_track_count": len(track_tuple),
+        "max_lane_link_hops": 2,
+        "lane_match_threshold_m": LANE_MATCH_THRESHOLD_M,
+        "map_feature_cap": MAX_MAP_FEATURES_PER_SCENARIO,
+        "aggregate": _aggregate_tracks(track_tuple),
+        "sources": sources,
+        "cases": cases,
+        "top_improvements": _rank_link_improvements(track_tuple, top=top),
+        "top_regressions": _rank_link_regressions(track_tuple, top=top),
+        "top_topology_gaps": _rank_topology_gaps(track_tuple, top=top),
+        "outputs": {
+            "manifest": "manifest.json",
+            "report": "report.md",
+        },
+        "scope_note": (
+            "Lane-continuation study only; this is not route planning, "
+            "not closed-loop simulation, not a default scorer change, and not "
+            "a Waymo benchmark claim."
         ),
     }
 
@@ -320,6 +491,148 @@ def lane_continuation_markdown(payload: dict[str, object]) -> str:
             "- A remaining regression does not invalidate the framework; it points to route choice, map topology quality, speed modeling, or richer prediction logic.",
             "- This prototype keeps the default scoring baseline unchanged and treats linked-lane following as a follow-up experiment.",
             "- Public artifacts stay aggregate and diagnostic; local per-case packets and raw Waymo TFRecords remain ignored.",
+        ]
+    )
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def lane_continuation_study_markdown(payload: dict[str, object]) -> str:
+    """Return public-safe Markdown for a lane-continuation validation study."""
+
+    aggregate = _required_mapping(payload, "aggregate")
+    sources = _required_list(payload, "sources")
+    improvements = _required_list(payload, "top_improvements")
+    regressions = _required_list(payload, "top_regressions")
+    topology_gaps = _required_list(payload, "top_topology_gaps")
+    lines = [
+        "# ScenarioLens Lane-Continuation Validation Study",
+        "",
+        "This report scans scenario inputs for targets whose nearest-lane rollout "
+        "would clamp at the end of the selected lane polyline, then evaluates "
+        "whether following parsed lane `entry_lanes`/`exit_lanes` changes the "
+        "diagnosis. It turns the one-case lane-link prototype into a small "
+        "repeatable validation workflow.",
+        "",
+        "It is intentionally scoped: this is not route planning, not a default "
+        "scorer change, not closed-loop simulation, and not a Waymo benchmark "
+        "claim. Raw Waymo files and local per-case packets stay out of git.",
+        "",
+        "## Run Scope",
+        "",
+        f"- Inputs: {', '.join(f'`{path}`' for path in payload['input_paths'])}",
+        f"- Input format: `{payload['input_format']}`",
+        f"- Ready for analysis: {payload['ready']}",
+        f"- Sources scanned: {payload['source_count']}",
+        f"- Scenarios scanned: {payload['scenario_count']}",
+        f"- Candidate cases: {payload['candidate_case_count']}",
+        f"- Candidate tracks: {payload['candidate_track_count']}",
+        f"- Max scenarios per input: {payload['max_scenarios_per_input']}",
+        f"- Max lane-link hops: {payload['max_lane_link_hops']}",
+        f"- Lane-match threshold: {_meter_text(payload['lane_match_threshold_m'])}",
+        f"- Waymo map feature cap: {payload['map_feature_cap']}",
+        "- Raw scenario data committed: no",
+        "",
+        "## Executive Findings",
+        "",
+        "| Metric | Value |",
+        "| --- | ---: |",
+        f"| Candidate tracks | {aggregate['evaluated_track_count']} |",
+        f"| Tracks using linked lanes | {aggregate['linked_lane_track_count']} |",
+        f"| Tracks improved over nearest lane | {aggregate['improved_over_nearest_count']} |",
+        f"| Tracks regressed vs nearest lane | {aggregate['regressed_vs_nearest_count']} |",
+        f"| Topology gaps | {aggregate['topology_gap_count']} |",
+        f"| Tracks still clamped after links | {aggregate['still_clamped_count']} |",
+        f"| Mean nearest FDE | {_meter_text(aggregate['mean_nearest_fde_m'])} |",
+        f"| Mean lane-link FDE | {_meter_text(aggregate['mean_lane_link_fde_m'])} |",
+        f"| Mean lane-link improvement over nearest | {_signed_meter_text(aggregate['mean_lane_link_improvement_m'])} |",
+        "",
+    ]
+
+    if not payload["ready"]:
+        lines.extend(
+            [
+                "## Next Action",
+                "",
+                "Fix the failing input path or use an ingestable ScenarioLens JSON "
+                "file, then rerun `lane-continuation-study`.",
+                "",
+            ]
+        )
+        return "\n".join(lines).rstrip() + "\n"
+
+    lines.extend(
+        [
+            "## Per-Source Summary",
+            "",
+            "| Source | Scenarios | Candidate cases | Candidate tracks | Linked tracks | Improvements | Regressions | Topology gaps | Mean improvement |",
+            "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+        ]
+    )
+    for source in sources:
+        assert isinstance(source, dict)
+        lines.append(
+            "| "
+            f"`{source['source_name']}` | "
+            f"{source['scenario_count']} | "
+            f"{source['candidate_case_count']} | "
+            f"{source['candidate_track_count']} | "
+            f"{source['linked_lane_track_count']} | "
+            f"{source['improved_over_nearest_count']} | "
+            f"{source['regressed_vs_nearest_count']} | "
+            f"{source['topology_gap_count']} | "
+            f"{_signed_meter_text(source['mean_lane_link_improvement_m'])} |"
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Largest Lane-Link Improvements",
+            "",
+            "| Rank | Source | Scenario | Track | Nearest FDE | Lane-link FDE | Link improvement | Feature chain | Before/after remaining | Result |",
+            "| ---: | --- | --- | --- | ---: | ---: | ---: | --- | --- | --- |",
+        ]
+    )
+    _append_study_rows(lines, improvements)
+
+    lines.extend(
+        [
+            "",
+            "## Largest Lane-Link Regressions",
+            "",
+            "Negative improvements mean linked-lane following was worse than the "
+            "clamped nearest-lane rollout. Those are useful route-choice and "
+            "map-topology diagnostics, not failures of the framework.",
+            "",
+            "| Rank | Source | Scenario | Track | Nearest FDE | Lane-link FDE | Link improvement | Feature chain | Before/after remaining | Result |",
+            "| ---: | --- | --- | --- | ---: | ---: | ---: | --- | --- | --- |",
+        ]
+    )
+    _append_study_rows(lines, regressions)
+
+    lines.extend(
+        [
+            "",
+            "## Topology Gaps",
+            "",
+            "These candidates still could not use a linked-lane chain. They point "
+            "to parser coverage, missing linked features, or map topology limits "
+            "that are worth auditing before changing baseline behavior.",
+            "",
+            "| Rank | Source | Scenario | Track | Nearest FDE | Lane-link FDE | Link improvement | Feature chain | Before/after remaining | Result |",
+            "| ---: | --- | --- | --- | ---: | ---: | ---: | --- | --- | --- |",
+        ]
+    )
+    _append_study_rows(lines, topology_gaps)
+
+    lines.extend(
+        [
+            "",
+            "## Interpretation",
+            "",
+            "- Improvements show cases where nearest-lane clamping was a diagnostic artifact that parsed lane links can explain.",
+            "- Regressions and topology gaps are just as valuable: they identify route-choice, map topology, parser coverage, or horizon limits for the next audit.",
+            "- The default ScenarioLens scoring baseline remains unchanged; this is a validation workflow around a follow-up experiment.",
+            "- Public artifacts stay aggregate and diagnostic; raw Waymo TFRecords and local per-case packets remain ignored.",
         ]
     )
     return "\n".join(lines).rstrip() + "\n"
@@ -637,6 +950,108 @@ def _prototype_case(
     return case_payload
 
 
+def _study_case(
+    source: Path,
+    source_index: int,
+    scenario_index: int,
+    scenario: Scenario,
+) -> dict[str, object] | None:
+    constant = constant_velocity_baseline(scenario)
+    nearest = lane_aware_baseline(scenario)
+    heading = heading_aware_lane_baseline(scenario)
+    lane_link, lane_link_details = _lane_link_baseline_with_details(
+        scenario=scenario,
+        miss_threshold_m=DEFAULT_MISS_THRESHOLD_M,
+        lane_match_threshold_m=LANE_MATCH_THRESHOLD_M,
+        max_hops=2,
+    )
+    track_results = _study_track_results(
+        source=source,
+        source_index=source_index,
+        scenario_index=scenario_index,
+        scenario_id=scenario.scenario_id,
+        constant_results=constant.track_results,
+        nearest_results=nearest.track_results,
+        heading_results=heading.track_results,
+        lane_link_results=lane_link.track_results,
+        lane_link_details=lane_link_details,
+    )
+    if not track_results:
+        return None
+    return {
+        "ready": True,
+        "rank": 0,
+        "case_label": f"Lane-continuation candidate {source_index}.{scenario_index}",
+        "scenario_id": scenario.scenario_id,
+        "source_input": str(source),
+        "source_name": _source_name(source),
+        "source_index": source_index,
+        "scenario_index": scenario_index,
+        "summary": _case_summary_from_tracks(track_results),
+        "primary_conclusion": _primary_conclusion(track_results),
+        "track_results": track_results,
+    }
+
+
+def _study_track_results(
+    source: Path,
+    source_index: int,
+    scenario_index: int,
+    scenario_id: str,
+    constant_results: tuple[PredictionTrackResult, ...],
+    nearest_results: tuple[PredictionTrackResult, ...],
+    heading_results: tuple[PredictionTrackResult, ...],
+    lane_link_results: tuple[PredictionTrackResult, ...],
+    lane_link_details: dict[str, dict[str, object]],
+) -> list[dict[str, object]]:
+    constant_by_id = {result.track_id: result for result in constant_results}
+    nearest_by_id = {result.track_id: result for result in nearest_results}
+    heading_by_id = {result.track_id: result for result in heading_results}
+    lane_link_by_id = {result.track_id: result for result in lane_link_results}
+    rows = []
+    for track_id, link_detail in lane_link_details.items():
+        if not bool(link_detail.get("lane_end_clamp_risk_before")):
+            continue
+        constant = constant_by_id.get(track_id)
+        nearest = nearest_by_id.get(track_id)
+        heading = heading_by_id.get(track_id)
+        lane_link = lane_link_by_id.get(track_id)
+        if (
+            constant is None
+            or nearest is None
+            or heading is None
+            or lane_link is None
+        ):
+            continue
+        row = {
+            "source_input": str(source),
+            "source_name": _source_name(source),
+            "source_index": source_index,
+            "scenario_index": scenario_index,
+            "scenario_id": scenario_id,
+            "track_id": track_id,
+            "agent_type": constant.agent_type,
+            "constant_velocity_fde_m": constant.fde_m,
+            "nearest_lane_fde_m": nearest.fde_m,
+            "heading_lane_fde_m": heading.fde_m,
+            "lane_link_fde_m": lane_link.fde_m,
+            "lane_link_improvement_over_nearest_m": _optional_delta(
+                nearest.fde_m,
+                lane_link.fde_m,
+            ),
+            "lane_link_improvement_over_constant_m": _optional_delta(
+                constant.fde_m,
+                lane_link.fde_m,
+            ),
+            "lane_link_map_used": lane_link.map_used,
+            "lane_link_fallback_reason": lane_link.fallback_reason,
+            "lane_link": link_detail,
+        }
+        row["conclusion"] = _track_conclusion(row)
+        rows.append(row)
+    return rows
+
+
 def _selected_track_results(
     audit_case: dict[str, object],
     constant_results: tuple[PredictionTrackResult, ...],
@@ -800,6 +1215,30 @@ def _case_summary(
     }
 
 
+def _case_summary_from_tracks(track_results: list[dict[str, object]]) -> dict[str, object]:
+    return {
+        "evaluated_track_count": len(track_results),
+        "constant_velocity_fde_m": _mean(
+            _numbers(track.get("constant_velocity_fde_m") for track in track_results)
+        ),
+        "nearest_lane_fde_m": _mean(
+            _numbers(track.get("nearest_lane_fde_m") for track in track_results)
+        ),
+        "heading_lane_fde_m": _mean(
+            _numbers(track.get("heading_lane_fde_m") for track in track_results)
+        ),
+        "lane_link_fde_m": _mean(
+            _numbers(track.get("lane_link_fde_m") for track in track_results)
+        ),
+        "lane_link_improvement_over_nearest_m": _mean(
+            _numbers(
+                track.get("lane_link_improvement_over_nearest_m")
+                for track in track_results
+            )
+        ),
+    }
+
+
 def _aggregate_cases(cases: list[dict[str, object]]) -> dict[str, object]:
     evaluated = [case for case in cases if bool(case.get("ready"))]
     tracks = [
@@ -833,6 +1272,127 @@ def _aggregate_cases(cases: list[dict[str, object]]) -> dict[str, object]:
         "mean_lane_link_fde_m": _mean(link_fdes),
         "mean_lane_link_improvement_m": _mean(improvements),
     }
+
+
+def _aggregate_tracks(tracks: tuple[object, ...]) -> dict[str, object]:
+    rows = tuple(track for track in tracks if isinstance(track, dict))
+    nearest_fdes = _numbers(track.get("nearest_lane_fde_m") for track in rows)
+    link_fdes = _numbers(track.get("lane_link_fde_m") for track in rows)
+    improvements = _numbers(
+        track.get("lane_link_improvement_over_nearest_m") for track in rows
+    )
+    return {
+        "evaluated_track_count": len(rows),
+        "linked_lane_track_count": sum(
+            int(_required_mapping(track, "lane_link").get("link_count", 0) or 0) > 0
+            for track in rows
+        ),
+        "improved_over_nearest_count": sum(
+            (_optional_float(track.get("lane_link_improvement_over_nearest_m")) or 0.0)
+            > 1.0
+            for track in rows
+        ),
+        "regressed_vs_nearest_count": sum(
+            (_optional_float(track.get("lane_link_improvement_over_nearest_m")) or 0.0)
+            < -1.0
+            for track in rows
+        ),
+        "topology_gap_count": sum(
+            str(_required_mapping(track, "conclusion").get("label")) == "topology_gap"
+            for track in rows
+        ),
+        "still_clamped_count": sum(
+            bool(_required_mapping(track, "lane_link").get("lane_end_clamp_risk_after"))
+            for track in rows
+        ),
+        "mean_nearest_fde_m": _mean(nearest_fdes),
+        "mean_lane_link_fde_m": _mean(link_fdes),
+        "mean_lane_link_improvement_m": _mean(improvements),
+    }
+
+
+def _rank_link_improvements(
+    tracks: tuple[dict[str, object], ...],
+    top: int,
+) -> list[dict[str, object]]:
+    return sorted(
+        _rankable_track_rows(tracks),
+        key=lambda row: (
+            -float(row["lane_link_improvement_over_nearest_m"]),
+            str(row["scenario_id"]),
+            str(row["track_id"]),
+        ),
+    )[:top]
+
+
+def _rank_link_regressions(
+    tracks: tuple[dict[str, object], ...],
+    top: int,
+) -> list[dict[str, object]]:
+    return sorted(
+        (
+            row
+            for row in _rankable_track_rows(tracks)
+            if float(row["lane_link_improvement_over_nearest_m"]) < -1.0
+        ),
+        key=lambda row: (
+            float(row["lane_link_improvement_over_nearest_m"]),
+            str(row["scenario_id"]),
+            str(row["track_id"]),
+        ),
+    )[:top]
+
+
+def _rank_topology_gaps(
+    tracks: tuple[dict[str, object], ...],
+    top: int,
+) -> list[dict[str, object]]:
+    return sorted(
+        (
+            row
+            for row in tracks
+            if str(_required_mapping(row, "conclusion").get("label")) == "topology_gap"
+        ),
+        key=lambda row: (
+            -float(_optional_float(row.get("nearest_lane_fde_m")) or 0.0),
+            str(row["scenario_id"]),
+            str(row["track_id"]),
+        ),
+    )[:top]
+
+
+def _rankable_track_rows(
+    tracks: tuple[dict[str, object], ...],
+) -> tuple[dict[str, object], ...]:
+    return tuple(
+        track
+        for track in tracks
+        if track.get("lane_link_improvement_over_nearest_m") is not None
+    )
+
+
+def _append_study_rows(lines: list[str], rows: list[object]) -> None:
+    if not rows:
+        lines.append("| n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a | n/a |")
+        return
+    for rank, row in enumerate(rows, start=1):
+        assert isinstance(row, dict)
+        link = _required_mapping(row, "lane_link")
+        conclusion = _required_mapping(row, "conclusion")
+        lines.append(
+            "| "
+            f"{rank} | "
+            f"`{row['source_name']}` | "
+            f"`{row['scenario_id']}` | "
+            f"`{row['track_id']}` | "
+            f"{_meter_text(row['nearest_lane_fde_m'])} | "
+            f"{_meter_text(row['lane_link_fde_m'])} | "
+            f"{_signed_meter_text(row['lane_link_improvement_over_nearest_m'])} | "
+            f"{_feature_chain_text(link)} | "
+            f"{_meter_text(link['base_remaining_m'])} / "
+            f"{_meter_text(link['route_remaining_m'])} | "
+            f"`{conclusion['label']}` |"
+        )
 
 
 def _lane_features(scenario: Scenario) -> list[dict[str, object]]:
@@ -1053,6 +1613,10 @@ def _optional_float(value: object) -> float | None:
         return float(value)
     except (TypeError, ValueError):
         return None
+
+
+def _source_name(path: Path) -> str:
+    return path.name or str(path)
 
 
 def _meter_text(value: object) -> str:

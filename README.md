@@ -95,6 +95,7 @@ Then open `http://localhost:8000/demo/`.
 - [Context open-loop replay prototype](docs/reports/waymo_context_open_loop_replay_prototype.md)
 - [Context route/intent audit](docs/reports/waymo_context_route_intent_audit.md)
 - [Lane-link continuation prototype](docs/reports/waymo_lane_continuation_prototype.md)
+- [Lane-continuation validation study](docs/reports/waymo_lane_continuation_study.md)
 - [Real Waymo lane-aware baseline diagnostic](docs/reports/waymo_lane_aware_baseline_cross_shard.md)
 - [Lane-aware baseline debug casebook](docs/reports/waymo_lane_aware_debug_casebook.md)
 - [Replay candidate plan](docs/reports/waymo_replay_candidate_plan.md)
@@ -223,6 +224,9 @@ smoke test. The prototype can:
 - run a lane-link continuation prototype that proves the linked-lane follow-up
   on a deterministic fixture, resolves the real warning's parsed lane chain,
   and cuts nearest-lane FDE by 63.578 m on that stable case,
+- scan the same 100-scenario local Waymo slice for 178 lane-continuation
+  candidates, where linked lanes improve 96 targets and expose 47 regressions
+  plus 33 topology gaps for follow-up audits,
 - expose public-safe heading-aware improvement, regression, and fallback-heavy
   cases in the live Scenario Explorer,
 - turn heading-aware debug cases into a replay-readiness queue for the next
@@ -234,8 +238,8 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to turn the resolved lane-continuation case into a small
-validation set across more shards before optional Waymax/JAX work.
+The next milestone is to graduate the strongest lane-continuation wins,
+regressions, and topology gaps into richer replay or Waymax/JAX experiments.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -476,6 +480,21 @@ PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-prototype \
   --output-dir data/processed/waymo_lane_continuation_prototype \
   --case-count 3 \
   --public-report docs/reports/waymo_lane_continuation_prototype.md
+```
+
+Scan the local Waymo slice for lane-continuation validation candidates:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-study \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00007-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00008-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00009-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00010-of-00150 \
+  --format native \
+  --output-dir data/processed/waymo_lane_continuation_study \
+  --max-scenarios 25 \
+  --top 10 \
+  --public-report docs/reports/waymo_lane_continuation_study.md
 ```
 
 Run the no-auth baseline ablation:
