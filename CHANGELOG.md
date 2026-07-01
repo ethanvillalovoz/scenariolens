@@ -53,6 +53,10 @@ All notable changes to ScenarioLens are documented here.
   `docs/reports/waymo_context_eval_set.md`, turning context-failure rankings
   into grouped public-safe scenario IDs with acceptance checks for follow-up
   experiments.
+- `baseline-debug` support for context-eval-set manifests, with
+  `docs/reports/waymo_context_eval_debug_casebook.md` and
+  `docs/reports/waymo_context_replay_candidate_plan.md` publishing a
+  context-derived debug/replay queue.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

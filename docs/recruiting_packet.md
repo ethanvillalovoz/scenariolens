@@ -11,6 +11,8 @@ robotics, AI/ML, and software engineering internship conversations.
 - Architecture: `docs/architecture.md`
 - Portfolio report: `docs/reports/portfolio_report.md`
 - Context evaluation set: `docs/reports/waymo_context_eval_set.md`
+- Context eval debug casebook: `docs/reports/waymo_context_eval_debug_casebook.md`
+- Context replay candidate plan: `docs/reports/waymo_context_replay_candidate_plan.md`
 - Real lane-aware baseline diagnostic: `docs/reports/waymo_lane_aware_baseline_cross_shard.md`
 - Lane-aware debug casebook: `docs/reports/waymo_lane_aware_debug_casebook.md`
 - Replay candidate plan: `docs/reports/waymo_replay_candidate_plan.md`
@@ -171,13 +173,16 @@ Testing and verification:
 - A context evaluation set turns those ranked rows into 14 unique scenario IDs
   grouped by signal context, route/topology, lane-aware regression, and fallback
   stress, with acceptance checks for follow-up experiments.
+- A context eval debug casebook reloads five eval seeds into local diagnostics,
+  and a context replay-candidate plan separates two replay-ready cases from
+  three map-match audits.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
 What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
-2. Use the context evaluation set to drive casebook and replay-candidate queues.
+2. Run replay prototypes over the context replay-ready cases.
 3. Compare distribution stability across true shards and scenario tags.
 4. Graduate stable replay candidates into an optional Waymax/JAX path.
 5. Create curated scenario collections for pedestrian, cyclist, merge, and

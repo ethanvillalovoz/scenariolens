@@ -65,6 +65,6 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Use the context evaluation set to drive casebook and replay-candidate queues;
-expand beyond shards `00007` through `00010`; and graduate stable open-loop
-replay candidates into an optional Waymax/JAX path.
+Run replay prototypes over the context replay-ready cases; expand beyond shards
+`00007` through `00010`; and graduate stable open-loop replay candidates into an
+optional Waymax/JAX path.

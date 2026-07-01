@@ -359,10 +359,13 @@ ablation is checked in at
 `docs/reports/waymo_heading_aware_lane_selection_study.md`. The context-joined
 failure study at
 `docs/reports/waymo_context_failure_study_cross_shard.md` now feeds a curated
-context evaluation set at `docs/reports/waymo_context_eval_set.md`. Next work is
-to use that eval set for casebook/replay-candidate selection, expand the shard
-set from `docs/reports/waymo_motion_shard_plan.md`, and graduate stable replay
-candidates into an optional Waymax/JAX path.
+context evaluation set at `docs/reports/waymo_context_eval_set.md`, a context
+debug casebook at `docs/reports/waymo_context_eval_debug_casebook.md`, and a
+context replay-candidate queue at
+`docs/reports/waymo_context_replay_candidate_plan.md`. Next work is to run
+replay prototypes over the context replay-ready cases, expand the shard set from
+`docs/reports/waymo_motion_shard_plan.md`, and graduate stable replay candidates
+into an optional Waymax/JAX path.
 
 ## Stretch Goals
 

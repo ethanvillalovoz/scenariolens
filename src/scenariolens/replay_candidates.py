@@ -114,9 +114,12 @@ def replay_candidate_markdown(payload: dict[str, object]) -> str:
     aggregate = _required_mapping(payload, "aggregate")
     candidates = _required_list(payload, "candidates")
     heading_mode = _is_heading_payload(payload)
+    context_mode = str(payload.get("source_kind")) == "context_eval_set"
     title = (
         "# ScenarioLens Heading-Aware Replay Candidate Plan"
         if heading_mode
+        else "# ScenarioLens Context Replay Candidate Plan"
+        if context_mode
         else "# ScenarioLens Replay Candidate Plan"
     )
     intro = (
@@ -127,6 +130,13 @@ def replay_candidate_markdown(payload: dict[str, object]) -> str:
         "heading-aware cases should be replayed first, why they matter, and "
         "what must be checked before treating replay results as evidence."
         if heading_mode
+        else "This report turns the context eval debug casebook into a small, "
+        "honest replay/debug queue. It keeps context-rich failures, signal and "
+        "route/topology cases, lane-aware regressions, and fallback-stress "
+        "cases visible while separating replay-ready scenarios from map-match "
+        "audits. It is not a completed simulation integration or benchmark "
+        "claim."
+        if context_mode
         else "This report turns the baseline-debug casebook into a small, "
         "honest candidate queue for the next Waymax/JAX replay experiment. It "
         "does not claim that ScenarioLens already performs simulation replay. "
@@ -288,6 +298,7 @@ def replay_candidate_markdown(payload: dict[str, object]) -> str:
             [
                 "- Improvement candidates test whether map-conditioned rollouts preserve the observed lane-aware advantage under replay.",
                 "- Regression candidates are higher-value debugging targets because they expose lane choice, direction, route, or intent assumptions.",
+                "- Context-derived candidates should preserve their eval-set group labels during follow-up so signal, topology, regression, and fallback behavior are not collapsed into one score.",
                 "- Fallback-audit candidates should not be replayed as model evidence until map matching, coordinate frames, and target eligibility are checked.",
                 "- This is a planning artifact for the next experiment, not a completed Waymax/JAX integration.",
             ]

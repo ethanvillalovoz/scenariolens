@@ -300,6 +300,36 @@ hooks. The checked-in report contains 14 unique scenario IDs across signal,
 route/topology, lane-regression, and fallback-stress groups. It is not an
 official benchmark and does not include raw Waymo data.
 
+## Context Eval Debug Casebook
+
+```bash
+scenariolens baseline-debug \
+  --study-manifest data/processed/waymo_context_eval_set/manifest.json \
+  --output-dir data/processed/waymo_context_eval_debug_casebook \
+  --case-count 5 \
+  --public-report docs/reports/waymo_context_eval_debug_casebook.md
+```
+
+When the study manifest comes from `context-eval-set`, `baseline-debug` reloads
+the selected local scenarios, writes ignored SVG overlays and per-case
+manifests, and publishes a public-safe casebook. The checked-in report covers
+five context-eval seeds: context-rich failure, signal/topology cases,
+fallback-stress cases, and a lane-aware regression.
+
+## Context Replay Candidate Plan
+
+```bash
+scenariolens replay-candidates \
+  --debug-manifest data/processed/waymo_context_eval_debug_casebook/manifest.json \
+  --output-dir data/processed/waymo_context_replay_candidates \
+  --public-report docs/reports/waymo_context_replay_candidate_plan.md
+```
+
+This turns the context eval debug casebook into a replay/debug queue. The
+checked-in report identifies two replay-ready candidates and three map-match
+audits while preserving the context-eval grouping instead of collapsing every
+case into one aggregate score.
+
 ## Baseline Ablation
 
 ```bash

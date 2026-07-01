@@ -19,6 +19,8 @@ The current pipeline supports synthetic scenarios, ScenarioLens JSON, row-wise C
 - Map-match threshold audit is checked in under `docs/reports/waymo_map_match_audit.md`.
 - Heading-aware lane-selection study is checked in under `docs/reports/waymo_heading_aware_lane_selection_study.md`.
 - Context evaluation set is checked in under `docs/reports/waymo_context_eval_set.md`.
+- Context eval debug casebook is checked in under `docs/reports/waymo_context_eval_debug_casebook.md`.
+- Context replay candidate plan is checked in under `docs/reports/waymo_context_replay_candidate_plan.md`.
 - Heading-aware debug casebook is checked in under `docs/reports/waymo_heading_aware_debug_casebook.md`.
 - Heading-aware replay candidate plan is checked in under `docs/reports/waymo_heading_aware_replay_candidate_plan.md`.
 - Heading-aware replay prototype is checked in under `docs/reports/waymo_heading_aware_replay_prototype.md`.
@@ -357,6 +359,7 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 - The map/signal context study is aggregate coverage evidence, not a route planner or traffic-light quality audit.
 - The context-joined failure study is diagnostic grouping evidence, not a causal claim about map or signal features.
 - The context evaluation set is a curated scenario-ID packet, not an official benchmark split.
+- The context replay candidate plan is a readiness queue, not completed simulation.
 - The heading-aware lane selector is an ablation, not a replacement for the default scorer.
 - The heading-aware replay candidate plan is a queue for replay experiments, not completed simulation.
 - The heading-aware replay prototype is open-loop diagnostic evidence, not closed-loop simulation.
@@ -366,6 +369,6 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 
 - Expand the documented local-slice recipe across more Waymo Motion validation shards.
 - Compare baseline ADE/FDE distributions across more validation shards.
-- Use the context evaluation set to drive casebook and replay-candidate selection.
+- Run replay prototypes over the context replay-ready cases.
 - Graduate stable open-loop replay candidates into an optional Waymax/JAX path.
 - Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.

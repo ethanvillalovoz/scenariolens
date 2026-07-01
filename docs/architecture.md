@@ -19,6 +19,7 @@ flowchart LR
     F --> N["Failure-stability comparison report"]
     F --> X["Context-failure study"]
     X --> Y["Context evaluation set"]
+    Y --> Q
     P --> U["Heading-aware lane-selection study"]
     U --> V["Explorer case diagnostics"]
     U --> W["Heading-aware debug casebook"]
@@ -55,8 +56,8 @@ flowchart LR
 | Context evaluation set | `src/scenariolens/context_eval_set.py` | Converts context-failure rankings into grouped, public-safe scenario ID sets with selection reasons, acceptance checks, and follow-up experiment hooks. |
 | Baseline comparison | `src/scenariolens/baseline_compare.py` | Generates public-safe Markdown/JSON comparison reports for constant-velocity versus lane-aware prediction baselines. |
 | Lane-selection study | `src/scenariolens/lane_selection_study.py` | Compares nearest-lane and heading-aware lane-selection variants across local slices without changing the default scoring baseline. |
-| Baseline debug | `src/scenariolens/baseline_debug.py` | Selects representative baseline-comparison or lane-selection cases and writes ignored local SVG overlays, per-track metric timelines, lane-match diagnostics, and public-safe casebook summaries. |
-| Replay candidates | `src/scenariolens/replay_candidates.py` | Converts baseline-debug and heading-aware casebook manifests into public-safe replay-readiness queues with priority scores, blockers, and next actions for Waymax/JAX follow-up work. |
+| Baseline debug | `src/scenariolens/baseline_debug.py` | Selects representative baseline-comparison, lane-selection, or context-eval-set cases and writes ignored local SVG overlays, per-track metric timelines, lane-match diagnostics, and public-safe casebook summaries. |
+| Replay candidates | `src/scenariolens/replay_candidates.py` | Converts baseline-debug, context-eval debug, and heading-aware casebook manifests into public-safe replay-readiness queues with priority scores, blockers, and next actions for Waymax/JAX follow-up work. |
 | Replay prototype | `src/scenariolens/replay_prototype.py` | Reloads replay-ready local scenarios, reruns open-loop baseline rollouts, applies deterministic anchor-velocity perturbations, and publishes public-safe stability summaries. |
 | Heading replay prototype | `src/scenariolens/heading_replay_prototype.py` | Reloads heading-ready local scenarios, compares nearest-lane and heading-aware open-loop rollouts, applies deterministic perturbations, and publishes selector stability summaries. |
 | Map-match audit | `src/scenariolens/map_match_audit.py` | Reloads fallback-heavy debug cases, sweeps lane-match thresholds, and publishes public-safe evidence about whether wider lane acceptance improves or worsens FDE before changing matcher behavior. |

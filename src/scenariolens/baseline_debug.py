@@ -7,6 +7,7 @@ from pathlib import Path
 
 from scenariolens.baseline_compare import fallback_reason_counts
 from scenariolens.baseline_compare_study import BASELINE_COMPARISON_STUDY_FORMAT
+from scenariolens.context_eval_set import CONTEXT_EVAL_SET_FORMAT
 from scenariolens.failure_study import (
     FAILURE_STUDY_INPUT_FORMATS,
     load_failure_study_input,
@@ -117,20 +118,36 @@ def baseline_debug_casebook_markdown(
 ) -> str:
     """Return a Markdown casebook for selected baseline-debug scenarios."""
 
-    if payload.get("source_kind") == "lane_selection_study":
+    source_kind = str(payload.get("source_kind", "baseline_compare_study"))
+    if source_kind == "lane_selection_study":
         return _lane_selection_debug_casebook_markdown(
             payload,
             public_safe=public_safe,
         )
 
     cases = _required_list(payload, "cases")
-    lines = [
-        "# ScenarioLens Baseline Debug Casebook",
-        "",
-        "This casebook explains selected constant-velocity vs lane-aware "
+    context_mode = source_kind == "context_eval_set"
+    title = (
+        "# ScenarioLens Context Eval Debug Casebook"
+        if context_mode
+        else "# ScenarioLens Baseline Debug Casebook"
+    )
+    intro = (
+        "This casebook turns the context evaluation set into debuggable "
+        "evidence: selected scenario IDs are reloaded locally, scored through "
+        "constant-velocity and lane-aware baselines, and summarized with "
+        "public-safe metrics while raw Waymo records and local overlays stay "
+        "ignored."
+        if context_mode
+        else "This casebook explains selected constant-velocity vs lane-aware "
         "prediction outcomes. It is meant to turn the aggregate study into "
         "debuggable evidence: where maps help, where naive lane following "
-        "regresses, and where the lane-aware baseline intentionally falls back.",
+        "regresses, and where the lane-aware baseline intentionally falls back."
+    )
+    lines = [
+        title,
+        "",
+        intro,
         "",
         "## Scope",
         "",
@@ -245,9 +262,10 @@ def baseline_debug_casebook_markdown(
             "",
             "## Interpretation",
             "",
-            "- The improvement case shows where map-conditioned motion can reduce a simple forecast error.",
-            "- The regression case is the useful warning: nearest-lane following can be wrong when lane choice, direction, or intent is ambiguous.",
-            "- The fallback-heavy case shows production-minded behavior for a diagnostic baseline: when inputs are not trustworthy, it records why and returns to the safer baseline.",
+            "- The improvement cases show where map-conditioned motion can reduce a simple forecast error.",
+            "- The regression cases are useful warnings: nearest-lane following can be wrong when lane choice, direction, or intent is ambiguous.",
+            "- The fallback-heavy cases show production-minded behavior for a diagnostic baseline: when inputs are not trustworthy, it records why and returns to the safer baseline.",
+            "- Context-eval cases keep signal, topology, regression, and fallback groups visible so follow-up replay does not overfit one failure mode.",
             "- This is still an evaluation/debugging framework, not a production prediction model or Waymo benchmark claim.",
         ]
     )
@@ -401,23 +419,37 @@ def _payload_from_study_manifest(
 ) -> dict[str, object]:
     study_payload = json.loads(study_manifest_path.read_text(encoding="utf-8"))
     study_format = study_payload.get("format")
-    if study_format not in {BASELINE_COMPARISON_STUDY_FORMAT, LANE_SELECTION_STUDY_FORMAT}:
+    if study_format not in {
+        BASELINE_COMPARISON_STUDY_FORMAT,
+        LANE_SELECTION_STUDY_FORMAT,
+        CONTEXT_EVAL_SET_FORMAT,
+    }:
         raise ValueError(
-            "Expected a baseline-compare-study or lane-selection-study "
-            f"manifest with format {BASELINE_COMPARISON_STUDY_FORMAT} or "
-            f"{LANE_SELECTION_STUDY_FORMAT}."
+            "Expected a baseline-compare-study, lane-selection-study, or "
+            "context-eval-set manifest with format "
+            f"{BASELINE_COMPARISON_STUDY_FORMAT}, {LANE_SELECTION_STUDY_FORMAT}, "
+            f"or {CONTEXT_EVAL_SET_FORMAT}."
         )
 
     source_kind = (
         "lane_selection_study"
         if study_format == LANE_SELECTION_STUDY_FORMAT
+        else "context_eval_set"
+        if study_format == CONTEXT_EVAL_SET_FORMAT
         else "baseline_compare_study"
     )
-    specs = (
-        _case_specs_from_lane_selection_study(study_payload, case_count=case_count)
-        if source_kind == "lane_selection_study"
-        else _case_specs_from_study(study_payload, case_count=case_count)
-    )
+    if source_kind == "lane_selection_study":
+        specs = _case_specs_from_lane_selection_study(
+            study_payload,
+            case_count=case_count,
+        )
+    elif source_kind == "context_eval_set":
+        specs = _case_specs_from_context_eval_set(
+            study_payload,
+            case_count=case_count,
+        )
+    else:
+        specs = _case_specs_from_study(study_payload, case_count=case_count)
     cases = []
     ready = bool(study_payload.get("ready", False))
     for spec in specs:
@@ -631,6 +663,43 @@ def _case_specs_from_lane_selection_study(
             seen.add(key_value)
 
     return specs[:case_count]
+
+
+def _case_specs_from_context_eval_set(
+    study_payload: dict[str, object],
+    case_count: int,
+) -> list[dict[str, object]]:
+    specs: list[dict[str, object]] = []
+    seen: set[tuple[str, str]] = set()
+    cases = study_payload.get("deduplicated_cases")
+    if not isinstance(cases, list):
+        return specs
+
+    for row in cases:
+        if len(specs) >= case_count or not isinstance(row, dict):
+            continue
+        key = (str(row.get("source_input", "")), str(row.get("scenario_id", "")))
+        if key in seen or not key[0] or not key[1]:
+            continue
+        groups = row.get("selection_groups")
+        group_text = (
+            ", ".join(str(group) for group in groups)
+            if isinstance(groups, list) and groups
+            else str(row.get("selection_group_label", "context eval"))
+        )
+        specs.append(
+            {
+                **row,
+                "case_label": f"Context eval seed {len(specs) + 1}",
+                "selection_reason": (
+                    "Selected from the context evaluation set; groups: "
+                    f"{group_text}."
+                ),
+            }
+        )
+        seen.add(key)
+
+    return specs
 
 
 def _case_from_spec(

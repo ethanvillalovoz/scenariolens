@@ -97,7 +97,8 @@ work before changing the default matcher.
 
 Reports are public-safe artifacts. They summarize aggregate metrics, tag-level
 failures, score components, stability across slices, curated evaluation sets,
-and the hardest scenario IDs without publishing raw gated dataset records.
+debug/replay queues, and the hardest scenario IDs without publishing raw gated
+dataset records.
 
 ## Explorer
 
@@ -111,8 +112,7 @@ and links to the public reports.
 - Add a dataset adapter for another public motion dataset.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
-- Use curated context evaluation sets to drive casebook and replay-candidate
-  selection.
+- Run replay prototypes over context replay-ready candidates.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.
 - Analyze heading-aware replay stability across more validation shards.
