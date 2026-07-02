@@ -111,10 +111,12 @@ work rather than a baseline tuning claim.
 
 The branch-selection diagnostic is the next layer: it reloads continuation
 regression cases, enumerates parsed linked-lane branch alternatives, compares a
-non-oracle anchor-heading selector with an observed-future oracle upper bound,
-and reports whether the error is recoverable by branch choice. The oracle
-column is deliberately an upper-bound debugging tool, not a deployable route
-selector.
+non-oracle anchor-heading selector, a non-oracle motion-context selector, and
+an observed-future oracle upper bound, then reports whether the error is
+recoverable by branch choice. The motion-context selector uses recent speed,
+known forecast horizon, route-chain length, and downstream lane speed limits.
+The oracle column is deliberately an upper-bound debugging tool, not a
+deployable route selector.
 
 ## Map-Match Audit
 
@@ -145,8 +147,8 @@ and links to the public reports.
 - Add a dataset adapter for another public motion dataset.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
-- Replace the branch-selection oracle upper bound with a richer non-oracle
-  route prior, then rerun replay and route diagnostics.
+- Replay the motion-context selected branches under deterministic
+  perturbations, then compare them against the default linked route.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.
 - Analyze heading-aware replay stability across more validation shards.

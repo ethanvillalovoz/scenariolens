@@ -42,16 +42,23 @@ class LaneContinuationBranchSelectionTest(unittest.TestCase):
             self.assertEqual(aggregate["branchable_case_count"], 1)
             self.assertEqual(aggregate["single_chain_case_count"], 1)
             self.assertEqual(aggregate["oracle_improved_case_count"], 1)
+            self.assertEqual(aggregate["motion_context_improved_case_count"], 1)
+            self.assertEqual(
+                aggregate["motion_context_oracle_match_branchable_count"],
+                1,
+            )
 
             by_id = {case["scenario_id"]: case for case in payload["cases"]}
             branched = by_id["branch_case"]
             self.assertEqual(branched["route_candidate_count"], 2)
             self.assertEqual(branched["default_chain"], ["100", "200"])
+            self.assertEqual(branched["motion_context_chain"], ["100", "300"])
             self.assertEqual(branched["oracle_chain"], ["100", "300"])
             self.assertEqual(
                 branched["verdict"],
-                "oracle_branch_upper_bound_improves",
+                "motion_context_selector_improves",
             )
+            self.assertGreater(branched["motion_context_recoverable_fde_m"], 5.0)
             self.assertGreater(branched["oracle_recoverable_fde_m"], 5.0)
 
             single = by_id["single_chain_case"]
@@ -83,6 +90,7 @@ class LaneContinuationBranchSelectionTest(unittest.TestCase):
             self.assertTrue(result.ready)
             self.assertEqual(result.case_count, 2)
             self.assertEqual(result.branchable_count, 1)
+            self.assertEqual(result.motion_context_improved_count, 1)
             self.assertEqual(result.oracle_improved_count, 1)
             self.assertTrue(result.report_path.exists())
             self.assertTrue(public_report.exists())
@@ -123,6 +131,7 @@ class LaneContinuationBranchSelectionTest(unittest.TestCase):
             )
 
             self.assertIn("Generated 2 branch-selection diagnostic", result.stdout)
+            self.assertIn("1 motion-context improvement", result.stdout)
             self.assertTrue((output_dir / "manifest.json").exists())
             self.assertTrue((output_dir / "report.md").exists())
             self.assertTrue(public_report.exists())
@@ -240,18 +249,21 @@ def _branch_scenario() -> Scenario:
                     "feature_id": "100",
                     "points": [[0.0, 0.0], [5.0, 0.0]],
                     "exit_lanes": [200, 300],
+                    "speed_limit_mph": 35.0,
                 },
                 {
                     "kind": "lane",
                     "feature_id": "200",
                     "points": [[5.0, 0.0], [15.0, 0.0]],
                     "entry_lanes": [100],
+                    "speed_limit_mph": 35.0,
                 },
                 {
                     "kind": "lane",
                     "feature_id": "300",
                     "points": [[5.0, 0.0], [5.0, 12.0]],
                     "entry_lanes": [100],
+                    "speed_limit_mph": 10.0,
                 },
             ],
         },

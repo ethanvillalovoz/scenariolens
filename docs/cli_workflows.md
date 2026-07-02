@@ -457,7 +457,9 @@ scenariolens lane-continuation-branch-selection \
 
 This follows the route-diagnostics casebook by enumerating parsed branch
 alternatives for continuation regressions. The `anchor_heading` selector uses
-only anchor velocity and route geometry; the `oracle_upper_bound` selector uses
+only anchor velocity and route geometry; the `motion_context` selector adds a
+non-oracle prior from recent speed, known forecast horizon, route-chain length,
+and downstream lane speed limits; the `oracle_upper_bound` selector uses
 observed future motion only to measure recoverable branch-choice error. Treat
 it as diagnostic evidence, not a route planner or benchmark claim.
 

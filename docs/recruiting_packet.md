@@ -209,8 +209,9 @@ Testing and verification:
   link-worse-than-constant-velocity case, and five topology blockers.
 - A branch-selection diagnostic sweeps parsed alternatives for the five
   continuation regression diagnostics, finding two branchable cases, three
-  single-chain cases, and two oracle upper-bound improvements while showing
-  the simple anchor-heading selector is not enough.
+  single-chain cases, two non-oracle motion-context improvements, and two
+  oracle upper-bound improvements while showing the simple anchor-heading
+  selector is not enough.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
@@ -218,8 +219,8 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Replace the branch-selection oracle upper bound with a richer non-oracle
-   route prior, then rerun the replay and diagnostic gates.
+3. Replay the motion-context selected branches under deterministic
+   perturbations, then rerun the replay and diagnostic gates.
 4. Create curated scenario collections for pedestrian, cyclist, merge, and
    unprotected-turn cases.
 

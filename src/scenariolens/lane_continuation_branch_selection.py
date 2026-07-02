@@ -51,6 +51,7 @@ class LaneContinuationBranchSelectionResult:
     ready: bool
     case_count: int
     branchable_count: int
+    motion_context_improved_count: int
     oracle_improved_count: int
     output_dir: Path
     manifest_path: Path
@@ -103,6 +104,9 @@ def generate_lane_continuation_branch_selection(
         ready=bool(payload["ready"]),
         case_count=int(payload["case_count"]),
         branchable_count=int(aggregate["branchable_case_count"]),
+        motion_context_improved_count=int(
+            aggregate["motion_context_improved_case_count"]
+        ),
         oracle_improved_count=int(aggregate["oracle_improved_case_count"]),
         output_dir=target,
         manifest_path=manifest_path,
@@ -214,15 +218,17 @@ def lane_continuation_branch_selection_markdown(payload: dict[str, object]) -> s
         "This report follows the route-diagnostics casebook with a branch sweep: "
         "for each replayed continuation regression, ScenarioLens reloads the "
         "local scenario, enumerates parsed linked-lane alternatives, and "
-        "compares the current geometric route against two diagnostic selectors.",
+        "compares the current geometric route against three diagnostic selectors.",
         "",
         "The `anchor_heading` selector uses only the anchor velocity and parsed "
-        "route geometry. The `oracle_upper_bound` selector is an oracle upper "
-        "bound that uses the observed future trajectory only to quantify "
-        "whether choosing another parsed branch could explain the failure. "
-        "It is intentionally not a route "
-        "planner, not closed-loop simulation, not Waymax/JAX execution, and "
-        "not a Waymo benchmark claim.",
+        "route geometry. The `motion_context` selector adds a non-oracle route "
+        "prior from recent target speed, known forecast horizon, route-chain "
+        "length, and downstream lane speed limits. The `oracle_upper_bound` "
+        "selector is an oracle upper bound that uses the observed future "
+        "trajectory only to quantify whether choosing another parsed branch "
+        "could explain the failure. It is intentionally not a route planner, "
+        "not closed-loop simulation, not Waymax/JAX execution, and not a "
+        "Waymo benchmark claim.",
         "",
         "## Scope",
         "",
@@ -245,17 +251,22 @@ def lane_continuation_branch_selection_markdown(payload: dict[str, object]) -> s
         f"| Oracle upper-bound improvements | {aggregate['oracle_improved_case_count']} |",
         f"| Anchor-heading selector improvements | {aggregate['anchor_heading_improved_case_count']} |",
         f"| Anchor-heading selector changed route | {aggregate['anchor_heading_changed_case_count']} |",
+        f"| Motion-context selector improvements | {aggregate['motion_context_improved_case_count']} |",
+        f"| Motion-context selector changed route | {aggregate['motion_context_changed_case_count']} |",
+        f"| Motion-context matched oracle on branchable cases | {aggregate['motion_context_oracle_match_branchable_count']} |",
+        f"| Mean motion-context recoverable FDE | {_signed_meter_text(aggregate['mean_motion_context_recoverable_fde_m'])} |",
+        f"| Max motion-context recoverable FDE | {_signed_meter_text(aggregate['max_motion_context_recoverable_fde_m'])} |",
         f"| Default route still best | {aggregate['default_best_case_count']} |",
         f"| Mean oracle recoverable FDE | {_signed_meter_text(aggregate['mean_oracle_recoverable_fde_m'])} |",
         f"| Max oracle recoverable FDE | {_signed_meter_text(aggregate['max_oracle_recoverable_fde_m'])} |",
         "",
         "## Case Results",
         "",
-        "| Rank | Scenario | Track | Diagnosis | Routes | Default chain | Anchor-heading chain | Oracle chain | Oracle gain | Verdict |",
-        "| ---: | --- | --- | --- | ---: | --- | --- | --- | ---: | --- |",
+        "| Rank | Scenario | Track | Diagnosis | Routes | Default chain | Motion-context chain | Oracle chain | Motion gain | Oracle gain | Verdict |",
+        "| ---: | --- | --- | --- | ---: | --- | --- | --- | ---: | ---: | --- |",
     ]
     if not cases:
-        lines.append("| n/a | n/a | n/a | n/a | 0 | n/a | n/a | n/a | n/a | n/a |")
+        lines.append("| n/a | n/a | n/a | n/a | 0 | n/a | n/a | n/a | n/a | n/a | n/a |")
     for case in cases:
         assert isinstance(case, dict)
         lines.append(
@@ -266,8 +277,9 @@ def lane_continuation_branch_selection_markdown(payload: dict[str, object]) -> s
             f"`{case['diagnosis_label']}` | "
             f"{case['route_candidate_count']} | "
             f"{_chain_text(case.get('default_chain'))} | "
-            f"{_chain_text(case.get('anchor_heading_chain'))} | "
+            f"{_chain_text(case.get('motion_context_chain'))} | "
             f"{_chain_text(case.get('oracle_chain'))} | "
+            f"{_signed_meter_text(case.get('motion_context_recoverable_fde_m'))} | "
             f"{_signed_meter_text(case.get('oracle_recoverable_fde_m'))} | "
             f"`{case['verdict']}` |"
         )
@@ -286,14 +298,17 @@ def lane_continuation_branch_selection_markdown(payload: dict[str, object]) -> s
                 f"- Why it matters: {case['why_it_matters']}",
                 f"- Default linked-route FDE: {_meter_text(case.get('default_fde_m'))}",
                 f"- Anchor-heading route FDE: {_meter_text(case.get('anchor_heading_fde_m'))}",
+                f"- Motion-context route FDE: {_meter_text(case.get('motion_context_fde_m'))}",
                 f"- Oracle upper-bound route FDE: {_meter_text(case.get('oracle_fde_m'))}",
+                f"- Motion-context recoverable FDE: {_signed_meter_text(case.get('motion_context_recoverable_fde_m'))}",
                 f"- Oracle recoverable FDE: {_signed_meter_text(case.get('oracle_recoverable_fde_m'))}",
+                f"- Motion-context estimated travel: {_meter_text(case.get('motion_context_estimated_travel_m'))}",
                 f"- Route candidate count: {case['route_candidate_count']}",
                 "",
                 "Route candidates:",
                 "",
-                "| Chain | Status | Heading score | FDE | Gain vs default | Selector flags |",
-                "| --- | --- | ---: | ---: | ---: | --- |",
+                "| Chain | Status | Heading score | Motion score | FDE | Gain vs default | Selector flags |",
+                "| --- | --- | ---: | ---: | ---: | ---: | --- |",
             ]
         )
         route_candidates = _required_list(case, "route_candidates")
@@ -306,6 +321,8 @@ def lane_continuation_branch_selection_markdown(payload: dict[str, object]) -> s
                 flags.append("default")
             if route.get("is_anchor_heading_selected"):
                 flags.append("anchor_heading")
+            if route.get("is_motion_context_selected"):
+                flags.append("motion_context")
             if route.get("is_oracle_selected"):
                 flags.append("oracle_upper_bound")
             lines.append(
@@ -313,6 +330,7 @@ def lane_continuation_branch_selection_markdown(payload: dict[str, object]) -> s
                 f"{_chain_text(route.get('feature_chain'))} | "
                 f"`{route['status']}` | "
                 f"{_score_text(route.get('anchor_heading_score'))} | "
+                f"{_score_text(route.get('motion_context_score'))} | "
                 f"{_meter_text(route.get('fde_m'))} | "
                 f"{_signed_meter_text(route.get('gain_vs_default_m'))} | "
                 f"{', '.join(flags) if flags else 'n/a'} |"
@@ -328,8 +346,9 @@ def lane_continuation_branch_selection_markdown(payload: dict[str, object]) -> s
             "## Interpretation",
             "",
             "- Branchable cases show where the parsed map topology exposes more than one continuation from the selected lane.",
+            "- Motion-context improvements are non-oracle evidence that recent speed, horizon length, and downstream lane speed limits can choose a better parsed branch on some cases.",
             "- Oracle upper-bound improvements prove that a different parsed branch can reduce open-loop error, but they are not deployable predictor results because they use observed future motion.",
-            "- If the anchor-heading selector does not change the route, the next step is a richer prior, such as route context, signals, near-term intent, or a learned candidate scorer.",
+            "- If motion-context still misses an oracle-improvable route, the next step is richer context such as turn-lane semantics, signal state, route context, or a learned candidate scorer.",
             "- Single-chain cases need longer topology, parser coverage, or a different selected lane before branch selection can help.",
             "- Public outputs stay diagnostic; raw Waymo TFRecords and local packets remain ignored.",
         ]
@@ -361,11 +380,15 @@ def _branch_case(
         "route_candidates": [],
         "default_chain": [],
         "anchor_heading_chain": [],
+        "motion_context_chain": [],
         "oracle_chain": [],
         "default_fde_m": None,
         "anchor_heading_fde_m": None,
+        "motion_context_fde_m": None,
         "oracle_fde_m": None,
+        "motion_context_recoverable_fde_m": None,
         "oracle_recoverable_fde_m": None,
+        "motion_context_estimated_travel_m": None,
         "verdict": "not_evaluable",
         "why_it_matters": "The case could not be reloaded for branch diagnostics.",
         "next_actions": [
@@ -433,6 +456,7 @@ def _evaluate_branch_routes(
 
     anchor_index = _anchor_index(states, scenario)
     anchor = states[anchor_index]
+    history_states = states[: anchor_index + 1]
     future_states = tuple(
         state for state in states[anchor_index + 1 :] if state.t > anchor.t
     )
@@ -464,13 +488,16 @@ def _evaluate_branch_routes(
 
     nominal = _required_mapping(replay_case, "nominal")
     default_chain = tuple(str(item) for item in nominal.get("feature_chain", []))
+    features_by_id = _lane_features_by_id(scenario)
     evaluated = [
         _route_result(
             route=route,
             anchor=anchor,
+            history_states=history_states,
             future_states=future_states,
             anchor_speed=anchor_speed,
             default_chain=default_chain,
+            features_by_id=features_by_id,
         )
         for route in route_candidates
     ]
@@ -483,6 +510,15 @@ def _evaluate_branch_routes(
             _chain_text(row["feature_chain"]),
         ),
     )
+    motion_context = max(
+        evaluated,
+        key=lambda row: (
+            float(row["motion_context_score"]),
+            float(row["anchor_heading_score"]),
+            -float(row["fde_m"]),
+            _chain_text(row["feature_chain"]),
+        ),
+    )
     oracle = min(
         evaluated,
         key=lambda row: (float(row["fde_m"]), _chain_text(row["feature_chain"])),
@@ -490,6 +526,7 @@ def _evaluate_branch_routes(
     for row in evaluated:
         row["is_default"] = row is default
         row["is_anchor_heading_selected"] = row is anchor_heading
+        row["is_motion_context_selected"] = row is motion_context
         row["is_oracle_selected"] = row is oracle
         row["gain_vs_default_m"] = round(
             float(default["fde_m"]) - float(row["fde_m"]),
@@ -499,11 +536,17 @@ def _evaluate_branch_routes(
     branchable = len(evaluated) > 1
     oracle_gain = round(float(default["fde_m"]) - float(oracle["fde_m"]), 3)
     anchor_gain = round(float(default["fde_m"]) - float(anchor_heading["fde_m"]), 3)
+    motion_context_gain = round(
+        float(default["fde_m"]) - float(motion_context["fde_m"]),
+        3,
+    )
     verdict = _case_verdict(
         branchable=branchable,
         oracle_gain=oracle_gain,
         anchor_gain=anchor_gain,
+        motion_context_gain=motion_context_gain,
         anchor_changed=anchor_heading is not default,
+        motion_context_changed=motion_context is not default,
         oracle_changed=oracle is not default,
     )
     nearest_fde = _optional_float(nominal.get("nearest_lane_fde_m"))
@@ -524,15 +567,23 @@ def _evaluate_branch_routes(
         "branchable": branchable,
         "default_chain": list(default["feature_chain"]),
         "anchor_heading_chain": list(anchor_heading["feature_chain"]),
+        "motion_context_chain": list(motion_context["feature_chain"]),
         "oracle_chain": list(oracle["feature_chain"]),
         "default_fde_m": float(default["fde_m"]),
         "anchor_heading_fde_m": float(anchor_heading["fde_m"]),
+        "motion_context_fde_m": float(motion_context["fde_m"]),
         "oracle_fde_m": float(oracle["fde_m"]),
         "oracle_recoverable_fde_m": oracle_gain,
         "anchor_heading_recoverable_fde_m": anchor_gain,
+        "motion_context_recoverable_fde_m": motion_context_gain,
+        "motion_context_estimated_travel_m": motion_context.get(
+            "motion_context_estimated_travel_m"
+        ),
         "anchor_heading_changed_route": anchor_heading is not default,
+        "motion_context_changed_route": motion_context is not default,
         "oracle_changed_route": oracle is not default,
         "default_is_oracle_best": oracle is default,
+        "motion_context_is_oracle_best": oracle is motion_context,
         "verdict": verdict,
         "why_it_matters": _why_it_matters(verdict),
         "next_actions": _next_actions(verdict),
@@ -682,9 +733,11 @@ def _route_from_points(
 def _route_result(
     route: _BranchRoute,
     anchor: State,
+    history_states: tuple[State, ...],
     future_states: tuple[State, ...],
     anchor_speed: float,
     default_chain: tuple[str, ...],
+    features_by_id: dict[str, dict[str, object]],
 ) -> dict[str, object]:
     predictions = tuple(
         _advance_along_lane(
@@ -702,6 +755,19 @@ def _route_result(
     )
     fde = errors[-1] if errors else 0.0
     horizon_travel = anchor_speed * (future_states[-1].t - anchor.t)
+    heading_score = _anchor_heading_score(
+        anchor=anchor,
+        route=route,
+        horizon_travel_m=horizon_travel,
+    )
+    motion_context = _motion_context_score(
+        anchor=anchor,
+        history_states=history_states,
+        route=route,
+        horizon_s=future_states[-1].t - anchor.t,
+        horizon_travel_m=horizon_travel,
+        features_by_id=features_by_id,
+    )
     return {
         "feature_chain": list(route.feature_ids),
         "status": route.status,
@@ -709,12 +775,19 @@ def _route_result(
         "ade_m": round(sum(errors) / len(errors), 3) if errors else None,
         "fde_m": round(fde, 3),
         "miss": fde > DEFAULT_MISS_THRESHOLD_M,
-        "anchor_heading_score": round(
-            _anchor_heading_score(
-                anchor=anchor,
-                route=route,
-                horizon_travel_m=horizon_travel,
-            ),
+        "anchor_heading_score": round(heading_score, 6),
+        "motion_context_score": round(float(motion_context["score"]), 6),
+        "motion_context_estimated_travel_m": round(
+            float(motion_context["estimated_travel_m"]),
+            3,
+        ),
+        "motion_context_route_fit": round(float(motion_context["route_fit"]), 6),
+        "motion_context_speed_limit_drop": round(
+            float(motion_context["speed_limit_drop"]),
+            6,
+        ),
+        "motion_context_endpoint_alignment": round(
+            float(motion_context["endpoint_alignment"]),
             6,
         ),
         "route_remaining_m": round(route.route_remaining_m, 3),
@@ -732,22 +805,96 @@ def _anchor_heading_score(
 ) -> float:
     if not route.points:
         return -999.0
-    velocity_norm = hypot(anchor.vx, anchor.vy)
-    endpoint_dx = route.points[-1][0] - anchor.x
-    endpoint_dy = route.points[-1][1] - anchor.y
-    endpoint_norm = hypot(endpoint_dx, endpoint_dy)
-    if velocity_norm <= 0.0 or endpoint_norm <= 0.0:
-        alignment = 0.0
-    else:
-        alignment = ((anchor.vx / velocity_norm) * (endpoint_dx / endpoint_norm)) + (
-            (anchor.vy / velocity_norm) * (endpoint_dy / endpoint_norm)
-        )
+    alignment = _endpoint_alignment(anchor, route)
     clamp_penalty = max(horizon_travel_m - route.route_remaining_m, 0.0) / max(
         horizon_travel_m,
         1.0,
     )
     link_bonus = min(route.link_count, 2) * 0.01
     return alignment - clamp_penalty + link_bonus
+
+
+def _motion_context_score(
+    anchor: State,
+    history_states: tuple[State, ...],
+    route: _BranchRoute,
+    horizon_s: float,
+    horizon_travel_m: float,
+    features_by_id: dict[str, dict[str, object]],
+) -> dict[str, float]:
+    estimated_speed = min(
+        hypot(anchor.vx, anchor.vy),
+        _recent_speed_mps(history_states),
+    )
+    estimated_travel = max(estimated_speed * max(horizon_s, 0.0), 0.0)
+    endpoint_alignment = _endpoint_alignment(anchor, route)
+    route_fit = -abs(route.route_remaining_m - estimated_travel) / max(
+        horizon_travel_m,
+        1.0,
+    )
+    speed_limit_drop = _route_speed_limit_drop(route, features_by_id)
+    link_bonus = min(route.link_count, 2) * 0.01
+    return {
+        "score": (0.40 * endpoint_alignment)
+        + (0.85 * route_fit)
+        + (1.00 * speed_limit_drop)
+        + link_bonus,
+        "estimated_travel_m": estimated_travel,
+        "route_fit": route_fit,
+        "speed_limit_drop": speed_limit_drop,
+        "endpoint_alignment": endpoint_alignment,
+    }
+
+
+def _endpoint_alignment(anchor: State, route: _BranchRoute) -> float:
+    if not route.points:
+        return 0.0
+    velocity_norm = hypot(anchor.vx, anchor.vy)
+    endpoint_dx = route.points[-1][0] - anchor.x
+    endpoint_dy = route.points[-1][1] - anchor.y
+    endpoint_norm = hypot(endpoint_dx, endpoint_dy)
+    if velocity_norm <= 0.0 or endpoint_norm <= 0.0:
+        return 0.0
+    return ((anchor.vx / velocity_norm) * (endpoint_dx / endpoint_norm)) + (
+        (anchor.vy / velocity_norm) * (endpoint_dy / endpoint_norm)
+    )
+
+
+def _recent_speed_mps(history_states: tuple[State, ...]) -> float:
+    if not history_states:
+        return 0.0
+    recent = history_states[-5:]
+    speeds = [hypot(state.vx, state.vy) for state in recent]
+    valid = [speed for speed in speeds if isfinite(speed)]
+    if not valid:
+        return 0.0
+    return sum(valid) / len(valid)
+
+
+def _route_speed_limit_drop(
+    route: _BranchRoute,
+    features_by_id: dict[str, dict[str, object]],
+) -> float:
+    if len(route.feature_ids) < 2:
+        return 0.0
+    base = _feature_speed_limit_mph(features_by_id.get(route.feature_ids[0], {}))
+    downstream = [
+        value
+        for feature_id in route.feature_ids[1:]
+        if (
+            value := _feature_speed_limit_mph(features_by_id.get(feature_id, {}))
+        )
+        is not None
+    ]
+    if base is None or not downstream or base <= 0.0:
+        return 0.0
+    return max(base - min(downstream), 0.0) / base
+
+
+def _feature_speed_limit_mph(feature: dict[str, object]) -> float | None:
+    value = feature.get("speed_limit_mph")
+    number = _optional_float(value)
+    return number if number is not None and number > 0.0 else None
 
 
 def _select_default_route(
@@ -771,13 +918,17 @@ def _case_verdict(
     branchable: bool,
     oracle_gain: float,
     anchor_gain: float,
+    motion_context_gain: float,
     anchor_changed: bool,
+    motion_context_changed: bool,
     oracle_changed: bool,
 ) -> str:
     if not branchable:
         return "single_chain_no_branch_choice"
     if anchor_changed and anchor_gain > 1.0:
         return "anchor_heading_selector_improves"
+    if motion_context_changed and motion_context_gain > 1.0:
+        return "motion_context_selector_improves"
     if oracle_changed and oracle_gain > 1.0:
         return "oracle_branch_upper_bound_improves"
     if oracle_gain > 1.0:
@@ -788,6 +939,8 @@ def _case_verdict(
 def _why_it_matters(verdict: str) -> str:
     if verdict == "anchor_heading_selector_improves":
         return "A simple anchor-heading route prior changes the parsed branch and reduces open-loop error on this diagnostic case."
+    if verdict == "motion_context_selector_improves":
+        return "A non-oracle motion-context prior changes the parsed branch and reduces open-loop error using recent speed, route length, and downstream speed limits."
     if verdict == "oracle_branch_upper_bound_improves":
         return "Another parsed branch fits the observed future better, proving branch choice is a plausible source of the continuation regression."
     if verdict == "single_chain_no_branch_choice":
@@ -804,9 +957,15 @@ def _next_actions(verdict: str) -> list[str]:
             "Keep the default geometric route side by side as the control.",
             "Verify the selector across the broader continuation candidate queue.",
         ]
+    if verdict == "motion_context_selector_improves":
+        return [
+            "Replay the motion-context selected branch under deterministic anchor perturbations.",
+            "Compare the selector across the broader continuation candidate queue.",
+            "Keep the oracle upper bound as a diagnostic ceiling, not a deployable result.",
+        ]
     if verdict == "oracle_branch_upper_bound_improves":
         return [
-            "Add a richer non-oracle route prior using route context, traffic controls, or near-term intent cues.",
+            "Add a richer non-oracle route prior using turn-lane semantics, traffic controls, or near-term intent cues.",
             "Use the oracle branch only as an upper-bound diagnostic, not as a deployed predictor.",
             "Rerun perturbation checks after adding the non-oracle prior.",
         ]
@@ -830,11 +989,15 @@ def _not_evaluable(reason: str) -> dict[str, object]:
         "branchable": False,
         "default_chain": [],
         "anchor_heading_chain": [],
+        "motion_context_chain": [],
         "oracle_chain": [],
         "default_fde_m": None,
         "anchor_heading_fde_m": None,
+        "motion_context_fde_m": None,
         "oracle_fde_m": None,
+        "motion_context_recoverable_fde_m": None,
         "oracle_recoverable_fde_m": None,
+        "motion_context_estimated_travel_m": None,
         "verdict": reason,
         "why_it_matters": "The case cannot support branch selection until the blocker is resolved.",
         "next_actions": [
@@ -850,7 +1013,16 @@ def _aggregate_cases(cases: list[dict[str, object]]) -> dict[str, object]:
         for case in ready
         if (gain := _optional_float(case.get("oracle_recoverable_fde_m"))) is not None
     ]
+    motion_context_gains = [
+        gain
+        for case in ready
+        if (gain := _optional_float(case.get("motion_context_recoverable_fde_m")))
+        is not None
+    ]
     positive_oracle_gains = [gain for gain in oracle_gains if gain > 1.0]
+    positive_motion_context_gains = [
+        gain for gain in motion_context_gains if gain > 1.0
+    ]
     return {
         "case_count": len(cases),
         "evaluable_case_count": len(ready),
@@ -867,6 +1039,26 @@ def _aggregate_cases(cases: list[dict[str, object]]) -> dict[str, object]:
         ),
         "anchor_heading_changed_case_count": sum(
             bool(case.get("anchor_heading_changed_route")) for case in ready
+        ),
+        "motion_context_improved_case_count": len(positive_motion_context_gains),
+        "motion_context_changed_case_count": sum(
+            bool(case.get("motion_context_changed_route")) for case in ready
+        ),
+        "motion_context_oracle_match_count": sum(
+            bool(case.get("motion_context_is_oracle_best")) for case in ready
+        ),
+        "motion_context_oracle_match_branchable_count": sum(
+            bool(case.get("branchable"))
+            and bool(case.get("motion_context_is_oracle_best"))
+            for case in ready
+        ),
+        "mean_motion_context_recoverable_fde_m": _mean(
+            tuple(positive_motion_context_gains)
+        ),
+        "max_motion_context_recoverable_fde_m": (
+            round(max(positive_motion_context_gains), 3)
+            if positive_motion_context_gains
+            else None
         ),
         "default_best_case_count": sum(
             bool(case.get("default_is_oracle_best")) for case in ready

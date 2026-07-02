@@ -216,10 +216,12 @@ The lane-continuation branch-selection diagnostic is checked in at
 [`docs/reports/waymo_lane_continuation_branch_selection.md`](reports/waymo_lane_continuation_branch_selection.md).
 It reads ignored replay/diagnostic manifests, reloads local shards, and
 publishes only derived branch-sweep metrics: 5 continuation regression cases,
-2 branchable parsed-topology cases, 3 single-chain cases, and 2 oracle
-upper-bound improvements. The oracle branch uses observed future motion only
-as a diagnostic upper bound; it is not a deployed route selector. Local branch
-manifests remain ignored under `data/processed/`.
+2 branchable parsed-topology cases, 3 single-chain cases, 2 non-oracle
+motion-context improvements, and 2 oracle upper-bound improvements. The
+motion-context selector uses recent speed, forecast horizon, route-chain
+length, and downstream lane speed limits; the oracle branch uses observed
+future motion only as a diagnostic upper bound. Local branch manifests remain
+ignored under `data/processed/`.
 
 ## Interpretation Rules
 

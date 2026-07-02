@@ -895,6 +895,7 @@ def lane_continuation_branch_selection_command(
     print(
         f"Generated {result.case_count} branch-selection diagnostic(s): "
         f"{result.branchable_count} branchable case(s), "
+        f"{result.motion_context_improved_count} motion-context improvement(s), "
         f"{result.oracle_improved_count} oracle upper-bound improvement(s)."
     )
     return 0

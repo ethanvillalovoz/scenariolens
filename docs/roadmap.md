@@ -388,10 +388,11 @@ link-worse-than-constant-velocity case, and 5 topology blockers. The branch
 selection diagnostic at
 `docs/reports/waymo_lane_continuation_branch_selection.md` then sweeps parsed
 branch alternatives for the 5 continuation regression diagnostics, finding 2
-branchable cases, 3 single-chain cases, and 2 oracle upper-bound improvements
-with 20.534 m mean recoverable FDE. Next work is to replace that oracle upper
-bound with a non-oracle route prior using route context, traffic controls, or
-near-term intent cues, then rerun replay stability.
+branchable cases, 3 single-chain cases, 2 non-oracle motion-context
+improvements, and 2 oracle upper-bound improvements with 20.534 m mean
+recoverable FDE. Next work is to replay the motion-context selected branches
+under deterministic perturbations and compare them against the default linked
+route.
 
 ## Stretch Goals
 

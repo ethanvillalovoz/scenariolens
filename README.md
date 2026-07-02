@@ -241,9 +241,9 @@ smoke test. The prototype can:
   buckets: 3 stable route-choice regressions, 1 horizon-limit case, 1
   link-worse-than-constant-velocity case, and 5 topology blockers,
 - sweep parsed branch alternatives for the 5 continuation regression
-  diagnostics, finding 2 branchable cases, 3 single-chain cases, and 2
-  oracle upper-bound improvements while keeping the anchor-heading selector
-  honest at 0 improvements,
+  diagnostics, finding 2 branchable cases, 3 single-chain cases, 2
+  motion-context improvements, and 2 oracle upper-bound improvements while
+  keeping the anchor-heading selector honest at 0 improvements,
 - expose public-safe heading-aware improvement, regression, and fallback-heavy
   cases in the live Scenario Explorer,
 - turn heading-aware debug cases into a replay-readiness queue for the next
@@ -255,9 +255,8 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to replace the oracle upper-bound branch sweep with a
-non-oracle route prior using route context, traffic controls, or near-term
-intent cues, then rerun replay stability.
+The next milestone is to replay the motion-context selected branches under
+deterministic perturbations and compare them against the default linked route.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
