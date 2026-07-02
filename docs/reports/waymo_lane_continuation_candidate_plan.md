@@ -10,18 +10,18 @@ It is intentionally scoped: this is not route planning, not closed-loop simulati
 - Ready for planning: True
 - Top rows per bucket: 5
 - Study scenarios scanned: 100
-- Study candidate tracks: 178
+- Study candidate tracks: 209
 - Raw scenario data committed: no
 
 ## Source Study Snapshot
 
 | Metric | Count / Value |
 | --- | ---: |
-| Tracks using linked lanes | 145 |
-| Tracks improved over nearest lane | 96 |
-| Tracks regressed vs nearest lane | 47 |
-| Topology gaps | 33 |
-| Mean lane-link improvement | +12.675 m |
+| Tracks using linked lanes | 192 |
+| Tracks improved over nearest lane | 133 |
+| Tracks regressed vs nearest lane | 57 |
+| Topology gaps | 17 |
+| Mean lane-link improvement | +17.682 m |
 
 ## Queue Summary
 
@@ -37,19 +37,19 @@ It is intentionally scoped: this is not route planning, not closed-loop simulati
 
 | Rank | Source | Scenario | Track | Priority | Nearest FDE | Lane-link FDE | Delta | Chain | First action |
 | ---: | --- | --- | --- | ---: | ---: | ---: | ---: | --- | --- |
-| 1 | `validation.tfrecord-00010-of-00150` | `a863e5638dfff0ca` | `1765` | 12.83 | 144.122 m | 7.919 m | +136.203 m | 249 -> 244 -> 275 | Replay nearest-lane and lane-link rollouts from the same anchor state as a positive control. |
-| 2 | `validation.tfrecord-00007-of-00150` | `2f366a31ab03f8b` | `1059` | 11.57 | 148.345 m | 9.068 m | +139.277 m | 220 -> 210 | Replay nearest-lane and lane-link rollouts from the same anchor state as a positive control. |
-| 3 | `validation.tfrecord-00008-of-00150` | `65d7afd24453a1ba` | `510` | 9.44 | 90.668 m | 5.454 m | +85.214 m | 159 -> 146 -> 140 | Replay nearest-lane and lane-link rollouts from the same anchor state as a positive control. |
-| 4 | `validation.tfrecord-00007-of-00150` | `77c44d1768793143` | `34` | 8.49 | 87.044 m | 3.732 m | +83.312 m | 176 -> 164 -> 148 | Replay nearest-lane and lane-link rollouts from the same anchor state as a positive control. |
-| 5 | `validation.tfrecord-00008-of-00150` | `564a6bcc85c4f72f` | `1143` | 7.84 | 81.835 m | 6.818 m | +75.017 m | 167 -> 173 -> 255 | Replay nearest-lane and lane-link rollouts from the same anchor state as a positive control. |
+| 1 | `validation.tfrecord-00009-of-00150` | `937eb2fa17da45c0` | `979` | 12.95 | 151.676 m | 10.354 m | +141.322 m | 312 -> 319 -> 246 | Replay nearest-lane and lane-link rollouts from the same anchor state as a positive control. |
+| 2 | `validation.tfrecord-00010-of-00150` | `a863e5638dfff0ca` | `1765` | 12.83 | 144.122 m | 7.919 m | +136.203 m | 249 -> 244 -> 275 | Replay nearest-lane and lane-link rollouts from the same anchor state as a positive control. |
+| 3 | `validation.tfrecord-00009-of-00150` | `fc8c647623f81bb4` | `1466` | 12.09 | 144.514 m | 3.143 m | +141.371 m | 153 -> 344 -> 343 | Replay nearest-lane and lane-link rollouts from the same anchor state as a positive control. |
+| 4 | `validation.tfrecord-00007-of-00150` | `2f366a31ab03f8b` | `1059` | 11.57 | 148.345 m | 9.068 m | +139.277 m | 220 -> 210 | Replay nearest-lane and lane-link rollouts from the same anchor state as a positive control. |
+| 5 | `validation.tfrecord-00009-of-00150` | `8807e9963f411c48` | `722` | 9.96 | 103.862 m | 3.700 m | +100.162 m | 337 -> 559 -> 553 | Replay nearest-lane and lane-link rollouts from the same anchor state as a positive control. |
 
 ## Replay Debug Targets: Largest Regressions
 
 | Rank | Source | Scenario | Track | Priority | Nearest FDE | Lane-link FDE | Delta | Chain | First action |
 | ---: | --- | --- | --- | ---: | ---: | ---: | ---: | --- | --- |
 | 6 | `validation.tfrecord-00009-of-00150` | `260785192cf6c991` | `1754` | 7.47 | 22.573 m | 81.112 m | -58.539 m | 235 -> 241 -> 315 | Replay nearest-lane and lane-link rollouts side by side and inspect the selected continuation chain. |
-| 7 | `validation.tfrecord-00010-of-00150` | `d8dde10f514a501c` | `651` | 5.36 | 73.197 m | 104.290 m | -31.093 m | 134 -> 143 -> 146 | Replay nearest-lane and lane-link rollouts side by side and inspect the selected continuation chain. |
-| 8 | `validation.tfrecord-00008-of-00150` | `e3f6a29b59e42c1` | `741` | 5.25 | 15.869 m | 58.942 m | -43.073 m | 161 -> 127 -> 116 | Replay nearest-lane and lane-link rollouts side by side and inspect the selected continuation chain. |
+| 7 | `validation.tfrecord-00008-of-00150` | `e3f6a29b59e42c1` | `741` | 5.25 | 15.869 m | 58.942 m | -43.073 m | 161 -> 127 -> 116 | Replay nearest-lane and lane-link rollouts side by side and inspect the selected continuation chain. |
+| 8 | `validation.tfrecord-00007-of-00150` | `d30709cd60e60395` | `164` | 4.66 | 16.292 m | 52.496 m | -36.204 m | 603 -> 610 -> 371 | Replay nearest-lane and lane-link rollouts side by side and inspect the selected continuation chain. |
 | 9 | `validation.tfrecord-00010-of-00150` | `5c49e681a66c720` | `2627` | 4.24 | 4.595 m | 38.598 m | -34.003 m | 285 -> 120 -> 119 | Replay nearest-lane and lane-link rollouts side by side and inspect the selected continuation chain. |
 | 10 | `validation.tfrecord-00007-of-00150` | `e9db41e904b349a2` | `406` | 4.07 | 6.776 m | 38.292 m | -31.516 m | 295 -> 228 -> 201 | Replay nearest-lane and lane-link rollouts side by side and inspect the selected continuation chain. |
 
@@ -57,11 +57,34 @@ It is intentionally scoped: this is not route planning, not closed-loop simulati
 
 | Rank | Source | Scenario | Track | Priority | Nearest FDE | Lane-link FDE | Delta | Chain | First action |
 | ---: | --- | --- | --- | ---: | ---: | ---: | ---: | --- | --- |
-| 11 | `validation.tfrecord-00009-of-00150` | `fc8c647623f81bb4` | `1466` | 5.14 | 144.514 m | 144.514 m | 0.000 m | 153 | Inspect parsed entry/exit links for the selected feature and its missing continuation. |
+| 11 | `validation.tfrecord-00009-of-00150` | `6bdc7f92afefff73` | `59` | 4.93 | 134.082 m | 134.082 m | 0.000 m | 1056 | Inspect parsed entry/exit links for the selected feature and its missing continuation. |
 | 12 | `validation.tfrecord-00007-of-00150` | `2f366a31ab03f8b` | `1061` | 4.93 | 133.872 m | 133.872 m | 0.000 m | 219 | Inspect parsed entry/exit links for the selected feature and its missing continuation. |
-| 13 | `validation.tfrecord-00007-of-00150` | `770fec53ec3e0395` | `1105` | 4.88 | 131.434 m | 131.434 m | 0.000 m | 306 | Inspect parsed entry/exit links for the selected feature and its missing continuation. |
-| 14 | `validation.tfrecord-00007-of-00150` | `c52455a0495c9bdb` | `1937` | 4.68 | 121.451 m | 121.451 m | 0.000 m | 295 | Inspect parsed entry/exit links for the selected feature and its missing continuation. |
-| 15 | `validation.tfrecord-00009-of-00150` | `c45b209a75ff4610` | `1815` | 4.59 | 117.044 m | 117.044 m | 0.000 m | 248 | Inspect parsed entry/exit links for the selected feature and its missing continuation. |
+| 13 | `validation.tfrecord-00010-of-00150` | `74a5b3325a534a87` | `3178` | 4.03 | 88.934 m | 88.934 m | 0.000 m | 333 | Inspect parsed entry/exit links for the selected feature and its missing continuation. |
+| 14 | `validation.tfrecord-00010-of-00150` | `2f035a284480e981` | `715` | 3.42 | 58.747 m | 58.747 m | 0.000 m | 513 | Inspect parsed entry/exit links for the selected feature and its missing continuation. |
+| 15 | `validation.tfrecord-00008-of-00150` | `4dfe7c285670839f` | `0` | 3.28 | 51.637 m | 51.637 m | 0.000 m | 44 | Inspect parsed entry/exit links for the selected feature and its missing continuation. |
+
+## `937eb2fa17da45c0` / track `979`
+
+- Queue: `improvement_replay_control`
+- Readiness: `ready_for_improvement_replay_with_horizon_caution`
+- Priority score: 12.95
+- Why it matters: Linked-lane continuation substantially improves the nearest-lane diagnostic, making this a positive replay control.
+- Source: `validation.tfrecord-00009-of-00150`
+- Feature chain: 312 -> 319 -> 246
+- Link status: `linked_lane_chain`
+- Nearest-lane FDE: 151.676 m
+- Lane-link FDE: 10.354 m
+- Link improvement: +141.322 m
+- Before/after remaining lane distance: 19.637 m / 160.970 m
+
+Recommended next actions:
+- Replay nearest-lane and lane-link rollouts from the same anchor state as a positive control.
+- Verify the feature chain aligns with the target's observed future before claiming route intent.
+- Use this case to calibrate expected linked-lane behavior before tuning regressions.
+
+Blockers / cautions:
+- Raw Waymo TFRecords must remain local and ignored for replay.
+- The target still out-travels the linked lane chain within the prediction horizon.
 
 ## `a863e5638dfff0ca` / track `1765`
 
@@ -86,6 +109,28 @@ Blockers / cautions:
 - Raw Waymo TFRecords must remain local and ignored for replay.
 - The target still out-travels the linked lane chain within the prediction horizon.
 
+## `fc8c647623f81bb4` / track `1466`
+
+- Queue: `improvement_replay_control`
+- Readiness: `ready_for_continuation_improvement_replay`
+- Priority score: 12.09
+- Why it matters: Linked-lane continuation substantially improves the nearest-lane diagnostic, making this a positive replay control.
+- Source: `validation.tfrecord-00009-of-00150`
+- Feature chain: 153 -> 344 -> 343
+- Link status: `linked_lane_chain`
+- Nearest-lane FDE: 144.514 m
+- Lane-link FDE: 3.143 m
+- Link improvement: +141.371 m
+- Before/after remaining lane distance: 12.820 m / 230.044 m
+
+Recommended next actions:
+- Replay nearest-lane and lane-link rollouts from the same anchor state as a positive control.
+- Verify the feature chain aligns with the target's observed future before claiming route intent.
+- Use this case to calibrate expected linked-lane behavior before tuning regressions.
+
+Blockers / cautions:
+- Raw Waymo TFRecords must remain local and ignored for replay.
+
 ## `2f366a31ab03f8b` / track `1059`
 
 - Queue: `improvement_replay_control`
@@ -108,64 +153,19 @@ Recommended next actions:
 Blockers / cautions:
 - Raw Waymo TFRecords must remain local and ignored for replay.
 
-## `65d7afd24453a1ba` / track `510`
-
-- Queue: `improvement_replay_control`
-- Readiness: `ready_for_improvement_replay_with_horizon_caution`
-- Priority score: 9.44
-- Why it matters: Linked-lane continuation substantially improves the nearest-lane diagnostic, making this a positive replay control.
-- Source: `validation.tfrecord-00008-of-00150`
-- Feature chain: 159 -> 146 -> 140
-- Link status: `linked_lane_chain`
-- Nearest-lane FDE: 90.668 m
-- Lane-link FDE: 5.454 m
-- Link improvement: +85.214 m
-- Before/after remaining lane distance: 0.000 m / 96.121 m
-
-Recommended next actions:
-- Replay nearest-lane and lane-link rollouts from the same anchor state as a positive control.
-- Verify the feature chain aligns with the target's observed future before claiming route intent.
-- Use this case to calibrate expected linked-lane behavior before tuning regressions.
-
-Blockers / cautions:
-- Raw Waymo TFRecords must remain local and ignored for replay.
-- The target still out-travels the linked lane chain within the prediction horizon.
-
-## `77c44d1768793143` / track `34`
+## `8807e9963f411c48` / track `722`
 
 - Queue: `improvement_replay_control`
 - Readiness: `ready_for_continuation_improvement_replay`
-- Priority score: 8.49
+- Priority score: 9.96
 - Why it matters: Linked-lane continuation substantially improves the nearest-lane diagnostic, making this a positive replay control.
-- Source: `validation.tfrecord-00007-of-00150`
-- Feature chain: 176 -> 164 -> 148
+- Source: `validation.tfrecord-00009-of-00150`
+- Feature chain: 337 -> 559 -> 553
 - Link status: `linked_lane_chain`
-- Nearest-lane FDE: 87.044 m
-- Lane-link FDE: 3.732 m
-- Link improvement: +83.312 m
-- Before/after remaining lane distance: 16.109 m / 138.217 m
-
-Recommended next actions:
-- Replay nearest-lane and lane-link rollouts from the same anchor state as a positive control.
-- Verify the feature chain aligns with the target's observed future before claiming route intent.
-- Use this case to calibrate expected linked-lane behavior before tuning regressions.
-
-Blockers / cautions:
-- Raw Waymo TFRecords must remain local and ignored for replay.
-
-## `564a6bcc85c4f72f` / track `1143`
-
-- Queue: `improvement_replay_control`
-- Readiness: `ready_for_continuation_improvement_replay`
-- Priority score: 7.84
-- Why it matters: Linked-lane continuation substantially improves the nearest-lane diagnostic, making this a positive replay control.
-- Source: `validation.tfrecord-00008-of-00150`
-- Feature chain: 167 -> 173 -> 255
-- Link status: `linked_lane_chain`
-- Nearest-lane FDE: 81.835 m
-- Lane-link FDE: 6.818 m
-- Link improvement: +75.017 m
-- Before/after remaining lane distance: 7.487 m / 85.384 m
+- Nearest-lane FDE: 103.862 m
+- Lane-link FDE: 3.700 m
+- Link improvement: +100.162 m
+- Before/after remaining lane distance: 19.057 m / 188.109 m
 
 Recommended next actions:
 - Replay nearest-lane and lane-link rollouts from the same anchor state as a positive control.
@@ -198,28 +198,6 @@ Blockers / cautions:
 - Raw Waymo TFRecords must remain local and ignored for replay.
 - The target still out-travels the linked lane chain within the prediction horizon.
 
-## `d8dde10f514a501c` / track `651`
-
-- Queue: `regression_replay_debug`
-- Readiness: `ready_for_continuation_regression_replay`
-- Priority score: 5.36
-- Why it matters: Linked-lane continuation regresses against the clamped nearest-lane rollout, making this a route-choice or topology debugging target.
-- Source: `validation.tfrecord-00010-of-00150`
-- Feature chain: 134 -> 143 -> 146
-- Link status: `linked_lane_chain`
-- Nearest-lane FDE: 73.197 m
-- Lane-link FDE: 104.290 m
-- Link improvement: -31.093 m
-- Before/after remaining lane distance: 12.534 m / 76.738 m
-
-Recommended next actions:
-- Replay nearest-lane and lane-link rollouts side by side and inspect the selected continuation chain.
-- Check whether the target actually follows a different route, turns, slows, or changes lanes.
-- Use the result to decide whether route-choice priors or richer lane-candidate search are needed.
-
-Blockers / cautions:
-- Raw Waymo TFRecords must remain local and ignored for replay.
-
 ## `e3f6a29b59e42c1` / track `741`
 
 - Queue: `regression_replay_debug`
@@ -233,6 +211,28 @@ Blockers / cautions:
 - Lane-link FDE: 58.942 m
 - Link improvement: -43.073 m
 - Before/after remaining lane distance: 24.653 m / 125.444 m
+
+Recommended next actions:
+- Replay nearest-lane and lane-link rollouts side by side and inspect the selected continuation chain.
+- Check whether the target actually follows a different route, turns, slows, or changes lanes.
+- Use the result to decide whether route-choice priors or richer lane-candidate search are needed.
+
+Blockers / cautions:
+- Raw Waymo TFRecords must remain local and ignored for replay.
+
+## `d30709cd60e60395` / track `164`
+
+- Queue: `regression_replay_debug`
+- Readiness: `ready_for_continuation_regression_replay`
+- Priority score: 4.66
+- Why it matters: Linked-lane continuation regresses against the clamped nearest-lane rollout, making this a route-choice or topology debugging target.
+- Source: `validation.tfrecord-00007-of-00150`
+- Feature chain: 603 -> 610 -> 371
+- Link status: `linked_lane_chain`
+- Nearest-lane FDE: 16.292 m
+- Lane-link FDE: 52.496 m
+- Link improvement: -36.204 m
+- Before/after remaining lane distance: 31.155 m / 112.428 m
 
 Recommended next actions:
 - Replay nearest-lane and lane-link rollouts side by side and inspect the selected continuation chain.
@@ -286,19 +286,19 @@ Recommended next actions:
 Blockers / cautions:
 - Raw Waymo TFRecords must remain local and ignored for replay.
 
-## `fc8c647623f81bb4` / track `1466`
+## `6bdc7f92afefff73` / track `59`
 
 - Queue: `topology_audit`
 - Readiness: `needs_topology_audit`
-- Priority score: 5.14
+- Priority score: 4.93
 - Why it matters: The selected lane still lacks a usable parsed continuation chain, making this parser/topology coverage work before replay.
 - Source: `validation.tfrecord-00009-of-00150`
-- Feature chain: 153
+- Feature chain: 1056
 - Link status: `linked_feature_missing`
-- Nearest-lane FDE: 144.514 m
-- Lane-link FDE: 144.514 m
+- Nearest-lane FDE: 134.082 m
+- Lane-link FDE: 134.082 m
 - Link improvement: 0.000 m
-- Before/after remaining lane distance: 12.820 m / 12.820 m
+- Before/after remaining lane distance: 1.793 m / 1.793 m
 
 Recommended next actions:
 - Inspect parsed entry/exit links for the selected feature and its missing continuation.
@@ -334,17 +334,41 @@ Blockers / cautions:
 - No usable parsed linked-lane chain is available yet.
 - The target still out-travels the linked lane chain within the prediction horizon.
 
-## `770fec53ec3e0395` / track `1105`
+## `74a5b3325a534a87` / track `3178`
 
 - Queue: `topology_audit`
 - Readiness: `needs_topology_audit`
-- Priority score: 4.88
+- Priority score: 4.03
 - Why it matters: The selected lane still lacks a usable parsed continuation chain, making this parser/topology coverage work before replay.
-- Source: `validation.tfrecord-00007-of-00150`
-- Feature chain: 306
+- Source: `validation.tfrecord-00010-of-00150`
+- Feature chain: 333
+- Link status: `no_entry_lanes`
+- Nearest-lane FDE: 88.934 m
+- Lane-link FDE: 88.934 m
+- Link improvement: 0.000 m
+- Before/after remaining lane distance: 15.947 m / 23.515 m
+
+Recommended next actions:
+- Inspect parsed entry/exit links for the selected feature and its missing continuation.
+- Check whether the lightweight map-feature cap, link direction, or raw map topology caused the gap.
+- Rerun the continuation study after parser/topology coverage changes before replaying this case.
+
+Blockers / cautions:
+- Raw Waymo TFRecords must remain local and ignored for replay.
+- No usable parsed linked-lane chain is available yet.
+- The target still out-travels the linked lane chain within the prediction horizon.
+
+## `2f035a284480e981` / track `715`
+
+- Queue: `topology_audit`
+- Readiness: `needs_topology_audit`
+- Priority score: 3.42
+- Why it matters: The selected lane still lacks a usable parsed continuation chain, making this parser/topology coverage work before replay.
+- Source: `validation.tfrecord-00010-of-00150`
+- Feature chain: 513
 - Link status: `linked_feature_missing`
-- Nearest-lane FDE: 131.434 m
-- Lane-link FDE: 131.434 m
+- Nearest-lane FDE: 58.747 m
+- Lane-link FDE: 58.747 m
 - Link improvement: 0.000 m
 - Before/after remaining lane distance: 0.000 m / 0.000 m
 
@@ -358,43 +382,19 @@ Blockers / cautions:
 - No usable parsed linked-lane chain is available yet.
 - The target still out-travels the linked lane chain within the prediction horizon.
 
-## `c52455a0495c9bdb` / track `1937`
+## `4dfe7c285670839f` / track `0`
 
 - Queue: `topology_audit`
 - Readiness: `needs_topology_audit`
-- Priority score: 4.68
+- Priority score: 3.28
 - Why it matters: The selected lane still lacks a usable parsed continuation chain, making this parser/topology coverage work before replay.
-- Source: `validation.tfrecord-00007-of-00150`
-- Feature chain: 295
-- Link status: `linked_feature_missing`
-- Nearest-lane FDE: 121.451 m
-- Lane-link FDE: 121.451 m
+- Source: `validation.tfrecord-00008-of-00150`
+- Feature chain: 44
+- Link status: `no_exit_lanes`
+- Nearest-lane FDE: 51.637 m
+- Lane-link FDE: 51.637 m
 - Link improvement: 0.000 m
-- Before/after remaining lane distance: 6.738 m / 6.738 m
-
-Recommended next actions:
-- Inspect parsed entry/exit links for the selected feature and its missing continuation.
-- Check whether the lightweight map-feature cap, link direction, or raw map topology caused the gap.
-- Rerun the continuation study after parser/topology coverage changes before replaying this case.
-
-Blockers / cautions:
-- Raw Waymo TFRecords must remain local and ignored for replay.
-- No usable parsed linked-lane chain is available yet.
-- The target still out-travels the linked lane chain within the prediction horizon.
-
-## `c45b209a75ff4610` / track `1815`
-
-- Queue: `topology_audit`
-- Readiness: `needs_topology_audit`
-- Priority score: 4.59
-- Why it matters: The selected lane still lacks a usable parsed continuation chain, making this parser/topology coverage work before replay.
-- Source: `validation.tfrecord-00009-of-00150`
-- Feature chain: 248
-- Link status: `linked_feature_missing`
-- Nearest-lane FDE: 117.044 m
-- Lane-link FDE: 117.044 m
-- Link improvement: 0.000 m
-- Before/after remaining lane distance: 14.162 m / 14.162 m
+- Before/after remaining lane distance: 15.863 m / 15.863 m
 
 Recommended next actions:
 - Inspect parsed entry/exit links for the selected feature and its missing continuation.

@@ -395,8 +395,9 @@ scenariolens lane-continuation-study \
 
 This scans the same 100-scenario local Waymo slice for targets whose
 nearest-lane rollout would clamp at the end of a selected lane. The checked-in
-report keeps both sides of the diagnostic: 96 linked-lane improvements, 47
-regressions, and 33 topology gaps.
+report keeps both sides of the diagnostic after linked-lane closure
+materialization: 133 linked-lane improvements, 57 regressions, and 17 topology
+gaps.
 
 ## Lane-Continuation Candidate Plan
 
@@ -476,16 +477,12 @@ scenariolens lane-continuation-branch-replay \
 This replays motion-context branch choices under deterministic anchor-velocity
 perturbations. The checked-in report covers 2 branchable real-data cases and 8
 perturbation trials. The acceptance gate requires branch preservation and at
-least 1.0 m recoverable FDE in every valid perturbation: one branch passes that
-gate for broader selector evaluation, while the second becomes a route-context
-margin follow-up with a -0.443 m worst-case margin. The report also evaluates
-an experimental history-speed-prior replay score; it preserves the branch but
-does not resolve the margin target, so the next useful experiment is richer
-route context rather than simply smoothing speed. The route-context margin
-diagnostic now labels that case as `speed_minus_route_context_margin`, records
-a 0.443 m gap to the rollout gate, and publishes selected-vs-default route
-feature deltas for follow-up. Treat that case as the next route-context target,
-not as a failed benchmark.
+least 1.0 m recoverable FDE in every valid perturbation: both branches pass that
+gate for broader selector evaluation, with 8/8 positive-gain trials and a
++28.627 m minimum robustness margin. The report also evaluates an experimental
+history-speed-prior replay score; it preserves both accepted cases and leaves no
+speed-prior margin target unresolved. Treat this as open-loop selector evidence,
+not as route planning or a benchmark claim.
 
 ## Lane-Continuation Branch Rollout Gate
 
@@ -497,11 +494,9 @@ scenariolens lane-continuation-branch-rollout-gate \
 ```
 
 This converts branch replay diagnostics into a conservative promote/hold
-packet. The current real-data report promotes 1 branch for broader selector
-evaluation and holds 1 route-context margin case with a concrete next action:
-add route-context features that can explain reduced-speed branch intent. It is
-release-style evidence triage, not a production release process, route planner,
-or benchmark claim.
+packet. The current real-data report promotes 2 branches for broader selector
+evaluation and holds 0 route-context margin cases. It is release-style evidence
+triage, not a production release process, route planner, or benchmark claim.
 
 ## Lane-Continuation Route-Context Guard
 
@@ -517,9 +512,10 @@ This evaluates a stricter non-oracle promotion guard over the two current
 motion-context branch candidates. The guard uses route-fit, endpoint-alignment,
 and downstream speed-limit context from branch selection, then checks whether
 its promote/hold decision agrees with the replay gate. The current real-data
-report promotes 1 robust branch, holds 1 speed-minus route-context margin case,
-and matches the replay gate on both cases. Treat it as a candidate policy for
-larger branchable queues, not as a route planner or benchmark.
+report promotes 1 robust branch, holds 1 replay-accepted branch for
+route-feature follow-up, and records 1 replay-gate match plus 1 false hold.
+Treat it as a candidate policy for larger branchable queues, not as a route
+planner or benchmark.
 
 ## Lane-Continuation Branch Coverage Audit
 
@@ -539,8 +535,8 @@ This manifest-only audit connects the continuation candidate plan, replay
 prototype, route diagnostics, branch selection, branch replay, and
 route-context guard into one coverage funnel. The current real-data report
 shows 15 continuation candidates, 10 replay-ready candidates, 5 branch-selection
-cases, 2 branchable cases, 1 route-guard promotion, 5 topology blockers, and
-9 expansion queue items. Treat it as a planning and coverage artifact, not as a
+cases, 3 branchable cases, 1 route-guard promotion, 5 topology blockers, and
+8 expansion queue items. Treat it as a planning and coverage artifact, not as a
 benchmark or proof that the selector is ready across the full dataset.
 
 ## Lane-Continuation Topology Gap Audit
@@ -554,10 +550,10 @@ scenariolens lane-continuation-topology-gap-audit \
 
 This audit reloads the topology blocker cases named by the replay manifest and
 compares capped ScenarioLens map features with raw parsed map-feature IDs. The
-current real-data report audits 5 topology blockers, finds 4 blocker cases with
-linked-lane targets in the raw parsed map beyond the current feature cap, and
-confirms 1 terminal lane. Treat it as an ingestion/topology expansion target,
-not as route-planning evidence.
+current real-data report audits 5 topology blockers, finds 2 blocker cases that
+remain cap-recoverable after linked-lane closure materialization, and confirms
+3 terminal or directional-link cases. Treat it as an ingestion/topology
+expansion target, not as route-planning evidence.
 
 ## Baseline Ablation
 

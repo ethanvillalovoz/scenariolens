@@ -26,16 +26,16 @@ It is intentionally public-safe. It reads summary manifests only, publishes coun
 | Topology-audit candidates | 5 |
 | Route diagnostics | 10 |
 | Branch-selection cases | 5 |
-| Branchable cases | 2 |
-| Single-chain cases | 3 |
+| Branchable cases | 3 |
+| Single-chain cases | 2 |
 | Motion-context branch improvements | 2 |
 | Branch-replay cases | 2 |
 | Route-guard promotions | 1 |
 | Route-guard holds | 1 |
 | Topology blockers | 5 |
-| Expansion queue items | 9 |
-| Branchable coverage of candidates | 13.3% |
-| Branchable coverage of branch-selection cases | 40.0% |
+| Expansion queue items | 8 |
+| Branchable coverage of candidates | 20.0% |
+| Branchable coverage of branch-selection cases | 60.0% |
 | Route-guard promotion coverage of candidates | 6.7% |
 
 ## Funnel
@@ -47,41 +47,40 @@ It is intentionally public-safe. It reads summary manifests only, publishes coun
 | Replayed cases | 10 | 66.7% | Improvement controls and regression-debug targets were replayed. | Keep topology probes separate from replay evidence. |
 | Route diagnostics | 10 | n/a | Replayed regressions and topology blockers have named failure labels. | Use labels to separate route-choice work from parser/topology work. |
 | Branch-selection cases | 5 | 50.0% | Regression diagnostics were reloaded and branch-swept. | Increase alternatives by improving topology parsing and search depth. |
-| Branchable cases | 2 | 40.0% | Parsed map topology exposed multiple continuations. | Use these as selector/guard evidence, not as whole-dataset coverage. |
-| Motion-context improvements | 2 | 100.0% | A non-oracle branch selector improved FDE on branchable cases. | Replay and guard these before changing selector defaults. |
+| Branchable cases | 3 | 60.0% | Parsed map topology exposed multiple continuations. | Use these as selector/guard evidence, not as whole-dataset coverage. |
+| Motion-context improvements | 2 | 66.7% | A non-oracle branch selector improved FDE on branchable cases. | Replay and guard these before changing selector defaults. |
 | Route-guard promotions | 1 | 50.0% | Strict route-context guard accepted a branch for broader evaluation. | Treat this as the positive control for expanding the queue. |
 
 ## Bottlenecks
 
 | Bottleneck | Count | Evidence | Expansion move |
 | --- | ---: | --- | --- |
-| `topology_parser_gap` | 5 | missing_linked_feature: 4, terminal_lane_or_parser_gap: 1 | Audit missing linked features, terminal lanes, and parser feature caps before expanding branch replay. |
-| `single_chain_no_branch_choice` | 3 | e3f6a29b59e42c1 / track 741, d8dde10f514a501c / track 651, e9db41e904b349a2 / track 406 | Expose alternate continuations through deeper topology search, better selected-lane choice, or richer lane-link parsing. |
-| `route_context_margin_hold` | 1 | 5c49e681a66c720 / track 2627 | Add endpoint-alignment, downstream topology, traffic-control, and speed-limit context before selector rollout. |
+| `topology_parser_gap` | 5 | missing_linked_feature: 2, terminal_lane_or_parser_gap: 3 | Audit missing linked features, terminal lanes, and parser feature caps before expanding branch replay. |
+| `single_chain_no_branch_choice` | 2 | e3f6a29b59e42c1 / track 741, e9db41e904b349a2 / track 406 | Expose alternate continuations through deeper topology search, better selected-lane choice, or richer lane-link parsing. |
+| `route_context_margin_hold` | 1 | d30709cd60e60395 / track 164 | Add endpoint-alignment, downstream topology, traffic-control, and speed-limit context before selector rollout. |
 | `narrow_regression_branch_queue` | 5 | 5 regression-debug candidates feed the current branch-selection stage. | After topology blockers shrink, raise top-per-bucket and rerun continuation replay, route diagnostics, branch selection, replay, and guard reports. |
 
 ## Expansion Queue
 
 | Rank | Type | Scenario | Track | Source | Why it matters | First next action |
 | ---: | --- | --- | --- | --- | --- | --- |
-| 1 | `route_context_margin` | `5c49e681a66c720` | `2627` | `validation.tfrecord-00010-of-00150` | The branch has nominal recoverable FDE, but route-context guardrails fired: endpoint_alignment_drop, downstream_speed_limit_drop. | Add turn-lane, downstream topology, and traffic-control context before selector rollout. |
+| 1 | `route_context_margin` | `d30709cd60e60395` | `164` | `validation.tfrecord-00007-of-00150` | The branch has nominal recoverable FDE, but route-context guardrails fired: endpoint_alignment_drop. | Collect richer route-context evidence before promoting this branch. |
 | 2 | `single_chain_branch_expansion` | `e3f6a29b59e42c1` | `741` | `validation.tfrecord-00008-of-00150` | The parsed topology exposes only one usable linked chain, so this case needs richer topology or a different selected lane before branch selection can help. | Audit lane topology depth, missing links, and selected-lane quality. |
-| 3 | `single_chain_branch_expansion` | `d8dde10f514a501c` | `651` | `validation.tfrecord-00010-of-00150` | The parsed topology exposes only one usable linked chain, so this case needs richer topology or a different selected lane before branch selection can help. | Audit lane topology depth, missing links, and selected-lane quality. |
-| 4 | `single_chain_branch_expansion` | `e9db41e904b349a2` | `406` | `validation.tfrecord-00007-of-00150` | The parsed topology exposes only one usable linked chain, so this case needs richer topology or a different selected lane before branch selection can help. | Audit lane topology depth, missing links, and selected-lane quality. |
-| 5 | `topology_parser_gap` | `fc8c647623f81bb4` | `1466` | `validation.tfrecord-00009-of-00150` | The selected feature references a continuation that the lightweight parser did not make usable. | Audit the selected map feature's parsed entry/exit lane IDs. |
-| 6 | `topology_parser_gap` | `2f366a31ab03f8b` | `1061` | `validation.tfrecord-00007-of-00150` | The selected lane appears terminal or lacks parsed exit/entry links even though the target continues beyond it. | Audit the selected map feature's parsed entry/exit lane IDs. |
-| 7 | `topology_parser_gap` | `770fec53ec3e0395` | `1105` | `validation.tfrecord-00007-of-00150` | The selected feature references a continuation that the lightweight parser did not make usable. | Audit the selected map feature's parsed entry/exit lane IDs. |
-| 8 | `topology_parser_gap` | `c52455a0495c9bdb` | `1937` | `validation.tfrecord-00007-of-00150` | The selected feature references a continuation that the lightweight parser did not make usable. | Audit the selected map feature's parsed entry/exit lane IDs. |
-| 9 | `topology_parser_gap` | `c45b209a75ff4610` | `1815` | `validation.tfrecord-00009-of-00150` | The selected feature references a continuation that the lightweight parser did not make usable. | Audit the selected map feature's parsed entry/exit lane IDs. |
+| 3 | `single_chain_branch_expansion` | `e9db41e904b349a2` | `406` | `validation.tfrecord-00007-of-00150` | The parsed topology exposes only one usable linked chain, so this case needs richer topology or a different selected lane before branch selection can help. | Audit lane topology depth, missing links, and selected-lane quality. |
+| 4 | `topology_parser_gap` | `6bdc7f92afefff73` | `59` | `validation.tfrecord-00009-of-00150` | The selected feature references a continuation that the lightweight parser did not make usable. | Audit the selected map feature's parsed entry/exit lane IDs. |
+| 5 | `topology_parser_gap` | `2f366a31ab03f8b` | `1061` | `validation.tfrecord-00007-of-00150` | The selected lane appears terminal or lacks parsed exit/entry links even though the target continues beyond it. | Audit the selected map feature's parsed entry/exit lane IDs. |
+| 6 | `topology_parser_gap` | `74a5b3325a534a87` | `3178` | `validation.tfrecord-00010-of-00150` | The selected lane appears terminal or lacks parsed exit/entry links even though the target continues beyond it. | Audit the selected map feature's parsed entry/exit lane IDs. |
+| 7 | `topology_parser_gap` | `2f035a284480e981` | `715` | `validation.tfrecord-00010-of-00150` | The selected feature references a continuation that the lightweight parser did not make usable. | Audit the selected map feature's parsed entry/exit lane IDs. |
+| 8 | `topology_parser_gap` | `4dfe7c285670839f` | `0` | `validation.tfrecord-00008-of-00150` | The selected lane appears terminal or lacks parsed exit/entry links even though the target continues beyond it. | Audit the selected map feature's parsed entry/exit lane IDs. |
 
 ## Source Coverage
 
 | Source | Candidates | Branch-selection cases | Branchable | Guard promotions | Guard holds |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| `validation.tfrecord-00007-of-00150` | 6 | 1 | 0 | 0 | 0 |
-| `validation.tfrecord-00008-of-00150` | 3 | 1 | 0 | 0 | 0 |
-| `validation.tfrecord-00009-of-00150` | 3 | 1 | 1 | 1 | 0 |
-| `validation.tfrecord-00010-of-00150` | 3 | 2 | 1 | 0 | 1 |
+| `validation.tfrecord-00007-of-00150` | 4 | 2 | 1 | 0 | 1 |
+| `validation.tfrecord-00008-of-00150` | 2 | 1 | 0 | 0 | 0 |
+| `validation.tfrecord-00009-of-00150` | 5 | 1 | 1 | 1 | 0 |
+| `validation.tfrecord-00010-of-00150` | 4 | 1 | 1 | 0 | 0 |
 
 ## Interpretation
 

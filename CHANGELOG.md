@@ -71,6 +71,9 @@ All notable changes to ScenarioLens are documented here.
 - Waymo Motion ingestion now retains enough lightweight map features for the
   current lane-continuation proof case to resolve chain `144 -> 190 -> 193`,
   reducing nearest-lane FDE by 63.578 m in the checked-in diagnostic report.
+- Waymo Motion ingestion now preserves the first 240 map features and appends a
+  bounded two-hop linked-lane closure set, cutting continuation topology gaps
+  from 33 to 17 on the 100-scenario local validation slice.
 - `scenariolens lane-continuation-study` workflow and
   `docs/reports/waymo_lane_continuation_study.md`, scanning the 100-scenario
   local Waymo slice for lane-end clamp candidates and publishing linked-lane
@@ -108,8 +111,9 @@ All notable changes to ScenarioLens are documented here.
   and route-context guard manifests into a public-safe expansion funnel.
 - `scenariolens lane-continuation-topology-gap-audit` workflow and
   `docs/reports/waymo_lane_continuation_topology_gap_audit.md`, reloading the
-  5 topology blockers from the replay manifest and showing that 4 blocker cases
-  are cap-recoverable while 1 lane is a confirmed terminal case.
+  5 topology blockers from the replay manifest and showing that 2 blocker cases
+  remain cap-recoverable while 3 lanes are terminal or directional-link cases
+  after linked-lane closure materialization.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

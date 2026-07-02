@@ -26,28 +26,28 @@ The replay still uses open-loop ground-truth future states for scoring. It is a 
 | Cases analyzed | 2 |
 | Replayed cases | 2 |
 | Perturbation trials | 8 |
-| Stable motion-context cases | 1 |
-| Sensitive motion-context cases | 1 |
+| Stable motion-context cases | 2 |
+| Sensitive motion-context cases | 0 |
 | Branch-preserving trials | 8 |
-| Positive-gain trials | 7 |
-| Stable positive trials | 7 |
-| Accepted branch cases | 1 |
-| Route-context follow-up cases | 1 |
+| Positive-gain trials | 8 |
+| Stable positive trials | 8 |
+| Accepted branch cases | 2 |
+| Route-context follow-up cases | 0 |
 | Selector-stability follow-up cases | 0 |
-| History speed-prior accepted cases | 1 |
+| History speed-prior accepted cases | 2 |
 | Margin follow-ups resolved by speed prior | 0 |
-| History speed-prior stable positive trials | 7 |
-| Route-context margin diagnostics | 1 |
-| Speed-minus margin diagnostics | 1 |
-| Speed-prior unresolved margin cases | 1 |
-| Mean nominal recoverable FDE | +20.534 m |
-| Mean perturbed recoverable FDE | +19.883 m |
-| Min perturbed recoverable FDE | +0.557 m |
-| Max perturbed recoverable FDE | +37.766 m |
-| Min robustness margin | -0.443 m |
-| Mean robustness margin | +15.572 m |
-| History speed-prior min margin | -3.099 m |
-| History speed-prior mean margin | +14.245 m |
+| History speed-prior stable positive trials | 8 |
+| Route-context margin diagnostics | 0 |
+| Speed-minus margin diagnostics | 0 |
+| Speed-prior unresolved margin cases | 0 |
+| Mean nominal recoverable FDE | +40.301 m |
+| Mean perturbed recoverable FDE | +39.819 m |
+| Min perturbed recoverable FDE | +29.627 m |
+| Max perturbed recoverable FDE | +52.054 m |
+| Min robustness margin | +28.627 m |
+| Mean robustness margin | +29.834 m |
+| History speed-prior min margin | +28.627 m |
+| History speed-prior mean margin | +31.523 m |
 
 ## Perturbations
 
@@ -60,15 +60,15 @@ The replay still uses open-loop ground-truth future states for scoring. It is a 
 
 | Rank | Scenario | Track | Default chain | Motion-context chain | Nominal gain | Stable trials | Margin | Speed-prior margin | Acceptance | Route context | Stability |
 | ---: | --- | --- | --- | --- | ---: | ---: | ---: | ---: | --- | --- | --- |
-| 1 | `260785192cf6c991` | `1754` | 235 -> 241 -> 315 | 235 -> 307 -> 306 | +37.766 m | 4/4 | +31.588 m | +31.588 m | `accepted_for_selector_rollout` | `accepted_no_route_context_followup` | `stable_motion_context_branch` |
-| 4 | `5c49e681a66c720` | `2627` | 285 -> 120 -> 119 | 285 -> 286 -> 287 | +3.301 m | 3/4 | -0.443 m | -3.099 m | `needs_route_context_margin` | `speed_minus_route_context_margin` | `branch_stable_gain_sensitive` |
+| 1 | `260785192cf6c991` | `1754` | 235 -> 241 -> 315 -> 337 | 235 -> 307 -> 306 -> 314 | +40.840 m | 4/4 | +28.627 m | +28.627 m | `accepted_for_selector_rollout` | `accepted_no_route_context_followup` | `stable_motion_context_branch` |
+| 3 | `d30709cd60e60395` | `164` | 603 -> 610 -> 371 -> 394 | 603 -> 609 -> 606 -> 597 | +39.762 m | 4/4 | +31.042 m | +34.418 m | `accepted_for_selector_rollout` | `accepted_no_route_context_followup` | `stable_motion_context_branch` |
 
 ## Route-Context Margin Diagnostics
 
 | Rank | Scenario | Track | Diagnostic | Priority | Worst trial | Gap to gate | Oracle match | Speed-prior resolved | First next action |
 | ---: | --- | --- | --- | ---: | --- | ---: | --- | --- | --- |
 | 1 | `260785192cf6c991` | `1754` | `accepted_no_route_context_followup` | 0.00 | `speed_minus_10pct` | 0.000 m | True | False | Broaden the branch replay queue with the same acceptance gate. |
-| 4 | `5c49e681a66c720` | `2627` | `speed_minus_route_context_margin` | 5.18 | `speed_minus_10pct` | +0.443 m | True | False | Add route-context features that can explain reduced-speed branch intent. |
+| 3 | `d30709cd60e60395` | `164` | `accepted_no_route_context_followup` | 0.00 | `speed_minus_10pct` | 0.000 m | True | False | Broaden the branch replay queue with the same acceptance gate. |
 
 ## `260785192cf6c991` / track `1754`
 
@@ -86,21 +86,21 @@ The replay still uses open-loop ground-truth future states for scoring. It is a 
 - Speed-prior next action: Evaluate this selector behavior on a broader branchable continuation queue.
 - Route-context hypothesis: The branch already clears the replay gate; use it as a broader selector-evaluation candidate.
 - Route-context priority: 0.00
-- Default linked-route FDE: 81.112 m
-- Motion-context route FDE: 43.346 m
-- History speed-prior route FDE: 43.346 m
-- Nominal recoverable FDE: +37.766 m
-- Nominal history speed-prior recoverable FDE: +37.766 m
+- Default linked-route FDE: 87.147 m
+- Motion-context route FDE: 46.307 m
+- History speed-prior route FDE: 46.307 m
+- Nominal recoverable FDE: +40.840 m
+- Nominal history speed-prior recoverable FDE: +40.840 m
 - Branch-preserving trials: 4/4
 - Positive-gain trials: 4/4
 - Stable positive trials: 4/4
 - Worst perturbation: `speed_minus_10pct`
-- Robustness margin: +31.588 m
+- Robustness margin: +28.627 m
 - History speed-prior stable positive trials: 4/4
 - History speed-prior worst perturbation: `speed_minus_10pct`
-- History speed-prior robustness margin: +31.588 m
+- History speed-prior robustness margin: +28.627 m
 - Selected route matches diagnostic oracle: True
-- Selected vs default route context: route fit +0.077, endpoint alignment -0.001, downstream speed-limit drop 0.000, remaining route -37.679 m
+- Selected vs default route context: route fit +0.493, endpoint alignment -0.010, downstream speed-limit drop 0.000, remaining route -55.283 m
 
 Route-context next actions:
 
@@ -111,57 +111,56 @@ Perturbation trials:
 
 | Perturbation | Motion-context chain | Gain vs default | Speed-prior gain | Branch preserved | Positive gain | Speed-prior positive | Verdict |
 | --- | --- | ---: | ---: | --- | --- | --- | --- |
-| `speed_minus_10pct` | 235 -> 307 -> 306 | +32.588 m | +32.588 m | True | True | True | `stable_positive_motion_context_branch` |
-| `speed_plus_10pct` | 235 -> 307 -> 306 | +37.766 m | +37.766 m | True | True | True | `stable_positive_motion_context_branch` |
-| `heading_left_5deg` | 235 -> 307 -> 306 | +37.766 m | +37.766 m | True | True | True | `stable_positive_motion_context_branch` |
-| `heading_right_5deg` | 235 -> 307 -> 306 | +37.766 m | +37.766 m | True | True | True | `stable_positive_motion_context_branch` |
+| `speed_minus_10pct` | 235 -> 307 -> 306 -> 314 | +29.627 m | +29.627 m | True | True | True | `stable_positive_motion_context_branch` |
+| `speed_plus_10pct` | 235 -> 307 -> 306 -> 314 | +52.054 m | +52.054 m | True | True | True | `stable_positive_motion_context_branch` |
+| `heading_left_5deg` | 235 -> 307 -> 306 -> 314 | +40.840 m | +40.840 m | True | True | True | `stable_positive_motion_context_branch` |
+| `heading_right_5deg` | 235 -> 307 -> 306 -> 314 | +40.840 m | +40.840 m | True | True | True | `stable_positive_motion_context_branch` |
 
-## `5c49e681a66c720` / track `2627`
+## `d30709cd60e60395` / track `164`
 
 - Diagnosis source: `stable_route_choice_regression`
-- Source: `validation.tfrecord-00010-of-00150`
+- Source: `validation.tfrecord-00007-of-00150`
 - Ready: True
-- Stability: **branch_stable_gain_sensitive**
-- Acceptance: **needs_route_context_margin**
-- History speed-prior acceptance: **needs_route_context_margin**
-- Route-context diagnostic: **speed_minus_route_context_margin**
-- Why it matters: The branch choice is stable, but the gain margin is too thin under at least one perturbation.
-- Acceptance reason: The selected branch is stable, but at least one perturbation falls below the recoverable-FDE threshold.
-- Recommended next action: Add richer route context or speed-prior calibration before treating this branch as robust.
-- Speed-prior reason: The selected branch is stable, but the history speed-prior candidate still falls below the recoverable-FDE threshold.
-- Speed-prior next action: Add richer route context before treating this branch as robust.
-- Route-context hypothesis: The selected branch is stable and matches the diagnostic oracle, but reduced anchor speed erases the gain margin. Add richer route-context evidence before treating this branch as robust.
-- Route-context priority: 5.18
-- Default linked-route FDE: 38.598 m
-- Motion-context route FDE: 35.297 m
-- History speed-prior route FDE: 36.060 m
-- Nominal recoverable FDE: +3.301 m
-- Nominal history speed-prior recoverable FDE: +2.538 m
+- Stability: **stable_motion_context_branch**
+- Acceptance: **accepted_for_selector_rollout**
+- History speed-prior acceptance: **accepted_for_selector_rollout**
+- Route-context diagnostic: **accepted_no_route_context_followup**
+- Why it matters: The motion-context branch passes the acceptance gate, making it ready for broader selector evaluation.
+- Acceptance reason: All perturbations preserved the motion-context branch and kept recoverable FDE above the acceptance threshold.
+- Recommended next action: Evaluate this selector behavior on a broader branchable continuation queue.
+- Speed-prior reason: All perturbations preserved the history speed-prior branch and kept recoverable FDE above the acceptance threshold.
+- Speed-prior next action: Evaluate this selector behavior on a broader branchable continuation queue.
+- Route-context hypothesis: The branch already clears the replay gate; use it as a broader selector-evaluation candidate.
+- Route-context priority: 0.00
+- Default linked-route FDE: 52.496 m
+- Motion-context route FDE: 12.734 m
+- History speed-prior route FDE: 12.341 m
+- Nominal recoverable FDE: +39.762 m
+- Nominal history speed-prior recoverable FDE: +40.155 m
 - Branch-preserving trials: 4/4
-- Positive-gain trials: 3/4
-- Stable positive trials: 3/4
+- Positive-gain trials: 4/4
+- Stable positive trials: 4/4
 - Worst perturbation: `speed_minus_10pct`
-- Robustness margin: -0.443 m
-- History speed-prior stable positive trials: 3/4
+- Robustness margin: +31.042 m
+- History speed-prior stable positive trials: 4/4
 - History speed-prior worst perturbation: `speed_minus_10pct`
-- History speed-prior robustness margin: -3.099 m
+- History speed-prior robustness margin: +34.418 m
 - Selected route matches diagnostic oracle: True
-- Selected vs default route context: route fit +0.200, endpoint alignment -0.234, downstream speed-limit drop +0.286, remaining route -12.219 m
+- Selected vs default route context: route fit +0.578, endpoint alignment -0.236, downstream speed-limit drop 0.000, remaining route -43.858 m
 
 Route-context next actions:
 
-- Add route-context features that can explain reduced-speed branch intent.
-- Test turn-lane, downstream topology, and traffic-control context before selector rollout.
-- Keep the speed-prior ablation as negative evidence, not a promoted default.
+- Broaden the branch replay queue with the same acceptance gate.
+- Keep this case as a positive control for selector rollout checks.
 
 Perturbation trials:
 
 | Perturbation | Motion-context chain | Gain vs default | Speed-prior gain | Branch preserved | Positive gain | Speed-prior positive | Verdict |
 | --- | --- | ---: | ---: | --- | --- | --- | --- |
-| `speed_minus_10pct` | 285 -> 286 -> 287 | +0.557 m | -2.099 m | True | False | False | `branch_preserved_gain_sensitive` |
-| `speed_plus_10pct` | 285 -> 286 -> 287 | +6.023 m | +7.010 m | True | True | True | `stable_positive_motion_context_branch` |
-| `heading_left_5deg` | 285 -> 286 -> 287 | +3.301 m | +2.538 m | True | True | True | `stable_positive_motion_context_branch` |
-| `heading_right_5deg` | 285 -> 286 -> 287 | +3.301 m | +2.538 m | True | True | True | `stable_positive_motion_context_branch` |
+| `speed_minus_10pct` | 603 -> 609 -> 606 -> 597 | +32.042 m | +35.418 m | True | True | True | `stable_positive_motion_context_branch` |
+| `speed_plus_10pct` | 603 -> 609 -> 606 -> 597 | +43.627 m | +44.023 m | True | True | True | `stable_positive_motion_context_branch` |
+| `heading_left_5deg` | 603 -> 609 -> 606 -> 597 | +39.762 m | +40.155 m | True | True | True | `stable_positive_motion_context_branch` |
+| `heading_right_5deg` | 603 -> 609 -> 606 -> 597 | +39.762 m | +40.155 m | True | True | True | `stable_positive_motion_context_branch` |
 
 ## Interpretation
 

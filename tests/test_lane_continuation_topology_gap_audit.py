@@ -35,17 +35,21 @@ class LaneContinuationTopologyGapAuditTest(unittest.TestCase):
             self.assertTrue(payload["ready"])
             aggregate = payload["aggregate"]
             self.assertEqual(aggregate["case_count"], 2)
-            self.assertEqual(aggregate["cap_recoverable_case_count"], 1)
+            self.assertEqual(aggregate["cap_recovered_case_count"], 1)
+            self.assertEqual(aggregate["cap_recoverable_case_count"], 0)
             self.assertEqual(aggregate["terminal_confirmed_case_count"], 1)
             self.assertEqual(aggregate["capped_map_at_limit_count"], 1)
 
             cap_case, terminal_case = payload["cases"]
-            self.assertEqual(cap_case["diagnosis_label"], "cap_recoverable_link_target")
+            self.assertEqual(cap_case["diagnosis_label"], "cap_recovered_link_target")
             self.assertEqual(cap_case["raw_lane_feature_count"], MAX_MAP_FEATURES_PER_SCENARIO + 2)
-            self.assertEqual(cap_case["capped_lane_feature_count"], MAX_MAP_FEATURES_PER_SCENARIO)
+            self.assertEqual(
+                cap_case["capped_lane_feature_count"],
+                MAX_MAP_FEATURES_PER_SCENARIO + 1,
+            )
             target = cap_case["link_target_presence"][0]
             self.assertEqual(target["target_id"], str(MAX_MAP_FEATURES_PER_SCENARIO + 2))
-            self.assertFalse(target["present_in_capped_map"])
+            self.assertTrue(target["present_in_capped_map"])
             self.assertTrue(target["present_in_raw_map"])
             self.assertTrue(target["beyond_cap"])
             self.assertEqual(
@@ -67,7 +71,7 @@ class LaneContinuationTopologyGapAuditTest(unittest.TestCase):
             markdown = lane_continuation_topology_gap_audit_markdown(payload)
 
             self.assertIn("Topology Gap Audit", markdown)
-            self.assertIn("cap_recoverable_link_target", markdown)
+            self.assertIn("cap_recovered_link_target", markdown)
             self.assertIn("terminal_lane_confirmed", markdown)
             self.assertIn("Raw scenario data committed: no", markdown)
             self.assertIn("not a Waymo benchmark claim", markdown)
@@ -90,7 +94,8 @@ class LaneContinuationTopologyGapAuditTest(unittest.TestCase):
 
             self.assertTrue(result.ready)
             self.assertEqual(result.case_count, 2)
-            self.assertEqual(result.cap_recoverable_count, 1)
+            self.assertEqual(result.cap_recovered_count, 1)
+            self.assertEqual(result.cap_recoverable_count, 0)
             self.assertEqual(result.terminal_confirmed_count, 1)
             self.assertEqual(
                 manifest["format"],
@@ -129,7 +134,8 @@ class LaneContinuationTopologyGapAuditTest(unittest.TestCase):
             )
 
             self.assertIn("Generated topology gap audit", result.stdout)
-            self.assertIn("1 cap-recoverable", result.stdout)
+            self.assertIn("1 recovered", result.stdout)
+            self.assertIn("0 cap-recoverable", result.stdout)
             self.assertIn("1 terminal confirmation", result.stdout)
             self.assertTrue((output_dir / "manifest.json").exists())
             self.assertTrue((output_dir / "report.md").exists())

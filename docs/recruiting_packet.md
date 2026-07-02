@@ -201,8 +201,9 @@ Testing and verification:
   deterministic fixture, resolves the real stable warning's parsed lane chain
   `144 -> 190 -> 193`, and cuts nearest-lane FDE by 63.578 m on that case.
 - A lane-continuation validation study scans 100 real local Waymo scenarios and
-  finds 178 lane-end clamp candidates: 96 linked-lane improvements, 47
-  regressions, and 33 topology gaps for follow-up audit work.
+  finds 209 lane-end clamp candidates after linked-lane closure materialization:
+  133 linked-lane improvements, 57 regressions, and 17 topology gaps for
+  follow-up audit work.
 - A lane-continuation candidate plan turns that study into 15 follow-up items:
   five replay controls, five regression debug targets, and five topology-audit
   blockers.
@@ -219,33 +220,28 @@ Testing and verification:
   selector is not enough.
 - A motion-context branch replay diagnostic replays those two branch choices
   under eight deterministic perturbations: the selected branch is preserved in
-  all eight trials, positive recoverable FDE holds in seven, one branch is
-  accepted for broader selector evaluation, and one becomes a route-context
-  margin follow-up at -0.443 m.
+  all eight trials, positive recoverable FDE holds in all eight trials, both
+  branches are accepted for broader selector evaluation, and the minimum
+  robustness margin is +28.627 m.
 - An experimental history-speed-prior replay score tests a simple non-oracle
-  calibration idea on the same branch choices. It keeps one accepted case but
-  does not resolve the margin follow-up, turning the negative result into a
-  concrete route-context next step.
-- A route-context margin diagnostic labels the unresolved case as
-  `speed_minus_route_context_margin`, records the 0.443 m gap to the gate, and
-  exposes selected-vs-default route-feature deltas for the next selector
-  experiment.
+  calibration idea on the same branch choices. It preserves both accepted cases
+  and leaves no speed-prior margin target unresolved.
 - A branch rollout gate converts the replay outputs into a promote/hold queue:
   one branch is ready for broader selector evaluation and one route-context
   margin case remains held with a concrete next action.
 - A route-context guard study tests a stricter non-oracle promotion rule over
-  the same branchable queue: one robust branch is promoted, the speed-minus
-  margin case is held by endpoint-alignment and downstream speed-limit
-  guardrails, and the guard matches the replay gate on both cases.
+  the same branchable queue: one robust branch is promoted, one replay-accepted
+  branch is held for route-feature follow-up, and the guard records one
+  replay-gate match plus one false hold for calibration.
 - A branch coverage audit connects the continuation candidate, replay,
   diagnostics, branch-selection, branch-replay, and route-context guard
   manifests into one funnel: 15 continuation candidates, 10 replay-ready
-  candidates, 5 branch-selection cases, 2 branchable cases, 1 route-guard
-  promotion, 5 topology blockers, and 9 expansion queue items.
+  candidates, 5 branch-selection cases, 3 branchable cases, 1 route-guard
+  promotion, 5 topology blockers, and 8 expansion queue items.
 - A topology gap audit reloads those 5 topology blockers and compares capped
-  ScenarioLens map features with raw parsed map-feature IDs: 4 blocker cases
-  are cap-recoverable, 1 lane is terminal, and 0 raw target misses remain
-  unexplained.
+  ScenarioLens map features with raw parsed map-feature IDs: 2 blocker cases
+  remain cap-recoverable, 3 are terminal or directional-link cases, and 0 raw
+  target misses remain unexplained.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
@@ -253,8 +249,8 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Materialize linked-lane closure features before applying the map-feature cap,
-   then rerun continuation replay and branch coverage on the expanded queue.
+3. Audit remaining terminal/directional topology cases and calibrate the
+   conservative route-context guard false hold.
 4. Create curated scenario collections for pedestrian, cyclist, merge, and
    unprotected-turn cases.
 

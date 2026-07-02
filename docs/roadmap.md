@@ -374,8 +374,9 @@ continuation prototype at
 following on a deterministic fixture and resolves the real stable warning's
 parsed lane chain, reducing the clamped nearest-lane FDE by 63.578 m. The
 validation study at `docs/reports/waymo_lane_continuation_study.md` then scans
-100 local Waymo scenarios and finds 178 lane-continuation candidates, including
-96 linked-lane improvements, 47 regressions, and 33 topology gaps. The
+100 local Waymo scenarios and finds 209 lane-continuation candidates after
+linked-lane closure materialization, including 133 linked-lane improvements,
+57 regressions, and 17 topology gaps. The
 candidate plan at `docs/reports/waymo_lane_continuation_candidate_plan.md`
 promotes 15 of those rows into replay controls, regression debug targets, and
 topology-audit blockers. The replay prototype at
@@ -383,43 +384,38 @@ topology-audit blockers. The replay prototype at
 rows as 10 target-track replays, 40 deterministic perturbation trials, and 5
 topology probes. The route diagnostics report at
 `docs/reports/waymo_lane_continuation_route_diagnostics.md` classifies the
-follow-up set into 3 stable route-choice regressions, 1 horizon-limit case, 1
-link-worse-than-constant-velocity case, and 5 topology blockers. The branch
+follow-up set into 4 stable route-choice regressions, 1 horizon-limit case, 0
+link-worse-than-constant-velocity cases, and 5 topology blockers. The branch
 selection diagnostic at
 `docs/reports/waymo_lane_continuation_branch_selection.md` then sweeps parsed
-branch alternatives for the 5 continuation regression diagnostics, finding 2
-branchable cases, 3 single-chain cases, 2 non-oracle motion-context
-improvements, and 2 oracle upper-bound improvements with 20.534 m mean
+branch alternatives for the 5 continuation regression diagnostics, finding 3
+branchable cases, 2 single-chain cases, 2 non-oracle motion-context
+improvements, and 3 oracle upper-bound improvements with 27.968 m mean
 recoverable FDE. The branch replay diagnostic at
 `docs/reports/waymo_lane_continuation_branch_replay.md` then replays those 2
 motion-context choices under 8 deterministic perturbations: branch choice is
-preserved in 8/8 trials, positive recoverable FDE holds in 7/8 trials, and the
-acceptance gate marks 1 branch ready for broader selector evaluation and 1
-branch as a route-context margin follow-up with a -0.443 m worst-case margin.
-An experimental history-speed-prior replay score keeps 1 accepted case but
-does not resolve the margin follow-up, so next work is broader branch replay
-plus richer route context for that case. The route-context margin diagnostic
-now labels the unresolved case as `speed_minus_route_context_margin`, records
-a 0.443 m gap to the gate, and publishes route-feature deltas for the next
-selector iteration. The branch rollout gate at
+preserved in 8/8 trials, positive recoverable FDE holds in 8/8 trials, and the
+acceptance gate marks 2 branches ready for broader selector evaluation with a
++28.627 m minimum robustness margin. An experimental history-speed-prior replay
+score preserves both accepted cases and leaves no speed-prior margin target
+unresolved. The branch rollout gate at
 `docs/reports/waymo_lane_continuation_branch_rollout_gate.md` turns those
-outcomes into a promote/hold queue: 1 branch is ready for broader selector
-evaluation and 1 route-context margin case remains held with a concrete next
-action. The route-context guard study at
+outcomes into a promote/hold queue: 2 branches are ready for broader selector
+evaluation and 0 route-context margin cases remain held. The route-context
+guard study at
 `docs/reports/waymo_lane_continuation_route_context_guard.md` tests a stricter
 non-oracle promotion policy over those two branchable candidates, promoting the
-robust branch, holding the speed-minus margin case, and matching the replay
-gate on both cases. The branch coverage audit at
+robust branch, holding one replay-accepted branch for route-feature follow-up,
+and matching the replay gate on one of the two replay-accepted cases. The branch
+coverage audit at
 `docs/reports/waymo_lane_continuation_branch_coverage.md` connects the full
 continuation-to-branch funnel: 15 continuation candidates, 10 replay-ready
-candidates, 5 branch-selection cases, 2 branchable cases, 1 route-guard
-promotion, 5 topology blockers, and 9 expansion queue items. Next work should
-reduce topology/parser gaps and single-chain branch blockers before claiming
-broader selector readiness. The topology gap audit at
-`docs/reports/waymo_lane_continuation_topology_gap_audit.md` now shows that 4
-of the 5 topology blockers are cap-recoverable blocker cases and 1 is a
-confirmed terminal lane, so the next engineering step is to materialize
-linked-lane closure features before applying the map-feature cap.
+candidates, 5 branch-selection cases, 3 branchable cases, 1 route-guard
+promotion, 5 topology blockers, and 8 expansion queue items. Linked-lane
+closure materialization now cuts study topology gaps from 33 to 17 and raises
+linked-lane improvements from 96 to 133. Next work should audit terminal and
+directional topology cases, calibrate the route-context guard false hold, and
+expand the closure-enabled queue before claiming broader selector readiness.
 
 ## Stretch Goals
 

@@ -54,6 +54,7 @@ class LaneContinuationTopologyGapAuditResult:
 
     ready: bool
     case_count: int
+    cap_recovered_count: int
     cap_recoverable_count: int
     terminal_confirmed_count: int
     output_dir: Path
@@ -91,6 +92,7 @@ def generate_lane_continuation_topology_gap_audit(
     return LaneContinuationTopologyGapAuditResult(
         ready=bool(payload["ready"]),
         case_count=int(aggregate["case_count"]),
+        cap_recovered_count=int(aggregate["cap_recovered_case_count"]),
         cap_recoverable_count=int(aggregate["cap_recoverable_case_count"]),
         terminal_confirmed_count=int(aggregate["terminal_confirmed_case_count"]),
         output_dir=target,
@@ -202,7 +204,8 @@ def lane_continuation_topology_gap_audit_markdown(
         "| --- | ---: |",
         f"| Cases audited | {aggregate['case_count']} |",
         f"| Ready cases | {aggregate['ready_case_count']} |",
-        f"| Cap-recoverable cases | {aggregate['cap_recoverable_case_count']} |",
+        f"| Cap-recovered cases | {aggregate['cap_recovered_case_count']} |",
+        f"| Still cap-recoverable cases | {aggregate['cap_recoverable_case_count']} |",
         f"| Terminal lanes confirmed | {aggregate['terminal_confirmed_case_count']} |",
         f"| Raw target still missing | {aggregate['raw_target_missing_case_count']} |",
         f"| Selected feature missing in capped map | {aggregate['selected_feature_missing_case_count']} |",
@@ -282,6 +285,7 @@ def lane_continuation_topology_gap_audit_markdown(
             "",
             "## Interpretation",
             "",
+            "- Cap-recovered cases mean a referenced lane target from beyond the raw feature cap is now available in the capped ScenarioLens map feature set.",
             "- Cap-recoverable cases mean the referenced lane target exists in the raw parsed map but was not available inside the capped ScenarioLens map feature set.",
             "- Terminal-lane confirmations mean the selected lane has no parsed continuation in either the capped or raw parsed map; these need selected-lane or topology-neighborhood work rather than a simple cap increase.",
             "- Raw-missing targets stay parser/proto-source audits until the referenced id can be found.",
@@ -587,6 +591,13 @@ def _diagnosis(
         if not bool(target["present_in_capped_map"])
         and bool(target["present_in_raw_map"])
     ]
+    cap_recovered_targets = [
+        target
+        for target in target_presence
+        if bool(target["present_in_capped_map"])
+        and bool(target["present_in_raw_map"])
+        and bool(target["beyond_cap"])
+    ]
     raw_missing_targets = [
         target
         for target in target_presence
@@ -611,6 +622,16 @@ def _diagnosis(
         actions = [
             "Materialize closure features referenced by selected lane links before applying the map-feature cap.",
             "Rerun lane-continuation replay and branch coverage after link-closure loading.",
+        ]
+    elif cap_recovered_targets:
+        label = "cap_recovered_link_target"
+        reason = (
+            "A referenced link target from beyond the raw feature cap is now "
+            "available in the capped ScenarioLens map feature set."
+        )
+        actions = [
+            "Rerun lane-continuation replay and branch coverage with link-closure materialization enabled.",
+            "Confirm the former topology blocker moves into replay or branch-selection evidence.",
         ]
     elif not capped_targets and not raw_targets and raw_selected is not None:
         label = "terminal_lane_confirmed"
@@ -654,6 +675,7 @@ def _diagnosis(
     return {
         "diagnosis_label": label,
         "diagnosis_reason": reason,
+        "cap_recovered": label == "cap_recovered_link_target",
         "cap_recoverable": label == "cap_recoverable_link_target",
         "terminal_confirmed": label == "terminal_lane_confirmed",
         "raw_target_missing": label == "raw_link_target_missing",
@@ -726,6 +748,9 @@ def _aggregate_cases(cases: list[dict[str, object]]) -> dict[str, object]:
     return {
         "case_count": len(cases),
         "ready_case_count": len(ready),
+        "cap_recovered_case_count": sum(
+            bool(case.get("cap_recovered")) for case in ready
+        ),
         "cap_recoverable_case_count": sum(
             bool(case.get("cap_recoverable")) for case in ready
         ),

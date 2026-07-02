@@ -5,6 +5,7 @@ import tempfile
 from pathlib import Path
 
 from scenariolens.ingest.waymo_motion import (
+    MAX_LINK_CLOSURE_FEATURES_PER_SCENARIO,
     MAX_MAP_FEATURES_PER_SCENARIO,
     WAYMO_OPEN_CHALLENGES_URL,
     WAYMO_OPEN_DATASET_URL,
@@ -296,6 +297,35 @@ def _tfrecord(payload: bytes) -> bytes:
     return struct.pack("<Q", len(payload)) + b"\x00\x00\x00\x00" + payload + b"\x00\x00\x00\x00"
 
 
+def _json_lane_features_with_closure_gap() -> list[dict[str, object]]:
+    features = [
+        _json_lane_feature(
+            1,
+            exit_lanes=[MAX_MAP_FEATURES_PER_SCENARIO + 2],
+        )
+    ]
+    for feature_id in range(2, MAX_MAP_FEATURES_PER_SCENARIO + 3):
+        features.append(_json_lane_feature(feature_id, exit_lanes=[]))
+    return features
+
+
+def _json_lane_feature(
+    feature_id: int,
+    exit_lanes: list[int],
+) -> dict[str, object]:
+    lane: dict[str, object] = {
+        "speedLimitMph": 35.0,
+        "type": "TYPE_SURFACE_STREET",
+        "polyline": [
+            {"x": 0.0, "y": float(feature_id)},
+            {"x": 10.0, "y": float(feature_id)},
+        ],
+    }
+    if exit_lanes:
+        lane["exitLanes"] = exit_lanes
+    return {"id": feature_id, "lane": lane}
+
+
 class WaymoMotionIngestTest(unittest.TestCase):
     def test_adapter_status_documents_native_adapter(self) -> None:
         status = adapter_status()
@@ -379,6 +409,64 @@ class WaymoMotionIngestTest(unittest.TestCase):
         self.assertGreaterEqual(MAX_MAP_FEATURES_PER_SCENARIO, 190)
         self.assertEqual(scenario.metadata["waymo_map_summary"]["feature_count"], 190)
         self.assertIn("190", feature_ids)
+
+    def test_load_waymo_motion_reserves_link_closure_features_before_cap(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "scenario.json"
+            path.write_text(
+                json.dumps(
+                    {
+                        "scenarioId": "waymo_link_closure_cap",
+                        "timestampsSeconds": [0.0, 0.1],
+                        "currentTimeIndex": 0,
+                        "sdcTrackIndex": 0,
+                        "tracksToPredict": [{"trackIndex": 0}],
+                        "tracks": [
+                            {
+                                "id": 10,
+                                "objectType": "TYPE_VEHICLE",
+                                "states": [
+                                    {
+                                        "centerX": 0.0,
+                                        "centerY": 0.0,
+                                        "velocityX": 5.0,
+                                        "velocityY": 0.0,
+                                        "valid": True,
+                                    },
+                                    {
+                                        "centerX": 0.5,
+                                        "centerY": 0.0,
+                                        "velocityX": 5.0,
+                                        "velocityY": 0.0,
+                                        "valid": True,
+                                    },
+                                ],
+                            }
+                        ],
+                        "mapFeatures": _json_lane_features_with_closure_gap(),
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            scenarios = load_waymo_motion(path)
+
+        map_features = scenarios[0].metadata["waymo_map_features"]
+        feature_ids = {feature["feature_id"] for feature in map_features}
+        target_id = str(MAX_MAP_FEATURES_PER_SCENARIO + 2)
+        displaced_tail_id = str(MAX_MAP_FEATURES_PER_SCENARIO)
+        self.assertLessEqual(
+            len(map_features),
+            MAX_MAP_FEATURES_PER_SCENARIO
+            + MAX_LINK_CLOSURE_FEATURES_PER_SCENARIO,
+        )
+        self.assertIn("1", feature_ids)
+        self.assertIn(target_id, feature_ids)
+        self.assertIn(displaced_tail_id, feature_ids)
+        self.assertEqual(
+            scenarios[0].metadata["waymo_map_summary"]["materialized_link_target_count"],
+            1,
+        )
 
     def test_inspect_waymo_motion_slice_reports_missing_input(self) -> None:
         report = inspect_waymo_motion_slice("missing-waymo-dir")

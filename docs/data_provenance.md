@@ -189,8 +189,8 @@ retains 240 map features per scenario. That cuts the clamped nearest-lane FDE by
 The lane-continuation validation study is checked in at
 [`docs/reports/waymo_lane_continuation_study.md`](reports/waymo_lane_continuation_study.md).
 It scans the same 100-scenario local slice for lane-end clamp candidates and
-publishes aggregate/ranked diagnostics only: 178 candidate tracks, 145 linked
-lane rollouts, 96 improvements, 47 regressions, and 33 topology gaps. Raw
+publishes aggregate/ranked diagnostics only: 209 candidate tracks, 192 linked
+lane rollouts, 133 improvements, 57 regressions, and 17 topology gaps. Raw
 Waymo files and ignored local manifests remain outside git.
 
 The lane-continuation candidate plan is checked in at
@@ -216,8 +216,8 @@ The lane-continuation branch-selection diagnostic is checked in at
 [`docs/reports/waymo_lane_continuation_branch_selection.md`](reports/waymo_lane_continuation_branch_selection.md).
 It reads ignored replay/diagnostic manifests, reloads local shards, and
 publishes only derived branch-sweep metrics: 5 continuation regression cases,
-2 branchable parsed-topology cases, 3 single-chain cases, 2 non-oracle
-motion-context improvements, and 2 oracle upper-bound improvements. The
+3 branchable parsed-topology cases, 2 single-chain cases, 2 non-oracle
+motion-context improvements, and 3 oracle upper-bound improvements. The
 motion-context selector uses recent speed, forecast horizon, route-chain
 length, and downstream lane speed limits; the oracle branch uses observed
 future motion only as a diagnostic upper bound. Local branch manifests remain
@@ -227,31 +227,27 @@ The motion-context branch replay diagnostic is checked in at
 [`docs/reports/waymo_lane_continuation_branch_replay.md`](reports/waymo_lane_continuation_branch_replay.md).
 It reads the ignored branch-selection manifest, reloads the two branchable
 local Waymo cases, and publishes only branch/gain stability summaries: 8
-deterministic perturbation trials, 8 branch-preserving trials, 7 positive-gain
-trials, 1 branch accepted for broader selector evaluation, 1 route-context
-margin follow-up, and a -0.443 m minimum robustness margin. The same report
-also checks an experimental history-speed-prior replay score; it keeps 1
-accepted case and leaves the margin follow-up unresolved, with a -3.099 m
-minimum speed-prior margin. The route-context margin diagnostic labels the
-unresolved case as `speed_minus_route_context_margin`, records a 0.443 m gap
-to the gate, and publishes only aggregate/case-summary route-feature deltas.
+deterministic perturbation trials, 8 branch-preserving trials, 8 positive-gain
+trials, 2 branches accepted for broader selector evaluation, 0 route-context
+margin follow-ups, and a +28.627 m minimum robustness margin. The same report
+also checks an experimental history-speed-prior replay score; it preserves both
+accepted cases and leaves no speed-prior margin target unresolved.
 Raw TFRecords and local replay packets remain ignored.
 
 The branch rollout gate is checked in at
 [`docs/reports/waymo_lane_continuation_branch_rollout_gate.md`](reports/waymo_lane_continuation_branch_rollout_gate.md).
 It reads the ignored branch-replay manifest and publishes only promote/hold
-decisions derived from the replay summary: 2 replayed cases, 1 branch promoted
-for broader selector evaluation, 1 route-context margin hold, 0 selector
-stability holds, and the first next action for the held case. This is
-release-style evidence triage, not a production release process or route
-planner.
+decisions derived from the replay summary: 2 replayed cases, 2 branches
+promoted for broader selector evaluation, 0 route-context margin holds, and 0
+selector-stability holds. This is release-style evidence triage, not a
+production release process or route planner.
 
 The route-context guard study is checked in at
 [`docs/reports/waymo_lane_continuation_route_context_guard.md`](reports/waymo_lane_continuation_route_context_guard.md).
 It reads ignored branch-selection and branch-replay manifests, then publishes
 only derived guard decisions and route-feature deltas: 2 motion-context branch
-candidates, 1 guard promotion, 1 guard hold, 2/2 replay-gate matches, 0 false
-promotions, and 0 false holds. The guard uses route fit, endpoint alignment,
+candidates, 1 guard promotion, 1 guard hold, 1/2 replay-gate matches, 0 false
+promotions, and 1 false hold. The guard uses route fit, endpoint alignment,
 and downstream speed-limit context; replay outcomes are used only to evaluate
 the guard, not to choose a branch. Raw TFRecords and local replay packets
 remain ignored.
@@ -261,17 +257,17 @@ The branch coverage audit is checked in at
 It reads ignored candidate, replay, route-diagnostic, branch-selection,
 branch-replay, and route-context guard manifests, then publishes only a derived
 coverage funnel and expansion queue: 15 continuation candidates, 10
-replay-ready candidates, 5 branch-selection cases, 2 branchable cases, 1
-route-guard promotion, 5 topology blockers, and 9 expansion items. It does not
+replay-ready candidates, 5 branch-selection cases, 3 branchable cases, 1
+route-guard promotion, 5 topology blockers, and 8 expansion items. It does not
 read raw Waymo TFRecords and is not a benchmark coverage claim.
 
 The topology gap audit is checked in at
 [`docs/reports/waymo_lane_continuation_topology_gap_audit.md`](reports/waymo_lane_continuation_topology_gap_audit.md).
 It reloads the ignored local source scenarios referenced by the replay manifest,
 then publishes only derived topology classifications: 5 topology blockers
-audited, 4 cap-recoverable blocker cases, 1 terminal lane confirmation,
-0 raw target misses, and 5 capped maps at the current feature cap. Raw Waymo
-records and local per-case packets remain ignored.
+audited, 2 cap-recoverable blocker cases, 3 terminal or directional-link
+confirmations, 0 raw target misses, and 4 maps at or above the base feature cap.
+Raw Waymo records and local per-case packets remain ignored.
 
 ## Interpretation Rules
 

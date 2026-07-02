@@ -22,12 +22,12 @@ It is intentionally scoped: this is not a route planner, not closed-loop simulat
 | Diagnostics | 10 |
 | Regression diagnostics | 5 |
 | Topology diagnostics | 5 |
-| Stable regression warnings | 3 |
+| Stable regression warnings | 4 |
 | Horizon-limit cases | 1 |
-| Link worse than constant velocity | 1 |
+| Link worse than constant velocity | 0 |
 | Topology blockers | 5 |
-| Missing linked features | 4 |
-| Terminal/no-exit lane probes | 1 |
+| Missing linked features | 2 |
+| Terminal/no-exit lane probes | 3 |
 
 ## Stable Regression Diagnostics
 
@@ -35,7 +35,7 @@ It is intentionally scoped: this is not a route planner, not closed-loop simulat
 | ---: | --- | --- | ---: | --- | ---: | ---: | ---: | --- | --- |
 | 1 | `260785192cf6c991` | `1754` | 7.57 | `route_horizon_limit` | 22.573 m | 81.112 m | -58.539 m | 235 -> 241 -> 315 | Extend linked-lane search depth or route-chain coverage before tuning prediction behavior. |
 | 2 | `e3f6a29b59e42c1` | `741` | 5.62 | `stable_route_choice_regression` | 15.869 m | 58.942 m | -43.073 m | 161 -> 127 -> 116 | Compare alternate linked-lane branches from the same selected feature. |
-| 3 | `d8dde10f514a501c` | `651` | 5.10 | `linked_route_worse_than_constant_velocity` | 73.197 m | 104.290 m | -31.093 m | 134 -> 143 -> 146 | Inspect whether the linked route turns away from the target's future motion. |
+| 3 | `d30709cd60e60395` | `164` | 4.37 | `stable_route_choice_regression` | 16.292 m | 52.496 m | -36.204 m | 603 -> 610 -> 371 | Compare alternate linked-lane branches from the same selected feature. |
 | 4 | `5c49e681a66c720` | `2627` | 4.10 | `stable_route_choice_regression` | 4.595 m | 38.598 m | -34.003 m | 285 -> 120 -> 119 | Compare alternate linked-lane branches from the same selected feature. |
 | 5 | `e9db41e904b349a2` | `406` | 3.86 | `stable_route_choice_regression` | 6.776 m | 38.292 m | -31.516 m | 295 -> 228 -> 201 | Compare alternate linked-lane branches from the same selected feature. |
 
@@ -43,11 +43,11 @@ It is intentionally scoped: this is not a route planner, not closed-loop simulat
 
 | Rank | Scenario | Track | Priority | Diagnosis | Nearest FDE | Lane-link FDE | Delta | Chain | First action |
 | ---: | --- | --- | ---: | --- | ---: | ---: | ---: | --- | --- |
-| 6 | `fc8c647623f81bb4` | `1466` | 5.14 | `missing_linked_feature` | 144.514 m | 144.514 m | 0.000 m | 153 | Audit the selected map feature's parsed entry/exit lane IDs. |
+| 6 | `6bdc7f92afefff73` | `59` | 4.93 | `missing_linked_feature` | 134.082 m | 134.082 m | 0.000 m | 1056 | Audit the selected map feature's parsed entry/exit lane IDs. |
 | 7 | `2f366a31ab03f8b` | `1061` | 4.93 | `terminal_lane_or_parser_gap` | 133.872 m | 133.872 m | 0.000 m | 219 | Audit the selected map feature's parsed entry/exit lane IDs. |
-| 8 | `770fec53ec3e0395` | `1105` | 4.88 | `missing_linked_feature` | 131.434 m | 131.434 m | 0.000 m | 306 | Audit the selected map feature's parsed entry/exit lane IDs. |
-| 9 | `c52455a0495c9bdb` | `1937` | 4.68 | `missing_linked_feature` | 121.451 m | 121.451 m | 0.000 m | 295 | Audit the selected map feature's parsed entry/exit lane IDs. |
-| 10 | `c45b209a75ff4610` | `1815` | 4.59 | `missing_linked_feature` | 117.044 m | 117.044 m | 0.000 m | 248 | Audit the selected map feature's parsed entry/exit lane IDs. |
+| 8 | `74a5b3325a534a87` | `3178` | 4.03 | `terminal_lane_or_parser_gap` | 88.934 m | 88.934 m | 0.000 m | 333 | Audit the selected map feature's parsed entry/exit lane IDs. |
+| 9 | `2f035a284480e981` | `715` | 3.42 | `missing_linked_feature` | 58.747 m | 58.747 m | 0.000 m | 513 | Audit the selected map feature's parsed entry/exit lane IDs. |
+| 10 | `4dfe7c285670839f` | `0` | 3.28 | `terminal_lane_or_parser_gap` | 51.637 m | 51.637 m | 0.000 m | 44 | Audit the selected map feature's parsed entry/exit lane IDs. |
 
 ## `260785192cf6c991` / track `1754`
 
@@ -98,26 +98,26 @@ Recommended next actions:
 Blockers / cautions:
 - Raw Waymo TFRecords and local replay packets must stay ignored.
 
-## `d8dde10f514a501c` / track `651`
+## `d30709cd60e60395` / track `164`
 
 - Queue: `regression_replay_debug`
-- Diagnosis: **linked_route_worse_than_constant_velocity**
-- Priority score: 5.10
-- Why it matters: Linked-lane continuation is worse than both nearest-lane and constant velocity, making this a high-value route-prior debugging case.
-- Source: `validation.tfrecord-00010-of-00150`
+- Diagnosis: **stable_route_choice_regression**
+- Priority score: 4.37
+- Why it matters: The linked route remains worse than nearest-lane under perturbation, which points to route-choice or branch-selection logic.
+- Source: `validation.tfrecord-00007-of-00150`
 - Replay stability: `stable_regression_warning`
 - Link status/count: `linked_lane_chain` / 2
-- Feature chain: 134 -> 143 -> 146
-- Nearest-lane FDE: 73.197 m
-- Lane-link FDE: 104.290 m
-- Link improvement over nearest: -31.093 m
-- Link improvement over constant velocity: -46.548 m
-- Horizon / route remaining: 52.453 m / 76.738 m
+- Feature chain: 603 -> 610 -> 371
+- Nearest-lane FDE: 16.292 m
+- Lane-link FDE: 52.496 m
+- Link improvement over nearest: -36.204 m
+- Link improvement over constant velocity: +8.528 m
+- Horizon / route remaining: 75.892 m / 112.428 m
 
 Recommended next actions:
-- Inspect whether the linked route turns away from the target's future motion.
-- Test route candidates ranked by heading and future displacement consistency.
-- Treat this as a route-choice regression, not a scoring-baseline failure.
+- Compare alternate linked-lane branches from the same selected feature.
+- Add a route-choice prior before accepting the first linked continuation.
+- Keep nearest-lane and linked-lane results side by side in the next replay pass.
 
 Blockers / cautions:
 - Raw Waymo TFRecords and local replay packets must stay ignored.
@@ -170,21 +170,21 @@ Recommended next actions:
 Blockers / cautions:
 - Raw Waymo TFRecords and local replay packets must stay ignored.
 
-## `fc8c647623f81bb4` / track `1466`
+## `6bdc7f92afefff73` / track `59`
 
 - Queue: `topology_audit`
 - Diagnosis: **missing_linked_feature**
-- Priority score: 5.14
+- Priority score: 4.93
 - Why it matters: The selected feature references a continuation that the lightweight parser did not make usable.
 - Source: `validation.tfrecord-00009-of-00150`
 - Replay stability: `not_evaluable`
 - Link status/count: `linked_feature_missing` / 0
-- Feature chain: 153
-- Nearest-lane FDE: 144.514 m
-- Lane-link FDE: 144.514 m
+- Feature chain: 1056
+- Nearest-lane FDE: 134.082 m
+- Lane-link FDE: 134.082 m
 - Link improvement over nearest: 0.000 m
-- Link improvement over constant velocity: -141.362 m
-- Horizon / route remaining: 160.476 m / 12.820 m
+- Link improvement over constant velocity: -118.819 m
+- Horizon / route remaining: 150.972 m / 1.793 m
 
 Recommended next actions:
 - Audit the selected map feature's parsed entry/exit lane IDs.
@@ -222,21 +222,21 @@ Blockers / cautions:
 - The linked lane chain is still shorter than the target horizon.
 - Raw Waymo TFRecords and local replay packets must stay ignored.
 
-## `770fec53ec3e0395` / track `1105`
+## `74a5b3325a534a87` / track `3178`
 
 - Queue: `topology_audit`
-- Diagnosis: **missing_linked_feature**
-- Priority score: 4.88
-- Why it matters: The selected feature references a continuation that the lightweight parser did not make usable.
-- Source: `validation.tfrecord-00007-of-00150`
+- Diagnosis: **terminal_lane_or_parser_gap**
+- Priority score: 4.03
+- Why it matters: The selected lane appears terminal or lacks parsed exit/entry links even though the target continues beyond it.
+- Source: `validation.tfrecord-00010-of-00150`
 - Replay stability: `not_evaluable`
-- Link status/count: `linked_feature_missing` / 0
-- Feature chain: 306
-- Nearest-lane FDE: 131.434 m
-- Lane-link FDE: 131.434 m
+- Link status/count: `no_entry_lanes` / 0
+- Feature chain: 333
+- Nearest-lane FDE: 88.934 m
+- Lane-link FDE: 88.934 m
 - Link improvement over nearest: 0.000 m
-- Link improvement over constant velocity: -117.359 m
-- Horizon / route remaining: 115.837 m / 0.000 m
+- Link improvement over constant velocity: -32.680 m
+- Horizon / route remaining: 59.581 m / 23.515 m
 
 Recommended next actions:
 - Audit the selected map feature's parsed entry/exit lane IDs.
@@ -248,21 +248,21 @@ Blockers / cautions:
 - The linked lane chain is still shorter than the target horizon.
 - Raw Waymo TFRecords and local replay packets must stay ignored.
 
-## `c52455a0495c9bdb` / track `1937`
+## `2f035a284480e981` / track `715`
 
 - Queue: `topology_audit`
 - Diagnosis: **missing_linked_feature**
-- Priority score: 4.68
+- Priority score: 3.42
 - Why it matters: The selected feature references a continuation that the lightweight parser did not make usable.
-- Source: `validation.tfrecord-00007-of-00150`
+- Source: `validation.tfrecord-00010-of-00150`
 - Replay stability: `not_evaluable`
 - Link status/count: `linked_feature_missing` / 0
-- Feature chain: 295
-- Nearest-lane FDE: 121.451 m
-- Lane-link FDE: 121.451 m
+- Feature chain: 513
+- Nearest-lane FDE: 58.747 m
+- Lane-link FDE: 58.747 m
 - Link improvement over nearest: 0.000 m
-- Link improvement over constant velocity: -106.954 m
-- Horizon / route remaining: 142.662 m / 6.738 m
+- Link improvement over constant velocity: -36.366 m
+- Horizon / route remaining: 35.054 m / 0.000 m
 
 Recommended next actions:
 - Audit the selected map feature's parsed entry/exit lane IDs.
@@ -274,21 +274,21 @@ Blockers / cautions:
 - The linked lane chain is still shorter than the target horizon.
 - Raw Waymo TFRecords and local replay packets must stay ignored.
 
-## `c45b209a75ff4610` / track `1815`
+## `4dfe7c285670839f` / track `0`
 
 - Queue: `topology_audit`
-- Diagnosis: **missing_linked_feature**
-- Priority score: 4.59
-- Why it matters: The selected feature references a continuation that the lightweight parser did not make usable.
-- Source: `validation.tfrecord-00009-of-00150`
+- Diagnosis: **terminal_lane_or_parser_gap**
+- Priority score: 3.28
+- Why it matters: The selected lane appears terminal or lacks parsed exit/entry links even though the target continues beyond it.
+- Source: `validation.tfrecord-00008-of-00150`
 - Replay stability: `not_evaluable`
-- Link status/count: `linked_feature_missing` / 0
-- Feature chain: 248
-- Nearest-lane FDE: 117.044 m
-- Lane-link FDE: 117.044 m
+- Link status/count: `no_exit_lanes` / 0
+- Feature chain: 44
+- Nearest-lane FDE: 51.637 m
+- Lane-link FDE: 51.637 m
 - Link improvement over nearest: 0.000 m
-- Link improvement over constant velocity: -79.567 m
-- Horizon / route remaining: 93.731 m / 14.162 m
+- Link improvement over constant velocity: -33.688 m
+- Horizon / route remaining: 85.416 m / 15.863 m
 
 Recommended next actions:
 - Audit the selected map feature's parsed entry/exit lane IDs.

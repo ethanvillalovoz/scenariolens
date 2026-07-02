@@ -42,14 +42,14 @@ Topology-audit candidates are re-probed as blockers instead of being treated as 
 
 | Rank | Queue | Scenario | Track | Readiness | Nearest FDE | Lane-link FDE | Delta | Link status | Sign stability | Max swing |
 | ---: | --- | --- | --- | --- | ---: | ---: | ---: | --- | ---: | ---: |
-| 1 | `improvement_replay_control` | `a863e5638dfff0ca` | `1765` | `ready_for_improvement_replay_with_horizon_caution` | 144.122 m | 7.919 m | +136.203 m | `linked_lane_chain` | 4/4 | 15.483 m |
-| 2 | `improvement_replay_control` | `2f366a31ab03f8b` | `1059` | `ready_for_continuation_improvement_replay` | 148.345 m | 9.068 m | +139.277 m | `no_exit_lanes` | 4/4 | 16.874 m |
-| 3 | `improvement_replay_control` | `65d7afd24453a1ba` | `510` | `ready_for_improvement_replay_with_horizon_caution` | 90.668 m | 5.454 m | +85.214 m | `linked_lane_chain` | 4/4 | 1.391 m |
-| 4 | `improvement_replay_control` | `77c44d1768793143` | `34` | `ready_for_continuation_improvement_replay` | 87.044 m | 3.732 m | +83.312 m | `linked_lane_chain` | 4/4 | 9.947 m |
-| 5 | `improvement_replay_control` | `564a6bcc85c4f72f` | `1143` | `ready_for_continuation_improvement_replay` | 81.835 m | 6.818 m | +75.017 m | `linked_lane_chain` | 4/4 | 8.250 m |
+| 1 | `improvement_replay_control` | `937eb2fa17da45c0` | `979` | `ready_for_improvement_replay_with_horizon_caution` | 151.676 m | 10.354 m | +141.322 m | `linked_lane_chain` | 4/4 | 16.070 m |
+| 2 | `improvement_replay_control` | `a863e5638dfff0ca` | `1765` | `ready_for_improvement_replay_with_horizon_caution` | 144.122 m | 7.919 m | +136.203 m | `linked_lane_chain` | 4/4 | 15.483 m |
+| 3 | `improvement_replay_control` | `fc8c647623f81bb4` | `1466` | `ready_for_continuation_improvement_replay` | 144.514 m | 3.143 m | +141.371 m | `linked_lane_chain` | 4/4 | 16.047 m |
+| 4 | `improvement_replay_control` | `2f366a31ab03f8b` | `1059` | `ready_for_continuation_improvement_replay` | 148.345 m | 9.068 m | +139.277 m | `no_exit_lanes` | 4/4 | 16.874 m |
+| 5 | `improvement_replay_control` | `8807e9963f411c48` | `722` | `ready_for_continuation_improvement_replay` | 103.862 m | 3.700 m | +100.162 m | `linked_lane_chain` | 4/4 | 12.629 m |
 | 6 | `regression_replay_debug` | `260785192cf6c991` | `1754` | `ready_for_regression_replay_with_horizon_caution` | 22.573 m | 81.112 m | -58.539 m | `linked_lane_chain` | 4/4 | 5.178 m |
-| 7 | `regression_replay_debug` | `d8dde10f514a501c` | `651` | `ready_for_continuation_regression_replay` | 73.197 m | 104.290 m | -31.093 m | `linked_lane_chain` | 4/4 | 5.240 m |
-| 8 | `regression_replay_debug` | `e3f6a29b59e42c1` | `741` | `ready_for_continuation_regression_replay` | 15.869 m | 58.942 m | -43.073 m | `linked_lane_chain` | 4/4 | 9.947 m |
+| 7 | `regression_replay_debug` | `e3f6a29b59e42c1` | `741` | `ready_for_continuation_regression_replay` | 15.869 m | 58.942 m | -43.073 m | `linked_lane_chain` | 4/4 | 9.947 m |
+| 8 | `regression_replay_debug` | `d30709cd60e60395` | `164` | `ready_for_continuation_regression_replay` | 16.292 m | 52.496 m | -36.204 m | `linked_lane_chain` | 4/4 | 4.263 m |
 | 9 | `regression_replay_debug` | `5c49e681a66c720` | `2627` | `ready_for_continuation_regression_replay` | 4.595 m | 38.598 m | -34.003 m | `linked_lane_chain` | 4/4 | 6.084 m |
 | 10 | `regression_replay_debug` | `e9db41e904b349a2` | `406` | `ready_for_continuation_regression_replay` | 6.776 m | 38.292 m | -31.516 m | `linked_lane_chain` | 4/4 | 5.692 m |
 
@@ -57,11 +57,42 @@ Topology-audit candidates are re-probed as blockers instead of being treated as 
 
 | Rank | Scenario | Track | Link status | Link count | Nearest FDE | Lane-link FDE | First blocker |
 | ---: | --- | --- | --- | ---: | ---: | ---: | --- |
-| 11 | `fc8c647623f81bb4` | `1466` | `linked_feature_missing` | 0 | 144.514 m | 144.514 m | No usable parsed linked-lane chain is available yet. |
+| 11 | `6bdc7f92afefff73` | `59` | `linked_feature_missing` | 0 | 134.082 m | 134.082 m | No usable parsed linked-lane chain is available yet. |
 | 12 | `2f366a31ab03f8b` | `1061` | `no_exit_lanes` | 0 | 133.872 m | 133.872 m | No usable parsed linked-lane chain is available yet. |
-| 13 | `770fec53ec3e0395` | `1105` | `linked_feature_missing` | 0 | 131.434 m | 131.434 m | No usable parsed linked-lane chain is available yet. |
-| 14 | `c52455a0495c9bdb` | `1937` | `linked_feature_missing` | 0 | 121.451 m | 121.451 m | No usable parsed linked-lane chain is available yet. |
-| 15 | `c45b209a75ff4610` | `1815` | `linked_feature_missing` | 0 | 117.044 m | 117.044 m | No usable parsed linked-lane chain is available yet. |
+| 13 | `74a5b3325a534a87` | `3178` | `no_entry_lanes` | 0 | 88.934 m | 88.934 m | No usable parsed linked-lane chain is available yet. |
+| 14 | `2f035a284480e981` | `715` | `linked_feature_missing` | 0 | 58.747 m | 58.747 m | No usable parsed linked-lane chain is available yet. |
+| 15 | `4dfe7c285670839f` | `0` | `no_exit_lanes` | 0 | 51.637 m | 51.637 m | No usable parsed linked-lane chain is available yet. |
+
+## `937eb2fa17da45c0` / track `979`
+
+- Queue: `improvement_replay_control`
+- Readiness: `ready_for_improvement_replay_with_horizon_caution`
+- Source: `validation.tfrecord-00009-of-00150`
+- Result: **stable_improvement_control**
+- Why: Lane-link continuation improves the nearest-lane rollout for this replayed target.
+- Recommended next action: Use this as a positive control before tuning harder continuation regressions.
+- Feature chain: 312 -> 319 -> 246
+- Link status/count: `linked_lane_chain` / 2
+- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/1-improvement-replay-control-937eb2fa17da45c0-979/lane_continuation_replay_packet.json`
+
+Target replay row:
+
+| CV FDE | Nearest FDE | Heading FDE | Lane-link FDE | Link vs nearest | Link vs CV | Clamp after link |
+| ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| 13.028 m | 151.676 m | 151.676 m | 10.354 m | +141.322 m | +2.674 m | True |
+
+Perturbation trials:
+
+| Trial | Link vs nearest | Preserves expected sign | Nearest FDE | Lane-link FDE | Link status |
+| --- | ---: | --- | ---: | ---: | --- |
+| `speed_minus_10pct` | +125.252 m | True | 151.676 m | 26.424 m | `linked_lane_chain` |
+| `speed_plus_10pct` | +141.322 m | True | 151.676 m | 10.354 m | `linked_lane_chain` |
+| `heading_left_5deg` | +141.322 m | True | 151.676 m | 10.354 m | `linked_lane_chain` |
+| `heading_right_5deg` | +141.322 m | True | 151.676 m | 10.354 m | `linked_lane_chain` |
+
+Blockers / cautions:
+- The target still out-travels the linked lane chain within the prediction horizon.
+- Raw Waymo TFRecords and local replay packets must stay ignored.
 
 ## `a863e5638dfff0ca` / track `1765`
 
@@ -73,7 +104,7 @@ Topology-audit candidates are re-probed as blockers instead of being treated as 
 - Recommended next action: Use this as a positive control before tuning harder continuation regressions.
 - Feature chain: 249 -> 244 -> 275
 - Link status/count: `linked_lane_chain` / 2
-- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/1-improvement-replay-control-a863e5638dfff0ca-1765/lane_continuation_replay_packet.json`
+- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/2-improvement-replay-control-a863e5638dfff0ca-1765/lane_continuation_replay_packet.json`
 
 Target replay row:
 
@@ -94,6 +125,36 @@ Blockers / cautions:
 - The target still out-travels the linked lane chain within the prediction horizon.
 - Raw Waymo TFRecords and local replay packets must stay ignored.
 
+## `fc8c647623f81bb4` / track `1466`
+
+- Queue: `improvement_replay_control`
+- Readiness: `ready_for_continuation_improvement_replay`
+- Source: `validation.tfrecord-00009-of-00150`
+- Result: **stable_improvement_control**
+- Why: Lane-link continuation improves the nearest-lane rollout for this replayed target.
+- Recommended next action: Use this as a positive control before tuning harder continuation regressions.
+- Feature chain: 153 -> 344 -> 343
+- Link status/count: `linked_lane_chain` / 2
+- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/3-improvement-replay-control-fc8c647623f81bb4-1466/lane_continuation_replay_packet.json`
+
+Target replay row:
+
+| CV FDE | Nearest FDE | Heading FDE | Lane-link FDE | Link vs nearest | Link vs CV | Clamp after link |
+| ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| 3.152 m | 144.514 m | 144.514 m | 3.143 m | +141.371 m | +0.009 m | False |
+
+Perturbation trials:
+
+| Trial | Link vs nearest | Preserves expected sign | Nearest FDE | Lane-link FDE | Link status |
+| --- | ---: | --- | ---: | ---: | --- |
+| `speed_minus_10pct` | +131.609 m | True | 144.514 m | 12.905 m | `linked_lane_chain` |
+| `speed_plus_10pct` | +125.324 m | True | 144.514 m | 19.190 m | `linked_lane_chain` |
+| `heading_left_5deg` | +141.371 m | True | 144.514 m | 3.143 m | `linked_lane_chain` |
+| `heading_right_5deg` | +141.371 m | True | 144.514 m | 3.143 m | `linked_lane_chain` |
+
+Blockers / cautions:
+- Raw Waymo TFRecords and local replay packets must stay ignored.
+
 ## `2f366a31ab03f8b` / track `1059`
 
 - Queue: `improvement_replay_control`
@@ -104,7 +165,7 @@ Blockers / cautions:
 - Recommended next action: Use this as a positive control before tuning harder continuation regressions.
 - Feature chain: 220 -> 210
 - Link status/count: `no_exit_lanes` / 1
-- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/2-improvement-replay-control-2f366a31ab03f8b-1059/lane_continuation_replay_packet.json`
+- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/4-improvement-replay-control-2f366a31ab03f8b-1059/lane_continuation_replay_packet.json`
 
 Target replay row:
 
@@ -124,93 +185,32 @@ Perturbation trials:
 Blockers / cautions:
 - Raw Waymo TFRecords and local replay packets must stay ignored.
 
-## `65d7afd24453a1ba` / track `510`
-
-- Queue: `improvement_replay_control`
-- Readiness: `ready_for_improvement_replay_with_horizon_caution`
-- Source: `validation.tfrecord-00008-of-00150`
-- Result: **stable_improvement_control**
-- Why: Lane-link continuation improves the nearest-lane rollout for this replayed target.
-- Recommended next action: Use this as a positive control before tuning harder continuation regressions.
-- Feature chain: 159 -> 146 -> 140
-- Link status/count: `linked_lane_chain` / 2
-- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/3-improvement-replay-control-65d7afd24453a1ba-510/lane_continuation_replay_packet.json`
-
-Target replay row:
-
-| CV FDE | Nearest FDE | Heading FDE | Lane-link FDE | Link vs nearest | Link vs CV | Clamp after link |
-| ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| 6.452 m | 90.668 m | 90.668 m | 5.454 m | +85.214 m | +0.998 m | True |
-
-Perturbation trials:
-
-| Trial | Link vs nearest | Preserves expected sign | Nearest FDE | Lane-link FDE | Link status |
-| --- | ---: | --- | ---: | ---: | --- |
-| `speed_minus_10pct` | +86.605 m | True | 90.668 m | 4.063 m | `linked_lane_chain` |
-| `speed_plus_10pct` | +85.214 m | True | 90.668 m | 5.454 m | `linked_lane_chain` |
-| `heading_left_5deg` | +85.214 m | True | 90.668 m | 5.454 m | `linked_lane_chain` |
-| `heading_right_5deg` | +85.214 m | True | 90.668 m | 5.454 m | `linked_lane_chain` |
-
-Blockers / cautions:
-- The target still out-travels the linked lane chain within the prediction horizon.
-- Raw Waymo TFRecords and local replay packets must stay ignored.
-
-## `77c44d1768793143` / track `34`
+## `8807e9963f411c48` / track `722`
 
 - Queue: `improvement_replay_control`
 - Readiness: `ready_for_continuation_improvement_replay`
-- Source: `validation.tfrecord-00007-of-00150`
+- Source: `validation.tfrecord-00009-of-00150`
 - Result: **stable_improvement_control**
 - Why: Lane-link continuation improves the nearest-lane rollout for this replayed target.
 - Recommended next action: Use this as a positive control before tuning harder continuation regressions.
-- Feature chain: 176 -> 164 -> 148
+- Feature chain: 337 -> 559 -> 553
 - Link status/count: `linked_lane_chain` / 2
-- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/4-improvement-replay-control-77c44d1768793143-34/lane_continuation_replay_packet.json`
+- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/5-improvement-replay-control-8807e9963f411c48-722/lane_continuation_replay_packet.json`
 
 Target replay row:
 
 | CV FDE | Nearest FDE | Heading FDE | Lane-link FDE | Link vs nearest | Link vs CV | Clamp after link |
 | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| 8.927 m | 87.044 m | 87.044 m | 3.732 m | +83.312 m | +5.195 m | False |
+| 4.193 m | 103.862 m | 103.862 m | 3.700 m | +100.162 m | +0.493 m | False |
 
 Perturbation trials:
 
 | Trial | Link vs nearest | Preserves expected sign | Nearest FDE | Lane-link FDE | Link status |
 | --- | ---: | --- | ---: | ---: | --- |
-| `speed_minus_10pct` | +73.365 m | True | 87.044 m | 13.679 m | `linked_lane_chain` |
-| `speed_plus_10pct` | +80.814 m | True | 87.044 m | 6.230 m | `linked_lane_chain` |
-| `heading_left_5deg` | +83.312 m | True | 87.044 m | 3.732 m | `linked_lane_chain` |
-| `heading_right_5deg` | +83.312 m | True | 87.044 m | 3.732 m | `linked_lane_chain` |
-
-Blockers / cautions:
-- Raw Waymo TFRecords and local replay packets must stay ignored.
-
-## `564a6bcc85c4f72f` / track `1143`
-
-- Queue: `improvement_replay_control`
-- Readiness: `ready_for_continuation_improvement_replay`
-- Source: `validation.tfrecord-00008-of-00150`
-- Result: **stable_improvement_control**
-- Why: Lane-link continuation improves the nearest-lane rollout for this replayed target.
-- Recommended next action: Use this as a positive control before tuning harder continuation regressions.
-- Feature chain: 167 -> 173 -> 255
-- Link status/count: `linked_lane_chain` / 2
-- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/5-improvement-replay-control-564a6bcc85c4f72f-1143/lane_continuation_replay_packet.json`
-
-Target replay row:
-
-| CV FDE | Nearest FDE | Heading FDE | Lane-link FDE | Link vs nearest | Link vs CV | Clamp after link |
-| ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| 6.816 m | 81.835 m | 81.835 m | 6.818 m | +75.017 m | -0.002 m | False |
-
-Perturbation trials:
-
-| Trial | Link vs nearest | Preserves expected sign | Nearest FDE | Lane-link FDE | Link status |
-| --- | ---: | --- | ---: | ---: | --- |
-| `speed_minus_10pct` | +66.767 m | True | 81.835 m | 15.068 m | `linked_lane_chain` |
-| `speed_plus_10pct` | +77.895 m | True | 81.835 m | 3.940 m | `linked_lane_chain` |
-| `heading_left_5deg` | +75.017 m | True | 81.835 m | 6.818 m | `linked_lane_chain` |
-| `heading_right_5deg` | +75.017 m | True | 81.835 m | 6.818 m | `linked_lane_chain` |
+| `speed_minus_10pct` | +94.851 m | True | 103.862 m | 9.011 m | `linked_lane_chain` |
+| `speed_plus_10pct` | +87.533 m | True | 103.862 m | 16.329 m | `linked_lane_chain` |
+| `heading_left_5deg` | +100.162 m | True | 103.862 m | 3.700 m | `linked_lane_chain` |
+| `heading_right_5deg` | +100.162 m | True | 103.862 m | 3.700 m | `linked_lane_chain` |
 
 Blockers / cautions:
 - Raw Waymo TFRecords and local replay packets must stay ignored.
@@ -246,36 +246,6 @@ Blockers / cautions:
 - The target still out-travels the linked lane chain within the prediction horizon.
 - Raw Waymo TFRecords and local replay packets must stay ignored.
 
-## `d8dde10f514a501c` / track `651`
-
-- Queue: `regression_replay_debug`
-- Readiness: `ready_for_continuation_regression_replay`
-- Source: `validation.tfrecord-00010-of-00150`
-- Result: **stable_regression_debug**
-- Why: Lane-link continuation remains worse than nearest-lane for this replayed target.
-- Recommended next action: Inspect route choice, lane geometry, and future intent before changing the selector.
-- Feature chain: 134 -> 143 -> 146
-- Link status/count: `linked_lane_chain` / 2
-- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/7-regression-replay-debug-d8dde10f514a501c-651/lane_continuation_replay_packet.json`
-
-Target replay row:
-
-| CV FDE | Nearest FDE | Heading FDE | Lane-link FDE | Link vs nearest | Link vs CV | Clamp after link |
-| ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| 57.742 m | 73.197 m | 73.197 m | 104.290 m | -31.093 m | -46.548 m | False |
-
-Perturbation trials:
-
-| Trial | Link vs nearest | Preserves expected sign | Nearest FDE | Lane-link FDE | Link status |
-| --- | ---: | --- | ---: | ---: | --- |
-| `speed_minus_10pct` | -25.853 m | True | 73.197 m | 99.050 m | `linked_lane_chain` |
-| `speed_plus_10pct` | -36.333 m | True | 73.197 m | 109.530 m | `linked_lane_chain` |
-| `heading_left_5deg` | -31.093 m | True | 73.197 m | 104.290 m | `linked_lane_chain` |
-| `heading_right_5deg` | -31.093 m | True | 73.197 m | 104.290 m | `linked_lane_chain` |
-
-Blockers / cautions:
-- Raw Waymo TFRecords and local replay packets must stay ignored.
-
 ## `e3f6a29b59e42c1` / track `741`
 
 - Queue: `regression_replay_debug`
@@ -286,7 +256,7 @@ Blockers / cautions:
 - Recommended next action: Inspect route choice, lane geometry, and future intent before changing the selector.
 - Feature chain: 161 -> 127 -> 116
 - Link status/count: `linked_lane_chain` / 2
-- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/8-regression-replay-debug-e3f6a29b59e42c1-741/lane_continuation_replay_packet.json`
+- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/7-regression-replay-debug-e3f6a29b59e42c1-741/lane_continuation_replay_packet.json`
 
 Target replay row:
 
@@ -302,6 +272,36 @@ Perturbation trials:
 | `speed_plus_10pct` | -53.019 m | True | 15.869 m | 68.888 m | `linked_lane_chain` |
 | `heading_left_5deg` | -43.073 m | True | 15.869 m | 58.942 m | `linked_lane_chain` |
 | `heading_right_5deg` | -43.073 m | True | 15.869 m | 58.942 m | `linked_lane_chain` |
+
+Blockers / cautions:
+- Raw Waymo TFRecords and local replay packets must stay ignored.
+
+## `d30709cd60e60395` / track `164`
+
+- Queue: `regression_replay_debug`
+- Readiness: `ready_for_continuation_regression_replay`
+- Source: `validation.tfrecord-00007-of-00150`
+- Result: **stable_regression_debug**
+- Why: Lane-link continuation remains worse than nearest-lane for this replayed target.
+- Recommended next action: Inspect route choice, lane geometry, and future intent before changing the selector.
+- Feature chain: 603 -> 610 -> 371
+- Link status/count: `linked_lane_chain` / 2
+- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/8-regression-replay-debug-d30709cd60e60395-164/lane_continuation_replay_packet.json`
+
+Target replay row:
+
+| CV FDE | Nearest FDE | Heading FDE | Lane-link FDE | Link vs nearest | Link vs CV | Clamp after link |
+| ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| 61.024 m | 16.292 m | 16.292 m | 52.496 m | -36.204 m | +8.528 m | False |
+
+Perturbation trials:
+
+| Trial | Link vs nearest | Preserves expected sign | Nearest FDE | Lane-link FDE | Link status |
+| --- | ---: | --- | ---: | ---: | --- |
+| `speed_minus_10pct` | -32.143 m | True | 16.292 m | 48.435 m | `linked_lane_chain` |
+| `speed_plus_10pct` | -40.467 m | True | 16.292 m | 56.759 m | `linked_lane_chain` |
+| `heading_left_5deg` | -36.204 m | True | 16.292 m | 52.496 m | `linked_lane_chain` |
+| `heading_right_5deg` | -36.204 m | True | 16.292 m | 52.496 m | `linked_lane_chain` |
 
 Blockers / cautions:
 - Raw Waymo TFRecords and local replay packets must stay ignored.
@@ -366,7 +366,7 @@ Perturbation trials:
 Blockers / cautions:
 - Raw Waymo TFRecords and local replay packets must stay ignored.
 
-## `fc8c647623f81bb4` / track `1466`
+## `6bdc7f92afefff73` / track `59`
 
 - Queue: `topology_audit`
 - Readiness: `needs_topology_audit`
@@ -374,15 +374,15 @@ Blockers / cautions:
 - Result: **topology_blocker**
 - Why: The selected feature still lacks a usable linked-lane chain.
 - Recommended next action: Audit parsed lane links, map-feature caps, and link direction before replaying this case.
-- Feature chain: 153
+- Feature chain: 1056
 - Link status/count: `linked_feature_missing` / 0
-- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/11-topology-audit-fc8c647623f81bb4-1466/lane_continuation_replay_packet.json`
+- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/11-topology-audit-6bdc7f92afefff73-59/lane_continuation_replay_packet.json`
 
 Target replay row:
 
 | CV FDE | Nearest FDE | Heading FDE | Lane-link FDE | Link vs nearest | Link vs CV | Clamp after link |
 | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| 3.152 m | 144.514 m | 144.514 m | 144.514 m | 0.000 m | -141.362 m | True |
+| 15.263 m | 134.082 m | 134.082 m | 134.082 m | 0.000 m | -118.819 m | True |
 
 Blockers / cautions:
 - No usable parsed linked-lane chain is available yet.
@@ -412,69 +412,69 @@ Blockers / cautions:
 - The target still out-travels the linked lane chain within the prediction horizon.
 - Raw Waymo TFRecords and local replay packets must stay ignored.
 
-## `770fec53ec3e0395` / track `1105`
+## `74a5b3325a534a87` / track `3178`
 
 - Queue: `topology_audit`
 - Readiness: `needs_topology_audit`
-- Source: `validation.tfrecord-00007-of-00150`
+- Source: `validation.tfrecord-00010-of-00150`
 - Result: **topology_blocker**
 - Why: The selected feature still lacks a usable linked-lane chain.
 - Recommended next action: Audit parsed lane links, map-feature caps, and link direction before replaying this case.
-- Feature chain: 306
-- Link status/count: `linked_feature_missing` / 0
-- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/13-topology-audit-770fec53ec3e0395-1105/lane_continuation_replay_packet.json`
+- Feature chain: 333
+- Link status/count: `no_entry_lanes` / 0
+- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/13-topology-audit-74a5b3325a534a87-3178/lane_continuation_replay_packet.json`
 
 Target replay row:
 
 | CV FDE | Nearest FDE | Heading FDE | Lane-link FDE | Link vs nearest | Link vs CV | Clamp after link |
 | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| 14.075 m | 131.434 m | 131.434 m | 131.434 m | 0.000 m | -117.359 m | True |
+| 56.254 m | 88.934 m | 88.934 m | 88.934 m | 0.000 m | -32.680 m | True |
 
 Blockers / cautions:
 - No usable parsed linked-lane chain is available yet.
 - The target still out-travels the linked lane chain within the prediction horizon.
 - Raw Waymo TFRecords and local replay packets must stay ignored.
 
-## `c52455a0495c9bdb` / track `1937`
+## `2f035a284480e981` / track `715`
 
 - Queue: `topology_audit`
 - Readiness: `needs_topology_audit`
-- Source: `validation.tfrecord-00007-of-00150`
+- Source: `validation.tfrecord-00010-of-00150`
 - Result: **topology_blocker**
 - Why: The selected feature still lacks a usable linked-lane chain.
 - Recommended next action: Audit parsed lane links, map-feature caps, and link direction before replaying this case.
-- Feature chain: 295
+- Feature chain: 513
 - Link status/count: `linked_feature_missing` / 0
-- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/14-topology-audit-c52455a0495c9bdb-1937/lane_continuation_replay_packet.json`
+- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/14-topology-audit-2f035a284480e981-715/lane_continuation_replay_packet.json`
 
 Target replay row:
 
 | CV FDE | Nearest FDE | Heading FDE | Lane-link FDE | Link vs nearest | Link vs CV | Clamp after link |
 | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| 14.497 m | 121.451 m | 121.451 m | 121.451 m | 0.000 m | -106.954 m | True |
+| 22.381 m | 58.747 m | 58.747 m | 58.747 m | 0.000 m | -36.366 m | True |
 
 Blockers / cautions:
 - No usable parsed linked-lane chain is available yet.
 - The target still out-travels the linked lane chain within the prediction horizon.
 - Raw Waymo TFRecords and local replay packets must stay ignored.
 
-## `c45b209a75ff4610` / track `1815`
+## `4dfe7c285670839f` / track `0`
 
 - Queue: `topology_audit`
 - Readiness: `needs_topology_audit`
-- Source: `validation.tfrecord-00009-of-00150`
+- Source: `validation.tfrecord-00008-of-00150`
 - Result: **topology_blocker**
 - Why: The selected feature still lacks a usable linked-lane chain.
 - Recommended next action: Audit parsed lane links, map-feature caps, and link direction before replaying this case.
-- Feature chain: 248
-- Link status/count: `linked_feature_missing` / 0
-- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/15-topology-audit-c45b209a75ff4610-1815/lane_continuation_replay_packet.json`
+- Feature chain: 44
+- Link status/count: `no_exit_lanes` / 0
+- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/15-topology-audit-4dfe7c285670839f-0/lane_continuation_replay_packet.json`
 
 Target replay row:
 
 | CV FDE | Nearest FDE | Heading FDE | Lane-link FDE | Link vs nearest | Link vs CV | Clamp after link |
 | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| 37.477 m | 117.044 m | 117.044 m | 117.044 m | 0.000 m | -79.567 m | True |
+| 17.949 m | 51.637 m | 51.637 m | 51.637 m | 0.000 m | -33.688 m | True |
 
 Blockers / cautions:
 - No usable parsed linked-lane chain is available yet.

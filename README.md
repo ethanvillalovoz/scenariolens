@@ -233,9 +233,10 @@ smoke test. The prototype can:
 - run a lane-link continuation prototype that proves the linked-lane follow-up
   on a deterministic fixture, resolves the real warning's parsed lane chain,
   and cuts nearest-lane FDE by 63.578 m on that stable case,
-- scan the same 100-scenario local Waymo slice for 178 lane-continuation
-  candidates, where linked lanes improve 96 targets and expose 47 regressions
-  plus 33 topology gaps for follow-up audits,
+- scan the same 100-scenario local Waymo slice for 209 lane-continuation
+  candidates after linked-lane closure materialization, where linked lanes
+  improve 133 targets and expose 57 regressions plus 17 topology gaps for
+  follow-up audits,
 - turn those continuation-study rows into 15 replay/audit candidates: 5
   improvement controls, 5 regression debug targets, and 5 topology-audit
   blockers,
@@ -243,33 +244,34 @@ smoke test. The prototype can:
   prototype: 10 target-track replays, 40 deterministic perturbation trials,
   100% sign preservation, and 5 confirmed topology blockers,
 - classify those replayed continuation cases into route/topology follow-up
-  buckets: 3 stable route-choice regressions, 1 horizon-limit case, 1
-  link-worse-than-constant-velocity case, and 5 topology blockers,
+  buckets: 4 stable route-choice regressions, 1 horizon-limit case, 0
+  link-worse-than-constant-velocity cases, and 5 topology blockers,
 - sweep parsed branch alternatives for the 5 continuation regression
-  diagnostics, finding 2 branchable cases, 3 single-chain cases, 2
-  motion-context improvements, and 2 oracle upper-bound improvements while
+  diagnostics, finding 3 branchable cases, 2 single-chain cases, 2
+  motion-context improvements, and 3 oracle upper-bound improvements while
   keeping the anchor-heading selector honest at 0 improvements,
 - replay those 2 motion-context branch choices under 8 deterministic
   perturbations, preserving the selected branch in 8/8 trials and positive
-  recoverable FDE in 7/8 trials, with 1 branch accepted for broader selector
-  evaluation and 1 route-context margin follow-up at -0.443 m,
+  recoverable FDE in 8/8 trials, with 2 branches accepted for broader selector
+  evaluation and 0 route-context margin follow-ups,
 - test an experimental history-speed-prior replay score on the same branch
-  cases, showing that simple speed smoothing does not resolve the margin
-  follow-up and that richer route context is the better next target,
-- add a route-context margin diagnostic for the unresolved branch case,
-  identifying a speed-minus robustness gap, oracle-matched branch choice,
-  and route-feature deltas to guide the next selector iteration,
-- turn branch replay evidence into a conservative rollout gate with 1 promote
-  candidate and 1 route-context hold,
-- test a stricter route-context promotion guard that promotes the robust branch,
-  holds the speed-minus margin case, and matches the current replay gate on
-  both branchable cases,
+  cases, showing that both accepted branches remain stable under the speed
+  prior and leaving guard calibration as the better next target,
+- retain route-context diagnostics for replay/guard disagreement, using
+  selected-vs-default route-feature deltas to guide the next selector
+  calibration pass,
+- turn branch replay evidence into a conservative rollout gate with 2 promoted
+  candidates and 0 route-context holds,
+- test a stricter route-context promotion guard that promotes 1 robust branch,
+  holds 1 accepted replay candidate for route-feature follow-up, and reports 1
+  replay-gate match plus 1 false hold for calibration,
 - audit the continuation-to-branch funnel across 15 real-data candidates,
-  showing 2 branchable cases, 1 guarded promotion, 5 topology blockers, and
-  9 concrete expansion items for the next v1.0 branch queue,
+  showing 3 branchable cases, 1 guarded promotion, 5 topology blockers, and
+  8 concrete expansion items for the next v1.0 branch queue,
 - audit the topology blockers by comparing capped ScenarioLens map features
-  with raw parsed map-feature IDs, showing 4 of 5 blocker cases are
-  cap-recoverable and 1 lane is a confirmed terminal case,
+  with raw parsed map-feature IDs, showing 2 blocker cases remain
+  cap-recoverable and 3 lanes are terminal or directional-link cases after
+  closure materialization,
 - expose public-safe heading-aware improvement, regression, and fallback-heavy
   cases in the live Scenario Explorer,
 - turn heading-aware debug cases into a replay-readiness queue for the next
@@ -281,9 +283,9 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to materialize linked-lane closure features before
-applying the ScenarioLens map-feature cap, then rerun continuation replay,
-branch coverage, and route-context guard checks on the expanded candidate queue.
+The next milestone is to audit the remaining terminal/directional topology
+cases, calibrate the conservative route-context guard false hold, and expand the
+closure-enabled branch queue beyond the current 100-scenario slice.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).

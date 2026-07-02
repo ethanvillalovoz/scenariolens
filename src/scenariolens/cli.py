@@ -1088,6 +1088,7 @@ def lane_continuation_topology_gap_audit_command(
         return 2
     print(
         f"Generated topology gap audit for {result.case_count} case(s): "
+        f"{result.cap_recovered_count} recovered case(s), "
         f"{result.cap_recoverable_count} cap-recoverable case(s), "
         f"{result.terminal_confirmed_count} terminal confirmation(s)."
     )

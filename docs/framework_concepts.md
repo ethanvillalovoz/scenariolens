@@ -122,45 +122,40 @@ The branch replay diagnostic is the stability layer after branch selection. It
 reloads the motion-context-improved branch cases, applies the same deterministic
 anchor perturbations used elsewhere in ScenarioLens, and checks whether the
 selected branch and positive recoverable FDE survive. The current real-data
-run preserves the branch in 8/8 perturbation trials and positive gain in 7/8.
-Its acceptance gate marks one branch ready for broader selector evaluation and
-one branch as a route-context margin follow-up with a -0.443 m worst-case
-margin. The experimental history-speed-prior replay score keeps the same
-accepted-case count and does not resolve that margin follow-up, which points
-the next iteration toward richer route context instead of speed smoothing alone.
-The route-context margin diagnostic then labels the unresolved case as a
-`speed_minus_route_context_margin` target and publishes selected-vs-default
-route feature deltas for the next selector iteration.
+run preserves the branch in 8/8 perturbation trials and positive gain in 8/8.
+Its acceptance gate marks both replayed branches ready for broader selector
+evaluation, with a +28.627 m minimum robustness margin. The experimental
+history-speed-prior replay score preserves both accepted cases and leaves no
+speed-prior margin target unresolved, so the next iteration moves to guard
+calibration and larger branchable queues.
 
 The branch rollout gate is the triage layer after replay. It does not change
 the selector or claim production readiness; it turns replay outcomes into a
-public-safe promote/hold queue. The current real-data report promotes 1 branch
-for broader selector evaluation and holds 1 route-context margin case with a
-named next action, making the diagnostic feel closer to an autonomy evaluation
-workflow.
+public-safe promote/hold queue. The current real-data report promotes 2
+branches for broader selector evaluation and holds 0 route-context margin cases,
+making the diagnostic feel closer to an autonomy evaluation workflow.
 
-The route-context guard study is the first follow-up policy experiment for that
-hold. It keeps the existing selector unchanged, then tests a stricter
+The route-context guard study is the conservative policy layer after branch
+replay. It keeps the existing selector unchanged, then tests a stricter
 non-oracle promotion guard using route-fit, endpoint-alignment, and downstream
-speed-limit deltas from branch selection. On the current 2-case branchable
-queue it promotes the robust branch, holds the `speed_minus_route_context_margin`
-case, and matches the replay gate on both cases.
+speed-limit deltas from branch selection. On the current 2-case replay queue it
+promotes 1 robust branch, holds 1 accepted replay candidate for route-feature
+follow-up, and exposes 1 false hold for calibration.
 
 The branch coverage audit is the planning layer after the guard. It joins the
 continuation candidate plan, replay prototype, route diagnostics, branch
 selection, branch replay, and route-context guard manifests into one funnel.
 The current real-data audit shows why the next milestone is not "ship the
-selector": from 15 continuation candidates, only 2 are branchable today and 1
-passes the strict route guard. It also names 5 topology blockers, 3 single-chain
-branch-expansion targets, and the held route-context margin case as the next
-expansion queue.
+selector": from 15 continuation candidates, 3 are branchable today and 1 passes
+the strict route guard. It also names 5 topology blockers, 2 single-chain
+branch-expansion targets, and the guard false hold as the next expansion queue.
 
-The topology gap audit turns the largest branch-coverage blocker into a concrete
-ingestion task. It reloads the 5 replay topology blockers, compares the capped
-ScenarioLens map-feature set with raw parsed map-feature IDs, and shows that 4
-blocker cases have linked-lane targets beyond the current feature cap while 1
-lane is a confirmed terminal case. The next implementation target is therefore
-map-feature closure materialization, not a broader selector rewrite.
+The topology gap audit now measures what remains after linked-lane closure
+materialization. The ingestion layer preserves the first 240 map features and
+adds a bounded two-hop closure set for referenced lane links, cutting study
+topology gaps from 33 to 17. The remaining top replay blockers are 2
+cap-recoverable cases and 3 terminal or directional-link cases, so the next work
+is selected-lane neighborhood analysis rather than a simple cap increase.
 
 ## Map-Match Audit
 
@@ -191,9 +186,10 @@ and links to the public reports.
 - Add a dataset adapter for another public motion dataset.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
-- Materialize linked-lane closure features before applying the map-feature cap,
-  then rerun continuation replay, branch coverage, and route-context guard checks
-  across a larger branchable queue.
+- Audit terminal/directional topology cases and selected-lane neighborhoods.
+- Calibrate the route-context guard false hold against accepted branch replay
+  evidence.
+- Rerun the closure-enabled branch queue across more validation shards.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.
 - Analyze heading-aware replay stability across more validation shards.

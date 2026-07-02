@@ -67,8 +67,9 @@ mechanism on a deterministic linked-lane fixture and resolves the real stable
 warning's parsed lane chain `144 -> 190 -> 193`, cutting the clamped
 nearest-lane FDE by 63.578 m on that case.
 The lane-continuation validation study then scans the same 100-scenario local
-Waymo slice and finds 178 lane-end clamp candidates: 96 improve with linked
-lanes, 47 regress, and 33 remain topology gaps.
+Waymo slice and finds 209 lane-end clamp candidates after linked-lane closure
+materialization: 133 improve with linked lanes, 57 regress, and 17 remain
+topology gaps.
 The candidate plan then promotes 15 rows into concrete follow-up queues: five
 replay controls, five regression debug targets, and five topology-audit
 blockers.
@@ -88,34 +89,27 @@ downstream speed limits can recover some branch-choice error without using the
 observed future trajectory.
 The follow-up branch replay diagnostic then replays those two motion-context
 branch choices under eight deterministic perturbations. The selected branch is
-preserved in all eight trials, positive recoverable FDE holds in seven, one
-branch is accepted for broader selector evaluation, and the smaller-gain case
-becomes a route-context margin target with a -0.443 m worst-case margin. A
-simple history-speed-prior replay ablation does not clear that target, which
-keeps the next step focused on route context instead of claiming that speed
-smoothing solved the issue. The latest route-context margin diagnostic labels
-the case as `speed_minus_route_context_margin` and exposes the
-selected-vs-default route deltas that should drive the next selector
-experiment.
+preserved in all eight trials, positive recoverable FDE holds in all eight
+trials, both branches are accepted for broader selector evaluation, and the
+minimum robustness margin is +28.627 m. A simple history-speed-prior replay
+ablation preserves both accepted cases, so the next step is guard calibration
+and broader branchable coverage rather than speed smoothing.
 The branch rollout gate then converts those replay outcomes into a
-release-style promote/hold queue: one branch is promoted for broader selector
-evaluation, while the speed-minus margin case is held for route-context work.
-The route-context guard study tests a stricter non-oracle promotion policy over
-the same two branchable cases. It promotes the robust branch, holds the
-speed-minus margin case because endpoint-alignment and downstream speed-limit
-guardrails fire, and matches the replay gate on both cases.
-The branch coverage audit then zooms out from the two branchable cases and
-turns the limitation into a measurable expansion queue: 15 continuation
-candidates, 10 replay-ready candidates, 5 branch-selection cases, 2 branchable
-cases, 1 route-guard promotion, 5 topology blockers, and 9 named expansion
-items.
+release-style promote/hold queue: both replayed motion-context branches are
+promoted for broader selector evaluation. The stricter route-context guard stays
+more conservative: it promotes 1 branch, holds 1 accepted replay candidate for
+route-feature follow-up, and records that false hold as calibration evidence.
+The branch coverage audit then zooms out and turns the limitation into a
+measurable expansion queue: 15 continuation candidates, 10 replay-ready
+candidates, 5 branch-selection cases, 3 branchable cases, 1 route-guard
+promotion, 5 topology blockers, and 8 named expansion items.
 
-The topology gap audit follows the largest blocker class directly. It reloads
-the 5 topology blockers and compares the capped ScenarioLens map features with
-raw parsed map-feature IDs. Four blocker cases have linked-lane targets present
-beyond the current feature cap, one selected lane is terminal, and no raw target
-miss remains unexplained. That turns the next step into a concrete ingestion fix:
-carry linked-lane closure features through the cap before rerunning replay.
+The topology gap audit follows the largest blocker class directly. After
+linked-lane closure materialization, the 100-scenario study now finds 209
+lane-continuation candidates, 133 linked-lane improvements, and 17 topology
+gaps. The top replay blockers are now 2 cap-recoverable cases and 3 terminal or
+directional-link cases with no raw target misses, turning the next step into
+selected-lane neighborhood and guard-calibration work.
 
 ## Why It Matters
 
@@ -126,7 +120,7 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Materialize linked-lane closure features before the map-feature cap, rerun
-continuation replay and branch coverage, then expose alternatives for the three
-single-chain branch-selection cases and add richer turn-lane, topology, and
-traffic-control context for the held branch.
+Audit the remaining terminal/directional topology cases, expose alternatives for
+the two single-chain branch-selection cases, calibrate the route-context guard
+false hold, and expand the closure-enabled branch queue beyond shards `00007`
+through `00010`.

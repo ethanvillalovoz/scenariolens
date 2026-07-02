@@ -46,6 +46,8 @@ NATIVE_SUPPORTED_INPUT_PATTERNS = tuple(
     sorted(NATIVE_SUPPORTED_SUFFIXES | {".tfrecord-*-of-*"})
 )
 MAX_MAP_FEATURES_PER_SCENARIO = 240
+MAX_LINK_CLOSURE_FEATURES_PER_SCENARIO = 120
+MAX_LINK_CLOSURE_HOPS = 2
 MAX_MAP_POINTS_PER_FEATURE = 80
 
 TRAFFIC_SIGNAL_STATE_NAMES = {
@@ -787,9 +789,61 @@ def _waymo_map_features(mapping: dict[str, Any]) -> list[dict[str, object]]:
         feature = _map_feature_from_mapping(item)
         if feature is not None:
             features.append(feature)
-        if len(features) >= MAX_MAP_FEATURES_PER_SCENARIO:
+    return _cap_map_features_with_lane_link_closure(features)
+
+
+def _cap_map_features_with_lane_link_closure(
+    features: list[dict[str, object]],
+) -> list[dict[str, object]]:
+    if len(features) <= MAX_MAP_FEATURES_PER_SCENARIO:
+        return features
+
+    primary = features[:MAX_MAP_FEATURES_PER_SCENARIO]
+    by_id = {
+        feature_id: feature
+        for feature in features
+        if (feature_id := _map_feature_id(feature)) is not None
+    }
+    selected_ids = {
+        feature_id
+        for feature in primary
+        if (feature_id := _map_feature_id(feature)) is not None
+    }
+    closure_features: list[dict[str, object]] = []
+    frontier = primary
+    for _ in range(MAX_LINK_CLOSURE_HOPS):
+        next_frontier: list[dict[str, object]] = []
+        for feature in frontier:
+            for target_id in _lane_link_target_ids(feature):
+                if target_id in selected_ids or target_id not in by_id:
+                    continue
+                linked_feature = by_id[target_id]
+                closure_features.append(linked_feature)
+                selected_ids.add(target_id)
+                next_frontier.append(linked_feature)
+                if len(closure_features) >= MAX_LINK_CLOSURE_FEATURES_PER_SCENARIO:
+                    return primary + closure_features
+        if not next_frontier:
             break
-    return features
+        frontier = next_frontier
+    if not closure_features:
+        return primary
+    return primary + closure_features
+
+
+def _map_feature_id(feature: dict[str, object]) -> str | None:
+    feature_id = feature.get("feature_id")
+    return str(feature_id) if feature_id is not None else None
+
+
+def _lane_link_target_ids(feature: dict[str, object]) -> tuple[str, ...]:
+    if feature.get("kind") != "lane":
+        return ()
+    targets: list[str] = []
+    for field_name in ("entry_lanes", "exit_lanes"):
+        for value in _as_list(feature.get(field_name)):
+            targets.append(str(value))
+    return tuple(targets)
 
 
 def _waymo_map_summary(map_features: list[dict[str, object]]) -> dict[str, object]:
@@ -819,6 +873,17 @@ def _waymo_map_summary(map_features: list[dict[str, object]]) -> dict[str, objec
 
     lane_count = kind_counts.get("lane", 0)
     route_link_count = entry_link_count + exit_link_count + neighbor_link_count
+    link_targets = {
+        target_id
+        for feature in map_features
+        if feature.get("kind") == "lane"
+        for target_id in _lane_link_target_ids(feature)
+    }
+    feature_ids = {
+        feature_id
+        for feature in map_features
+        if (feature_id := _map_feature_id(feature)) is not None
+    }
     return {
         "feature_count": len(map_features),
         "kind_counts": dict(sorted(kind_counts.items())),
@@ -830,6 +895,7 @@ def _waymo_map_summary(map_features: list[dict[str, object]]) -> dict[str, objec
         "exit_link_count": exit_link_count,
         "neighbor_link_count": neighbor_link_count,
         "route_link_count": route_link_count,
+        "materialized_link_target_count": len(link_targets & feature_ids),
         "has_route_context": route_link_count > 0,
     }
 

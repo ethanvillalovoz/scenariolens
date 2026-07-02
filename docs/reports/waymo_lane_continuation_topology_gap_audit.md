@@ -20,42 +20,43 @@ The report is intentionally narrow: it does not change the default baseline, doe
 | --- | ---: |
 | Cases audited | 5 |
 | Ready cases | 5 |
-| Cap-recoverable cases | 4 |
-| Terminal lanes confirmed | 1 |
+| Cap-recovered cases | 0 |
+| Still cap-recoverable cases | 2 |
+| Terminal lanes confirmed | 3 |
 | Raw target still missing | 0 |
 | Selected feature missing in capped map | 0 |
-| Capped maps at feature cap | 5 |
-| Mean route gap to horizon | +123.601 m |
+| Capped maps at feature cap | 4 |
+| Mean route gap to horizon | +85.774 m |
 
 ## Decisions
 
 | Rank | Scenario | Track | Status | Selected lane | Link field | Link targets | Raw lanes | Capped lanes | Diagnosis | First next action |
 | ---: | --- | --- | --- | --- | --- | --- | ---: | ---: | --- | --- |
-| 11 | `fc8c647623f81bb4` | `1466` | `linked_feature_missing` | `153` | `exit_lanes` | `344` | 211 | 148 | `cap_recoverable_link_target` | Materialize closure features referenced by selected lane links before applying the map-feature cap. |
+| 11 | `6bdc7f92afefff73` | `59` | `linked_feature_missing` | `1056` | `exit_lanes` | `1047` | 712 | 141 | `cap_recoverable_link_target` | Materialize closure features referenced by selected lane links before applying the map-feature cap. |
 | 12 | `2f366a31ab03f8b` | `1061` | `no_exit_lanes` | `219` | `exit_lanes` | none | 100 | 100 | `terminal_lane_confirmed` | Audit selected-lane quality and nearby alternate lanes before expanding branch selection. |
-| 13 | `770fec53ec3e0395` | `1105` | `linked_feature_missing` | `306` | `exit_lanes` | `336`, `335` | 231 | 141 | `cap_recoverable_link_target` | Materialize closure features referenced by selected lane links before applying the map-feature cap. |
-| 14 | `c52455a0495c9bdb` | `1937` | `linked_feature_missing` | `295` | `exit_lanes` | `811`, `823` | 484 | 87 | `cap_recoverable_link_target` | Materialize closure features referenced by selected lane links before applying the map-feature cap. |
-| 15 | `c45b209a75ff4610` | `1815` | `linked_feature_missing` | `248` | `exit_lanes` | `413` | 380 | 116 | `cap_recoverable_link_target` | Materialize closure features referenced by selected lane links before applying the map-feature cap. |
+| 13 | `74a5b3325a534a87` | `3178` | `no_entry_lanes` | `333` | `entry_lanes` | none | 395 | 177 | `terminal_lane_confirmed` | Audit selected-lane quality and nearby alternate lanes before expanding branch selection. |
+| 14 | `2f035a284480e981` | `715` | `linked_feature_missing` | `513` | `exit_lanes` | `326` | 402 | 143 | `cap_recoverable_link_target` | Materialize closure features referenced by selected lane links before applying the map-feature cap. |
+| 15 | `4dfe7c285670839f` | `0` | `no_exit_lanes` | `44` | `exit_lanes` | none | 58 | 58 | `terminal_lane_confirmed` | Audit selected-lane quality and nearby alternate lanes before expanding branch selection. |
 
-## `fc8c647623f81bb4` / track `1466`
+## `6bdc7f92afefff73` / track `59`
 
 - Source: `validation.tfrecord-00009-of-00150`
 - Diagnosis: **cap_recoverable_link_target**
-- Selected feature: `153`
+- Selected feature: `1056`
 - Link field: `exit_lanes`
 - Lane-link status: `linked_feature_missing`
-- Raw/capped map features: 363 / 240
-- Raw/capped lane features: 211 / 148
+- Raw/capped map features: 903 / 294
+- Raw/capped lane features: 712 / 141
 - Capped map at feature cap: True
-- Horizon / route remaining: 160.476 m / 12.820 m
-- Route gap to horizon: +147.656 m
+- Horizon / route remaining: 150.972 m / 1.793 m
+- Route gap to horizon: +149.179 m
 - Reason: At least one referenced link target exists in the raw parsed map but is absent from the capped ScenarioLens map feature set.
 
 Link target presence:
 
 | Target | In capped map | In raw map | Raw index | Beyond cap |
 | --- | --- | --- | ---: | --- |
-| `344` | False | True | 276 | True |
+| `1047` | False | True | 695 | True |
 
 Recommended next actions:
 - Materialize closure features referenced by selected lane links before applying the map-feature cap.
@@ -85,82 +86,81 @@ Recommended next actions:
 - Audit selected-lane quality and nearby alternate lanes before expanding branch selection.
 - Treat this as selected-lane/topology-neighborhood work, not a simple cap increase.
 
-## `770fec53ec3e0395` / track `1105`
+## `74a5b3325a534a87` / track `3178`
 
-- Source: `validation.tfrecord-00007-of-00150`
+- Source: `validation.tfrecord-00010-of-00150`
+- Diagnosis: **terminal_lane_confirmed**
+- Selected feature: `333`
+- Link field: `entry_lanes`
+- Lane-link status: `no_entry_lanes`
+- Raw/capped map features: 528 / 286
+- Raw/capped lane features: 395 / 177
+- Capped map at feature cap: True
+- Horizon / route remaining: 59.581 m / 23.515 m
+- Route gap to horizon: +36.066 m
+- Reason: The selected lane has no parsed continuation in either capped or raw parsed map features.
+
+Link target presence:
+
+| Target | In capped map | In raw map | Raw index | Beyond cap |
+| --- | --- | --- | ---: | --- |
+| n/a | n/a | n/a | n/a | n/a |
+
+Recommended next actions:
+- Audit selected-lane quality and nearby alternate lanes before expanding branch selection.
+- Treat this as selected-lane/topology-neighborhood work, not a simple cap increase.
+
+## `2f035a284480e981` / track `715`
+
+- Source: `validation.tfrecord-00010-of-00150`
 - Diagnosis: **cap_recoverable_link_target**
-- Selected feature: `306`
+- Selected feature: `513`
 - Link field: `exit_lanes`
 - Lane-link status: `linked_feature_missing`
-- Raw/capped map features: 379 / 240
-- Raw/capped lane features: 231 / 141
+- Raw/capped map features: 556 / 285
+- Raw/capped lane features: 402 / 143
 - Capped map at feature cap: True
-- Horizon / route remaining: 115.837 m / 0.000 m
-- Route gap to horizon: +115.837 m
+- Horizon / route remaining: 35.054 m / 0.000 m
+- Route gap to horizon: +35.054 m
 - Reason: At least one referenced link target exists in the raw parsed map but is absent from the capped ScenarioLens map feature set.
 
 Link target presence:
 
 | Target | In capped map | In raw map | Raw index | Beyond cap |
 | --- | --- | --- | ---: | --- |
-| `336` | False | True | 258 | True |
-| `335` | False | True | 257 | True |
+| `326` | False | True | 244 | True |
 
 Recommended next actions:
 - Materialize closure features referenced by selected lane links before applying the map-feature cap.
 - Rerun lane-continuation replay and branch coverage after link-closure loading.
 
-## `c52455a0495c9bdb` / track `1937`
+## `4dfe7c285670839f` / track `0`
 
-- Source: `validation.tfrecord-00007-of-00150`
-- Diagnosis: **cap_recoverable_link_target**
-- Selected feature: `295`
+- Source: `validation.tfrecord-00008-of-00150`
+- Diagnosis: **terminal_lane_confirmed**
+- Selected feature: `44`
 - Link field: `exit_lanes`
-- Lane-link status: `linked_feature_missing`
-- Raw/capped map features: 727 / 240
-- Raw/capped lane features: 484 / 87
-- Capped map at feature cap: True
-- Horizon / route remaining: 142.662 m / 6.738 m
-- Route gap to horizon: +135.924 m
-- Reason: At least one referenced link target exists in the raw parsed map but is absent from the capped ScenarioLens map feature set.
+- Lane-link status: `no_exit_lanes`
+- Raw/capped map features: 108 / 108
+- Raw/capped lane features: 58 / 58
+- Capped map at feature cap: False
+- Horizon / route remaining: 85.416 m / 15.863 m
+- Route gap to horizon: +69.553 m
+- Reason: The selected lane has no parsed continuation in either capped or raw parsed map features.
 
 Link target presence:
 
 | Target | In capped map | In raw map | Raw index | Beyond cap |
 | --- | --- | --- | ---: | --- |
-| `811` | False | True | 570 | True |
-| `823` | False | True | 582 | True |
+| n/a | n/a | n/a | n/a | n/a |
 
 Recommended next actions:
-- Materialize closure features referenced by selected lane links before applying the map-feature cap.
-- Rerun lane-continuation replay and branch coverage after link-closure loading.
-
-## `c45b209a75ff4610` / track `1815`
-
-- Source: `validation.tfrecord-00009-of-00150`
-- Diagnosis: **cap_recoverable_link_target**
-- Selected feature: `248`
-- Link field: `exit_lanes`
-- Lane-link status: `linked_feature_missing`
-- Raw/capped map features: 573 / 240
-- Raw/capped lane features: 380 / 116
-- Capped map at feature cap: True
-- Horizon / route remaining: 93.731 m / 14.162 m
-- Route gap to horizon: +79.569 m
-- Reason: At least one referenced link target exists in the raw parsed map but is absent from the capped ScenarioLens map feature set.
-
-Link target presence:
-
-| Target | In capped map | In raw map | Raw index | Beyond cap |
-| --- | --- | --- | ---: | --- |
-| `413` | False | True | 331 | True |
-
-Recommended next actions:
-- Materialize closure features referenced by selected lane links before applying the map-feature cap.
-- Rerun lane-continuation replay and branch coverage after link-closure loading.
+- Audit selected-lane quality and nearby alternate lanes before expanding branch selection.
+- Treat this as selected-lane/topology-neighborhood work, not a simple cap increase.
 
 ## Interpretation
 
+- Cap-recovered cases mean a referenced lane target from beyond the raw feature cap is now available in the capped ScenarioLens map feature set.
 - Cap-recoverable cases mean the referenced lane target exists in the raw parsed map but was not available inside the capped ScenarioLens map feature set.
 - Terminal-lane confirmations mean the selected lane has no parsed continuation in either the capped or raw parsed map; these need selected-lane or topology-neighborhood work rather than a simple cap increase.
 - Raw-missing targets stay parser/proto-source audits until the referenced id can be found.

@@ -385,6 +385,8 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 
 - Expand the documented local-slice recipe across more Waymo Motion validation shards.
 - Compare baseline ADE/FDE distributions across more validation shards.
-- Materialize linked-lane closure features before applying the map-feature cap, then rerun continuation replay, branch coverage, and route-context guard checks on the expanded branchable queue.
+- Audit the remaining terminal/directional topology cases and selected-lane neighborhoods.
+- Calibrate the route-context guard false hold against accepted branch replay evidence.
+- Expand the closure-enabled branch queue beyond the current 100-scenario slice.
 - Graduate stable open-loop replay candidates into an optional Waymax/JAX path.
 - Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.

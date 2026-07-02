@@ -57,7 +57,8 @@ system. It should include:
 The current prototype already includes the reproducible pipeline, synthetic
 corpus, native Waymo Motion JSON/proto/TFRecord ingestion, taxonomy,
 interaction component scoring, constant-velocity baseline ADE/FDE and miss-rate
-analysis, lane-aware baseline comparison, public-safe tag-level failure and
+analysis, lane-aware baseline comparison, bounded linked-lane closure
+materialization for map-topology diagnostics, public-safe tag-level failure and
 stability studies, a baseline-debug casebook workflow, tests,
 replay-candidate planning, an open-loop replay/perturbation prototype,
 fallback-heavy map-match threshold auditing, a heading-aware lane-selection
