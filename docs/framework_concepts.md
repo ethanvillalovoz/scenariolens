@@ -146,6 +146,15 @@ speed-limit deltas from branch selection. On the current 2-case branchable
 queue it promotes the robust branch, holds the `speed_minus_route_context_margin`
 case, and matches the replay gate on both cases.
 
+The branch coverage audit is the planning layer after the guard. It joins the
+continuation candidate plan, replay prototype, route diagnostics, branch
+selection, branch replay, and route-context guard manifests into one funnel.
+The current real-data audit shows why the next milestone is not "ship the
+selector": from 15 continuation candidates, only 2 are branchable today and 1
+passes the strict route guard. It also names 5 topology blockers, 3 single-chain
+branch-expansion targets, and the held route-context margin case as the next
+expansion queue.
+
 ## Map-Match Audit
 
 The map-match audit handles cases that are not ready to be treated as replay
@@ -175,9 +184,9 @@ and links to the public reports.
 - Add a dataset adapter for another public motion dataset.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
-- Broaden motion-context branch replay, rollout gates, and route-context guard
-  checks across a larger branchable queue.
-- Add richer route context for margin follow-up branch choices.
+- Work down the branch coverage audit: reduce topology/parser gaps, expose
+  alternatives for single-chain cases, and rerun branch replay/guard checks
+  across a larger branchable queue.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.
 - Analyze heading-aware replay stability across more validation shards.

@@ -163,6 +163,8 @@ and links back to reports and provenance.
   [`docs/reports/waymo_lane_continuation_branch_rollout_gate.md`](reports/waymo_lane_continuation_branch_rollout_gate.md)
 - Route-context guard study:
   [`docs/reports/waymo_lane_continuation_route_context_guard.md`](reports/waymo_lane_continuation_route_context_guard.md)
+- Branch coverage audit:
+  [`docs/reports/waymo_lane_continuation_branch_coverage.md`](reports/waymo_lane_continuation_branch_coverage.md)
 - No-auth baseline ablation:
   [`docs/reports/baseline_ablation_study.md`](reports/baseline_ablation_study.md)
 - Shard expansion plan:

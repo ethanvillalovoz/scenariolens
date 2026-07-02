@@ -67,6 +67,9 @@ from scenariolens.lane_continuation_branch_selection import (
 from scenariolens.lane_continuation_branch_replay import (
     generate_lane_continuation_branch_replay,
 )
+from scenariolens.lane_continuation_branch_coverage import (
+    generate_lane_continuation_branch_coverage,
+)
 from scenariolens.lane_continuation_branch_rollout import (
     generate_lane_continuation_branch_rollout_gate,
 )
@@ -1013,6 +1016,47 @@ def lane_continuation_route_context_guard_command(
         f"{result.promoted_case_count} promoted candidate(s), "
         f"{result.held_case_count} hold(s), "
         f"{result.replay_gate_match_count} replay-gate match(es)."
+    )
+    return 0
+
+
+def lane_continuation_branch_coverage_command(
+    candidate_manifest: str,
+    replay_manifest: str,
+    diagnostics_manifest: str,
+    branch_selection_manifest: str,
+    output_dir: str,
+    branch_replay_manifest: str | None,
+    route_context_guard_manifest: str | None,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_lane_continuation_branch_coverage(
+            candidate_manifest_path=candidate_manifest,
+            replay_manifest_path=replay_manifest,
+            diagnostics_manifest_path=diagnostics_manifest,
+            branch_selection_manifest_path=branch_selection_manifest,
+            output_dir=output_dir,
+            branch_replay_manifest_path=branch_replay_manifest,
+            route_context_guard_manifest_path=route_context_guard_manifest,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote lane-continuation-branch-coverage manifest to {result.manifest_path}")
+    print(f"Wrote lane-continuation-branch-coverage report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("Lane-continuation branch coverage audit is not ready. See manifest.json.")
+        return 2
+    print(
+        f"Generated branch coverage audit for {result.candidate_count} "
+        f"candidate(s): {result.branchable_case_count} branchable case(s), "
+        f"{result.topology_blocker_count} topology blocker(s), "
+        f"{result.expansion_queue_count} expansion queue item(s)."
     )
     return 0
 
@@ -2101,6 +2145,56 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe route-context guard report copy.",
     )
+    lane_continuation_branch_coverage_parser = subparsers.add_parser(
+        "lane-continuation-branch-coverage",
+        help=(
+            "Audit the continuation-to-branch funnel and name expansion "
+            "blockers across public-safe manifests."
+        ),
+    )
+    lane_continuation_branch_coverage_parser.add_argument(
+        "--candidate-manifest",
+        required=True,
+        help="Manifest produced by scenariolens lane-continuation-candidates.",
+    )
+    lane_continuation_branch_coverage_parser.add_argument(
+        "--replay-manifest",
+        required=True,
+        help="Manifest produced by scenariolens lane-continuation-replay-prototype.",
+    )
+    lane_continuation_branch_coverage_parser.add_argument(
+        "--diagnostics-manifest",
+        required=True,
+        help="Manifest produced by scenariolens lane-continuation-route-diagnostics.",
+    )
+    lane_continuation_branch_coverage_parser.add_argument(
+        "--branch-selection-manifest",
+        required=True,
+        help="Manifest produced by scenariolens lane-continuation-branch-selection.",
+    )
+    lane_continuation_branch_coverage_parser.add_argument(
+        "--branch-replay-manifest",
+        default=None,
+        help="Optional manifest produced by scenariolens lane-continuation-branch-replay.",
+    )
+    lane_continuation_branch_coverage_parser.add_argument(
+        "--route-context-guard-manifest",
+        default=None,
+        help=(
+            "Optional manifest produced by scenariolens "
+            "lane-continuation-route-context-guard."
+        ),
+    )
+    lane_continuation_branch_coverage_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_lane_continuation_branch_coverage",
+        help="Directory for branch-coverage manifest.json and report.md.",
+    )
+    lane_continuation_branch_coverage_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe branch-coverage report copy.",
+    )
     heading_replay_parser = subparsers.add_parser(
         "heading-replay-prototype",
         help=(
@@ -2571,6 +2665,17 @@ def main() -> int:
             branch_selection_manifest=args.branch_selection_manifest,
             branch_replay_manifest=args.branch_replay_manifest,
             output_dir=args.output_dir,
+            public_report=args.public_report,
+        )
+    if args.command == "lane-continuation-branch-coverage":
+        return lane_continuation_branch_coverage_command(
+            candidate_manifest=args.candidate_manifest,
+            replay_manifest=args.replay_manifest,
+            diagnostics_manifest=args.diagnostics_manifest,
+            branch_selection_manifest=args.branch_selection_manifest,
+            output_dir=args.output_dir,
+            branch_replay_manifest=args.branch_replay_manifest,
+            route_context_guard_manifest=args.route_context_guard_manifest,
             public_report=args.public_report,
         )
     if args.command == "heading-replay-prototype":

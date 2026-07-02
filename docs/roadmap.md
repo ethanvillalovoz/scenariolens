@@ -409,7 +409,13 @@ action. The route-context guard study at
 `docs/reports/waymo_lane_continuation_route_context_guard.md` tests a stricter
 non-oracle promotion policy over those two branchable candidates, promoting the
 robust branch, holding the speed-minus margin case, and matching the replay
-gate on both cases.
+gate on both cases. The branch coverage audit at
+`docs/reports/waymo_lane_continuation_branch_coverage.md` connects the full
+continuation-to-branch funnel: 15 continuation candidates, 10 replay-ready
+candidates, 5 branch-selection cases, 2 branchable cases, 1 route-guard
+promotion, 5 topology blockers, and 9 expansion queue items. Next work should
+reduce topology/parser gaps and single-chain branch blockers before claiming
+broader selector readiness.
 
 ## Stretch Goals
 

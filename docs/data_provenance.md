@@ -256,6 +256,15 @@ and downstream speed-limit context; replay outcomes are used only to evaluate
 the guard, not to choose a branch. Raw TFRecords and local replay packets
 remain ignored.
 
+The branch coverage audit is checked in at
+[`docs/reports/waymo_lane_continuation_branch_coverage.md`](reports/waymo_lane_continuation_branch_coverage.md).
+It reads ignored candidate, replay, route-diagnostic, branch-selection,
+branch-replay, and route-context guard manifests, then publishes only a derived
+coverage funnel and expansion queue: 15 continuation candidates, 10
+replay-ready candidates, 5 branch-selection cases, 2 branchable cases, 1
+route-guard promotion, 5 topology blockers, and 9 expansion items. It does not
+read raw Waymo TFRecords and is not a benchmark coverage claim.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

@@ -521,6 +521,28 @@ report promotes 1 robust branch, holds 1 speed-minus route-context margin case,
 and matches the replay gate on both cases. Treat it as a candidate policy for
 larger branchable queues, not as a route planner or benchmark.
 
+## Lane-Continuation Branch Coverage Audit
+
+```bash
+scenariolens lane-continuation-branch-coverage \
+  --candidate-manifest data/processed/waymo_lane_continuation_candidates/manifest.json \
+  --replay-manifest data/processed/waymo_lane_continuation_replay_prototype/manifest.json \
+  --diagnostics-manifest data/processed/waymo_lane_continuation_route_diagnostics/manifest.json \
+  --branch-selection-manifest data/processed/waymo_lane_continuation_branch_selection/manifest.json \
+  --branch-replay-manifest data/processed/waymo_lane_continuation_branch_replay/manifest.json \
+  --route-context-guard-manifest data/processed/waymo_lane_continuation_route_context_guard/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_branch_coverage \
+  --public-report docs/reports/waymo_lane_continuation_branch_coverage.md
+```
+
+This manifest-only audit connects the continuation candidate plan, replay
+prototype, route diagnostics, branch selection, branch replay, and
+route-context guard into one coverage funnel. The current real-data report
+shows 15 continuation candidates, 10 replay-ready candidates, 5 branch-selection
+cases, 2 branchable cases, 1 route-guard promotion, 5 topology blockers, and
+9 expansion queue items. Treat it as a planning and coverage artifact, not as a
+benchmark or proof that the selector is ready across the full dataset.
+
 ## Baseline Ablation
 
 ```bash

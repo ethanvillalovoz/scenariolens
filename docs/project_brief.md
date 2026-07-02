@@ -68,7 +68,8 @@ context-eval debug/replay candidate reports, a context open-loop replay
 prototype, a context route/intent audit for the stable replay warning,
 a lane-link continuation prototype, validation study, candidate plan, replay
 prototype, route-diagnostics casebook, branch-selection diagnostic, and
-motion-context branch replay,
+motion-context branch replay, branch rollout gate, route-context guard, and
+branch coverage audit,
 Markdown/JSON reports, a local real-data validation packet workflow, static
 dashboard data, and 2D SVG trajectory rendering with forecast overlays.
 
