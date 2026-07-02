@@ -33,6 +33,7 @@ flowchart LR
     AB --> AC["Continuation replay/audit queue"]
     AC --> AD["Continuation replay prototype"]
     AD --> AE["Continuation route diagnostics"]
+    AE --> AF["Continuation branch selection"]
     Q --> T["Map-match threshold audit"]
     F --> I["Static dashboard payload"]
     V --> I
@@ -43,6 +44,7 @@ flowchart LR
     S --> K
     Z --> K
     AA --> K
+    AF --> K
     T --> K
     U --> K
     W --> K
@@ -72,6 +74,7 @@ flowchart LR
 | Lane-continuation candidates | `src/scenariolens/lane_continuation_candidates.py` | Turns continuation-study rows into public-safe replay controls, regression debug targets, and topology-audit blockers. |
 | Lane-continuation replay | `src/scenariolens/lane_continuation_replay.py` | Reloads queued lane-continuation targets, compares nearest-lane and linked-lane rollouts under deterministic perturbations, and keeps topology blockers separate from replay evidence. |
 | Lane-continuation diagnostics | `src/scenariolens/lane_continuation_diagnostics.py` | Classifies replayed linked-lane regressions and topology blockers into route-choice, horizon-limit, and parser/topology follow-up buckets. |
+| Lane-continuation branch selection | `src/scenariolens/lane_continuation_branch_selection.py` | Enumerates parsed linked-lane branch alternatives for continuation regressions, compares a non-oracle anchor-heading selector with an oracle upper-bound diagnostic, and keeps route-planning claims out of public artifacts. |
 | Heading replay prototype | `src/scenariolens/heading_replay_prototype.py` | Reloads heading-ready local scenarios, compares nearest-lane and heading-aware open-loop rollouts, applies deterministic perturbations, and publishes selector stability summaries. |
 | Map-match audit | `src/scenariolens/map_match_audit.py` | Reloads fallback-heavy debug cases, sweeps lane-match thresholds, and publishes public-safe evidence about whether wider lane acceptance improves or worsens FDE before changing matcher behavior. |
 | Failure study | `src/scenariolens/failure_study.py` | Aggregates ADE/FDE, miss rate, tag-level failures, score-component failures, and hardest scenario ids without publishing raw data. |
@@ -121,7 +124,8 @@ The public artifact path is:
    replay-candidate plans, context replay prototypes, open-loop replay prototype
    packets, route/intent audits, lane-link continuation prototypes and studies,
    continuation replay/audit queues, continuation replay prototypes,
-   continuation route diagnostics, and map-match audits,
+   continuation route diagnostics, continuation branch-selection diagnostics,
+   and map-match audits,
 4. publish aggregate summaries, dashboard payloads, and public-safe study reports,
 5. keep raw data, local SVG debug overlays, and per-scenario downloaded outputs local.
 

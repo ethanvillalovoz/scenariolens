@@ -384,9 +384,14 @@ rows as 10 target-track replays, 40 deterministic perturbation trials, and 5
 topology probes. The route diagnostics report at
 `docs/reports/waymo_lane_continuation_route_diagnostics.md` classifies the
 follow-up set into 3 stable route-choice regressions, 1 horizon-limit case, 1
-link-worse-than-constant-velocity case, and 5 topology blockers. Next work is
-to prototype alternate-branch route selection for the stable continuation
-regressions, then rerun the same replay and diagnostic gates.
+link-worse-than-constant-velocity case, and 5 topology blockers. The branch
+selection diagnostic at
+`docs/reports/waymo_lane_continuation_branch_selection.md` then sweeps parsed
+branch alternatives for the 5 continuation regression diagnostics, finding 2
+branchable cases, 3 single-chain cases, and 2 oracle upper-bound improvements
+with 20.534 m mean recoverable FDE. Next work is to replace that oracle upper
+bound with a non-oracle route prior using route context, traffic controls, or
+near-term intent cues, then rerun replay stability.
 
 ## Stretch Goals
 

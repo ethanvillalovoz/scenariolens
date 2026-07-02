@@ -109,6 +109,13 @@ diagnosis becomes evidence for continuation-aware follow-up. If the chain
 regresses or cannot resolve, the case becomes route-choice or topology coverage
 work rather than a baseline tuning claim.
 
+The branch-selection diagnostic is the next layer: it reloads continuation
+regression cases, enumerates parsed linked-lane branch alternatives, compares a
+non-oracle anchor-heading selector with an observed-future oracle upper bound,
+and reports whether the error is recoverable by branch choice. The oracle
+column is deliberately an upper-bound debugging tool, not a deployable route
+selector.
+
 ## Map-Match Audit
 
 The map-match audit handles cases that are not ready to be treated as replay
@@ -138,8 +145,8 @@ and links to the public reports.
 - Add a dataset adapter for another public motion dataset.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
-- Prototype alternate-branch route selection for stable continuation
-  regressions, then rerun replay and route diagnostics.
+- Replace the branch-selection oracle upper bound with a richer non-oracle
+  route prior, then rerun replay and route diagnostics.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.
 - Analyze heading-aware replay stability across more validation shards.

@@ -61,6 +61,9 @@ from scenariolens.lane_continuation import (
 from scenariolens.lane_continuation_candidates import (
     generate_lane_continuation_candidate_plan,
 )
+from scenariolens.lane_continuation_branch_selection import (
+    generate_lane_continuation_branch_selection,
+)
 from scenariolens.lane_continuation_diagnostics import (
     generate_lane_continuation_route_diagnostics,
 )
@@ -859,6 +862,40 @@ def lane_continuation_route_diagnostics_command(
         f"Generated {result.diagnostic_count} lane-continuation diagnostic(s): "
         f"{result.regression_count} regression diagnostic(s), "
         f"{result.topology_count} topology diagnostic(s)."
+    )
+    return 0
+
+
+def lane_continuation_branch_selection_command(
+    diagnostics_manifest: str,
+    output_dir: str,
+    top: int,
+    max_hops: int,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_lane_continuation_branch_selection(
+            diagnostics_manifest_path=diagnostics_manifest,
+            output_dir=output_dir,
+            top=top,
+            max_hops=max_hops,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote lane-continuation-branch-selection manifest to {result.manifest_path}")
+    print(f"Wrote lane-continuation-branch-selection report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("Lane-continuation branch selection is not ready. See manifest.json.")
+        return 2
+    print(
+        f"Generated {result.case_count} branch-selection diagnostic(s): "
+        f"{result.branchable_count} branchable case(s), "
+        f"{result.oracle_improved_count} oracle upper-bound improvement(s)."
     )
     return 0
 
@@ -1836,6 +1873,40 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe route/topology report copy.",
     )
+    lane_continuation_branch_selection_parser = subparsers.add_parser(
+        "lane-continuation-branch-selection",
+        help=(
+            "Enumerate parsed lane-link branch alternatives for continuation "
+            "regression diagnostics."
+        ),
+    )
+    lane_continuation_branch_selection_parser.add_argument(
+        "--diagnostics-manifest",
+        required=True,
+        help="Manifest produced by scenariolens lane-continuation-route-diagnostics.",
+    )
+    lane_continuation_branch_selection_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_lane_continuation_branch_selection",
+        help="Directory for branch-selection manifest.json and report.md.",
+    )
+    lane_continuation_branch_selection_parser.add_argument(
+        "--top",
+        type=int,
+        default=5,
+        help="Maximum regression diagnostics to branch-sweep.",
+    )
+    lane_continuation_branch_selection_parser.add_argument(
+        "--max-hops",
+        type=int,
+        default=2,
+        help="Maximum parsed lane-link hops to enumerate per branch.",
+    )
+    lane_continuation_branch_selection_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe branch-selection report copy.",
+    )
     heading_replay_parser = subparsers.add_parser(
         "heading-replay-prototype",
         help=(
@@ -2278,6 +2349,14 @@ def main() -> int:
             replay_manifest=args.replay_manifest,
             output_dir=args.output_dir,
             top=args.top,
+            public_report=args.public_report,
+        )
+    if args.command == "lane-continuation-branch-selection":
+        return lane_continuation_branch_selection_command(
+            diagnostics_manifest=args.diagnostics_manifest,
+            output_dir=args.output_dir,
+            top=args.top,
+            max_hops=args.max_hops,
             public_report=args.public_report,
         )
     if args.command == "heading-replay-prototype":

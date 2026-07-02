@@ -86,6 +86,10 @@ All notable changes to ScenarioLens are documented here.
   `docs/reports/waymo_lane_continuation_route_diagnostics.md`, classifying
   replayed continuation regressions and topology blockers into route-choice,
   horizon-limit, and parser/topology follow-up buckets.
+- `scenariolens lane-continuation-branch-selection` workflow and
+  `docs/reports/waymo_lane_continuation_branch_selection.md`, sweeping parsed
+  branch alternatives for continuation regressions and separating non-oracle
+  anchor-heading behavior from observed-future oracle upper-bound diagnostics.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

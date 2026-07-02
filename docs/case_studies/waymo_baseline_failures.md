@@ -79,6 +79,11 @@ signs on all perturbation trials while keeping topology gaps framed as blockers.
 The route diagnostics report then classifies the follow-up work: three stable
 route-choice regressions, one horizon-limit case, one linked route that is worse
 than constant velocity, and five topology blockers.
+The branch-selection diagnostic then sweeps parsed alternatives for the five
+continuation regression diagnostics. Two cases expose branch alternatives with
+oracle upper-bound gains, three cases have only a single parsed chain, and the
+simple anchor-heading selector improves none of them. That is useful evidence:
+the next route prior needs richer context, not just current heading.
 
 ## Why It Matters
 
@@ -89,6 +94,6 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Prototype alternate-branch route selection for stable continuation regressions;
-expand beyond shards `00007` through `00010`; and continue curating stable
-open-loop replay candidates.
+Replace the oracle branch-selection upper bound with a richer non-oracle route
+prior; expand beyond shards `00007` through `00010`; and continue curating
+stable open-loop replay candidates.

@@ -444,6 +444,23 @@ This turns replay results into a route/topology casebook: stable linked-lane
 regressions, horizon-limit cases, link-worse-than-constant-velocity cases, and
 parser/topology blockers. It is still diagnostic evidence, not route planning.
 
+## Lane-Continuation Branch Selection
+
+```bash
+scenariolens lane-continuation-branch-selection \
+  --diagnostics-manifest data/processed/waymo_lane_continuation_route_diagnostics/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_branch_selection \
+  --top 5 \
+  --max-hops 2 \
+  --public-report docs/reports/waymo_lane_continuation_branch_selection.md
+```
+
+This follows the route-diagnostics casebook by enumerating parsed branch
+alternatives for continuation regressions. The `anchor_heading` selector uses
+only anchor velocity and route geometry; the `oracle_upper_bound` selector uses
+observed future motion only to measure recoverable branch-choice error. Treat
+it as diagnostic evidence, not a route planner or benchmark claim.
+
 ## Baseline Ablation
 
 ```bash

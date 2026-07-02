@@ -212,6 +212,15 @@ It reads the ignored replay manifest and publishes only derived diagnostic
 labels and aggregate counts: stable route-choice regressions, horizon-limit
 cases, link-worse-than-constant-velocity cases, and topology blockers.
 
+The lane-continuation branch-selection diagnostic is checked in at
+[`docs/reports/waymo_lane_continuation_branch_selection.md`](reports/waymo_lane_continuation_branch_selection.md).
+It reads ignored replay/diagnostic manifests, reloads local shards, and
+publishes only derived branch-sweep metrics: 5 continuation regression cases,
+2 branchable parsed-topology cases, 3 single-chain cases, and 2 oracle
+upper-bound improvements. The oracle branch uses observed future motion only
+as a diagnostic upper bound; it is not a deployed route selector. Local branch
+manifests remain ignored under `data/processed/`.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark
