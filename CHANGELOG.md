@@ -82,6 +82,10 @@ All notable changes to ScenarioLens are documented here.
   `docs/reports/waymo_lane_continuation_replay_prototype.md`, executing all 15
   queued continuation cases as 10 target-track replays, 40 deterministic
   perturbation trials, and 5 topology probes.
+- `scenariolens lane-continuation-route-diagnostics` workflow and
+  `docs/reports/waymo_lane_continuation_route_diagnostics.md`, classifying
+  replayed continuation regressions and topology blockers into route-choice,
+  horizon-limit, and parser/topology follow-up buckets.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

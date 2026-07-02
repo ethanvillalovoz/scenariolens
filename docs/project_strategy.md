@@ -153,6 +153,8 @@ and links back to reports and provenance.
   [`docs/reports/waymo_lane_continuation_candidate_plan.md`](reports/waymo_lane_continuation_candidate_plan.md)
 - Lane-continuation replay prototype:
   [`docs/reports/waymo_lane_continuation_replay_prototype.md`](reports/waymo_lane_continuation_replay_prototype.md)
+- Lane-continuation route diagnostics:
+  [`docs/reports/waymo_lane_continuation_route_diagnostics.md`](reports/waymo_lane_continuation_route_diagnostics.md)
 - No-auth baseline ablation:
   [`docs/reports/baseline_ablation_study.md`](reports/baseline_ablation_study.md)
 - Shard expansion plan:

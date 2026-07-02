@@ -98,6 +98,7 @@ Then open `http://localhost:8000/demo/`.
 - [Lane-continuation validation study](docs/reports/waymo_lane_continuation_study.md)
 - [Lane-continuation candidate plan](docs/reports/waymo_lane_continuation_candidate_plan.md)
 - [Lane-continuation replay prototype](docs/reports/waymo_lane_continuation_replay_prototype.md)
+- [Lane-continuation route diagnostics](docs/reports/waymo_lane_continuation_route_diagnostics.md)
 - [Real Waymo lane-aware baseline diagnostic](docs/reports/waymo_lane_aware_baseline_cross_shard.md)
 - [Lane-aware baseline debug casebook](docs/reports/waymo_lane_aware_debug_casebook.md)
 - [Replay candidate plan](docs/reports/waymo_replay_candidate_plan.md)
@@ -235,6 +236,9 @@ smoke test. The prototype can:
 - execute the full lane-continuation candidate queue as a laptop-safe replay
   prototype: 10 target-track replays, 40 deterministic perturbation trials,
   100% sign preservation, and 5 confirmed topology blockers,
+- classify those replayed continuation cases into route/topology follow-up
+  buckets: 3 stable route-choice regressions, 1 horizon-limit case, 1
+  link-worse-than-constant-velocity case, and 5 topology blockers,
 - expose public-safe heading-aware improvement, regression, and fallback-heavy
   cases in the live Scenario Explorer,
 - turn heading-aware debug cases into a replay-readiness queue for the next
@@ -246,8 +250,8 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to use the replayed continuation regressions and topology
-blockers to prototype richer route-choice and map-topology diagnostics.
+The next milestone is to prototype an alternate-branch route selector for the
+stable continuation regressions and rerun the same diagnostics.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -525,6 +529,16 @@ PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-replay-prototype \
   --format native \
   --max-scenarios-per-source 25 \
   --public-report docs/reports/waymo_lane_continuation_replay_prototype.md
+```
+
+Classify replayed continuation regressions and topology blockers:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-route-diagnostics \
+  --replay-manifest data/processed/waymo_lane_continuation_replay_prototype/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_route_diagnostics \
+  --top 10 \
+  --public-report docs/reports/waymo_lane_continuation_route_diagnostics.md
 ```
 
 Run the no-auth baseline ablation:

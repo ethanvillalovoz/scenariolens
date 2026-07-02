@@ -76,6 +76,9 @@ The lane-continuation replay prototype executes those queued rows as 10
 target-track replay cases, 40 deterministic perturbation trials, and five
 topology probes. The replay pass preserves the expected improvement/regression
 signs on all perturbation trials while keeping topology gaps framed as blockers.
+The route diagnostics report then classifies the follow-up work: three stable
+route-choice regressions, one horizon-limit case, one linked route that is worse
+than constant velocity, and five topology blockers.
 
 ## Why It Matters
 
@@ -86,7 +89,6 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Use the replayed lane-continuation regressions and topology blockers to
-prototype richer route-choice or optional Waymax/JAX work; expand beyond shards
-`00007` through `00010`; and continue curating stable open-loop replay
-candidates.
+Prototype alternate-branch route selection for stable continuation regressions;
+expand beyond shards `00007` through `00010`; and continue curating stable
+open-loop replay candidates.

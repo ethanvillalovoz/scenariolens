@@ -61,6 +61,9 @@ from scenariolens.lane_continuation import (
 from scenariolens.lane_continuation_candidates import (
     generate_lane_continuation_candidate_plan,
 )
+from scenariolens.lane_continuation_diagnostics import (
+    generate_lane_continuation_route_diagnostics,
+)
 from scenariolens.lane_continuation_replay import (
     LANE_CONTINUATION_REPLAY_INPUT_FORMATS,
     generate_lane_continuation_replay_prototype,
@@ -824,6 +827,38 @@ def lane_continuation_replay_command(
         f"Generated {result.case_count} lane-continuation replay/audit case(s): "
         f"{result.replay_case_count} replay case(s), "
         f"{result.topology_case_count} topology probe(s)."
+    )
+    return 0
+
+
+def lane_continuation_route_diagnostics_command(
+    replay_manifest: str,
+    output_dir: str,
+    top: int,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_lane_continuation_route_diagnostics(
+            replay_manifest_path=replay_manifest,
+            output_dir=output_dir,
+            top=top,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote lane-continuation-route-diagnostics manifest to {result.manifest_path}")
+    print(f"Wrote lane-continuation-route-diagnostics report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("Lane-continuation route diagnostics are not ready. See manifest.json.")
+        return 2
+    print(
+        f"Generated {result.diagnostic_count} lane-continuation diagnostic(s): "
+        f"{result.regression_count} regression diagnostic(s), "
+        f"{result.topology_count} topology diagnostic(s)."
     )
     return 0
 
@@ -1773,6 +1808,34 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe replay prototype copy.",
     )
+    lane_continuation_route_diagnostics_parser = subparsers.add_parser(
+        "lane-continuation-route-diagnostics",
+        help=(
+            "Classify replayed lane-continuation regressions and topology "
+            "blockers into route-choice follow-up buckets."
+        ),
+    )
+    lane_continuation_route_diagnostics_parser.add_argument(
+        "--replay-manifest",
+        required=True,
+        help="Manifest produced by scenariolens lane-continuation-replay-prototype.",
+    )
+    lane_continuation_route_diagnostics_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_lane_continuation_route_diagnostics",
+        help="Directory for route/topology diagnostic manifest.json and report.md.",
+    )
+    lane_continuation_route_diagnostics_parser.add_argument(
+        "--top",
+        type=int,
+        default=10,
+        help="Maximum route/topology diagnostic rows to publish.",
+    )
+    lane_continuation_route_diagnostics_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe route/topology report copy.",
+    )
     heading_replay_parser = subparsers.add_parser(
         "heading-replay-prototype",
         help=(
@@ -2208,6 +2271,13 @@ def main() -> int:
             top_per_bucket=args.top_per_bucket,
             input_format=args.format,
             max_scenarios_per_source=args.max_scenarios_per_source,
+            public_report=args.public_report,
+        )
+    if args.command == "lane-continuation-route-diagnostics":
+        return lane_continuation_route_diagnostics_command(
+            replay_manifest=args.replay_manifest,
+            output_dir=args.output_dir,
+            top=args.top,
             public_report=args.public_report,
         )
     if args.command == "heading-replay-prototype":

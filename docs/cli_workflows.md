@@ -430,6 +430,20 @@ checked-in report covers 10 target-track replays, 40 deterministic
 perturbation trials, and 5 topology probes while keeping raw Waymo data and
 local replay packets ignored.
 
+## Lane-Continuation Route Diagnostics
+
+```bash
+scenariolens lane-continuation-route-diagnostics \
+  --replay-manifest data/processed/waymo_lane_continuation_replay_prototype/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_route_diagnostics \
+  --top 10 \
+  --public-report docs/reports/waymo_lane_continuation_route_diagnostics.md
+```
+
+This turns replay results into a route/topology casebook: stable linked-lane
+regressions, horizon-limit cases, link-worse-than-constant-velocity cases, and
+parser/topology blockers. It is still diagnostic evidence, not route planning.
+
 ## Baseline Ablation
 
 ```bash

@@ -381,10 +381,12 @@ promotes 15 of those rows into replay controls, regression debug targets, and
 topology-audit blockers. The replay prototype at
 `docs/reports/waymo_lane_continuation_replay_prototype.md` executes those 15
 rows as 10 target-track replays, 40 deterministic perturbation trials, and 5
-topology probes. Next work is to expand the shard set from
-`docs/reports/waymo_motion_shard_plan.md` and use the stable regressions plus
-topology blockers to prototype richer route-choice or optional Waymax/JAX
-experiments.
+topology probes. The route diagnostics report at
+`docs/reports/waymo_lane_continuation_route_diagnostics.md` classifies the
+follow-up set into 3 stable route-choice regressions, 1 horizon-limit case, 1
+link-worse-than-constant-velocity case, and 5 topology blockers. Next work is
+to prototype alternate-branch route selection for the stable continuation
+regressions, then rerun the same replay and diagnostic gates.
 
 ## Stretch Goals
 

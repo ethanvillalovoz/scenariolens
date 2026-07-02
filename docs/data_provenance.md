@@ -206,6 +206,12 @@ publishes 10 target-track replay summaries, 40 deterministic perturbation
 trials, and 5 topology probes, and keeps local replay packets under ignored
 `data/processed/` paths.
 
+The lane-continuation route diagnostics report is checked in at
+[`docs/reports/waymo_lane_continuation_route_diagnostics.md`](reports/waymo_lane_continuation_route_diagnostics.md).
+It reads the ignored replay manifest and publishes only derived diagnostic
+labels and aggregate counts: stable route-choice regressions, horizon-limit
+cases, link-worse-than-constant-velocity cases, and topology blockers.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

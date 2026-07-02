@@ -102,10 +102,12 @@ lane-end clamp candidates and ranks linked-lane improvements, regressions, and
 topology gaps. The candidate plan turns those ranked rows into replay controls,
 regression debug targets, and topology-audit blockers. The replay prototype
 then executes the queued replay rows under deterministic perturbations and
-keeps topology probes as blockers. If linked lanes improve FDE, the diagnosis
-becomes evidence for continuation-aware follow-up. If the chain regresses or
-cannot resolve, the case becomes route-choice or topology coverage work rather
-than a baseline tuning claim.
+keeps topology probes as blockers. The route-diagnostics report then separates
+stable route-choice regressions, horizon-limit cases, link-worse-than-constant
+velocity cases, and parser/topology blockers. If linked lanes improve FDE, the
+diagnosis becomes evidence for continuation-aware follow-up. If the chain
+regresses or cannot resolve, the case becomes route-choice or topology coverage
+work rather than a baseline tuning claim.
 
 ## Map-Match Audit
 
@@ -136,8 +138,8 @@ and links to the public reports.
 - Add a dataset adapter for another public motion dataset.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
-- Use replayed lane-continuation regressions and topology blockers to prototype
-  richer route-choice, lane-topology, or optional Waymax/JAX experiments.
+- Prototype alternate-branch route selection for stable continuation
+  regressions, then rerun replay and route diagnostics.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.
 - Analyze heading-aware replay stability across more validation shards.
