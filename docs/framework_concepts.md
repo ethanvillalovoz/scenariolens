@@ -132,6 +132,13 @@ The route-context margin diagnostic then labels the unresolved case as a
 `speed_minus_route_context_margin` target and publishes selected-vs-default
 route feature deltas for the next selector iteration.
 
+The branch rollout gate is the triage layer after replay. It does not change
+the selector or claim production readiness; it turns replay outcomes into a
+public-safe promote/hold queue. The current real-data report promotes 1 branch
+for broader selector evaluation and holds 1 route-context margin case with a
+named next action, making the diagnostic feel closer to an autonomy evaluation
+workflow.
+
 ## Map-Match Audit
 
 The map-match audit handles cases that are not ready to be treated as replay
@@ -163,6 +170,7 @@ and links to the public reports.
   public data.
 - Broaden motion-context branch replay and add richer route context for margin
   follow-up branch choices.
+- Expand the branch rollout gate across a larger branchable queue.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.
 - Analyze heading-aware replay stability across more validation shards.

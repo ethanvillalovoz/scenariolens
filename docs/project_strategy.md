@@ -159,6 +159,8 @@ and links back to reports and provenance.
   [`docs/reports/waymo_lane_continuation_branch_selection.md`](reports/waymo_lane_continuation_branch_selection.md)
 - Motion-context branch replay:
   [`docs/reports/waymo_lane_continuation_branch_replay.md`](reports/waymo_lane_continuation_branch_replay.md)
+- Branch rollout gate:
+  [`docs/reports/waymo_lane_continuation_branch_rollout_gate.md`](reports/waymo_lane_continuation_branch_rollout_gate.md)
 - No-auth baseline ablation:
   [`docs/reports/baseline_ablation_study.md`](reports/baseline_ablation_study.md)
 - Shard expansion plan:

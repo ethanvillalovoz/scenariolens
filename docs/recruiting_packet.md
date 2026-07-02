@@ -22,6 +22,7 @@ robotics, AI/ML, and software engineering internship conversations.
 - Lane-continuation route diagnostics: `docs/reports/waymo_lane_continuation_route_diagnostics.md`
 - Lane-continuation branch selection: `docs/reports/waymo_lane_continuation_branch_selection.md`
 - Motion-context branch replay: `docs/reports/waymo_lane_continuation_branch_replay.md`
+- Branch rollout gate: `docs/reports/waymo_lane_continuation_branch_rollout_gate.md`
 - Real lane-aware baseline diagnostic: `docs/reports/waymo_lane_aware_baseline_cross_shard.md`
 - Lane-aware debug casebook: `docs/reports/waymo_lane_aware_debug_casebook.md`
 - Replay candidate plan: `docs/reports/waymo_replay_candidate_plan.md`
@@ -68,7 +69,7 @@ Use one bullet if space is tight:
 Use two bullets if the project gets a dedicated entry:
 
 - Built ScenarioLens, a local-first autonomy scenario evaluation tool that ingests synthetic, Waymo Motion-shaped JSON, normalized CSV, and small downloaded Waymo Motion TFRecord slices, then ranks long-tail cases using interpretable proximity, TTC, VRU, path-conflict, density, and taxonomy features.
-- Shipped a tested portfolio demo with 100+ Python unit tests, GitHub Actions CI, SVG trajectory rendering, deterministic dashboard data, lane-aware baseline comparison, a 100-scenario cross-shard Waymo Motion stability report, a 100-scenario lane-aware diagnostic, a heading-aware lane-selection ablation, baseline-debug casebooks, replay-candidate plans, open-loop replay/perturbation prototypes, route/intent, lane-link, continuation-candidate/replay/diagnostic/branch-selection/branch-replay, and map-match audits, and a static Scenario Explorer deployed at `ethanvillalovoz.com/scenariolens`.
+- Shipped a tested portfolio demo with 100+ Python unit tests, GitHub Actions CI, SVG trajectory rendering, deterministic dashboard data, lane-aware baseline comparison, a 100-scenario cross-shard Waymo Motion stability report, a 100-scenario lane-aware diagnostic, a heading-aware lane-selection ablation, baseline-debug casebooks, replay-candidate plans, open-loop replay/perturbation prototypes, route/intent, lane-link, continuation-candidate/replay/diagnostic/branch-selection/branch-replay, branch rollout gates, and map-match audits, and a static Scenario Explorer deployed at `ethanvillalovoz.com/scenariolens`.
 
 Short project line:
 
@@ -226,6 +227,9 @@ Testing and verification:
   `speed_minus_route_context_margin`, records the 0.443 m gap to the gate, and
   exposes selected-vs-default route-feature deltas for the next selector
   experiment.
+- A branch rollout gate converts the replay outputs into a promote/hold queue:
+  one branch is ready for broader selector evaluation and one route-context
+  margin case remains held with a concrete next action.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 

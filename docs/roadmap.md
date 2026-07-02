@@ -401,7 +401,11 @@ does not resolve the margin follow-up, so next work is broader branch replay
 plus richer route context for that case. The route-context margin diagnostic
 now labels the unresolved case as `speed_minus_route_context_margin`, records
 a 0.443 m gap to the gate, and publishes route-feature deltas for the next
-selector iteration.
+selector iteration. The branch rollout gate at
+`docs/reports/waymo_lane_continuation_branch_rollout_gate.md` turns those
+outcomes into a promote/hold queue: 1 branch is ready for broader selector
+evaluation and 1 route-context margin case remains held with a concrete next
+action.
 
 ## Stretch Goals
 

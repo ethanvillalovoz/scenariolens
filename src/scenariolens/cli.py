@@ -67,6 +67,9 @@ from scenariolens.lane_continuation_branch_selection import (
 from scenariolens.lane_continuation_branch_replay import (
     generate_lane_continuation_branch_replay,
 )
+from scenariolens.lane_continuation_branch_rollout import (
+    generate_lane_continuation_branch_rollout_gate,
+)
 from scenariolens.lane_continuation_diagnostics import (
     generate_lane_continuation_route_diagnostics,
 )
@@ -937,6 +940,37 @@ def lane_continuation_branch_replay_command(
         "history speed-prior accepted case(s), "
         f"{result.route_context_margin_case_count} "
         "route-context margin case(s)."
+    )
+    return 0
+
+
+def lane_continuation_branch_rollout_gate_command(
+    branch_replay_manifest: str,
+    output_dir: str,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_lane_continuation_branch_rollout_gate(
+            branch_replay_manifest_path=branch_replay_manifest,
+            output_dir=output_dir,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote lane-continuation-branch-rollout manifest to {result.manifest_path}")
+    print(f"Wrote lane-continuation-branch-rollout report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("Lane-continuation branch rollout gate is not ready. See manifest.json.")
+        return 2
+    print(
+        f"Generated {result.case_count} branch rollout decision(s): "
+        f"{result.promoted_case_count} promoted candidate(s), "
+        f"{result.held_route_context_case_count} route-context hold(s), "
+        f"{result.held_selector_stability_case_count} selector-stability hold(s)."
     )
     return 0
 
@@ -1976,6 +2010,28 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe branch-replay report copy.",
     )
+    lane_continuation_branch_rollout_parser = subparsers.add_parser(
+        "lane-continuation-branch-rollout-gate",
+        help=(
+            "Turn branch replay diagnostics into public-safe promote/hold "
+            "rollout decisions."
+        ),
+    )
+    lane_continuation_branch_rollout_parser.add_argument(
+        "--branch-replay-manifest",
+        required=True,
+        help="Manifest produced by scenariolens lane-continuation-branch-replay.",
+    )
+    lane_continuation_branch_rollout_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_lane_continuation_branch_rollout_gate",
+        help="Directory for branch-rollout manifest.json and report.md.",
+    )
+    lane_continuation_branch_rollout_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe rollout-gate report copy.",
+    )
     heading_replay_parser = subparsers.add_parser(
         "heading-replay-prototype",
         help=(
@@ -2433,6 +2489,12 @@ def main() -> int:
             branch_selection_manifest=args.branch_selection_manifest,
             output_dir=args.output_dir,
             top=args.top,
+            public_report=args.public_report,
+        )
+    if args.command == "lane-continuation-branch-rollout-gate":
+        return lane_continuation_branch_rollout_gate_command(
+            branch_replay_manifest=args.branch_replay_manifest,
+            output_dir=args.output_dir,
             public_report=args.public_report,
         )
     if args.command == "heading-replay-prototype":

@@ -97,6 +97,9 @@ smoothing solved the issue. The latest route-context margin diagnostic labels
 the case as `speed_minus_route_context_margin` and exposes the
 selected-vs-default route deltas that should drive the next selector
 experiment.
+The branch rollout gate then converts those replay outcomes into a
+release-style promote/hold queue: one branch is promoted for broader selector
+evaluation, while the speed-minus margin case is held for route-context work.
 
 ## Why It Matters
 
@@ -107,6 +110,6 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Implement a richer route-context selector candidate for the branch replay
-margin follow-up; expand beyond shards `00007` through `00010`; and continue
-curating stable open-loop replay candidates.
+Implement a richer route-context selector candidate for the branch rollout
+hold; expand beyond shards `00007` through `00010`; and continue curating
+stable open-loop replay candidates.

@@ -237,6 +237,15 @@ unresolved case as `speed_minus_route_context_margin`, records a 0.443 m gap
 to the gate, and publishes only aggregate/case-summary route-feature deltas.
 Raw TFRecords and local replay packets remain ignored.
 
+The branch rollout gate is checked in at
+[`docs/reports/waymo_lane_continuation_branch_rollout_gate.md`](reports/waymo_lane_continuation_branch_rollout_gate.md).
+It reads the ignored branch-replay manifest and publishes only promote/hold
+decisions derived from the replay summary: 2 replayed cases, 1 branch promoted
+for broader selector evaluation, 1 route-context margin hold, 0 selector
+stability holds, and the first next action for the held case. This is
+release-style evidence triage, not a production release process or route
+planner.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

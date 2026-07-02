@@ -95,6 +95,9 @@ All notable changes to ScenarioLens are documented here.
   `docs/reports/waymo_lane_continuation_branch_replay.md`, replaying
   motion-context branch choices under deterministic perturbations and
   separating accepted branch evidence from route-context margin follow-up cases.
+- `scenariolens lane-continuation-branch-rollout-gate` workflow and
+  `docs/reports/waymo_lane_continuation_branch_rollout_gate.md`, converting
+  branch replay evidence into public-safe promote/hold rollout triage.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

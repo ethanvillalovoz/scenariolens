@@ -487,6 +487,22 @@ a 0.443 m gap to the rollout gate, and publishes selected-vs-default route
 feature deltas for follow-up. Treat that case as the next route-context target,
 not as a failed benchmark.
 
+## Lane-Continuation Branch Rollout Gate
+
+```bash
+scenariolens lane-continuation-branch-rollout-gate \
+  --branch-replay-manifest data/processed/waymo_lane_continuation_branch_replay/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_branch_rollout_gate \
+  --public-report docs/reports/waymo_lane_continuation_branch_rollout_gate.md
+```
+
+This converts branch replay diagnostics into a conservative promote/hold
+packet. The current real-data report promotes 1 branch for broader selector
+evaluation and holds 1 route-context margin case with a concrete next action:
+add route-context features that can explain reduced-speed branch intent. It is
+release-style evidence triage, not a production release process, route planner,
+or benchmark claim.
+
 ## Baseline Ablation
 
 ```bash
