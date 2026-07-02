@@ -86,6 +86,11 @@ parsed chain, and the simple anchor-heading selector improves none of them.
 That is useful evidence: recent speed, horizon length, route-chain length, and
 downstream speed limits can recover some branch-choice error without using the
 observed future trajectory.
+The follow-up branch replay diagnostic then replays those two motion-context
+branch choices under eight deterministic perturbations. The selected branch is
+preserved in all eight trials, positive recoverable FDE holds in seven, and
+the smaller-gain case becomes an explicit gain-sensitive target for richer
+route context.
 
 ## Why It Matters
 
@@ -96,6 +101,6 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Replay the motion-context selected branches under deterministic perturbations;
-expand beyond shards `00007` through `00010`; and continue curating stable
-open-loop replay candidates.
+Add richer route context for the gain-sensitive branch replay case; expand
+beyond shards `00007` through `00010`; and continue curating stable open-loop
+replay candidates.

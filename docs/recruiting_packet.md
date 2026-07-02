@@ -21,6 +21,7 @@ robotics, AI/ML, and software engineering internship conversations.
 - Lane-continuation replay prototype: `docs/reports/waymo_lane_continuation_replay_prototype.md`
 - Lane-continuation route diagnostics: `docs/reports/waymo_lane_continuation_route_diagnostics.md`
 - Lane-continuation branch selection: `docs/reports/waymo_lane_continuation_branch_selection.md`
+- Motion-context branch replay: `docs/reports/waymo_lane_continuation_branch_replay.md`
 - Real lane-aware baseline diagnostic: `docs/reports/waymo_lane_aware_baseline_cross_shard.md`
 - Lane-aware debug casebook: `docs/reports/waymo_lane_aware_debug_casebook.md`
 - Replay candidate plan: `docs/reports/waymo_replay_candidate_plan.md`
@@ -67,7 +68,7 @@ Use one bullet if space is tight:
 Use two bullets if the project gets a dedicated entry:
 
 - Built ScenarioLens, a local-first autonomy scenario evaluation tool that ingests synthetic, Waymo Motion-shaped JSON, normalized CSV, and small downloaded Waymo Motion TFRecord slices, then ranks long-tail cases using interpretable proximity, TTC, VRU, path-conflict, density, and taxonomy features.
-- Shipped a tested portfolio demo with 100+ Python unit tests, GitHub Actions CI, SVG trajectory rendering, deterministic dashboard data, lane-aware baseline comparison, a 100-scenario cross-shard Waymo Motion stability report, a 100-scenario lane-aware diagnostic, a heading-aware lane-selection ablation, baseline-debug casebooks, replay-candidate plans, open-loop replay/perturbation prototypes, route/intent, lane-link, continuation-candidate/replay/diagnostic/branch-selection, and map-match audits, and a static Scenario Explorer deployed at `ethanvillalovoz.com/scenariolens`.
+- Shipped a tested portfolio demo with 100+ Python unit tests, GitHub Actions CI, SVG trajectory rendering, deterministic dashboard data, lane-aware baseline comparison, a 100-scenario cross-shard Waymo Motion stability report, a 100-scenario lane-aware diagnostic, a heading-aware lane-selection ablation, baseline-debug casebooks, replay-candidate plans, open-loop replay/perturbation prototypes, route/intent, lane-link, continuation-candidate/replay/diagnostic/branch-selection/branch-replay, and map-match audits, and a static Scenario Explorer deployed at `ethanvillalovoz.com/scenariolens`.
 
 Short project line:
 
@@ -212,6 +213,10 @@ Testing and verification:
   single-chain cases, two non-oracle motion-context improvements, and two
   oracle upper-bound improvements while showing the simple anchor-heading
   selector is not enough.
+- A motion-context branch replay diagnostic replays those two branch choices
+  under eight deterministic perturbations: the selected branch is preserved in
+  all eight trials, positive recoverable FDE holds in seven, one case is stable,
+  and one is explicitly labeled gain-sensitive.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
@@ -219,8 +224,8 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Replay the motion-context selected branches under deterministic
-   perturbations, then rerun the replay and diagnostic gates.
+3. Add richer route context for the gain-sensitive branch replay case, then
+   broaden the selector check across more branchable continuation examples.
 4. Create curated scenario collections for pedestrian, cyclist, merge, and
    unprotected-turn cases.
 

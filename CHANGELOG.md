@@ -91,6 +91,10 @@ All notable changes to ScenarioLens are documented here.
   branch alternatives for continuation regressions and separating non-oracle
   anchor-heading and motion-context selectors from observed-future oracle
   upper-bound diagnostics.
+- `scenariolens lane-continuation-branch-replay` workflow and
+  `docs/reports/waymo_lane_continuation_branch_replay.md`, replaying
+  motion-context branch choices under deterministic perturbations and
+  separating stable branch evidence from gain-sensitive follow-up cases.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

@@ -223,6 +223,14 @@ length, and downstream lane speed limits; the oracle branch uses observed
 future motion only as a diagnostic upper bound. Local branch manifests remain
 ignored under `data/processed/`.
 
+The motion-context branch replay diagnostic is checked in at
+[`docs/reports/waymo_lane_continuation_branch_replay.md`](reports/waymo_lane_continuation_branch_replay.md).
+It reads the ignored branch-selection manifest, reloads the two branchable
+local Waymo cases, and publishes only branch/gain stability summaries: 8
+deterministic perturbation trials, 8 branch-preserving trials, 7 positive-gain
+trials, 1 stable motion-context case, and 1 gain-sensitive case. Raw TFRecords
+and local replay packets remain ignored.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

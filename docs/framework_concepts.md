@@ -118,6 +118,13 @@ known forecast horizon, route-chain length, and downstream lane speed limits.
 The oracle column is deliberately an upper-bound debugging tool, not a
 deployable route selector.
 
+The branch replay diagnostic is the stability layer after branch selection. It
+reloads the motion-context-improved branch cases, applies the same deterministic
+anchor perturbations used elsewhere in ScenarioLens, and checks whether the
+selected branch and positive recoverable FDE survive. The current real-data
+run preserves the branch in 8/8 perturbation trials and positive gain in 7/8,
+with one stable case and one gain-sensitive follow-up target.
+
 ## Map-Match Audit
 
 The map-match audit handles cases that are not ready to be treated as replay
@@ -147,8 +154,8 @@ and links to the public reports.
 - Add a dataset adapter for another public motion dataset.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
-- Replay the motion-context selected branches under deterministic
-  perturbations, then compare them against the default linked route.
+- Broaden motion-context branch replay and add richer route context for
+  gain-sensitive branch choices.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.
 - Analyze heading-aware replay stability across more validation shards.

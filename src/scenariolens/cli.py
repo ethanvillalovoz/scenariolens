@@ -64,6 +64,9 @@ from scenariolens.lane_continuation_candidates import (
 from scenariolens.lane_continuation_branch_selection import (
     generate_lane_continuation_branch_selection,
 )
+from scenariolens.lane_continuation_branch_replay import (
+    generate_lane_continuation_branch_replay,
+)
 from scenariolens.lane_continuation_diagnostics import (
     generate_lane_continuation_route_diagnostics,
 )
@@ -897,6 +900,38 @@ def lane_continuation_branch_selection_command(
         f"{result.branchable_count} branchable case(s), "
         f"{result.motion_context_improved_count} motion-context improvement(s), "
         f"{result.oracle_improved_count} oracle upper-bound improvement(s)."
+    )
+    return 0
+
+
+def lane_continuation_branch_replay_command(
+    branch_selection_manifest: str,
+    output_dir: str,
+    top: int,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_lane_continuation_branch_replay(
+            branch_selection_manifest_path=branch_selection_manifest,
+            output_dir=output_dir,
+            top=top,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote lane-continuation-branch-replay manifest to {result.manifest_path}")
+    print(f"Wrote lane-continuation-branch-replay report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("Lane-continuation branch replay is not ready. See manifest.json.")
+        return 2
+    print(
+        f"Generated {result.case_count} branch replay diagnostic(s): "
+        f"{result.replayed_case_count} replayed case(s), "
+        f"{result.stable_case_count} stable motion-context case(s)."
     )
     return 0
 
@@ -1908,6 +1943,34 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe branch-selection report copy.",
     )
+    lane_continuation_branch_replay_parser = subparsers.add_parser(
+        "lane-continuation-branch-replay",
+        help=(
+            "Replay motion-context branch choices under deterministic "
+            "anchor perturbations."
+        ),
+    )
+    lane_continuation_branch_replay_parser.add_argument(
+        "--branch-selection-manifest",
+        required=True,
+        help="Manifest produced by scenariolens lane-continuation-branch-selection.",
+    )
+    lane_continuation_branch_replay_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_lane_continuation_branch_replay",
+        help="Directory for branch-replay manifest.json and report.md.",
+    )
+    lane_continuation_branch_replay_parser.add_argument(
+        "--top",
+        type=int,
+        default=5,
+        help="Maximum motion-context branch cases to replay.",
+    )
+    lane_continuation_branch_replay_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe branch-replay report copy.",
+    )
     heading_replay_parser = subparsers.add_parser(
         "heading-replay-prototype",
         help=(
@@ -2358,6 +2421,13 @@ def main() -> int:
             output_dir=args.output_dir,
             top=args.top,
             max_hops=args.max_hops,
+            public_report=args.public_report,
+        )
+    if args.command == "lane-continuation-branch-replay":
+        return lane_continuation_branch_replay_command(
+            branch_selection_manifest=args.branch_selection_manifest,
+            output_dir=args.output_dir,
+            top=args.top,
             public_report=args.public_report,
         )
     if args.command == "heading-replay-prototype":

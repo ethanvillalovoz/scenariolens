@@ -100,6 +100,7 @@ Then open `http://localhost:8000/demo/`.
 - [Lane-continuation replay prototype](docs/reports/waymo_lane_continuation_replay_prototype.md)
 - [Lane-continuation route diagnostics](docs/reports/waymo_lane_continuation_route_diagnostics.md)
 - [Lane-continuation branch selection diagnostic](docs/reports/waymo_lane_continuation_branch_selection.md)
+- [Motion-context branch replay diagnostic](docs/reports/waymo_lane_continuation_branch_replay.md)
 - [Real Waymo lane-aware baseline diagnostic](docs/reports/waymo_lane_aware_baseline_cross_shard.md)
 - [Lane-aware baseline debug casebook](docs/reports/waymo_lane_aware_debug_casebook.md)
 - [Replay candidate plan](docs/reports/waymo_replay_candidate_plan.md)
@@ -244,6 +245,9 @@ smoke test. The prototype can:
   diagnostics, finding 2 branchable cases, 3 single-chain cases, 2
   motion-context improvements, and 2 oracle upper-bound improvements while
   keeping the anchor-heading selector honest at 0 improvements,
+- replay those 2 motion-context branch choices under 8 deterministic
+  perturbations, preserving the selected branch in 8/8 trials and positive
+  recoverable FDE in 7/8 trials, with 1 stable case and 1 gain-sensitive case,
 - expose public-safe heading-aware improvement, regression, and fallback-heavy
   cases in the live Scenario Explorer,
 - turn heading-aware debug cases into a replay-readiness queue for the next
@@ -255,8 +259,8 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to replay the motion-context selected branches under
-deterministic perturbations and compare them against the default linked route.
+The next milestone is to broaden motion-context branch replay beyond the first
+two branchable cases and add richer route context for the gain-sensitive case.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -555,6 +559,16 @@ PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-branch-selection \
   --top 5 \
   --max-hops 2 \
   --public-report docs/reports/waymo_lane_continuation_branch_selection.md
+```
+
+Replay the motion-context branch choices under deterministic perturbations:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-branch-replay \
+  --branch-selection-manifest data/processed/waymo_lane_continuation_branch_selection/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_branch_replay \
+  --top 5 \
+  --public-report docs/reports/waymo_lane_continuation_branch_replay.md
 ```
 
 Run the no-auth baseline ablation:

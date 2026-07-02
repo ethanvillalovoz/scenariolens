@@ -390,9 +390,12 @@ selection diagnostic at
 branch alternatives for the 5 continuation regression diagnostics, finding 2
 branchable cases, 3 single-chain cases, 2 non-oracle motion-context
 improvements, and 2 oracle upper-bound improvements with 20.534 m mean
-recoverable FDE. Next work is to replay the motion-context selected branches
-under deterministic perturbations and compare them against the default linked
-route.
+recoverable FDE. The branch replay diagnostic at
+`docs/reports/waymo_lane_continuation_branch_replay.md` then replays those 2
+motion-context choices under 8 deterministic perturbations: branch choice is
+preserved in 8/8 trials, positive recoverable FDE holds in 7/8 trials, and the
+second case is labeled gain-sensitive. Next work is broader branch replay plus
+richer route context for the gain-sensitive case.
 
 ## Stretch Goals
 

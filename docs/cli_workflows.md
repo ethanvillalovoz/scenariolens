@@ -463,6 +463,23 @@ and downstream lane speed limits; the `oracle_upper_bound` selector uses
 observed future motion only to measure recoverable branch-choice error. Treat
 it as diagnostic evidence, not a route planner or benchmark claim.
 
+## Lane-Continuation Branch Replay
+
+```bash
+scenariolens lane-continuation-branch-replay \
+  --branch-selection-manifest data/processed/waymo_lane_continuation_branch_selection/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_branch_replay \
+  --top 5 \
+  --public-report docs/reports/waymo_lane_continuation_branch_replay.md
+```
+
+This replays motion-context branch choices under deterministic anchor-velocity
+perturbations. The checked-in report covers 2 branchable real-data cases and 8
+perturbation trials: the selected branch is preserved in 8/8 trials, positive
+recoverable FDE holds in 7/8 trials, and one case is explicitly labeled
+gain-sensitive. Treat the sensitive case as the next route-context target, not
+as a failed benchmark.
+
 ## Baseline Ablation
 
 ```bash
