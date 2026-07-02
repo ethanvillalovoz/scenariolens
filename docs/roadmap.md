@@ -398,7 +398,10 @@ acceptance gate marks 1 branch ready for broader selector evaluation and 1
 branch as a route-context margin follow-up with a -0.443 m worst-case margin.
 An experimental history-speed-prior replay score keeps 1 accepted case but
 does not resolve the margin follow-up, so next work is broader branch replay
-plus richer route context for that case.
+plus richer route context for that case. The route-context margin diagnostic
+now labels the unresolved case as `speed_minus_route_context_margin`, records
+a 0.443 m gap to the gate, and publishes route-feature deltas for the next
+selector iteration.
 
 ## Stretch Goals
 

@@ -211,7 +211,7 @@ def portfolio_markdown(
             "",
             "- Expand the documented local-slice recipe across more Waymo Motion validation shards.",
             "- Compare baseline ADE/FDE distributions across more validation shards.",
-            "- Add richer route context for branch replay margin follow-ups; the simple history-speed-prior ablation did not clear the current margin gate.",
+            "- Implement a richer route-context selector candidate for the branch replay margin target now labeled `speed_minus_route_context_margin`.",
             "- Graduate stable open-loop replay candidates into an optional Waymax/JAX path.",
             "- Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.",
             "",

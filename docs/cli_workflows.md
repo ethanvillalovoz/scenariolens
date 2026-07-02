@@ -481,8 +481,11 @@ gate for broader selector evaluation, while the second becomes a route-context
 margin follow-up with a -0.443 m worst-case margin. The report also evaluates
 an experimental history-speed-prior replay score; it preserves the branch but
 does not resolve the margin target, so the next useful experiment is richer
-route context rather than simply smoothing speed. Treat that case as the next
-route-context target, not as a failed benchmark.
+route context rather than simply smoothing speed. The route-context margin
+diagnostic now labels that case as `speed_minus_route_context_margin`, records
+a 0.443 m gap to the rollout gate, and publishes selected-vs-default route
+feature deltas for follow-up. Treat that case as the next route-context target,
+not as a failed benchmark.
 
 ## Baseline Ablation
 

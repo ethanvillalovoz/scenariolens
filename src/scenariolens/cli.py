@@ -934,7 +934,9 @@ def lane_continuation_branch_replay_command(
         f"{result.stable_case_count} stable motion-context case(s), "
         f"{result.accepted_case_count} accepted branch case(s), "
         f"{result.history_speed_prior_accepted_case_count} "
-        "history speed-prior accepted case(s)."
+        "history speed-prior accepted case(s), "
+        f"{result.route_context_margin_case_count} "
+        "route-context margin case(s)."
     )
     return 0
 

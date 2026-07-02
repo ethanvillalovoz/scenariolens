@@ -44,6 +44,7 @@ class LaneContinuationBranchReplayResult:
     stable_case_count: int
     accepted_case_count: int
     history_speed_prior_accepted_case_count: int
+    route_context_margin_case_count: int
     output_dir: Path
     manifest_path: Path
     report_path: Path
@@ -86,6 +87,9 @@ def generate_lane_continuation_branch_replay(
         accepted_case_count=int(aggregate["accepted_branch_case_count"]),
         history_speed_prior_accepted_case_count=int(
             aggregate["history_speed_prior_accepted_case_count"]
+        ),
+        route_context_margin_case_count=int(
+            aggregate["route_context_margin_case_count"]
         ),
         output_dir=target,
         manifest_path=manifest_path,
@@ -254,6 +258,9 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
         f"| History speed-prior accepted cases | {aggregate['history_speed_prior_accepted_case_count']} |",
         f"| Margin follow-ups resolved by speed prior | {aggregate['history_speed_prior_resolved_margin_case_count']} |",
         f"| History speed-prior stable positive trials | {aggregate['history_speed_prior_stable_positive_trial_count']} |",
+        f"| Route-context margin diagnostics | {aggregate['route_context_margin_case_count']} |",
+        f"| Speed-minus margin diagnostics | {aggregate['speed_minus_route_context_margin_case_count']} |",
+        f"| Speed-prior unresolved margin cases | {aggregate['speed_prior_unresolved_margin_case_count']} |",
         f"| Mean nominal recoverable FDE | {_signed_meter_text(aggregate['mean_nominal_gain_m'])} |",
         f"| Mean perturbed recoverable FDE | {_signed_meter_text(aggregate['mean_trial_gain_m'])} |",
         f"| Min perturbed recoverable FDE | {_signed_meter_text(aggregate['min_trial_gain_m'])} |",
@@ -275,7 +282,7 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
             "",
             "## Case Results",
             "",
-            "| Rank | Scenario | Track | Default chain | Motion-context chain | Nominal gain | Stable trials | Margin | Speed-prior margin | Acceptance | Speed-prior acceptance | Stability |",
+            "| Rank | Scenario | Track | Default chain | Motion-context chain | Nominal gain | Stable trials | Margin | Speed-prior margin | Acceptance | Route context | Stability |",
             "| ---: | --- | --- | --- | --- | ---: | ---: | ---: | ---: | --- | --- | --- |",
         ]
     )
@@ -291,9 +298,9 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
             case,
             "history_speed_prior_stability",
         )
-        speed_prior_acceptance = _required_mapping(
+        route_context = _required_mapping(
             case,
-            "history_speed_prior_acceptance_decision",
+            "route_context_margin_diagnostic",
         )
         lines.append(
             "| "
@@ -308,8 +315,37 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
             f"{_signed_meter_text(stability.get('robustness_margin_m'))} | "
             f"{_signed_meter_text(speed_prior_stability.get('robustness_margin_m'))} | "
             f"`{acceptance['label']}` | "
-            f"`{speed_prior_acceptance['label']}` | "
+            f"`{route_context['label']}` | "
             f"`{stability['label']}` |"
+        )
+
+    lines.extend(
+        [
+            "",
+            "## Route-Context Margin Diagnostics",
+            "",
+            "| Rank | Scenario | Track | Diagnostic | Priority | Worst trial | Gap to gate | Oracle match | Speed-prior resolved | First next action |",
+            "| ---: | --- | --- | --- | ---: | --- | ---: | --- | --- | --- |",
+        ]
+    )
+    if not cases:
+        lines.append("| n/a | n/a | n/a | n/a | 0.00 | n/a | n/a | n/a | n/a | n/a |")
+    for case in cases:
+        assert isinstance(case, dict)
+        route_context = _required_mapping(case, "route_context_margin_diagnostic")
+        actions = _required_list(route_context, "next_actions")
+        lines.append(
+            "| "
+            f"{case['rank']} | "
+            f"`{case['scenario_id']}` | "
+            f"`{case['track_id']}` | "
+            f"`{route_context['label']}` | "
+            f"{float(route_context['priority_score']):.2f} | "
+            f"`{route_context['worst_trial_label']}` | "
+            f"{_signed_meter_text(route_context.get('robustness_gap_to_gate_m'))} | "
+            f"{route_context['selected_matches_oracle']} | "
+            f"{route_context['speed_prior_resolved_margin']} | "
+            f"{actions[0] if actions else 'Manual review.'} |"
         )
 
     for case in cases:
@@ -324,6 +360,9 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
             case,
             "history_speed_prior_acceptance_decision",
         )
+        route_context = _required_mapping(case, "route_context_margin_diagnostic")
+        route_deltas = _required_mapping(route_context, "selected_vs_default")
+        route_actions = _required_list(route_context, "next_actions")
         lines.extend(
             [
                 "",
@@ -335,11 +374,14 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
                 f"- Stability: **{stability['label']}**",
                 f"- Acceptance: **{acceptance['label']}**",
                 f"- History speed-prior acceptance: **{speed_prior_acceptance['label']}**",
+                f"- Route-context diagnostic: **{route_context['label']}**",
                 f"- Why it matters: {case['why_it_matters']}",
                 f"- Acceptance reason: {acceptance['reason']}",
                 f"- Recommended next action: {acceptance['next_action']}",
                 f"- Speed-prior reason: {speed_prior_acceptance['reason']}",
                 f"- Speed-prior next action: {speed_prior_acceptance['next_action']}",
+                f"- Route-context hypothesis: {route_context['hypothesis']}",
+                f"- Route-context priority: {float(route_context['priority_score']):.2f}",
                 "- Default linked-route FDE: "
                 f"{_meter_text(case.get('default_fde_m'))}",
                 "- Motion-context route FDE: "
@@ -370,6 +412,17 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
                 f"`{speed_prior_stability['worst_trial_label']}`",
                 "- History speed-prior robustness margin: "
                 f"{_signed_meter_text(speed_prior_stability.get('robustness_margin_m'))}",
+                "- Selected route matches diagnostic oracle: "
+                f"{route_context['selected_matches_oracle']}",
+                "- Selected vs default route context: "
+                f"route fit {_signed_score_text(route_deltas.get('route_fit_delta'))}, "
+                f"endpoint alignment {_signed_score_text(route_deltas.get('endpoint_alignment_delta'))}, "
+                f"downstream speed-limit drop {_signed_score_text(route_deltas.get('speed_limit_drop_delta'))}, "
+                f"remaining route {_signed_meter_text(route_deltas.get('route_remaining_delta_m'))}",
+                "",
+                "Route-context next actions:",
+                "",
+                *[f"- {action}" for action in route_actions],
                 "",
                 "Perturbation trials:",
                 "",
@@ -405,6 +458,9 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
             "non-oracle speed calibration would clear the same replay gate; "
             "they are candidates for the next selector experiment, not a new "
             "default metric.",
+            "- Route-context margin diagnostics identify stable branch choices "
+            "whose gains are too thin for rollout and name the route features "
+            "that should be tested before promoting the selector.",
             "- Sensitive cases are still useful: they identify where a "
             "hand-built selector needs richer route context or a learned "
             "candidate scorer.",
@@ -463,6 +519,7 @@ def _branch_replay_case(
         "history_speed_prior_acceptance_decision": _acceptance_decision(
             _empty_stability()
         ),
+        "route_context_margin_diagnostic": _empty_route_context_margin_diagnostic(),
         "why_it_matters": "The motion-context branch case could not be replayed.",
     }
     if replay_case is None:
@@ -543,6 +600,13 @@ def _branch_replay_case(
         trials=trials,
     )
     speed_prior_acceptance = _acceptance_decision(speed_prior_stability)
+    route_context = _route_context_margin_diagnostic(
+        nominal=nominal,
+        stability=stability,
+        acceptance=acceptance,
+        speed_prior_stability=speed_prior_stability,
+        speed_prior_acceptance=speed_prior_acceptance,
+    )
     base.update(
         {
             "ready": True,
@@ -577,6 +641,7 @@ def _branch_replay_case(
             "acceptance_decision": acceptance,
             "history_speed_prior_stability": speed_prior_stability,
             "history_speed_prior_acceptance_decision": speed_prior_acceptance,
+            "route_context_margin_diagnostic": route_context,
             "why_it_matters": _why_it_matters(stability, acceptance),
         }
     )
@@ -687,6 +752,13 @@ def _selected_motion_context_route(
     return None
 
 
+def _selected_default_route(evaluation: dict[str, object]) -> dict[str, object] | None:
+    for route in _required_list(evaluation, "route_candidates"):
+        if isinstance(route, dict) and bool(route.get("is_default")):
+            return route
+    return None
+
+
 def _perturbation_stability(
     nominal_gain: object,
     expected_chain: tuple[str, ...],
@@ -788,6 +860,237 @@ def _gain_stability(
         "worst_trial_label": worst_trial_label,
         "robustness_margin_m": robustness_margin,
     }
+
+
+def _route_context_margin_diagnostic(
+    nominal: dict[str, object],
+    stability: dict[str, object],
+    acceptance: dict[str, object],
+    speed_prior_stability: dict[str, object],
+    speed_prior_acceptance: dict[str, object],
+) -> dict[str, object]:
+    default_route = _selected_default_route(nominal)
+    selected_route = _selected_motion_context_route(nominal)
+    nominal_gain = _optional_float(nominal.get("motion_context_recoverable_fde_m"))
+    min_gain = _optional_float(stability.get("min_gain_m"))
+    speed_prior_min_gain = _optional_float(speed_prior_stability.get("min_gain_m"))
+    robustness_gap = (
+        round(max(_MIN_STABLE_GAIN_M - min_gain, 0.0), 3)
+        if min_gain is not None
+        else None
+    )
+    speed_prior_delta = (
+        round(speed_prior_min_gain - min_gain, 3)
+        if speed_prior_min_gain is not None and min_gain is not None
+        else None
+    )
+    selected_chain = tuple(str(item) for item in nominal.get("motion_context_chain", []))
+    oracle_chain = tuple(str(item) for item in nominal.get("oracle_chain", []))
+    selected_matches_oracle = bool(selected_chain) and selected_chain == oracle_chain
+    speed_prior_resolved = (
+        str(acceptance.get("label")) == "needs_route_context_margin"
+        and str(speed_prior_acceptance.get("label")) == "accepted_for_selector_rollout"
+    )
+    label = _route_context_margin_label(
+        acceptance=acceptance,
+        stability=stability,
+    )
+    selected_vs_default = _selected_vs_default_route_context(
+        default_route=default_route,
+        selected_route=selected_route,
+    )
+    priority = _route_context_priority_score(
+        label=label,
+        nominal_gain=nominal_gain,
+        robustness_gap=robustness_gap,
+        speed_prior_delta=speed_prior_delta,
+        selected_matches_oracle=selected_matches_oracle,
+    )
+    hypothesis = _route_context_hypothesis(
+        label=label,
+        selected_matches_oracle=selected_matches_oracle,
+        speed_prior_resolved=speed_prior_resolved,
+    )
+    return {
+        "label": label,
+        "priority_score": priority,
+        "hypothesis": hypothesis,
+        "worst_trial_label": stability.get("worst_trial_label"),
+        "nominal_gain_m": round(nominal_gain, 3)
+        if nominal_gain is not None
+        else None,
+        "min_gain_m": round(min_gain, 3) if min_gain is not None else None,
+        "robustness_gap_to_gate_m": robustness_gap,
+        "selected_matches_oracle": selected_matches_oracle,
+        "speed_prior_resolved_margin": speed_prior_resolved,
+        "history_speed_prior_min_gain_m": round(speed_prior_min_gain, 3)
+        if speed_prior_min_gain is not None
+        else None,
+        "history_speed_prior_delta_vs_base_min_gain_m": speed_prior_delta,
+        "selected_vs_default": selected_vs_default,
+        "next_actions": _route_context_next_actions(
+            label=label,
+            speed_prior_resolved=speed_prior_resolved,
+        ),
+    }
+
+
+def _route_context_margin_label(
+    acceptance: dict[str, object],
+    stability: dict[str, object],
+) -> str:
+    decision = str(acceptance.get("label", "not_evaluable"))
+    if decision == "accepted_for_selector_rollout":
+        return "accepted_no_route_context_followup"
+    if decision == "needs_route_context_margin":
+        worst = str(stability.get("worst_trial_label") or "")
+        if worst == "speed_minus_10pct":
+            return "speed_minus_route_context_margin"
+        return "route_context_margin"
+    if decision == "needs_selector_stability":
+        return "selector_stability_context_margin"
+    if decision == "needs_route_and_selector_followup":
+        return "route_and_selector_context_margin"
+    return "not_evaluable"
+
+
+def _selected_vs_default_route_context(
+    default_route: dict[str, object] | None,
+    selected_route: dict[str, object] | None,
+) -> dict[str, object]:
+    if default_route is None or selected_route is None:
+        return {
+            "default_chain": [],
+            "selected_chain": [],
+            "route_fit_delta": None,
+            "endpoint_alignment_delta": None,
+            "speed_limit_drop_delta": None,
+            "heading_score_delta": None,
+            "motion_context_score_delta": None,
+            "route_remaining_delta_m": None,
+            "selected_route_remaining_m": None,
+            "default_route_remaining_m": None,
+            "horizon_travel_m": None,
+        }
+
+    def delta(field: str) -> float | None:
+        selected = _optional_float(selected_route.get(field))
+        default = _optional_float(default_route.get(field))
+        if selected is None or default is None:
+            return None
+        return round(selected - default, 3)
+
+    return {
+        "default_chain": default_route.get("feature_chain", []),
+        "selected_chain": selected_route.get("feature_chain", []),
+        "route_fit_delta": delta("motion_context_route_fit"),
+        "endpoint_alignment_delta": delta("motion_context_endpoint_alignment"),
+        "speed_limit_drop_delta": delta("motion_context_speed_limit_drop"),
+        "heading_score_delta": delta("anchor_heading_score"),
+        "motion_context_score_delta": delta("motion_context_score"),
+        "route_remaining_delta_m": delta("route_remaining_m"),
+        "selected_route_remaining_m": selected_route.get("route_remaining_m"),
+        "default_route_remaining_m": default_route.get("route_remaining_m"),
+        "horizon_travel_m": selected_route.get("horizon_travel_m"),
+    }
+
+
+def _route_context_priority_score(
+    label: str,
+    nominal_gain: float | None,
+    robustness_gap: float | None,
+    speed_prior_delta: float | None,
+    selected_matches_oracle: bool,
+) -> float:
+    if label == "accepted_no_route_context_followup":
+        return 0.0
+    score = 1.0
+    if label == "speed_minus_route_context_margin":
+        score += 1.0
+    if robustness_gap is not None:
+        score += min(robustness_gap * 2.0, 3.0)
+    if nominal_gain is not None:
+        score += min(max(nominal_gain, 0.0) / 5.0, 2.0)
+    if speed_prior_delta is not None and speed_prior_delta < 0.0:
+        score += min(abs(speed_prior_delta) / 3.0, 1.0)
+    if selected_matches_oracle:
+        score += 0.75
+    return round(score, 3)
+
+
+def _route_context_hypothesis(
+    label: str,
+    selected_matches_oracle: bool,
+    speed_prior_resolved: bool,
+) -> str:
+    if label == "accepted_no_route_context_followup":
+        return (
+            "The branch already clears the replay gate; use it as a broader "
+            "selector-evaluation candidate."
+        )
+    if speed_prior_resolved:
+        return (
+            "The branch is stable and a simple speed prior clears the margin, "
+            "so the next step is to validate that calibration on more cases."
+        )
+    if label == "speed_minus_route_context_margin" and selected_matches_oracle:
+        return (
+            "The selected branch is stable and matches the diagnostic oracle, "
+            "but reduced anchor speed erases the gain margin. Add richer "
+            "route-context evidence before treating this branch as robust."
+        )
+    if label in {"route_context_margin", "speed_minus_route_context_margin"}:
+        return (
+            "The branch choice is stable but the recoverable-FDE margin is too "
+            "thin; route context should explain when this choice is worth "
+            "promoting."
+        )
+    if label == "selector_stability_context_margin":
+        return (
+            "The gain is positive but selector choice changes under "
+            "perturbation, so context should improve route-candidate ranking."
+        )
+    return (
+        "The branch needs route-context and selector-stability follow-up before "
+        "it can support rollout evidence."
+    )
+
+
+def _route_context_next_actions(
+    label: str,
+    speed_prior_resolved: bool,
+) -> list[str]:
+    if label == "accepted_no_route_context_followup":
+        return [
+            "Broaden the branch replay queue with the same acceptance gate.",
+            "Keep this case as a positive control for selector rollout checks.",
+        ]
+    if speed_prior_resolved:
+        return [
+            "Validate the speed-prior calibration on a broader branchable queue.",
+            "Keep the original anchor-speed replay as the control.",
+            "Do not change default ScenarioLens scoring until the broader gate passes.",
+        ]
+    if label == "speed_minus_route_context_margin":
+        return [
+            "Add route-context features that can explain reduced-speed branch intent.",
+            "Test turn-lane, downstream topology, and traffic-control context before selector rollout.",
+            "Keep the speed-prior ablation as negative evidence, not a promoted default.",
+        ]
+    if label == "route_context_margin":
+        return [
+            "Add route-context features that increase confidence margin on stable branch choices.",
+            "Rerun perturbation replay before promoting the selector.",
+        ]
+    if label == "selector_stability_context_margin":
+        return [
+            "Increase selector margin with richer route-candidate context.",
+            "Keep positive-gain cases separate from branch-stable rollout evidence.",
+        ]
+    return [
+        "Keep the case in the diagnostic queue for route-context and selector follow-up.",
+        "Avoid route-planning or benchmark claims until the replay gate passes.",
+    ]
 
 
 def _acceptance_decision(stability: dict[str, object]) -> dict[str, object]:
@@ -917,6 +1220,9 @@ def _aggregate_cases(cases: list[dict[str, object]]) -> dict[str, object]:
         _required_mapping(case, "history_speed_prior_acceptance_decision")
         for case in ready
     ]
+    route_contexts = [
+        _required_mapping(case, "route_context_margin_diagnostic") for case in ready
+    ]
     margins = [
         margin
         for stability in stabilities
@@ -929,6 +1235,23 @@ def _aggregate_cases(cases: list[dict[str, object]]) -> dict[str, object]:
         if (margin := _optional_float(stability.get("robustness_margin_m")))
         is not None
     ]
+    route_context_priorities = [
+        priority
+        for diagnostic in route_contexts
+        if (priority := _optional_float(diagnostic.get("priority_score")))
+        is not None
+    ]
+    route_context_gaps = [
+        gap
+        for diagnostic in route_contexts
+        if (gap := _optional_float(diagnostic.get("robustness_gap_to_gate_m")))
+        is not None
+    ]
+    route_context_margin_labels = {
+        "speed_minus_route_context_margin",
+        "route_context_margin",
+        "route_and_selector_context_margin",
+    }
     return {
         "case_count": len(cases),
         "replayed_case_count": len(ready),
@@ -979,6 +1302,27 @@ def _aggregate_cases(cases: list[dict[str, object]]) -> dict[str, object]:
             str(decision.get("label")) == "needs_route_context_margin"
             for decision in speed_prior_acceptances
         ),
+        "route_context_margin_case_count": sum(
+            str(diagnostic.get("label")) in route_context_margin_labels
+            for diagnostic in route_contexts
+        ),
+        "speed_minus_route_context_margin_case_count": sum(
+            str(diagnostic.get("label")) == "speed_minus_route_context_margin"
+            for diagnostic in route_contexts
+        ),
+        "speed_prior_unresolved_margin_case_count": sum(
+            str(base_decision.get("label")) == "needs_route_context_margin"
+            and str(speed_decision.get("label")) == "needs_route_context_margin"
+            for base_decision, speed_decision in zip(
+                acceptances,
+                speed_prior_acceptances,
+            )
+        ),
+        "oracle_matched_margin_case_count": sum(
+            str(diagnostic.get("label")) in route_context_margin_labels
+            and bool(diagnostic.get("selected_matches_oracle"))
+            for diagnostic in route_contexts
+        ),
         "route_context_followup_case_count": sum(
             str(decision.get("label")) == "needs_route_context_margin"
             for decision in acceptances
@@ -1011,6 +1355,14 @@ def _aggregate_cases(cases: list[dict[str, object]]) -> dict[str, object]:
             round(min(speed_prior_margins), 3) if speed_prior_margins else None
         ),
         "mean_history_speed_prior_margin_m": _mean(tuple(speed_prior_margins)),
+        "max_route_context_priority_score": (
+            round(max(route_context_priorities), 3)
+            if route_context_priorities
+            else None
+        ),
+        "max_route_context_gap_to_gate_m": (
+            round(max(route_context_gaps), 3) if route_context_gaps else None
+        ),
     }
 
 
@@ -1031,6 +1383,26 @@ def _empty_stability() -> dict[str, object]:
         "max_gain_swing_m": None,
         "worst_trial_label": None,
         "robustness_margin_m": None,
+    }
+
+
+def _empty_route_context_margin_diagnostic() -> dict[str, object]:
+    return {
+        "label": "not_evaluable",
+        "priority_score": 0.0,
+        "hypothesis": "The case could not produce route-context margin evidence.",
+        "worst_trial_label": None,
+        "nominal_gain_m": None,
+        "min_gain_m": None,
+        "robustness_gap_to_gate_m": None,
+        "selected_matches_oracle": False,
+        "speed_prior_resolved_margin": False,
+        "history_speed_prior_min_gain_m": None,
+        "history_speed_prior_delta_vs_base_min_gain_m": None,
+        "selected_vs_default": {},
+        "next_actions": [
+            "Confirm the local replay inputs and rerun branch replay.",
+        ],
     }
 
 
@@ -1088,3 +1460,11 @@ def _mean(values: tuple[float, ...]) -> float | None:
     if not values:
         return None
     return round(sum(values) / len(values), 3)
+
+
+def _signed_score_text(value: object) -> str:
+    number = _optional_float(value)
+    if number is None:
+        return "n/a"
+    sign = "+" if number > 0 else ""
+    return f"{sign}{number:.3f}"

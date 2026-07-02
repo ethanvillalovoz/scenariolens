@@ -10,6 +10,7 @@ from scenariolens.lane_continuation_branch_replay import (
     _acceptance_decision,
     _history_speed_prior_stability,
     _perturbation_stability,
+    _route_context_margin_diagnostic,
     generate_lane_continuation_branch_replay,
     lane_continuation_branch_replay_markdown,
     lane_continuation_branch_replay_payload,
@@ -45,6 +46,7 @@ class LaneContinuationBranchReplayTest(unittest.TestCase):
                 aggregate["history_speed_prior_accepted_case_count"],
                 1,
             )
+            self.assertEqual(aggregate["route_context_margin_case_count"], 0)
             self.assertEqual(aggregate["route_context_followup_case_count"], 0)
             self.assertGreater(aggregate["min_robustness_margin_m"], 1.0)
             self.assertGreater(
@@ -77,11 +79,16 @@ class LaneContinuationBranchReplayTest(unittest.TestCase):
                 "history_speed_prior_gain_m",
                 case["perturbation_trials"][0],
             )
+            self.assertEqual(
+                case["route_context_margin_diagnostic"]["label"],
+                "accepted_no_route_context_followup",
+            )
 
             markdown = lane_continuation_branch_replay_markdown(payload)
             self.assertIn("Motion-Context Branch Replay Diagnostic", markdown)
             self.assertIn("Acceptance gate", markdown)
             self.assertIn("History speed-prior accepted cases", markdown)
+            self.assertIn("Route-Context Margin Diagnostics", markdown)
             self.assertIn("accepted_for_selector_rollout", markdown)
             self.assertIn("stable_motion_context_branch", markdown)
             self.assertIn("not a route planner", markdown)
@@ -145,6 +152,7 @@ class LaneContinuationBranchReplayTest(unittest.TestCase):
             self.assertIn("Generated 1 branch replay diagnostic", result.stdout)
             self.assertIn("1 stable motion-context case", result.stdout)
             self.assertIn("1 accepted branch case", result.stdout)
+            self.assertIn("0 route-context margin case", result.stdout)
             self.assertTrue((output_dir / "manifest.json").exists())
             self.assertTrue((output_dir / "report.md").exists())
             self.assertTrue(public_report.exists())
@@ -229,6 +237,91 @@ class LaneContinuationBranchReplayTest(unittest.TestCase):
             speed_prior_decision["label"],
             "accepted_for_selector_rollout",
         )
+
+    def test_route_context_diagnostic_explains_speed_minus_margin(self) -> None:
+        trials = [
+            {
+                "ready": True,
+                "label": "speed_minus_10pct",
+                "branch_preserved": True,
+                "positive_gain": False,
+                "motion_context_gain_m": 0.75,
+                "history_speed_prior_positive_gain": False,
+                "history_speed_prior_gain_m": -0.25,
+            },
+            {
+                "ready": True,
+                "label": "speed_plus_10pct",
+                "branch_preserved": True,
+                "positive_gain": True,
+                "motion_context_gain_m": 3.0,
+                "history_speed_prior_positive_gain": True,
+                "history_speed_prior_gain_m": 2.0,
+            },
+        ]
+        stability = _perturbation_stability(
+            nominal_gain=2.0,
+            expected_chain=("100", "300"),
+            trials=trials,
+        )
+        acceptance = _acceptance_decision(stability)
+        speed_prior_stability = _history_speed_prior_stability(
+            nominal_gain=1.5,
+            expected_chain=("100", "300"),
+            trials=trials,
+        )
+        speed_prior_acceptance = _acceptance_decision(speed_prior_stability)
+        diagnostic = _route_context_margin_diagnostic(
+            nominal={
+                "motion_context_recoverable_fde_m": 2.0,
+                "motion_context_chain": ["100", "300"],
+                "oracle_chain": ["100", "300"],
+                "route_candidates": [
+                    {
+                        "feature_chain": ["100", "200"],
+                        "is_default": True,
+                        "is_motion_context_selected": False,
+                        "motion_context_route_fit": -0.8,
+                        "motion_context_endpoint_alignment": 0.99,
+                        "motion_context_speed_limit_drop": 0.0,
+                        "anchor_heading_score": 1.0,
+                        "motion_context_score": -0.2,
+                        "route_remaining_m": 110.0,
+                        "horizon_travel_m": 60.0,
+                    },
+                    {
+                        "feature_chain": ["100", "300"],
+                        "is_default": False,
+                        "is_motion_context_selected": True,
+                        "motion_context_route_fit": -0.4,
+                        "motion_context_endpoint_alignment": 0.7,
+                        "motion_context_speed_limit_drop": 0.25,
+                        "anchor_heading_score": 0.8,
+                        "motion_context_score": 0.1,
+                        "route_remaining_m": 95.0,
+                        "horizon_travel_m": 60.0,
+                    },
+                ],
+            },
+            stability=stability,
+            acceptance=acceptance,
+            speed_prior_stability=speed_prior_stability,
+            speed_prior_acceptance=speed_prior_acceptance,
+        )
+
+        self.assertEqual(
+            diagnostic["label"],
+            "speed_minus_route_context_margin",
+        )
+        self.assertEqual(diagnostic["robustness_gap_to_gate_m"], 0.25)
+        self.assertTrue(diagnostic["selected_matches_oracle"])
+        self.assertFalse(diagnostic["speed_prior_resolved_margin"])
+        self.assertGreater(diagnostic["priority_score"], 3.0)
+        selected_vs_default = diagnostic["selected_vs_default"]
+        self.assertEqual(selected_vs_default["route_fit_delta"], 0.4)
+        self.assertEqual(selected_vs_default["endpoint_alignment_delta"], -0.29)
+        self.assertEqual(selected_vs_default["speed_limit_drop_delta"], 0.25)
+        self.assertEqual(selected_vs_default["route_remaining_delta_m"], -15.0)
 
 
 def _write_branch_selection_manifest(root: Path) -> Path:

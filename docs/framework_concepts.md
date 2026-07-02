@@ -128,6 +128,9 @@ one branch as a route-context margin follow-up with a -0.443 m worst-case
 margin. The experimental history-speed-prior replay score keeps the same
 accepted-case count and does not resolve that margin follow-up, which points
 the next iteration toward richer route context instead of speed smoothing alone.
+The route-context margin diagnostic then labels the unresolved case as a
+`speed_minus_route_context_margin` target and publishes selected-vs-default
+route feature deltas for the next selector iteration.
 
 ## Map-Match Audit
 

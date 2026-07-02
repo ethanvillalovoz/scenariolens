@@ -232,8 +232,10 @@ trials, 1 branch accepted for broader selector evaluation, 1 route-context
 margin follow-up, and a -0.443 m minimum robustness margin. The same report
 also checks an experimental history-speed-prior replay score; it keeps 1
 accepted case and leaves the margin follow-up unresolved, with a -3.099 m
-minimum speed-prior margin. Raw TFRecords and local replay packets remain
-ignored.
+minimum speed-prior margin. The route-context margin diagnostic labels the
+unresolved case as `speed_minus_route_context_margin`, records a 0.443 m gap
+to the gate, and publishes only aggregate/case-summary route-feature deltas.
+Raw TFRecords and local replay packets remain ignored.
 
 ## Interpretation Rules
 

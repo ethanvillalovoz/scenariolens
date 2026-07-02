@@ -222,6 +222,10 @@ Testing and verification:
   calibration idea on the same branch choices. It keeps one accepted case but
   does not resolve the margin follow-up, turning the negative result into a
   concrete route-context next step.
+- A route-context margin diagnostic labels the unresolved case as
+  `speed_minus_route_context_margin`, records the 0.443 m gap to the gate, and
+  exposes selected-vs-default route-feature deltas for the next selector
+  experiment.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
@@ -229,9 +233,9 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Add richer route context for the branch replay margin follow-up, since the
-   simple history-speed-prior ablation did not clear that gate, then broaden
-   the selector check across more branchable continuation examples.
+3. Implement a richer route-context selector candidate for the
+   `speed_minus_route_context_margin` case, then broaden the selector check
+   across more branchable continuation examples.
 4. Create curated scenario collections for pedestrian, cyclist, merge, and
    unprotected-turn cases.
 

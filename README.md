@@ -252,6 +252,9 @@ smoke test. The prototype can:
 - test an experimental history-speed-prior replay score on the same branch
   cases, showing that simple speed smoothing does not resolve the margin
   follow-up and that richer route context is the better next target,
+- add a route-context margin diagnostic for the unresolved branch case,
+  identifying a speed-minus robustness gap, oracle-matched branch choice,
+  and route-feature deltas to guide the next selector iteration,
 - expose public-safe heading-aware improvement, regression, and fallback-heavy
   cases in the live Scenario Explorer,
 - turn heading-aware debug cases into a replay-readiness queue for the next
