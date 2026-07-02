@@ -110,6 +110,13 @@ candidates, 10 replay-ready candidates, 5 branch-selection cases, 2 branchable
 cases, 1 route-guard promotion, 5 topology blockers, and 9 named expansion
 items.
 
+The topology gap audit follows the largest blocker class directly. It reloads
+the 5 topology blockers and compares the capped ScenarioLens map features with
+raw parsed map-feature IDs. Four blocker cases have linked-lane targets present
+beyond the current feature cap, one selected lane is terminal, and no raw target
+miss remains unexplained. That turns the next step into a concrete ingestion fix:
+carry linked-lane closure features through the cap before rerunning replay.
+
 ## Why It Matters
 
 Autonomy teams need tooling that finds where average-case performance hides
@@ -119,8 +126,7 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Work down the branch coverage audit: reduce topology/parser gaps, expose
-alternatives for the three single-chain branch-selection cases, add richer
-turn-lane/topology/traffic-control context for the held branch, expand beyond
-shards `00007` through `00010`, and continue curating stable open-loop replay
-candidates.
+Materialize linked-lane closure features before the map-feature cap, rerun
+continuation replay and branch coverage, then expose alternatives for the three
+single-chain branch-selection cases and add richer turn-lane, topology, and
+traffic-control context for the held branch.

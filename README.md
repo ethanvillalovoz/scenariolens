@@ -104,6 +104,7 @@ Then open `http://localhost:8000/demo/`.
 - [Branch rollout gate](docs/reports/waymo_lane_continuation_branch_rollout_gate.md)
 - [Route-context guard study](docs/reports/waymo_lane_continuation_route_context_guard.md)
 - [Branch coverage audit](docs/reports/waymo_lane_continuation_branch_coverage.md)
+- [Topology gap audit](docs/reports/waymo_lane_continuation_topology_gap_audit.md)
 - [Real Waymo lane-aware baseline diagnostic](docs/reports/waymo_lane_aware_baseline_cross_shard.md)
 - [Lane-aware baseline debug casebook](docs/reports/waymo_lane_aware_debug_casebook.md)
 - [Replay candidate plan](docs/reports/waymo_replay_candidate_plan.md)
@@ -266,6 +267,9 @@ smoke test. The prototype can:
 - audit the continuation-to-branch funnel across 15 real-data candidates,
   showing 2 branchable cases, 1 guarded promotion, 5 topology blockers, and
   9 concrete expansion items for the next v1.0 branch queue,
+- audit the topology blockers by comparing capped ScenarioLens map features
+  with raw parsed map-feature IDs, showing 4 of 5 blocker cases are
+  cap-recoverable and 1 lane is a confirmed terminal case,
 - expose public-safe heading-aware improvement, regression, and fallback-heavy
   cases in the live Scenario Explorer,
 - turn heading-aware debug cases into a replay-readiness queue for the next
@@ -277,9 +281,9 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to work down the branch coverage audit: reduce topology
-parser gaps, expose alternatives for the three single-chain cases, and add
-richer route-context features for the held speed-minus margin follow-up.
+The next milestone is to materialize linked-lane closure features before
+applying the ScenarioLens map-feature cap, then rerun continuation replay,
+branch coverage, and route-context guard checks on the expanded candidate queue.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -621,6 +625,15 @@ PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-branch-coverage \
   --route-context-guard-manifest data/processed/waymo_lane_continuation_route_context_guard/manifest.json \
   --output-dir data/processed/waymo_lane_continuation_branch_coverage \
   --public-report docs/reports/waymo_lane_continuation_branch_coverage.md
+```
+
+Audit topology blockers from the continuation replay manifest:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-topology-gap-audit \
+  --replay-manifest data/processed/waymo_lane_continuation_replay_prototype/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_topology_gap_audit \
+  --public-report docs/reports/waymo_lane_continuation_topology_gap_audit.md
 ```
 
 Run the no-auth baseline ablation:

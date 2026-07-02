@@ -106,6 +106,10 @@ All notable changes to ScenarioLens are documented here.
   `docs/reports/waymo_lane_continuation_branch_coverage.md`, connecting the
   continuation candidate, replay, diagnostics, branch-selection, branch-replay,
   and route-context guard manifests into a public-safe expansion funnel.
+- `scenariolens lane-continuation-topology-gap-audit` workflow and
+  `docs/reports/waymo_lane_continuation_topology_gap_audit.md`, reloading the
+  5 topology blockers from the replay manifest and showing that 4 blocker cases
+  are cap-recoverable while 1 lane is a confirmed terminal case.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

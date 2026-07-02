@@ -155,6 +155,13 @@ passes the strict route guard. It also names 5 topology blockers, 3 single-chain
 branch-expansion targets, and the held route-context margin case as the next
 expansion queue.
 
+The topology gap audit turns the largest branch-coverage blocker into a concrete
+ingestion task. It reloads the 5 replay topology blockers, compares the capped
+ScenarioLens map-feature set with raw parsed map-feature IDs, and shows that 4
+blocker cases have linked-lane targets beyond the current feature cap while 1
+lane is a confirmed terminal case. The next implementation target is therefore
+map-feature closure materialization, not a broader selector rewrite.
+
 ## Map-Match Audit
 
 The map-match audit handles cases that are not ready to be treated as replay
@@ -184,8 +191,8 @@ and links to the public reports.
 - Add a dataset adapter for another public motion dataset.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
-- Work down the branch coverage audit: reduce topology/parser gaps, expose
-  alternatives for single-chain cases, and rerun branch replay/guard checks
+- Materialize linked-lane closure features before applying the map-feature cap,
+  then rerun continuation replay, branch coverage, and route-context guard checks
   across a larger branchable queue.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.

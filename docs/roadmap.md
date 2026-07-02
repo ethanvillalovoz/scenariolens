@@ -415,7 +415,11 @@ continuation-to-branch funnel: 15 continuation candidates, 10 replay-ready
 candidates, 5 branch-selection cases, 2 branchable cases, 1 route-guard
 promotion, 5 topology blockers, and 9 expansion queue items. Next work should
 reduce topology/parser gaps and single-chain branch blockers before claiming
-broader selector readiness.
+broader selector readiness. The topology gap audit at
+`docs/reports/waymo_lane_continuation_topology_gap_audit.md` now shows that 4
+of the 5 topology blockers are cap-recoverable blocker cases and 1 is a
+confirmed terminal lane, so the next engineering step is to materialize
+linked-lane closure features before applying the map-feature cap.
 
 ## Stretch Goals
 

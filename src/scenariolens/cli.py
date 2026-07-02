@@ -83,6 +83,9 @@ from scenariolens.lane_continuation_replay import (
     LANE_CONTINUATION_REPLAY_INPUT_FORMATS,
     generate_lane_continuation_replay_prototype,
 )
+from scenariolens.lane_continuation_topology_gap_audit import (
+    generate_lane_continuation_topology_gap_audit,
+)
 from scenariolens.map_match_audit import (
     DEFAULT_AUDIT_THRESHOLDS_M,
     generate_map_match_audit,
@@ -1057,6 +1060,36 @@ def lane_continuation_branch_coverage_command(
         f"candidate(s): {result.branchable_case_count} branchable case(s), "
         f"{result.topology_blocker_count} topology blocker(s), "
         f"{result.expansion_queue_count} expansion queue item(s)."
+    )
+    return 0
+
+
+def lane_continuation_topology_gap_audit_command(
+    replay_manifest: str,
+    output_dir: str,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_lane_continuation_topology_gap_audit(
+            replay_manifest_path=replay_manifest,
+            output_dir=output_dir,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote lane-continuation-topology-gap-audit manifest to {result.manifest_path}")
+    print(f"Wrote lane-continuation-topology-gap-audit report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("Lane-continuation topology gap audit is not ready. See manifest.json.")
+        return 2
+    print(
+        f"Generated topology gap audit for {result.case_count} case(s): "
+        f"{result.cap_recoverable_count} cap-recoverable case(s), "
+        f"{result.terminal_confirmed_count} terminal confirmation(s)."
     )
     return 0
 
@@ -2195,6 +2228,28 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe branch-coverage report copy.",
     )
+    lane_continuation_topology_gap_parser = subparsers.add_parser(
+        "lane-continuation-topology-gap-audit",
+        help=(
+            "Audit topology blocker cases for map-feature cap and raw-link "
+            "materialization gaps."
+        ),
+    )
+    lane_continuation_topology_gap_parser.add_argument(
+        "--replay-manifest",
+        required=True,
+        help="Manifest produced by scenariolens lane-continuation-replay-prototype.",
+    )
+    lane_continuation_topology_gap_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_lane_continuation_topology_gap_audit",
+        help="Directory for topology-gap audit manifest.json and report.md.",
+    )
+    lane_continuation_topology_gap_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe topology-gap report copy.",
+    )
     heading_replay_parser = subparsers.add_parser(
         "heading-replay-prototype",
         help=(
@@ -2676,6 +2731,12 @@ def main() -> int:
             output_dir=args.output_dir,
             branch_replay_manifest=args.branch_replay_manifest,
             route_context_guard_manifest=args.route_context_guard_manifest,
+            public_report=args.public_report,
+        )
+    if args.command == "lane-continuation-topology-gap-audit":
+        return lane_continuation_topology_gap_audit_command(
+            replay_manifest=args.replay_manifest,
+            output_dir=args.output_dir,
             public_report=args.public_report,
         )
     if args.command == "heading-replay-prototype":

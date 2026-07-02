@@ -265,6 +265,14 @@ replay-ready candidates, 5 branch-selection cases, 2 branchable cases, 1
 route-guard promotion, 5 topology blockers, and 9 expansion items. It does not
 read raw Waymo TFRecords and is not a benchmark coverage claim.
 
+The topology gap audit is checked in at
+[`docs/reports/waymo_lane_continuation_topology_gap_audit.md`](reports/waymo_lane_continuation_topology_gap_audit.md).
+It reloads the ignored local source scenarios referenced by the replay manifest,
+then publishes only derived topology classifications: 5 topology blockers
+audited, 4 cap-recoverable blocker cases, 1 terminal lane confirmation,
+0 raw target misses, and 5 capped maps at the current feature cap. Raw Waymo
+records and local per-case packets remain ignored.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

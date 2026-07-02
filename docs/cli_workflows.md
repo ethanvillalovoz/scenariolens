@@ -543,6 +543,22 @@ cases, 2 branchable cases, 1 route-guard promotion, 5 topology blockers, and
 9 expansion queue items. Treat it as a planning and coverage artifact, not as a
 benchmark or proof that the selector is ready across the full dataset.
 
+## Lane-Continuation Topology Gap Audit
+
+```bash
+scenariolens lane-continuation-topology-gap-audit \
+  --replay-manifest data/processed/waymo_lane_continuation_replay_prototype/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_topology_gap_audit \
+  --public-report docs/reports/waymo_lane_continuation_topology_gap_audit.md
+```
+
+This audit reloads the topology blocker cases named by the replay manifest and
+compares capped ScenarioLens map features with raw parsed map-feature IDs. The
+current real-data report audits 5 topology blockers, finds 4 blocker cases with
+linked-lane targets in the raw parsed map beyond the current feature cap, and
+confirms 1 terminal lane. Treat it as an ingestion/topology expansion target,
+not as route-planning evidence.
+
 ## Baseline Ablation
 
 ```bash
