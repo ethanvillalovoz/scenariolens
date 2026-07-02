@@ -532,6 +532,10 @@ def _evaluate_branch_routes(
             float(default["fde_m"]) - float(row["fde_m"]),
             3,
         )
+        row["history_speed_prior_gain_vs_default_m"] = round(
+            float(default["fde_m"]) - float(row["history_speed_prior_fde_m"]),
+            3,
+        )
 
     branchable = len(evaluated) > 1
     oracle_gain = round(float(default["fde_m"]) - float(oracle["fde_m"]), 3)
@@ -739,22 +743,28 @@ def _route_result(
     default_chain: tuple[str, ...],
     features_by_id: dict[str, dict[str, object]],
 ) -> dict[str, object]:
-    predictions = tuple(
-        _advance_along_lane(
-            route.points,
-            start_s=route.start_s,
-            travel_m=anchor_speed * (actual.t - anchor.t),
-            target_time_s=actual.t,
-            speed_mps=anchor_speed,
-        )
-        for actual in future_states
-    )
-    errors = tuple(
-        _state_error(predicted, actual)
-        for predicted, actual in zip(predictions, future_states)
+    errors = _route_errors(
+        route=route,
+        anchor=anchor,
+        future_states=future_states,
+        speed_mps=anchor_speed,
     )
     fde = errors[-1] if errors else 0.0
     horizon_travel = anchor_speed * (future_states[-1].t - anchor.t)
+    history_speed_prior = _history_blended_speed_prior_mps(
+        anchor_speed=anchor_speed,
+        history_states=history_states,
+    )
+    history_prior_errors = _route_errors(
+        route=route,
+        anchor=anchor,
+        future_states=future_states,
+        speed_mps=history_speed_prior,
+    )
+    history_prior_fde = history_prior_errors[-1] if history_prior_errors else 0.0
+    history_prior_horizon_travel = history_speed_prior * (
+        future_states[-1].t - anchor.t
+    )
     heading_score = _anchor_heading_score(
         anchor=anchor,
         route=route,
@@ -775,6 +785,18 @@ def _route_result(
         "ade_m": round(sum(errors) / len(errors), 3) if errors else None,
         "fde_m": round(fde, 3),
         "miss": fde > DEFAULT_MISS_THRESHOLD_M,
+        "history_speed_prior_mps": round(history_speed_prior, 3),
+        "history_speed_prior_ade_m": (
+            round(sum(history_prior_errors) / len(history_prior_errors), 3)
+            if history_prior_errors
+            else None
+        ),
+        "history_speed_prior_fde_m": round(history_prior_fde, 3),
+        "history_speed_prior_miss": history_prior_fde > DEFAULT_MISS_THRESHOLD_M,
+        "history_speed_prior_horizon_travel_m": round(
+            history_prior_horizon_travel,
+            3,
+        ),
         "anchor_heading_score": round(heading_score, 6),
         "motion_context_score": round(float(motion_context["score"]), 6),
         "motion_context_estimated_travel_m": round(
@@ -796,6 +818,28 @@ def _route_result(
         "lane_end_clamp_risk_after": horizon_travel >= route.route_remaining_m,
         "is_default_chain_match": tuple(route.feature_ids) == default_chain,
     }
+
+
+def _route_errors(
+    route: _BranchRoute,
+    anchor: State,
+    future_states: tuple[State, ...],
+    speed_mps: float,
+) -> tuple[float, ...]:
+    predictions = tuple(
+        _advance_along_lane(
+            route.points,
+            start_s=route.start_s,
+            travel_m=speed_mps * (actual.t - anchor.t),
+            target_time_s=actual.t,
+            speed_mps=speed_mps,
+        )
+        for actual in future_states
+    )
+    return tuple(
+        _state_error(predicted, actual)
+        for predicted, actual in zip(predictions, future_states)
+    )
 
 
 def _anchor_heading_score(
@@ -869,6 +913,17 @@ def _recent_speed_mps(history_states: tuple[State, ...]) -> float:
     if not valid:
         return 0.0
     return sum(valid) / len(valid)
+
+
+def _history_blended_speed_prior_mps(
+    anchor_speed: float,
+    history_states: tuple[State, ...],
+) -> float:
+    recent_speed = _recent_speed_mps(history_states)
+    if not isfinite(recent_speed) or recent_speed < MIN_LANE_AWARE_SPEED_MPS:
+        return anchor_speed
+    blended = (0.35 * anchor_speed) + (0.65 * recent_speed)
+    return max(blended, MIN_LANE_AWARE_SPEED_MPS)
 
 
 def _route_speed_limit_drop(

@@ -43,6 +43,7 @@ class LaneContinuationBranchReplayResult:
     replayed_case_count: int
     stable_case_count: int
     accepted_case_count: int
+    history_speed_prior_accepted_case_count: int
     output_dir: Path
     manifest_path: Path
     report_path: Path
@@ -83,6 +84,9 @@ def generate_lane_continuation_branch_replay(
         replayed_case_count=int(aggregate["replayed_case_count"]),
         stable_case_count=int(aggregate["stable_motion_context_case_count"]),
         accepted_case_count=int(aggregate["accepted_branch_case_count"]),
+        history_speed_prior_accepted_case_count=int(
+            aggregate["history_speed_prior_accepted_case_count"]
+        ),
         output_dir=target,
         manifest_path=manifest_path,
         report_path=report_path,
@@ -168,6 +172,11 @@ def lane_continuation_branch_replay_payload(
             "when every valid perturbation preserves the selected branch and "
             f"keeps recoverable FDE above {_MIN_STABLE_GAIN_M:.1f} m."
         ),
+        "history_speed_prior_note": (
+            "The history-speed-prior candidate is an experimental replay score "
+            "only: it blends anchor speed with recent target speed and does not "
+            "change the branch selector or default ScenarioLens metrics."
+        ),
         "case_count": len(cases),
         "source_branch_case_count": len(_required_list(branch_selection, "cases")),
         "selected_motion_context_case_count": len(selected),
@@ -203,6 +212,12 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
         "check whether the selector's branch choice and positive FDE gain are "
         "stable when the anchor state is nudged.",
         "",
+        "It also reports an experimental `history_speed_prior` candidate for "
+        "the same selected branch. That candidate blends anchor speed with "
+        "recent target speed during replay scoring only; it does not change "
+        "the branch selector, the default baseline, or the public performance "
+        "claims.",
+        "",
         "The replay still uses open-loop ground-truth future states for scoring. "
         "It is a diagnostic stability check, not a route planner, not "
         "closed-loop simulation, not Waymax/JAX execution, and not a Waymo "
@@ -217,6 +232,7 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
         f"- Perturbations per case: {len(perturbations)}",
         f"- Minimum stable gain: {_meter_text(payload['minimum_stable_gain_m'])}",
         f"- Acceptance gate: {payload['acceptance_gate']}",
+        f"- Experimental candidate: {payload['history_speed_prior_note']}",
         "- Raw scenario data committed: no",
         "- Local per-case replay packets committed: no",
         "",
@@ -235,12 +251,17 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
         f"| Accepted branch cases | {aggregate['accepted_branch_case_count']} |",
         f"| Route-context follow-up cases | {aggregate['route_context_followup_case_count']} |",
         f"| Selector-stability follow-up cases | {aggregate['selector_stability_followup_case_count']} |",
+        f"| History speed-prior accepted cases | {aggregate['history_speed_prior_accepted_case_count']} |",
+        f"| Margin follow-ups resolved by speed prior | {aggregate['history_speed_prior_resolved_margin_case_count']} |",
+        f"| History speed-prior stable positive trials | {aggregate['history_speed_prior_stable_positive_trial_count']} |",
         f"| Mean nominal recoverable FDE | {_signed_meter_text(aggregate['mean_nominal_gain_m'])} |",
         f"| Mean perturbed recoverable FDE | {_signed_meter_text(aggregate['mean_trial_gain_m'])} |",
         f"| Min perturbed recoverable FDE | {_signed_meter_text(aggregate['min_trial_gain_m'])} |",
         f"| Max perturbed recoverable FDE | {_signed_meter_text(aggregate['max_trial_gain_m'])} |",
         f"| Min robustness margin | {_signed_meter_text(aggregate['min_robustness_margin_m'])} |",
         f"| Mean robustness margin | {_signed_meter_text(aggregate['mean_robustness_margin_m'])} |",
+        f"| History speed-prior min margin | {_signed_meter_text(aggregate['min_history_speed_prior_margin_m'])} |",
+        f"| History speed-prior mean margin | {_signed_meter_text(aggregate['mean_history_speed_prior_margin_m'])} |",
         "",
         "## Perturbations",
         "",
@@ -254,16 +275,26 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
             "",
             "## Case Results",
             "",
-            "| Rank | Scenario | Track | Default chain | Motion-context chain | Nominal gain | Stable trials | Margin | Acceptance | Stability |",
-            "| ---: | --- | --- | --- | --- | ---: | ---: | ---: | --- | --- |",
+            "| Rank | Scenario | Track | Default chain | Motion-context chain | Nominal gain | Stable trials | Margin | Speed-prior margin | Acceptance | Speed-prior acceptance | Stability |",
+            "| ---: | --- | --- | --- | --- | ---: | ---: | ---: | ---: | --- | --- | --- |",
         ]
     )
     if not cases:
-        lines.append("| n/a | n/a | n/a | n/a | n/a | n/a | 0/0 | n/a | n/a | n/a |")
+        lines.append(
+            "| n/a | n/a | n/a | n/a | n/a | n/a | 0/0 | n/a | n/a | n/a | n/a | n/a |"
+        )
     for case in cases:
         assert isinstance(case, dict)
         stability = _required_mapping(case, "perturbation_stability")
         acceptance = _required_mapping(case, "acceptance_decision")
+        speed_prior_stability = _required_mapping(
+            case,
+            "history_speed_prior_stability",
+        )
+        speed_prior_acceptance = _required_mapping(
+            case,
+            "history_speed_prior_acceptance_decision",
+        )
         lines.append(
             "| "
             f"{case['rank']} | "
@@ -275,7 +306,9 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
             f"{stability['stable_positive_trial_count']}/"
             f"{stability['valid_trial_count']} | "
             f"{_signed_meter_text(stability.get('robustness_margin_m'))} | "
+            f"{_signed_meter_text(speed_prior_stability.get('robustness_margin_m'))} | "
             f"`{acceptance['label']}` | "
+            f"`{speed_prior_acceptance['label']}` | "
             f"`{stability['label']}` |"
         )
 
@@ -283,6 +316,14 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
         assert isinstance(case, dict)
         stability = _required_mapping(case, "perturbation_stability")
         acceptance = _required_mapping(case, "acceptance_decision")
+        speed_prior_stability = _required_mapping(
+            case,
+            "history_speed_prior_stability",
+        )
+        speed_prior_acceptance = _required_mapping(
+            case,
+            "history_speed_prior_acceptance_decision",
+        )
         lines.extend(
             [
                 "",
@@ -293,15 +334,22 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
                 f"- Ready: {case['ready']}",
                 f"- Stability: **{stability['label']}**",
                 f"- Acceptance: **{acceptance['label']}**",
+                f"- History speed-prior acceptance: **{speed_prior_acceptance['label']}**",
                 f"- Why it matters: {case['why_it_matters']}",
                 f"- Acceptance reason: {acceptance['reason']}",
                 f"- Recommended next action: {acceptance['next_action']}",
+                f"- Speed-prior reason: {speed_prior_acceptance['reason']}",
+                f"- Speed-prior next action: {speed_prior_acceptance['next_action']}",
                 "- Default linked-route FDE: "
                 f"{_meter_text(case.get('default_fde_m'))}",
                 "- Motion-context route FDE: "
                 f"{_meter_text(case.get('motion_context_fde_m'))}",
+                "- History speed-prior route FDE: "
+                f"{_meter_text(case.get('history_speed_prior_fde_m'))}",
                 "- Nominal recoverable FDE: "
                 f"{_signed_meter_text(case.get('nominal_motion_context_gain_m'))}",
+                "- Nominal history speed-prior recoverable FDE: "
+                f"{_signed_meter_text(case.get('nominal_history_speed_prior_gain_m'))}",
                 "- Branch-preserving trials: "
                 f"{stability['branch_preserving_trial_count']}/"
                 f"{stability['valid_trial_count']}",
@@ -315,11 +363,18 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
                 f"`{stability['worst_trial_label']}`",
                 "- Robustness margin: "
                 f"{_signed_meter_text(stability.get('robustness_margin_m'))}",
+                "- History speed-prior stable positive trials: "
+                f"{speed_prior_stability['stable_positive_trial_count']}/"
+                f"{speed_prior_stability['valid_trial_count']}",
+                "- History speed-prior worst perturbation: "
+                f"`{speed_prior_stability['worst_trial_label']}`",
+                "- History speed-prior robustness margin: "
+                f"{_signed_meter_text(speed_prior_stability.get('robustness_margin_m'))}",
                 "",
                 "Perturbation trials:",
                 "",
-                "| Perturbation | Motion-context chain | Gain vs default | Branch preserved | Positive gain | Verdict |",
-                "| --- | --- | ---: | --- | --- | --- |",
+                "| Perturbation | Motion-context chain | Gain vs default | Speed-prior gain | Branch preserved | Positive gain | Speed-prior positive | Verdict |",
+                "| --- | --- | ---: | ---: | --- | --- | --- | --- |",
             ]
         )
         for trial in _required_list(case, "perturbation_trials"):
@@ -329,8 +384,10 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
                 f"`{trial['label']}` | "
                 f"{_chain_text(trial.get('motion_context_chain'))} | "
                 f"{_signed_meter_text(trial.get('motion_context_gain_m'))} | "
+                f"{_signed_meter_text(trial.get('history_speed_prior_gain_m'))} | "
                 f"{trial['branch_preserved']} | "
                 f"{trial['positive_gain']} | "
+                f"{trial['history_speed_prior_positive_gain']} | "
                 f"`{trial['verdict']}` |"
             )
 
@@ -344,6 +401,10 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
             "- Accepted branch cases pass the stricter rollout gate: branch "
             "preservation plus at least 1.0 m recoverable FDE in every valid "
             "perturbation trial.",
+            "- History speed-prior accepted cases show whether a simple "
+            "non-oracle speed calibration would clear the same replay gate; "
+            "they are candidates for the next selector experiment, not a new "
+            "default metric.",
             "- Sensitive cases are still useful: they identify where a "
             "hand-built selector needs richer route context or a learned "
             "candidate scorer.",
@@ -392,10 +453,16 @@ def _branch_replay_case(
         "motion_context_chain": [],
         "default_fde_m": None,
         "motion_context_fde_m": None,
+        "history_speed_prior_fde_m": None,
         "nominal_motion_context_gain_m": None,
+        "nominal_history_speed_prior_gain_m": None,
         "perturbation_trials": [],
         "perturbation_stability": _empty_stability(),
         "acceptance_decision": _acceptance_decision(_empty_stability()),
+        "history_speed_prior_stability": _empty_stability(),
+        "history_speed_prior_acceptance_decision": _acceptance_decision(
+            _empty_stability()
+        ),
         "why_it_matters": "The motion-context branch case could not be replayed.",
     }
     if replay_case is None:
@@ -443,6 +510,16 @@ def _branch_replay_case(
     expected_chain = tuple(
         str(item) for item in nominal.get("motion_context_chain", [])
     )
+    nominal_motion_context_route = _selected_motion_context_route(nominal)
+    nominal_history_speed_prior_gain = (
+        _optional_float(
+            nominal_motion_context_route.get(
+                "history_speed_prior_gain_vs_default_m"
+            )
+        )
+        if nominal_motion_context_route is not None
+        else None
+    )
     trials = [
         _perturbation_trial(
             scenario=scenario,
@@ -460,6 +537,12 @@ def _branch_replay_case(
         trials=trials,
     )
     acceptance = _acceptance_decision(stability)
+    speed_prior_stability = _history_speed_prior_stability(
+        nominal_gain=nominal_history_speed_prior_gain,
+        expected_chain=expected_chain,
+        trials=trials,
+    )
+    speed_prior_acceptance = _acceptance_decision(speed_prior_stability)
     base.update(
         {
             "ready": True,
@@ -473,14 +556,27 @@ def _branch_replay_case(
             "oracle_chain": nominal.get("oracle_chain", []),
             "default_fde_m": nominal.get("default_fde_m"),
             "motion_context_fde_m": nominal.get("motion_context_fde_m"),
+            "history_speed_prior_fde_m": (
+                nominal_motion_context_route.get("history_speed_prior_fde_m")
+                if nominal_motion_context_route is not None
+                else None
+            ),
+            "history_speed_prior_mps": (
+                nominal_motion_context_route.get("history_speed_prior_mps")
+                if nominal_motion_context_route is not None
+                else None
+            ),
             "oracle_fde_m": nominal.get("oracle_fde_m"),
             "nominal_motion_context_gain_m": nominal.get(
                 "motion_context_recoverable_fde_m"
             ),
+            "nominal_history_speed_prior_gain_m": nominal_history_speed_prior_gain,
             "nominal_oracle_gain_m": nominal.get("oracle_recoverable_fde_m"),
             "perturbation_trials": trials,
             "perturbation_stability": stability,
             "acceptance_decision": acceptance,
+            "history_speed_prior_stability": speed_prior_stability,
+            "history_speed_prior_acceptance_decision": speed_prior_acceptance,
             "why_it_matters": _why_it_matters(stability, acceptance),
         }
     )
@@ -522,8 +618,20 @@ def _perturbation_trial(
     )
     chain = tuple(str(item) for item in evaluation.get("motion_context_chain", []))
     gain = _optional_float(evaluation.get("motion_context_recoverable_fde_m"))
+    motion_context_route = _selected_motion_context_route(evaluation)
+    history_speed_prior_gain = (
+        _optional_float(
+            motion_context_route.get("history_speed_prior_gain_vs_default_m")
+        )
+        if motion_context_route is not None
+        else None
+    )
     branch_preserved = bool(evaluation.get("ready")) and chain == expected_chain
     positive_gain = gain is not None and gain > _MIN_STABLE_GAIN_M
+    history_speed_prior_positive_gain = (
+        history_speed_prior_gain is not None
+        and history_speed_prior_gain > _MIN_STABLE_GAIN_M
+    )
     if not bool(evaluation.get("ready")):
         verdict = str(evaluation.get("verdict", "not_evaluable"))
     elif branch_preserved and positive_gain:
@@ -545,6 +653,18 @@ def _perturbation_trial(
         "motion_context_fde_m": evaluation.get("motion_context_fde_m"),
         "motion_context_gain_m": gain,
         "motion_context_score": _selected_motion_context_score(evaluation),
+        "history_speed_prior_fde_m": (
+            motion_context_route.get("history_speed_prior_fde_m")
+            if motion_context_route is not None
+            else None
+        ),
+        "history_speed_prior_mps": (
+            motion_context_route.get("history_speed_prior_mps")
+            if motion_context_route is not None
+            else None
+        ),
+        "history_speed_prior_gain_m": history_speed_prior_gain,
+        "history_speed_prior_positive_gain": history_speed_prior_positive_gain,
         "branch_preserved": branch_preserved,
         "positive_gain": positive_gain,
         "verdict": verdict,
@@ -552,9 +672,18 @@ def _perturbation_trial(
 
 
 def _selected_motion_context_score(evaluation: dict[str, object]) -> float | None:
+    route = _selected_motion_context_route(evaluation)
+    if route is None:
+        return None
+    return _optional_float(route.get("motion_context_score"))
+
+
+def _selected_motion_context_route(
+    evaluation: dict[str, object],
+) -> dict[str, object] | None:
     for route in _required_list(evaluation, "route_candidates"):
         if isinstance(route, dict) and bool(route.get("is_motion_context_selected")):
-            return _optional_float(route.get("motion_context_score"))
+            return route
     return None
 
 
@@ -563,16 +692,58 @@ def _perturbation_stability(
     expected_chain: tuple[str, ...],
     trials: list[dict[str, object]],
 ) -> dict[str, object]:
+    return _gain_stability(
+        nominal_gain=nominal_gain,
+        expected_chain=expected_chain,
+        trials=trials,
+        gain_field="motion_context_gain_m",
+        positive_field="positive_gain",
+        stable_label="stable_motion_context_branch",
+        selector_shifted_label="positive_gain_but_selector_shifted",
+        branch_gain_sensitive_label="branch_stable_gain_sensitive",
+        sensitive_label="sensitive_to_anchor_perturbation",
+    )
+
+
+def _history_speed_prior_stability(
+    nominal_gain: object,
+    expected_chain: tuple[str, ...],
+    trials: list[dict[str, object]],
+) -> dict[str, object]:
+    return _gain_stability(
+        nominal_gain=nominal_gain,
+        expected_chain=expected_chain,
+        trials=trials,
+        gain_field="history_speed_prior_gain_m",
+        positive_field="history_speed_prior_positive_gain",
+        stable_label="stable_history_speed_prior_branch",
+        selector_shifted_label="history_speed_prior_positive_gain_but_selector_shifted",
+        branch_gain_sensitive_label="history_speed_prior_branch_stable_gain_sensitive",
+        sensitive_label="history_speed_prior_sensitive_to_anchor_perturbation",
+    )
+
+
+def _gain_stability(
+    nominal_gain: object,
+    expected_chain: tuple[str, ...],
+    trials: list[dict[str, object]],
+    gain_field: str,
+    positive_field: str,
+    stable_label: str,
+    selector_shifted_label: str,
+    branch_gain_sensitive_label: str,
+    sensitive_label: str,
+) -> dict[str, object]:
     valid = [trial for trial in trials if bool(trial.get("ready"))]
     gains = [
         gain
         for trial in valid
-        if (gain := _optional_float(trial.get("motion_context_gain_m"))) is not None
+        if (gain := _optional_float(trial.get(gain_field))) is not None
     ]
     branch_preserving = sum(bool(trial.get("branch_preserved")) for trial in valid)
-    positive_gain = sum(bool(trial.get("positive_gain")) for trial in valid)
+    positive_gain = sum(bool(trial.get(positive_field)) for trial in valid)
     stable_positive = sum(
-        bool(trial.get("branch_preserved")) and bool(trial.get("positive_gain"))
+        bool(trial.get("branch_preserved")) and bool(trial.get(positive_field))
         for trial in valid
     )
     nominal = _optional_float(nominal_gain)
@@ -582,20 +753,20 @@ def _perturbation_stability(
         else None
     )
     min_gain = min(gains) if gains else None
-    worst_trial_label = _worst_trial_label(valid)
+    worst_trial_label = _worst_trial_label(valid, gain_field=gain_field)
     robustness_margin = (
         round(min_gain - _MIN_STABLE_GAIN_M, 3) if min_gain is not None else None
     )
     if not valid:
         label = "not_evaluable"
     elif stable_positive == len(valid):
-        label = "stable_motion_context_branch"
+        label = stable_label
     elif positive_gain == len(valid):
-        label = "positive_gain_but_selector_shifted"
+        label = selector_shifted_label
     elif branch_preserving == len(valid):
-        label = "branch_stable_gain_sensitive"
+        label = branch_gain_sensitive_label
     else:
-        label = "sensitive_to_anchor_perturbation"
+        label = sensitive_label
     return {
         "label": label,
         "expected_chain": list(expected_chain),
@@ -625,6 +796,9 @@ def _acceptance_decision(stability: dict[str, object]) -> dict[str, object]:
     branch_rate = _optional_float(stability.get("branch_preservation_rate")) or 0.0
     positive_rate = _optional_float(stability.get("positive_gain_rate")) or 0.0
     margin = _optional_float(stability.get("robustness_margin_m"))
+    is_speed_prior = label.startswith("history_speed_prior_") or (
+        label == "stable_history_speed_prior_branch"
+    )
     if valid_count == 0:
         return {
             "label": "not_evaluable",
@@ -632,13 +806,22 @@ def _acceptance_decision(stability: dict[str, object]) -> dict[str, object]:
             "reason": "No valid perturbation trials were available for the gate.",
             "next_action": "Confirm the local replay inputs and rerun branch replay.",
         }
-    if label == "stable_motion_context_branch" and margin is not None and margin >= 0.0:
+    if (
+        label in {"stable_motion_context_branch", "stable_history_speed_prior_branch"}
+        and margin is not None
+        and margin >= 0.0
+    ):
+        subject = (
+            "history speed-prior branch"
+            if label == "stable_history_speed_prior_branch"
+            else "motion-context branch"
+        )
         return {
             "label": "accepted_for_selector_rollout",
             "accepted": True,
             "reason": (
-                "All perturbations preserved the motion-context branch and "
-                "kept recoverable FDE above the acceptance threshold."
+                f"All perturbations preserved the {subject} and kept "
+                "recoverable FDE above the acceptance threshold."
             ),
             "next_action": (
                 "Evaluate this selector behavior on a broader branchable "
@@ -646,17 +829,28 @@ def _acceptance_decision(stability: dict[str, object]) -> dict[str, object]:
             ),
         }
     if branch_rate >= 1.0 and positive_rate < 1.0:
+        reason = (
+            "The selected branch is stable, but the history speed-prior "
+            "candidate still falls below the recoverable-FDE threshold."
+            if is_speed_prior
+            else (
+                "The selected branch is stable, but at least one perturbation "
+                "falls below the recoverable-FDE threshold."
+            )
+        )
+        next_action = (
+            "Add richer route context before treating this branch as robust."
+            if is_speed_prior
+            else (
+                "Add richer route context or speed-prior calibration before "
+                "treating this branch as robust."
+            )
+        )
         return {
             "label": "needs_route_context_margin",
             "accepted": False,
-            "reason": (
-                "The selected branch is stable, but at least one perturbation "
-                "falls below the recoverable-FDE threshold."
-            ),
-            "next_action": (
-                "Add richer route context or speed-prior calibration before "
-                "treating this branch as robust."
-            ),
+            "reason": reason,
+            "next_action": next_action,
         }
     if branch_rate < 1.0 and positive_rate >= 1.0:
         return {
@@ -690,6 +884,9 @@ def _aggregate_cases(cases: list[dict[str, object]]) -> dict[str, object]:
     stabilities = [
         _required_mapping(case, "perturbation_stability") for case in ready
     ]
+    speed_prior_stabilities = [
+        _required_mapping(case, "history_speed_prior_stability") for case in ready
+    ]
     trials = [
         trial
         for case in ready
@@ -701,6 +898,12 @@ def _aggregate_cases(cases: list[dict[str, object]]) -> dict[str, object]:
         for trial in trials
         if (gain := _optional_float(trial.get("motion_context_gain_m"))) is not None
     ]
+    speed_prior_trial_gains = [
+        gain
+        for trial in trials
+        if (gain := _optional_float(trial.get("history_speed_prior_gain_m")))
+        is not None
+    ]
     nominal_gains = [
         gain
         for case in ready
@@ -710,9 +913,19 @@ def _aggregate_cases(cases: list[dict[str, object]]) -> dict[str, object]:
     acceptances = [
         _required_mapping(case, "acceptance_decision") for case in ready
     ]
+    speed_prior_acceptances = [
+        _required_mapping(case, "history_speed_prior_acceptance_decision")
+        for case in ready
+    ]
     margins = [
         margin
         for stability in stabilities
+        if (margin := _optional_float(stability.get("robustness_margin_m")))
+        is not None
+    ]
+    speed_prior_margins = [
+        margin
+        for stability in speed_prior_stabilities
         if (margin := _optional_float(stability.get("robustness_margin_m")))
         is not None
     ]
@@ -738,9 +951,33 @@ def _aggregate_cases(cases: list[dict[str, object]]) -> dict[str, object]:
             bool(trial.get("branch_preserved")) and bool(trial.get("positive_gain"))
             for trial in trials
         ),
+        "history_speed_prior_positive_gain_trial_count": sum(
+            bool(trial.get("history_speed_prior_positive_gain")) for trial in trials
+        ),
+        "history_speed_prior_stable_positive_trial_count": sum(
+            bool(trial.get("branch_preserved"))
+            and bool(trial.get("history_speed_prior_positive_gain"))
+            for trial in trials
+        ),
         "accepted_branch_case_count": sum(
             str(decision.get("label")) == "accepted_for_selector_rollout"
             for decision in acceptances
+        ),
+        "history_speed_prior_accepted_case_count": sum(
+            str(decision.get("label")) == "accepted_for_selector_rollout"
+            for decision in speed_prior_acceptances
+        ),
+        "history_speed_prior_resolved_margin_case_count": sum(
+            str(base_decision.get("label")) == "needs_route_context_margin"
+            and str(speed_decision.get("label")) == "accepted_for_selector_rollout"
+            for base_decision, speed_decision in zip(
+                acceptances,
+                speed_prior_acceptances,
+            )
+        ),
+        "history_speed_prior_route_context_followup_case_count": sum(
+            str(decision.get("label")) == "needs_route_context_margin"
+            for decision in speed_prior_acceptances
         ),
         "route_context_followup_case_count": sum(
             str(decision.get("label")) == "needs_route_context_margin"
@@ -757,8 +994,23 @@ def _aggregate_cases(cases: list[dict[str, object]]) -> dict[str, object]:
         "mean_trial_gain_m": _mean(tuple(trial_gains)),
         "min_trial_gain_m": round(min(trial_gains), 3) if trial_gains else None,
         "max_trial_gain_m": round(max(trial_gains), 3) if trial_gains else None,
+        "mean_history_speed_prior_gain_m": _mean(tuple(speed_prior_trial_gains)),
+        "min_history_speed_prior_gain_m": (
+            round(min(speed_prior_trial_gains), 3)
+            if speed_prior_trial_gains
+            else None
+        ),
+        "max_history_speed_prior_gain_m": (
+            round(max(speed_prior_trial_gains), 3)
+            if speed_prior_trial_gains
+            else None
+        ),
         "min_robustness_margin_m": round(min(margins), 3) if margins else None,
         "mean_robustness_margin_m": _mean(tuple(margins)),
+        "min_history_speed_prior_margin_m": (
+            round(min(speed_prior_margins), 3) if speed_prior_margins else None
+        ),
+        "mean_history_speed_prior_margin_m": _mean(tuple(speed_prior_margins)),
     }
 
 
@@ -782,11 +1034,14 @@ def _empty_stability() -> dict[str, object]:
     }
 
 
-def _worst_trial_label(trials: list[dict[str, object]]) -> str | None:
+def _worst_trial_label(
+    trials: list[dict[str, object]],
+    gain_field: str = "motion_context_gain_m",
+) -> str | None:
     worst_label = None
     worst_gain = None
     for trial in trials:
-        gain = _optional_float(trial.get("motion_context_gain_m"))
+        gain = _optional_float(trial.get(gain_field))
         if gain is None:
             continue
         if worst_gain is None or gain < worst_gain:

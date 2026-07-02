@@ -8,6 +8,7 @@ from pathlib import Path
 from scenariolens.lane_continuation_branch_replay import (
     LANE_CONTINUATION_BRANCH_REPLAY_FORMAT,
     _acceptance_decision,
+    _history_speed_prior_stability,
     _perturbation_stability,
     generate_lane_continuation_branch_replay,
     lane_continuation_branch_replay_markdown,
@@ -40,13 +41,22 @@ class LaneContinuationBranchReplayTest(unittest.TestCase):
             self.assertEqual(aggregate["stable_motion_context_case_count"], 1)
             self.assertEqual(aggregate["stable_positive_trial_count"], 4)
             self.assertEqual(aggregate["accepted_branch_case_count"], 1)
+            self.assertEqual(
+                aggregate["history_speed_prior_accepted_case_count"],
+                1,
+            )
             self.assertEqual(aggregate["route_context_followup_case_count"], 0)
             self.assertGreater(aggregate["min_robustness_margin_m"], 1.0)
+            self.assertGreater(
+                aggregate["min_history_speed_prior_margin_m"],
+                1.0,
+            )
 
             case = payload["cases"][0]
             self.assertEqual(case["scenario_id"], "branch_case")
             self.assertEqual(case["motion_context_chain"], ["100", "300"])
             self.assertGreater(case["nominal_motion_context_gain_m"], 5.0)
+            self.assertGreater(case["nominal_history_speed_prior_gain_m"], 5.0)
             self.assertEqual(
                 case["perturbation_stability"]["label"],
                 "stable_motion_context_branch",
@@ -55,10 +65,23 @@ class LaneContinuationBranchReplayTest(unittest.TestCase):
                 case["acceptance_decision"]["label"],
                 "accepted_for_selector_rollout",
             )
+            self.assertEqual(
+                case["history_speed_prior_stability"]["label"],
+                "stable_history_speed_prior_branch",
+            )
+            self.assertEqual(
+                case["history_speed_prior_acceptance_decision"]["label"],
+                "accepted_for_selector_rollout",
+            )
+            self.assertIn(
+                "history_speed_prior_gain_m",
+                case["perturbation_trials"][0],
+            )
 
             markdown = lane_continuation_branch_replay_markdown(payload)
             self.assertIn("Motion-Context Branch Replay Diagnostic", markdown)
             self.assertIn("Acceptance gate", markdown)
+            self.assertIn("History speed-prior accepted cases", markdown)
             self.assertIn("accepted_for_selector_rollout", markdown)
             self.assertIn("stable_motion_context_branch", markdown)
             self.assertIn("not a route planner", markdown)
@@ -156,6 +179,56 @@ class LaneContinuationBranchReplayTest(unittest.TestCase):
         self.assertLess(stability["robustness_margin_m"], 0.0)
         self.assertEqual(decision["label"], "needs_route_context_margin")
         self.assertFalse(decision["accepted"])
+
+    def test_history_speed_prior_gate_can_resolve_margin_followup(self) -> None:
+        trials = [
+            {
+                "ready": True,
+                "label": "speed_minus_10pct",
+                "branch_preserved": True,
+                "positive_gain": False,
+                "motion_context_gain_m": 0.75,
+                "history_speed_prior_positive_gain": True,
+                "history_speed_prior_gain_m": 1.35,
+            },
+            {
+                "ready": True,
+                "label": "speed_plus_10pct",
+                "branch_preserved": True,
+                "positive_gain": True,
+                "motion_context_gain_m": 3.0,
+                "history_speed_prior_positive_gain": True,
+                "history_speed_prior_gain_m": 2.4,
+            },
+        ]
+
+        base_stability = _perturbation_stability(
+            nominal_gain=2.0,
+            expected_chain=("100", "300"),
+            trials=trials,
+        )
+        speed_prior_stability = _history_speed_prior_stability(
+            nominal_gain=2.1,
+            expected_chain=("100", "300"),
+            trials=trials,
+        )
+        base_decision = _acceptance_decision(base_stability)
+        speed_prior_decision = _acceptance_decision(speed_prior_stability)
+
+        self.assertEqual(base_decision["label"], "needs_route_context_margin")
+        self.assertEqual(
+            speed_prior_stability["label"],
+            "stable_history_speed_prior_branch",
+        )
+        self.assertEqual(
+            speed_prior_stability["worst_trial_label"],
+            "speed_minus_10pct",
+        )
+        self.assertGreaterEqual(speed_prior_stability["robustness_margin_m"], 0.0)
+        self.assertEqual(
+            speed_prior_decision["label"],
+            "accepted_for_selector_rollout",
+        )
 
 
 def _write_branch_selection_manifest(root: Path) -> Path:

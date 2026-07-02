@@ -229,8 +229,11 @@ It reads the ignored branch-selection manifest, reloads the two branchable
 local Waymo cases, and publishes only branch/gain stability summaries: 8
 deterministic perturbation trials, 8 branch-preserving trials, 7 positive-gain
 trials, 1 branch accepted for broader selector evaluation, 1 route-context
-margin follow-up, and a -0.443 m minimum robustness margin. Raw TFRecords and
-local replay packets remain ignored.
+margin follow-up, and a -0.443 m minimum robustness margin. The same report
+also checks an experimental history-speed-prior replay score; it keeps 1
+accepted case and leaves the margin follow-up unresolved, with a -3.099 m
+minimum speed-prior margin. Raw TFRecords and local replay packets remain
+ignored.
 
 ## Interpretation Rules
 

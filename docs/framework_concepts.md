@@ -125,7 +125,9 @@ selected branch and positive recoverable FDE survive. The current real-data
 run preserves the branch in 8/8 perturbation trials and positive gain in 7/8.
 Its acceptance gate marks one branch ready for broader selector evaluation and
 one branch as a route-context margin follow-up with a -0.443 m worst-case
-margin.
+margin. The experimental history-speed-prior replay score keeps the same
+accepted-case count and does not resolve that margin follow-up, which points
+the next iteration toward richer route context instead of speed smoothing alone.
 
 ## Map-Match Audit
 

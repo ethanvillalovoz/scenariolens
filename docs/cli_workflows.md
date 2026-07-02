@@ -478,7 +478,10 @@ perturbations. The checked-in report covers 2 branchable real-data cases and 8
 perturbation trials. The acceptance gate requires branch preservation and at
 least 1.0 m recoverable FDE in every valid perturbation: one branch passes that
 gate for broader selector evaluation, while the second becomes a route-context
-margin follow-up with a -0.443 m worst-case margin. Treat that case as the next
+margin follow-up with a -0.443 m worst-case margin. The report also evaluates
+an experimental history-speed-prior replay score; it preserves the branch but
+does not resolve the margin target, so the next useful experiment is richer
+route context rather than simply smoothing speed. Treat that case as the next
 route-context target, not as a failed benchmark.
 
 ## Baseline Ablation

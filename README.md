@@ -249,6 +249,9 @@ smoke test. The prototype can:
   perturbations, preserving the selected branch in 8/8 trials and positive
   recoverable FDE in 7/8 trials, with 1 branch accepted for broader selector
   evaluation and 1 route-context margin follow-up at -0.443 m,
+- test an experimental history-speed-prior replay score on the same branch
+  cases, showing that simple speed smoothing does not resolve the margin
+  follow-up and that richer route context is the better next target,
 - expose public-safe heading-aware improvement, regression, and fallback-heavy
   cases in the live Scenario Explorer,
 - turn heading-aware debug cases into a replay-readiness queue for the next

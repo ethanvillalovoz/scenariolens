@@ -218,6 +218,10 @@ Testing and verification:
   all eight trials, positive recoverable FDE holds in seven, one branch is
   accepted for broader selector evaluation, and one becomes a route-context
   margin follow-up at -0.443 m.
+- An experimental history-speed-prior replay score tests a simple non-oracle
+  calibration idea on the same branch choices. It keeps one accepted case but
+  does not resolve the margin follow-up, turning the negative result into a
+  concrete route-context next step.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
@@ -225,8 +229,9 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Add richer route context for the branch replay margin follow-up, then
-   broaden the selector check across more branchable continuation examples.
+3. Add richer route context for the branch replay margin follow-up, since the
+   simple history-speed-prior ablation did not clear that gate, then broaden
+   the selector check across more branchable continuation examples.
 4. Create curated scenario collections for pedestrian, cyclist, merge, and
    unprotected-turn cases.
 

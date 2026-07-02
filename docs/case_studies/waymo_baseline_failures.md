@@ -90,7 +90,10 @@ The follow-up branch replay diagnostic then replays those two motion-context
 branch choices under eight deterministic perturbations. The selected branch is
 preserved in all eight trials, positive recoverable FDE holds in seven, one
 branch is accepted for broader selector evaluation, and the smaller-gain case
-becomes a route-context margin target with a -0.443 m worst-case margin.
+becomes a route-context margin target with a -0.443 m worst-case margin. A
+simple history-speed-prior replay ablation does not clear that target, which
+keeps the next step focused on route context instead of claiming that speed
+smoothing solved the issue.
 
 ## Why It Matters
 
@@ -101,6 +104,6 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Add richer route context for the branch replay margin follow-up; expand
-beyond shards `00007` through `00010`; and continue curating stable open-loop
-replay candidates.
+Add richer route context for the branch replay margin follow-up; expand beyond
+shards `00007` through `00010`; and continue curating stable open-loop replay
+candidates.
