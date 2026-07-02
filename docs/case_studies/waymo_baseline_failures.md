@@ -88,9 +88,9 @@ downstream speed limits can recover some branch-choice error without using the
 observed future trajectory.
 The follow-up branch replay diagnostic then replays those two motion-context
 branch choices under eight deterministic perturbations. The selected branch is
-preserved in all eight trials, positive recoverable FDE holds in seven, and
-the smaller-gain case becomes an explicit gain-sensitive target for richer
-route context.
+preserved in all eight trials, positive recoverable FDE holds in seven, one
+branch is accepted for broader selector evaluation, and the smaller-gain case
+becomes a route-context margin target with a -0.443 m worst-case margin.
 
 ## Why It Matters
 
@@ -101,6 +101,6 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Add richer route context for the gain-sensitive branch replay case; expand
+Add richer route context for the branch replay margin follow-up; expand
 beyond shards `00007` through `00010`; and continue curating stable open-loop
 replay candidates.

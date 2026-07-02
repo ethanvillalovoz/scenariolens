@@ -931,7 +931,8 @@ def lane_continuation_branch_replay_command(
     print(
         f"Generated {result.case_count} branch replay diagnostic(s): "
         f"{result.replayed_case_count} replayed case(s), "
-        f"{result.stable_case_count} stable motion-context case(s)."
+        f"{result.stable_case_count} stable motion-context case(s), "
+        f"{result.accepted_case_count} accepted branch case(s)."
     )
     return 0
 

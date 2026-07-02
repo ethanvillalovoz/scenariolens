@@ -42,6 +42,7 @@ class LaneContinuationBranchReplayResult:
     case_count: int
     replayed_case_count: int
     stable_case_count: int
+    accepted_case_count: int
     output_dir: Path
     manifest_path: Path
     report_path: Path
@@ -81,6 +82,7 @@ def generate_lane_continuation_branch_replay(
         case_count=int(payload["case_count"]),
         replayed_case_count=int(aggregate["replayed_case_count"]),
         stable_case_count=int(aggregate["stable_motion_context_case_count"]),
+        accepted_case_count=int(aggregate["accepted_branch_case_count"]),
         output_dir=target,
         manifest_path=manifest_path,
         report_path=report_path,
@@ -161,6 +163,11 @@ def lane_continuation_branch_replay_payload(
         "top": top,
         "max_lane_link_hops": max_hops,
         "minimum_stable_gain_m": _MIN_STABLE_GAIN_M,
+        "acceptance_gate": (
+            "Accept a motion-context branch for broader selector rollout only "
+            "when every valid perturbation preserves the selected branch and "
+            f"keeps recoverable FDE above {_MIN_STABLE_GAIN_M:.1f} m."
+        ),
         "case_count": len(cases),
         "source_branch_case_count": len(_required_list(branch_selection, "cases")),
         "selected_motion_context_case_count": len(selected),
@@ -209,6 +216,7 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
         f"- Motion-context cases selected: {payload['selected_motion_context_case_count']}",
         f"- Perturbations per case: {len(perturbations)}",
         f"- Minimum stable gain: {_meter_text(payload['minimum_stable_gain_m'])}",
+        f"- Acceptance gate: {payload['acceptance_gate']}",
         "- Raw scenario data committed: no",
         "- Local per-case replay packets committed: no",
         "",
@@ -224,10 +232,15 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
         f"| Branch-preserving trials | {aggregate['branch_preserving_trial_count']} |",
         f"| Positive-gain trials | {aggregate['positive_gain_trial_count']} |",
         f"| Stable positive trials | {aggregate['stable_positive_trial_count']} |",
+        f"| Accepted branch cases | {aggregate['accepted_branch_case_count']} |",
+        f"| Route-context follow-up cases | {aggregate['route_context_followup_case_count']} |",
+        f"| Selector-stability follow-up cases | {aggregate['selector_stability_followup_case_count']} |",
         f"| Mean nominal recoverable FDE | {_signed_meter_text(aggregate['mean_nominal_gain_m'])} |",
         f"| Mean perturbed recoverable FDE | {_signed_meter_text(aggregate['mean_trial_gain_m'])} |",
         f"| Min perturbed recoverable FDE | {_signed_meter_text(aggregate['min_trial_gain_m'])} |",
         f"| Max perturbed recoverable FDE | {_signed_meter_text(aggregate['max_trial_gain_m'])} |",
+        f"| Min robustness margin | {_signed_meter_text(aggregate['min_robustness_margin_m'])} |",
+        f"| Mean robustness margin | {_signed_meter_text(aggregate['mean_robustness_margin_m'])} |",
         "",
         "## Perturbations",
         "",
@@ -241,15 +254,16 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
             "",
             "## Case Results",
             "",
-            "| Rank | Scenario | Track | Default chain | Motion-context chain | Nominal gain | Stable trials | Trial gain range | Stability |",
-            "| ---: | --- | --- | --- | --- | ---: | ---: | --- | --- |",
+            "| Rank | Scenario | Track | Default chain | Motion-context chain | Nominal gain | Stable trials | Margin | Acceptance | Stability |",
+            "| ---: | --- | --- | --- | --- | ---: | ---: | ---: | --- | --- |",
         ]
     )
     if not cases:
-        lines.append("| n/a | n/a | n/a | n/a | n/a | n/a | 0/0 | n/a | n/a |")
+        lines.append("| n/a | n/a | n/a | n/a | n/a | n/a | 0/0 | n/a | n/a | n/a |")
     for case in cases:
         assert isinstance(case, dict)
         stability = _required_mapping(case, "perturbation_stability")
+        acceptance = _required_mapping(case, "acceptance_decision")
         lines.append(
             "| "
             f"{case['rank']} | "
@@ -260,14 +274,15 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
             f"{_signed_meter_text(case.get('nominal_motion_context_gain_m'))} | "
             f"{stability['stable_positive_trial_count']}/"
             f"{stability['valid_trial_count']} | "
-            f"{_signed_meter_text(stability.get('min_gain_m'))} to "
-            f"{_signed_meter_text(stability.get('max_gain_m'))} | "
+            f"{_signed_meter_text(stability.get('robustness_margin_m'))} | "
+            f"`{acceptance['label']}` | "
             f"`{stability['label']}` |"
         )
 
     for case in cases:
         assert isinstance(case, dict)
         stability = _required_mapping(case, "perturbation_stability")
+        acceptance = _required_mapping(case, "acceptance_decision")
         lines.extend(
             [
                 "",
@@ -277,7 +292,10 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
                 f"- Source: `{case['source_name']}`",
                 f"- Ready: {case['ready']}",
                 f"- Stability: **{stability['label']}**",
+                f"- Acceptance: **{acceptance['label']}**",
                 f"- Why it matters: {case['why_it_matters']}",
+                f"- Acceptance reason: {acceptance['reason']}",
+                f"- Recommended next action: {acceptance['next_action']}",
                 "- Default linked-route FDE: "
                 f"{_meter_text(case.get('default_fde_m'))}",
                 "- Motion-context route FDE: "
@@ -293,6 +311,10 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
                 "- Stable positive trials: "
                 f"{stability['stable_positive_trial_count']}/"
                 f"{stability['valid_trial_count']}",
+                "- Worst perturbation: "
+                f"`{stability['worst_trial_label']}`",
+                "- Robustness margin: "
+                f"{_signed_meter_text(stability.get('robustness_margin_m'))}",
                 "",
                 "Perturbation trials:",
                 "",
@@ -319,6 +341,9 @@ def lane_continuation_branch_replay_markdown(payload: dict[str, object]) -> str:
             "",
             "- Stable motion-context cases preserve the selected branch and keep "
             "positive recoverable FDE across all deterministic perturbations.",
+            "- Accepted branch cases pass the stricter rollout gate: branch "
+            "preservation plus at least 1.0 m recoverable FDE in every valid "
+            "perturbation trial.",
             "- Sensitive cases are still useful: they identify where a "
             "hand-built selector needs richer route context or a learned "
             "candidate scorer.",
@@ -370,6 +395,7 @@ def _branch_replay_case(
         "nominal_motion_context_gain_m": None,
         "perturbation_trials": [],
         "perturbation_stability": _empty_stability(),
+        "acceptance_decision": _acceptance_decision(_empty_stability()),
         "why_it_matters": "The motion-context branch case could not be replayed.",
     }
     if replay_case is None:
@@ -433,6 +459,7 @@ def _branch_replay_case(
         expected_chain=expected_chain,
         trials=trials,
     )
+    acceptance = _acceptance_decision(stability)
     base.update(
         {
             "ready": True,
@@ -453,7 +480,8 @@ def _branch_replay_case(
             "nominal_oracle_gain_m": nominal.get("oracle_recoverable_fde_m"),
             "perturbation_trials": trials,
             "perturbation_stability": stability,
-            "why_it_matters": _why_it_matters(stability),
+            "acceptance_decision": acceptance,
+            "why_it_matters": _why_it_matters(stability, acceptance),
         }
     )
     return base
@@ -553,6 +581,11 @@ def _perturbation_stability(
         if gains and nominal is not None
         else None
     )
+    min_gain = min(gains) if gains else None
+    worst_trial_label = _worst_trial_label(valid)
+    robustness_margin = (
+        round(min_gain - _MIN_STABLE_GAIN_M, 3) if min_gain is not None else None
+    )
     if not valid:
         label = "not_evaluable"
     elif stable_positive == len(valid):
@@ -577,10 +610,78 @@ def _perturbation_stability(
         "stable_positive_rate": round(stable_positive / len(valid), 3)
         if valid
         else None,
-        "min_gain_m": round(min(gains), 3) if gains else None,
+        "min_gain_m": round(min_gain, 3) if min_gain is not None else None,
         "max_gain_m": round(max(gains), 3) if gains else None,
         "mean_gain_m": _mean(tuple(gains)),
         "max_gain_swing_m": round(max_swing, 3) if max_swing is not None else None,
+        "worst_trial_label": worst_trial_label,
+        "robustness_margin_m": robustness_margin,
+    }
+
+
+def _acceptance_decision(stability: dict[str, object]) -> dict[str, object]:
+    label = str(stability.get("label", "not_evaluable"))
+    valid_count = int(stability.get("valid_trial_count", 0) or 0)
+    branch_rate = _optional_float(stability.get("branch_preservation_rate")) or 0.0
+    positive_rate = _optional_float(stability.get("positive_gain_rate")) or 0.0
+    margin = _optional_float(stability.get("robustness_margin_m"))
+    if valid_count == 0:
+        return {
+            "label": "not_evaluable",
+            "accepted": False,
+            "reason": "No valid perturbation trials were available for the gate.",
+            "next_action": "Confirm the local replay inputs and rerun branch replay.",
+        }
+    if label == "stable_motion_context_branch" and margin is not None and margin >= 0.0:
+        return {
+            "label": "accepted_for_selector_rollout",
+            "accepted": True,
+            "reason": (
+                "All perturbations preserved the motion-context branch and "
+                "kept recoverable FDE above the acceptance threshold."
+            ),
+            "next_action": (
+                "Evaluate this selector behavior on a broader branchable "
+                "continuation queue."
+            ),
+        }
+    if branch_rate >= 1.0 and positive_rate < 1.0:
+        return {
+            "label": "needs_route_context_margin",
+            "accepted": False,
+            "reason": (
+                "The selected branch is stable, but at least one perturbation "
+                "falls below the recoverable-FDE threshold."
+            ),
+            "next_action": (
+                "Add richer route context or speed-prior calibration before "
+                "treating this branch as robust."
+            ),
+        }
+    if branch_rate < 1.0 and positive_rate >= 1.0:
+        return {
+            "label": "needs_selector_stability",
+            "accepted": False,
+            "reason": (
+                "Recoverable FDE remains positive, but the selected branch "
+                "changes under perturbation."
+            ),
+            "next_action": (
+                "Increase selector margin or add learned route-candidate "
+                "scoring before rollout."
+            ),
+        }
+    return {
+        "label": "needs_route_and_selector_followup",
+        "accepted": False,
+        "reason": (
+            "The branch choice and recoverable FDE are both sensitive under "
+            "perturbation."
+        ),
+        "next_action": (
+            "Keep this case in the diagnostic queue for route-context and "
+            "selector-stability work."
+        ),
     }
 
 
@@ -606,6 +707,15 @@ def _aggregate_cases(cases: list[dict[str, object]]) -> dict[str, object]:
         if (gain := _optional_float(case.get("nominal_motion_context_gain_m")))
         is not None
     ]
+    acceptances = [
+        _required_mapping(case, "acceptance_decision") for case in ready
+    ]
+    margins = [
+        margin
+        for stability in stabilities
+        if (margin := _optional_float(stability.get("robustness_margin_m")))
+        is not None
+    ]
     return {
         "case_count": len(cases),
         "replayed_case_count": len(ready),
@@ -628,10 +738,27 @@ def _aggregate_cases(cases: list[dict[str, object]]) -> dict[str, object]:
             bool(trial.get("branch_preserved")) and bool(trial.get("positive_gain"))
             for trial in trials
         ),
+        "accepted_branch_case_count": sum(
+            str(decision.get("label")) == "accepted_for_selector_rollout"
+            for decision in acceptances
+        ),
+        "route_context_followup_case_count": sum(
+            str(decision.get("label")) == "needs_route_context_margin"
+            for decision in acceptances
+        ),
+        "selector_stability_followup_case_count": sum(
+            str(decision.get("label")) in {
+                "needs_selector_stability",
+                "needs_route_and_selector_followup",
+            }
+            for decision in acceptances
+        ),
         "mean_nominal_gain_m": _mean(tuple(nominal_gains)),
         "mean_trial_gain_m": _mean(tuple(trial_gains)),
         "min_trial_gain_m": round(min(trial_gains), 3) if trial_gains else None,
         "max_trial_gain_m": round(max(trial_gains), 3) if trial_gains else None,
+        "min_robustness_margin_m": round(min(margins), 3) if margins else None,
+        "mean_robustness_margin_m": _mean(tuple(margins)),
     }
 
 
@@ -650,16 +777,39 @@ def _empty_stability() -> dict[str, object]:
         "max_gain_m": None,
         "mean_gain_m": None,
         "max_gain_swing_m": None,
+        "worst_trial_label": None,
+        "robustness_margin_m": None,
     }
 
 
-def _why_it_matters(stability: dict[str, object]) -> str:
-    label = str(stability.get("label"))
-    if label == "stable_motion_context_branch":
+def _worst_trial_label(trials: list[dict[str, object]]) -> str | None:
+    worst_label = None
+    worst_gain = None
+    for trial in trials:
+        gain = _optional_float(trial.get("motion_context_gain_m"))
+        if gain is None:
+            continue
+        if worst_gain is None or gain < worst_gain:
+            worst_gain = gain
+            worst_label = str(trial.get("label"))
+    return worst_label
+
+
+def _why_it_matters(
+    stability: dict[str, object],
+    acceptance: dict[str, object],
+) -> str:
+    if str(acceptance.get("label")) == "accepted_for_selector_rollout":
         return (
-            "The non-oracle branch choice stayed on the same parsed route and "
-            "kept positive recoverable FDE under all deterministic perturbations."
+            "The motion-context branch passes the acceptance gate, making it "
+            "ready for broader selector evaluation."
         )
+    if str(acceptance.get("label")) == "needs_route_context_margin":
+        return (
+            "The branch choice is stable, but the gain margin is too thin "
+            "under at least one perturbation."
+        )
+    label = str(stability.get("label"))
     if label == "positive_gain_but_selector_shifted":
         return (
             "The motion-context prior kept positive recoverable FDE, but the "

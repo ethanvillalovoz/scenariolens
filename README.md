@@ -247,7 +247,8 @@ smoke test. The prototype can:
   keeping the anchor-heading selector honest at 0 improvements,
 - replay those 2 motion-context branch choices under 8 deterministic
   perturbations, preserving the selected branch in 8/8 trials and positive
-  recoverable FDE in 7/8 trials, with 1 stable case and 1 gain-sensitive case,
+  recoverable FDE in 7/8 trials, with 1 branch accepted for broader selector
+  evaluation and 1 route-context margin follow-up at -0.443 m,
 - expose public-safe heading-aware improvement, regression, and fallback-heavy
   cases in the live Scenario Explorer,
 - turn heading-aware debug cases into a replay-readiness queue for the next
@@ -260,7 +261,7 @@ smoke test. The prototype can:
 - run without external dependencies.
 
 The next milestone is to broaden motion-context branch replay beyond the first
-two branchable cases and add richer route context for the gain-sensitive case.
+two branchable cases and add richer route context for the margin follow-up.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).

@@ -394,8 +394,10 @@ recoverable FDE. The branch replay diagnostic at
 `docs/reports/waymo_lane_continuation_branch_replay.md` then replays those 2
 motion-context choices under 8 deterministic perturbations: branch choice is
 preserved in 8/8 trials, positive recoverable FDE holds in 7/8 trials, and the
-second case is labeled gain-sensitive. Next work is broader branch replay plus
-richer route context for the gain-sensitive case.
+acceptance gate marks 1 branch ready for broader selector evaluation and 1
+branch as a route-context margin follow-up with a -0.443 m worst-case margin.
+Next work is broader branch replay plus richer route context for the margin
+follow-up case.
 
 ## Stretch Goals
 

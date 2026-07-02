@@ -228,8 +228,9 @@ The motion-context branch replay diagnostic is checked in at
 It reads the ignored branch-selection manifest, reloads the two branchable
 local Waymo cases, and publishes only branch/gain stability summaries: 8
 deterministic perturbation trials, 8 branch-preserving trials, 7 positive-gain
-trials, 1 stable motion-context case, and 1 gain-sensitive case. Raw TFRecords
-and local replay packets remain ignored.
+trials, 1 branch accepted for broader selector evaluation, 1 route-context
+margin follow-up, and a -0.443 m minimum robustness margin. Raw TFRecords and
+local replay packets remain ignored.
 
 ## Interpretation Rules
 

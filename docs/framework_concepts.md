@@ -122,8 +122,10 @@ The branch replay diagnostic is the stability layer after branch selection. It
 reloads the motion-context-improved branch cases, applies the same deterministic
 anchor perturbations used elsewhere in ScenarioLens, and checks whether the
 selected branch and positive recoverable FDE survive. The current real-data
-run preserves the branch in 8/8 perturbation trials and positive gain in 7/8,
-with one stable case and one gain-sensitive follow-up target.
+run preserves the branch in 8/8 perturbation trials and positive gain in 7/8.
+Its acceptance gate marks one branch ready for broader selector evaluation and
+one branch as a route-context margin follow-up with a -0.443 m worst-case
+margin.
 
 ## Map-Match Audit
 
@@ -154,8 +156,8 @@ and links to the public reports.
 - Add a dataset adapter for another public motion dataset.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
-- Broaden motion-context branch replay and add richer route context for
-  gain-sensitive branch choices.
+- Broaden motion-context branch replay and add richer route context for margin
+  follow-up branch choices.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.
 - Analyze heading-aware replay stability across more validation shards.

@@ -215,8 +215,9 @@ Testing and verification:
   selector is not enough.
 - A motion-context branch replay diagnostic replays those two branch choices
   under eight deterministic perturbations: the selected branch is preserved in
-  all eight trials, positive recoverable FDE holds in seven, one case is stable,
-  and one is explicitly labeled gain-sensitive.
+  all eight trials, positive recoverable FDE holds in seven, one branch is
+  accepted for broader selector evaluation, and one becomes a route-context
+  margin follow-up at -0.443 m.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
@@ -224,7 +225,7 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Add richer route context for the gain-sensitive branch replay case, then
+3. Add richer route context for the branch replay margin follow-up, then
    broaden the selector check across more branchable continuation examples.
 4. Create curated scenario collections for pedestrian, cyclist, merge, and
    unprotected-turn cases.

@@ -7,6 +7,8 @@ from pathlib import Path
 
 from scenariolens.lane_continuation_branch_replay import (
     LANE_CONTINUATION_BRANCH_REPLAY_FORMAT,
+    _acceptance_decision,
+    _perturbation_stability,
     generate_lane_continuation_branch_replay,
     lane_continuation_branch_replay_markdown,
     lane_continuation_branch_replay_payload,
@@ -37,6 +39,9 @@ class LaneContinuationBranchReplayTest(unittest.TestCase):
             self.assertEqual(aggregate["perturbation_trial_count"], 4)
             self.assertEqual(aggregate["stable_motion_context_case_count"], 1)
             self.assertEqual(aggregate["stable_positive_trial_count"], 4)
+            self.assertEqual(aggregate["accepted_branch_case_count"], 1)
+            self.assertEqual(aggregate["route_context_followup_case_count"], 0)
+            self.assertGreater(aggregate["min_robustness_margin_m"], 1.0)
 
             case = payload["cases"][0]
             self.assertEqual(case["scenario_id"], "branch_case")
@@ -46,9 +51,15 @@ class LaneContinuationBranchReplayTest(unittest.TestCase):
                 case["perturbation_stability"]["label"],
                 "stable_motion_context_branch",
             )
+            self.assertEqual(
+                case["acceptance_decision"]["label"],
+                "accepted_for_selector_rollout",
+            )
 
             markdown = lane_continuation_branch_replay_markdown(payload)
             self.assertIn("Motion-Context Branch Replay Diagnostic", markdown)
+            self.assertIn("Acceptance gate", markdown)
+            self.assertIn("accepted_for_selector_rollout", markdown)
             self.assertIn("stable_motion_context_branch", markdown)
             self.assertIn("not a route planner", markdown)
             self.assertIn("Raw scenario data committed: no", markdown)
@@ -110,9 +121,41 @@ class LaneContinuationBranchReplayTest(unittest.TestCase):
 
             self.assertIn("Generated 1 branch replay diagnostic", result.stdout)
             self.assertIn("1 stable motion-context case", result.stdout)
+            self.assertIn("1 accepted branch case", result.stdout)
             self.assertTrue((output_dir / "manifest.json").exists())
             self.assertTrue((output_dir / "report.md").exists())
             self.assertTrue(public_report.exists())
+
+    def test_acceptance_gate_flags_stable_branch_with_thin_gain_margin(self) -> None:
+        trials = [
+            {
+                "ready": True,
+                "label": "speed_minus_10pct",
+                "branch_preserved": True,
+                "positive_gain": False,
+                "motion_context_gain_m": 0.75,
+            },
+            {
+                "ready": True,
+                "label": "speed_plus_10pct",
+                "branch_preserved": True,
+                "positive_gain": True,
+                "motion_context_gain_m": 3.0,
+            },
+        ]
+
+        stability = _perturbation_stability(
+            nominal_gain=2.0,
+            expected_chain=("100", "300"),
+            trials=trials,
+        )
+        decision = _acceptance_decision(stability)
+
+        self.assertEqual(stability["label"], "branch_stable_gain_sensitive")
+        self.assertEqual(stability["worst_trial_label"], "speed_minus_10pct")
+        self.assertLess(stability["robustness_margin_m"], 0.0)
+        self.assertEqual(decision["label"], "needs_route_context_margin")
+        self.assertFalse(decision["accepted"])
 
 
 def _write_branch_selection_manifest(root: Path) -> Path:

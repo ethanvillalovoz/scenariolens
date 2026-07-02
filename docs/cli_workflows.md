@@ -475,10 +475,11 @@ scenariolens lane-continuation-branch-replay \
 
 This replays motion-context branch choices under deterministic anchor-velocity
 perturbations. The checked-in report covers 2 branchable real-data cases and 8
-perturbation trials: the selected branch is preserved in 8/8 trials, positive
-recoverable FDE holds in 7/8 trials, and one case is explicitly labeled
-gain-sensitive. Treat the sensitive case as the next route-context target, not
-as a failed benchmark.
+perturbation trials. The acceptance gate requires branch preservation and at
+least 1.0 m recoverable FDE in every valid perturbation: one branch passes that
+gate for broader selector evaluation, while the second becomes a route-context
+margin follow-up with a -0.443 m worst-case margin. Treat that case as the next
+route-context target, not as a failed benchmark.
 
 ## Baseline Ablation
 
