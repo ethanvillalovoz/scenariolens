@@ -73,6 +73,9 @@ from scenariolens.lane_continuation_branch_rollout import (
 from scenariolens.lane_continuation_diagnostics import (
     generate_lane_continuation_route_diagnostics,
 )
+from scenariolens.lane_continuation_route_context_guard import (
+    generate_lane_continuation_route_context_guard,
+)
 from scenariolens.lane_continuation_replay import (
     LANE_CONTINUATION_REPLAY_INPUT_FORMATS,
     generate_lane_continuation_replay_prototype,
@@ -971,6 +974,45 @@ def lane_continuation_branch_rollout_gate_command(
         f"{result.promoted_case_count} promoted candidate(s), "
         f"{result.held_route_context_case_count} route-context hold(s), "
         f"{result.held_selector_stability_case_count} selector-stability hold(s)."
+    )
+    return 0
+
+
+def lane_continuation_route_context_guard_command(
+    branch_selection_manifest: str,
+    branch_replay_manifest: str,
+    output_dir: str,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_lane_continuation_route_context_guard(
+            branch_selection_manifest_path=branch_selection_manifest,
+            branch_replay_manifest_path=branch_replay_manifest,
+            output_dir=output_dir,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(
+        "Wrote lane-continuation-route-context-guard manifest "
+        f"to {result.manifest_path}"
+    )
+    print(
+        "Wrote lane-continuation-route-context-guard report "
+        f"to {result.report_path}"
+    )
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("Lane-continuation route-context guard is not ready. See manifest.json.")
+        return 2
+    print(
+        f"Generated {result.case_count} route-context guard decision(s): "
+        f"{result.promoted_case_count} promoted candidate(s), "
+        f"{result.held_case_count} hold(s), "
+        f"{result.replay_gate_match_count} replay-gate match(es)."
     )
     return 0
 
@@ -2032,6 +2074,33 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe rollout-gate report copy.",
     )
+    lane_continuation_route_context_guard_parser = subparsers.add_parser(
+        "lane-continuation-route-context-guard",
+        help=(
+            "Evaluate a route-context promotion guard over motion-context "
+            "branch candidates."
+        ),
+    )
+    lane_continuation_route_context_guard_parser.add_argument(
+        "--branch-selection-manifest",
+        required=True,
+        help="Manifest produced by scenariolens lane-continuation-branch-selection.",
+    )
+    lane_continuation_route_context_guard_parser.add_argument(
+        "--branch-replay-manifest",
+        required=True,
+        help="Manifest produced by scenariolens lane-continuation-branch-replay.",
+    )
+    lane_continuation_route_context_guard_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_lane_continuation_route_context_guard",
+        help="Directory for route-context guard manifest.json and report.md.",
+    )
+    lane_continuation_route_context_guard_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe route-context guard report copy.",
+    )
     heading_replay_parser = subparsers.add_parser(
         "heading-replay-prototype",
         help=(
@@ -2493,6 +2562,13 @@ def main() -> int:
         )
     if args.command == "lane-continuation-branch-rollout-gate":
         return lane_continuation_branch_rollout_gate_command(
+            branch_replay_manifest=args.branch_replay_manifest,
+            output_dir=args.output_dir,
+            public_report=args.public_report,
+        )
+    if args.command == "lane-continuation-route-context-guard":
+        return lane_continuation_route_context_guard_command(
+            branch_selection_manifest=args.branch_selection_manifest,
             branch_replay_manifest=args.branch_replay_manifest,
             output_dir=args.output_dir,
             public_report=args.public_report,

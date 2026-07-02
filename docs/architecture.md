@@ -36,6 +36,7 @@ flowchart LR
     AE --> AF["Continuation branch selection"]
     AF --> AG["Motion-context branch replay"]
     AG --> AH["Branch rollout gate"]
+    AH --> AI["Route-context guard study"]
     Q --> T["Map-match threshold audit"]
     F --> I["Static dashboard payload"]
     V --> I
@@ -79,6 +80,7 @@ flowchart LR
 | Lane-continuation branch selection | `src/scenariolens/lane_continuation_branch_selection.py` | Enumerates parsed linked-lane branch alternatives for continuation regressions, compares non-oracle anchor-heading and motion-context selectors with an oracle upper-bound diagnostic, and keeps route-planning claims out of public artifacts. |
 | Lane-continuation branch replay | `src/scenariolens/lane_continuation_branch_replay.py` | Replays motion-context branch choices under deterministic anchor perturbations, reports acceptance gates, tests an experimental history-speed prior, and publishes route-context margin diagnostics while keeping route-planning claims out of public artifacts. |
 | Branch rollout gate | `src/scenariolens/lane_continuation_branch_rollout.py` | Converts branch replay diagnostics into public-safe promote/hold decisions, separating broader selector-evaluation candidates from route-context and selector-stability holds. |
+| Route-context guard study | `src/scenariolens/lane_continuation_route_context_guard.py` | Tests a non-oracle route-context promotion guard over branch-selection candidates, comparing route-fit, endpoint-alignment, and speed-limit-drop cues against branch replay outcomes. |
 | Heading replay prototype | `src/scenariolens/heading_replay_prototype.py` | Reloads heading-ready local scenarios, compares nearest-lane and heading-aware open-loop rollouts, applies deterministic perturbations, and publishes selector stability summaries. |
 | Map-match audit | `src/scenariolens/map_match_audit.py` | Reloads fallback-heavy debug cases, sweeps lane-match thresholds, and publishes public-safe evidence about whether wider lane acceptance improves or worsens FDE before changing matcher behavior. |
 | Failure study | `src/scenariolens/failure_study.py` | Aggregates ADE/FDE, miss rate, tag-level failures, score-component failures, and hardest scenario ids without publishing raw data. |

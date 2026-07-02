@@ -98,6 +98,10 @@ All notable changes to ScenarioLens are documented here.
 - `scenariolens lane-continuation-branch-rollout-gate` workflow and
   `docs/reports/waymo_lane_continuation_branch_rollout_gate.md`, converting
   branch replay evidence into public-safe promote/hold rollout triage.
+- `scenariolens lane-continuation-route-context-guard` workflow and
+  `docs/reports/waymo_lane_continuation_route_context_guard.md`, testing a
+  stricter non-oracle route-context promotion guard against branch replay
+  outcomes.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

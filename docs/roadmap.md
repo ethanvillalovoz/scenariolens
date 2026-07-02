@@ -405,7 +405,11 @@ selector iteration. The branch rollout gate at
 `docs/reports/waymo_lane_continuation_branch_rollout_gate.md` turns those
 outcomes into a promote/hold queue: 1 branch is ready for broader selector
 evaluation and 1 route-context margin case remains held with a concrete next
-action.
+action. The route-context guard study at
+`docs/reports/waymo_lane_continuation_route_context_guard.md` tests a stricter
+non-oracle promotion policy over those two branchable candidates, promoting the
+robust branch, holding the speed-minus margin case, and matching the replay
+gate on both cases.
 
 ## Stretch Goals
 

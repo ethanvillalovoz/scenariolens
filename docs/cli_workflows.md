@@ -503,6 +503,24 @@ add route-context features that can explain reduced-speed branch intent. It is
 release-style evidence triage, not a production release process, route planner,
 or benchmark claim.
 
+## Lane-Continuation Route-Context Guard
+
+```bash
+scenariolens lane-continuation-route-context-guard \
+  --branch-selection-manifest data/processed/waymo_lane_continuation_branch_selection/manifest.json \
+  --branch-replay-manifest data/processed/waymo_lane_continuation_branch_replay/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_route_context_guard \
+  --public-report docs/reports/waymo_lane_continuation_route_context_guard.md
+```
+
+This evaluates a stricter non-oracle promotion guard over the two current
+motion-context branch candidates. The guard uses route-fit, endpoint-alignment,
+and downstream speed-limit context from branch selection, then checks whether
+its promote/hold decision agrees with the replay gate. The current real-data
+report promotes 1 robust branch, holds 1 speed-minus route-context margin case,
+and matches the replay gate on both cases. Treat it as a candidate policy for
+larger branchable queues, not as a route planner or benchmark.
+
 ## Baseline Ablation
 
 ```bash

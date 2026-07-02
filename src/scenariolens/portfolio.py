@@ -139,6 +139,8 @@ def portfolio_markdown(
         "`docs/reports/waymo_lane_continuation_branch_replay.md`.",
         "- Branch rollout gate diagnostics are checked in under "
         "`docs/reports/waymo_lane_continuation_branch_rollout_gate.md`.",
+        "- Route-context guard diagnostics are checked in under "
+        "`docs/reports/waymo_lane_continuation_route_context_guard.md`.",
         "- Heading-aware debug casebook is checked in under "
         "`docs/reports/waymo_heading_aware_debug_casebook.md`.",
         "- Heading-aware replay candidate plan is checked in under "
@@ -203,7 +205,7 @@ def portfolio_markdown(
             "- The context replay candidate plan is a readiness queue, not completed simulation.",
             "- The context replay prototype is open-loop diagnostic evidence, not closed-loop simulation.",
             "- The context route/intent audit is a diagnostic follow-up, not a route planner.",
-            "- The lane-link continuation prototype, validation study, candidate plan, replay prototype, route diagnostics, branch-selection diagnostic, branch replay, and branch rollout gate are topology diagnostic evidence, not route planning or a production release process.",
+            "- The lane-link continuation prototype, validation study, candidate plan, replay prototype, route diagnostics, branch-selection diagnostic, branch replay, branch rollout gate, and route-context guard are topology diagnostic evidence, not route planning or a production release process.",
             "- The heading-aware lane selector is an ablation, not a replacement for the default scorer.",
             "- The heading-aware replay candidate plan is a queue for replay experiments, not completed simulation.",
             "- The heading-aware replay prototype is open-loop diagnostic evidence, not closed-loop simulation.",
@@ -213,7 +215,7 @@ def portfolio_markdown(
             "",
             "- Expand the documented local-slice recipe across more Waymo Motion validation shards.",
             "- Compare baseline ADE/FDE distributions across more validation shards.",
-            "- Implement a richer route-context selector candidate for the branch rollout hold now labeled `speed_minus_route_context_margin`.",
+            "- Broaden the route-context guard beyond the first two branchable cases and add richer turn-lane, topology, and traffic-control context for the held `speed_minus_route_context_margin` branch.",
             "- Graduate stable open-loop replay candidates into an optional Waymax/JAX path.",
             "- Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.",
             "",

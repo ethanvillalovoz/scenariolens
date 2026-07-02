@@ -246,6 +246,16 @@ stability holds, and the first next action for the held case. This is
 release-style evidence triage, not a production release process or route
 planner.
 
+The route-context guard study is checked in at
+[`docs/reports/waymo_lane_continuation_route_context_guard.md`](reports/waymo_lane_continuation_route_context_guard.md).
+It reads ignored branch-selection and branch-replay manifests, then publishes
+only derived guard decisions and route-feature deltas: 2 motion-context branch
+candidates, 1 guard promotion, 1 guard hold, 2/2 replay-gate matches, 0 false
+promotions, and 0 false holds. The guard uses route fit, endpoint alignment,
+and downstream speed-limit context; replay outcomes are used only to evaluate
+the guard, not to choose a branch. Raw TFRecords and local replay packets
+remain ignored.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

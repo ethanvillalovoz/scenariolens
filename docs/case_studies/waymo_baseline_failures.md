@@ -100,6 +100,10 @@ experiment.
 The branch rollout gate then converts those replay outcomes into a
 release-style promote/hold queue: one branch is promoted for broader selector
 evaluation, while the speed-minus margin case is held for route-context work.
+The route-context guard study tests a stricter non-oracle promotion policy over
+the same two branchable cases. It promotes the robust branch, holds the
+speed-minus margin case because endpoint-alignment and downstream speed-limit
+guardrails fire, and matches the replay gate on both cases.
 
 ## Why It Matters
 
@@ -110,6 +114,7 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Implement a richer route-context selector candidate for the branch rollout
-hold; expand beyond shards `00007` through `00010`; and continue curating
-stable open-loop replay candidates.
+Broaden the route-context guard beyond the first two branchable cases; add
+richer turn-lane, topology, and traffic-control context for the held branch;
+expand beyond shards `00007` through `00010`; and continue curating stable
+open-loop replay candidates.

@@ -102,6 +102,7 @@ Then open `http://localhost:8000/demo/`.
 - [Lane-continuation branch selection diagnostic](docs/reports/waymo_lane_continuation_branch_selection.md)
 - [Motion-context branch replay diagnostic](docs/reports/waymo_lane_continuation_branch_replay.md)
 - [Branch rollout gate](docs/reports/waymo_lane_continuation_branch_rollout_gate.md)
+- [Route-context guard study](docs/reports/waymo_lane_continuation_route_context_guard.md)
 - [Real Waymo lane-aware baseline diagnostic](docs/reports/waymo_lane_aware_baseline_cross_shard.md)
 - [Lane-aware baseline debug casebook](docs/reports/waymo_lane_aware_debug_casebook.md)
 - [Replay candidate plan](docs/reports/waymo_replay_candidate_plan.md)
@@ -258,6 +259,9 @@ smoke test. The prototype can:
   and route-feature deltas to guide the next selector iteration,
 - turn branch replay evidence into a conservative rollout gate with 1 promote
   candidate and 1 route-context hold,
+- test a stricter route-context promotion guard that promotes the robust branch,
+  holds the speed-minus margin case, and matches the current replay gate on
+  both branchable cases,
 - expose public-safe heading-aware improvement, regression, and fallback-heavy
   cases in the live Scenario Explorer,
 - turn heading-aware debug cases into a replay-readiness queue for the next
@@ -269,8 +273,8 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to broaden the branch replay/rollout queue beyond the
-first two branchable cases and implement richer route context for the
+The next milestone is to broaden the branch replay/rollout/guard queue beyond
+the first two branchable cases and add richer route-context features for the
 speed-minus margin follow-up.
 
 See [docs/project_brief.md](docs/project_brief.md) and
@@ -589,6 +593,16 @@ PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-branch-rollout-gate
   --branch-replay-manifest data/processed/waymo_lane_continuation_branch_replay/manifest.json \
   --output-dir data/processed/waymo_lane_continuation_branch_rollout_gate \
   --public-report docs/reports/waymo_lane_continuation_branch_rollout_gate.md
+```
+
+Test a stricter route-context promotion guard against the replay gate:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-route-context-guard \
+  --branch-selection-manifest data/processed/waymo_lane_continuation_branch_selection/manifest.json \
+  --branch-replay-manifest data/processed/waymo_lane_continuation_branch_replay/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_route_context_guard \
+  --public-report docs/reports/waymo_lane_continuation_route_context_guard.md
 ```
 
 Run the no-auth baseline ablation:

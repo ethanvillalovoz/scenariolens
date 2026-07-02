@@ -139,6 +139,13 @@ for broader selector evaluation and holds 1 route-context margin case with a
 named next action, making the diagnostic feel closer to an autonomy evaluation
 workflow.
 
+The route-context guard study is the first follow-up policy experiment for that
+hold. It keeps the existing selector unchanged, then tests a stricter
+non-oracle promotion guard using route-fit, endpoint-alignment, and downstream
+speed-limit deltas from branch selection. On the current 2-case branchable
+queue it promotes the robust branch, holds the `speed_minus_route_context_margin`
+case, and matches the replay gate on both cases.
+
 ## Map-Match Audit
 
 The map-match audit handles cases that are not ready to be treated as replay
@@ -168,9 +175,9 @@ and links to the public reports.
 - Add a dataset adapter for another public motion dataset.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
-- Broaden motion-context branch replay and add richer route context for margin
-  follow-up branch choices.
-- Expand the branch rollout gate across a larger branchable queue.
+- Broaden motion-context branch replay, rollout gates, and route-context guard
+  checks across a larger branchable queue.
+- Add richer route context for margin follow-up branch choices.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.
 - Analyze heading-aware replay stability across more validation shards.
