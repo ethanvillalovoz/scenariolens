@@ -102,11 +102,17 @@ route-feature follow-up, and records that false hold as calibration evidence.
 The follow-up calibration sweep tests endpoint-alignment gates against those
 replay labels and recommends a provisional -0.25 gate that would promote both
 accepted replay candidates on this queue, while explicitly noting that broader
-negative-control coverage is still missing.
+negative-control coverage was still missing at that stage.
 The branch coverage audit then zooms out and turns the limitation into a
 measurable expansion queue: 15 continuation candidates, 10 replay-ready
 candidates, 5 branch-selection cases, 3 branchable cases, 1 route-guard
 promotion, 5 topology blockers, and 8 named expansion items.
+The expanded branch coverage pass then raises the local queue to 30
+continuation candidates without leaving the laptop-safe workflow: 20 replay
+cases, 10 topology probes, 10 branch-selection cases, 6 branchable cases, 1
+accepted branch replay, and 1 route-context margin negative. On that expanded
+replay queue, the current route-context guard matches replay labels 2/2 with 0
+false holds and 0 false promotions.
 
 The topology gap audit follows the largest blocker class directly. After
 linked-lane closure materialization, the 100-scenario study now finds 209
@@ -144,7 +150,6 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Broaden the terminal-neighborhood selector experiment, expose alternatives for
-the two single-chain branch-selection cases, validate route-context guard
-calibration on expanded negative controls, and expand the closure-enabled
-branch queue beyond shards `00007` through `00010`.
+Broaden the terminal-neighborhood selector experiment, reduce the expanded
+topology blockers, add more replay-held branch negatives, and rerun the
+closure-enabled branch queue beyond shards `00007` through `00010`.

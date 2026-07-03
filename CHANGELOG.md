@@ -109,6 +109,11 @@ All notable changes to ScenarioLens are documented here.
   and `docs/reports/waymo_lane_continuation_route_context_guard_calibration.md`,
   sweeping endpoint-alignment gates and recommending a provisional -0.25 gate
   that clears the current false hold while noting missing negative controls.
+- Expanded lane-continuation branch queue artifacts at
+  `docs/reports/waymo_lane_continuation_branch_coverage_expanded.md` and
+  `docs/reports/waymo_lane_continuation_route_context_guard_calibration_expanded.md`,
+  raising the queue to 30 candidates, 20 replay cases, 10 topology probes, 6
+  branchable cases, and 1 replay-held route-context negative control.
 - `scenariolens lane-continuation-branch-coverage` workflow and
   `docs/reports/waymo_lane_continuation_branch_coverage.md`, connecting the
   continuation candidate, replay, diagnostics, branch-selection, branch-replay,

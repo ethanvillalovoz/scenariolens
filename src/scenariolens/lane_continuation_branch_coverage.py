@@ -263,17 +263,37 @@ def lane_continuation_branch_coverage_markdown(payload: dict[str, object]) -> st
     bottlenecks = _required_list(payload, "bottlenecks")
     expansion_queue = _required_list(payload, "expansion_queue")
     per_source = _required_list(payload, "per_source")
+    expanded = int(aggregate.get("candidate_top_per_bucket", 0) or 0) > 5
 
     lines = [
-        "# ScenarioLens Branch Coverage Audit",
+        (
+            "# ScenarioLens Expanded Branch Coverage Audit"
+            if expanded
+            else "# ScenarioLens Branch Coverage Audit"
+        ),
         "",
-        "This audit connects the lane-continuation candidate queue, replay "
-        "prototype, route diagnostics, branch selection, branch replay, and "
-        "route-context guard into one evidence funnel. Its job is to make the "
-        "current bottleneck explicit: only a small subset of continuation "
-        "failures is branchable today, so the next v1.0 work should expand "
-        "topology/parser coverage and route-context guard coverage before "
-        "claiming broader selector readiness.",
+        (
+            "This expanded audit raises the lane-continuation queue size before "
+            "connecting the candidate queue, replay prototype, route "
+            "diagnostics, branch selection, branch replay, and route-context "
+            "guard into one evidence funnel."
+            if expanded
+            else "This audit connects the lane-continuation candidate queue, replay "
+            "prototype, route diagnostics, branch selection, branch replay, and "
+            "route-context guard into one evidence funnel."
+        ),
+        (
+            "Its job is to show whether a broader real-slice queue produces "
+            "more branchable cases, selector evidence, topology blockers, and "
+            "route-context negative controls before ScenarioLens claims broader "
+            "selector readiness."
+            if expanded
+            else "Its job is to make the current bottleneck explicit: only a "
+            "small subset of continuation failures is branchable today, so the "
+            "next v1.0 work should expand topology/parser coverage and "
+            "route-context guard coverage before claiming broader selector "
+            "readiness."
+        ),
         "",
         "It is intentionally public-safe. It reads summary manifests only, "
         "publishes counts and scenario identifiers, and is not a Waymo "

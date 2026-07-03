@@ -105,6 +105,8 @@ Then open `http://localhost:8000/demo/`.
 - [Route-context guard study](docs/reports/waymo_lane_continuation_route_context_guard.md)
 - [Route-context guard calibration](docs/reports/waymo_lane_continuation_route_context_guard_calibration.md)
 - [Branch coverage audit](docs/reports/waymo_lane_continuation_branch_coverage.md)
+- [Expanded branch coverage audit](docs/reports/waymo_lane_continuation_branch_coverage_expanded.md)
+- [Expanded route-context guard calibration](docs/reports/waymo_lane_continuation_route_context_guard_calibration_expanded.md)
 - [Topology gap audit](docs/reports/waymo_lane_continuation_topology_gap_audit.md)
 - [Terminal neighborhood audit](docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md)
 - [Terminal neighborhood replay gate](docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md)
@@ -275,6 +277,11 @@ smoke test. The prototype can:
 - audit the continuation-to-branch funnel across 15 real-data candidates,
   showing 3 branchable cases, 1 guarded promotion, 5 topology blockers, and
   8 concrete expansion items for the next v1.0 branch queue,
+- expand that funnel to 30 real-data candidates on the same 100-scenario slice,
+  producing 20 replay cases, 10 topology probes, 10 branch-selection cases, 6
+  branchable cases, 1 accepted branch replay, 1 route-context margin negative,
+  and a route-context guard/calibration pass with 0 false holds and 0 false
+  promotions on the expanded replay queue,
 - audit the topology blockers by comparing capped ScenarioLens map features
   with raw parsed map-feature IDs, showing 2 blocker cases remain
   cap-recoverable and 3 lanes are terminal or directional-link cases after
@@ -298,10 +305,9 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to broaden terminal-neighborhood selector and
-route-context guard calibration across more candidates and negative controls,
-then expand the closure-enabled branch queue beyond the current 100-scenario
-slice.
+The next milestone is to expand the closure-enabled branch queue beyond the
+current 100-scenario slice, reduce topology blockers, and turn the new
+route-context margin negative into richer selector-context tests.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).

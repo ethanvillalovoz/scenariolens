@@ -26,6 +26,8 @@ robotics, AI/ML, and software engineering internship conversations.
 - Route-context guard study: `docs/reports/waymo_lane_continuation_route_context_guard.md`
 - Route-context guard calibration: `docs/reports/waymo_lane_continuation_route_context_guard_calibration.md`
 - Branch coverage audit: `docs/reports/waymo_lane_continuation_branch_coverage.md`
+- Expanded branch coverage audit: `docs/reports/waymo_lane_continuation_branch_coverage_expanded.md`
+- Expanded guard calibration: `docs/reports/waymo_lane_continuation_route_context_guard_calibration_expanded.md`
 - Topology gap audit: `docs/reports/waymo_lane_continuation_topology_gap_audit.md`
 - Terminal neighborhood audit: `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md`
 - Terminal neighborhood replay gate: `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md`
@@ -244,6 +246,12 @@ Testing and verification:
   manifests into one funnel: 15 continuation candidates, 10 replay-ready
   candidates, 5 branch-selection cases, 3 branchable cases, 1 route-guard
   promotion, 5 topology blockers, and 8 expansion queue items.
+- An expanded branch coverage audit raises the same local slice to 30
+  continuation candidates: 20 replay cases, 10 topology probes, 10
+  branch-selection cases, 6 branchable cases, 1 accepted branch replay, and 1
+  replay-held route-context margin negative. The paired expanded guard
+  calibration keeps the current -0.05 endpoint gate with 0 false holds and 0
+  false promotions on the expanded replay queue.
 - A topology gap audit reloads those 5 topology blockers and compares capped
   ScenarioLens map features with raw parsed map-feature IDs: 2 blocker cases
   remain cap-recoverable, 3 are terminal or directional-link cases, and 0 raw
@@ -265,8 +273,8 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Broaden the terminal-neighborhood selector experiment and validate
-   route-context guard calibration on expanded negative controls.
+3. Broaden the terminal-neighborhood selector experiment, reduce expanded
+   topology blockers, and add more replay-held branch negatives.
 4. Create curated scenario collections for pedestrian, cyclist, merge, and
    unprotected-turn cases.
 

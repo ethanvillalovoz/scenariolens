@@ -555,6 +555,66 @@ cases, 3 branchable cases, 1 route-guard promotion, 5 topology blockers, and
 8 expansion queue items. Treat it as a planning and coverage artifact, not as a
 benchmark or proof that the selector is ready across the full dataset.
 
+## Expanded Lane-Continuation Branch Queue
+
+```bash
+scenariolens lane-continuation-candidates \
+  --study-manifest data/processed/waymo_lane_continuation_study/manifest.json \
+  --top-per-bucket 10 \
+  --output-dir data/processed/waymo_lane_continuation_candidates_expanded
+
+scenariolens lane-continuation-replay-prototype \
+  --candidate-manifest data/processed/waymo_lane_continuation_candidates_expanded/manifest.json \
+  --top-per-bucket 10 \
+  --output-dir data/processed/waymo_lane_continuation_replay_prototype_expanded \
+  --format native \
+  --max-scenarios-per-source 25
+
+scenariolens lane-continuation-route-diagnostics \
+  --replay-manifest data/processed/waymo_lane_continuation_replay_prototype_expanded/manifest.json \
+  --top 20 \
+  --output-dir data/processed/waymo_lane_continuation_route_diagnostics_expanded
+
+scenariolens lane-continuation-branch-selection \
+  --diagnostics-manifest data/processed/waymo_lane_continuation_route_diagnostics_expanded/manifest.json \
+  --top 10 \
+  --max-hops 2 \
+  --output-dir data/processed/waymo_lane_continuation_branch_selection_expanded
+
+scenariolens lane-continuation-branch-replay \
+  --branch-selection-manifest data/processed/waymo_lane_continuation_branch_selection_expanded/manifest.json \
+  --top 10 \
+  --output-dir data/processed/waymo_lane_continuation_branch_replay_expanded
+
+scenariolens lane-continuation-route-context-guard \
+  --branch-selection-manifest data/processed/waymo_lane_continuation_branch_selection_expanded/manifest.json \
+  --branch-replay-manifest data/processed/waymo_lane_continuation_branch_replay_expanded/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_route_context_guard_expanded
+
+scenariolens lane-continuation-route-context-guard-calibration \
+  --route-context-guard-manifest data/processed/waymo_lane_continuation_route_context_guard_expanded/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_route_context_guard_calibration_expanded \
+  --public-report docs/reports/waymo_lane_continuation_route_context_guard_calibration_expanded.md
+
+scenariolens lane-continuation-branch-coverage \
+  --candidate-manifest data/processed/waymo_lane_continuation_candidates_expanded/manifest.json \
+  --replay-manifest data/processed/waymo_lane_continuation_replay_prototype_expanded/manifest.json \
+  --diagnostics-manifest data/processed/waymo_lane_continuation_route_diagnostics_expanded/manifest.json \
+  --branch-selection-manifest data/processed/waymo_lane_continuation_branch_selection_expanded/manifest.json \
+  --branch-replay-manifest data/processed/waymo_lane_continuation_branch_replay_expanded/manifest.json \
+  --route-context-guard-manifest data/processed/waymo_lane_continuation_route_context_guard_expanded/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_branch_coverage_expanded \
+  --public-report docs/reports/waymo_lane_continuation_branch_coverage_expanded.md
+```
+
+This raises the current local branch queue from 15 to 30 continuation
+candidates without changing the default scorer. The current expanded reports
+produce 20 replay cases, 10 topology probes, 10 branch-selection cases, 6
+branchable cases, 1 accepted branch replay, and 1 replay-held route-context
+margin negative. The expanded guard calibration keeps the current -0.05
+endpoint gate with 0 false holds and 0 false promotions on the expanded replay
+queue. Treat this as a larger real-slice diagnostic, not full-dataset coverage.
+
 ## Lane-Continuation Topology Gap Audit
 
 ```bash

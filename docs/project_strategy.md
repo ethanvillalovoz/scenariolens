@@ -167,6 +167,10 @@ and links back to reports and provenance.
   [`docs/reports/waymo_lane_continuation_route_context_guard_calibration.md`](reports/waymo_lane_continuation_route_context_guard_calibration.md)
 - Branch coverage audit:
   [`docs/reports/waymo_lane_continuation_branch_coverage.md`](reports/waymo_lane_continuation_branch_coverage.md)
+- Expanded branch coverage audit:
+  [`docs/reports/waymo_lane_continuation_branch_coverage_expanded.md`](reports/waymo_lane_continuation_branch_coverage_expanded.md)
+- Expanded route-context guard calibration:
+  [`docs/reports/waymo_lane_continuation_route_context_guard_calibration_expanded.md`](reports/waymo_lane_continuation_route_context_guard_calibration_expanded.md)
 - Topology gap audit:
   [`docs/reports/waymo_lane_continuation_topology_gap_audit.md`](reports/waymo_lane_continuation_topology_gap_audit.md)
 - Terminal neighborhood audit:

@@ -73,9 +73,34 @@ class LaneContinuationRouteContextGuardCalibrationTest(unittest.TestCase):
             self.assertIn("Endpoint-alignment gate", markdown)
             self.assertIn("-0.250", markdown)
             self.assertIn("false hold", markdown)
-            self.assertIn("negative controls", markdown)
+            self.assertIn("negative control", markdown)
             self.assertIn("not a route planner", markdown)
             self.assertIn("Raw scenario data committed: no", markdown)
+
+    def test_markdown_validates_current_gate_when_negative_control_matches(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            payload = lane_continuation_route_context_guard_calibration_payload(
+                route_context_guard_manifest_path=_write_guard_manifest_with_match(
+                    root
+                ),
+                output_dir=root / "calibration",
+            )
+
+            markdown = lane_continuation_route_context_guard_calibration_markdown(
+                payload
+            )
+
+            self.assertEqual(payload["aggregate"]["current_false_hold_count"], 0)
+            self.assertEqual(payload["aggregate"]["current_false_promote_count"], 0)
+            self.assertEqual(
+                payload["recommended_policy"]["endpoint_alignment_delta_gate"],
+                -0.05,
+            )
+            self.assertIn("validates the route-context guard", markdown)
+            self.assertIn("0 false holds", markdown)
+            self.assertIn("1 replay-held negative control", markdown)
+            self.assertNotIn("has no replay-rejected negative controls", markdown)
 
     def test_generate_calibration_writes_manifest_and_public_report(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -172,6 +197,45 @@ def _write_guard_manifest(root: Path) -> Path:
                         replay_label="needs_route_context_margin",
                         guard_label="hold_for_route_context_evidence",
                         gain=4.2,
+                    ),
+                ],
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    return manifest
+
+
+def _write_guard_manifest_with_match(root: Path) -> Path:
+    manifest = root / "route_context_guard_manifest_with_match.json"
+    manifest.write_text(
+        json.dumps(
+            {
+                "format": LANE_CONTINUATION_ROUTE_CONTEXT_GUARD_FORMAT,
+                "ready": True,
+                "branch_selection_manifest": "branch_selection/manifest.json",
+                "branch_replay_manifest": "branch_replay/manifest.json",
+                "guard_policy": {
+                    "route_fit_delta_gate": 0.0,
+                    "endpoint_alignment_delta_gate": -0.05,
+                    "speed_limit_drop_delta_gate": 0.1,
+                },
+                "cases": [
+                    _guard_case(
+                        scenario_id="accepted_current_promote",
+                        endpoint_delta=-0.01,
+                        replay_label="accepted_for_selector_rollout",
+                        guard_label="promote_motion_context_candidate",
+                        gain=37.766,
+                    ),
+                    _guard_case(
+                        scenario_id="held_negative_control",
+                        endpoint_delta=-0.23,
+                        replay_label="needs_route_context_margin",
+                        guard_label="hold_for_route_context_evidence",
+                        gain=3.301,
                     ),
                 ],
             },

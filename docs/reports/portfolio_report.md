@@ -34,6 +34,8 @@ The current pipeline supports synthetic scenarios, ScenarioLens JSON, row-wise C
 - Route-context guard diagnostics are checked in under `docs/reports/waymo_lane_continuation_route_context_guard.md`.
 - Route-context guard calibration is checked in under `docs/reports/waymo_lane_continuation_route_context_guard_calibration.md`.
 - Branch coverage audit is checked in under `docs/reports/waymo_lane_continuation_branch_coverage.md`.
+- Expanded branch coverage audit is checked in under `docs/reports/waymo_lane_continuation_branch_coverage_expanded.md`.
+- Expanded route-context guard calibration is checked in under `docs/reports/waymo_lane_continuation_route_context_guard_calibration_expanded.md`.
 - Topology gap audit is checked in under `docs/reports/waymo_lane_continuation_topology_gap_audit.md`.
 - Terminal-neighborhood audit is checked in under `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md`.
 - Terminal-neighborhood replay gate is checked in under `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md`.
@@ -390,7 +392,7 @@ These examples use a tiny checked-in CSV shaped like a normalized Waymo Motion e
 - Expand the documented local-slice recipe across more Waymo Motion validation shards.
 - Compare baseline ADE/FDE distributions across more validation shards.
 - Broaden the terminal-neighborhood selector experiment across more candidates.
-- Validate route-context guard calibration on expanded branchable and negative-control queues.
+- Reduce expanded topology blockers and add more replay-held branch negatives.
 - Expand the closure-enabled branch queue beyond the current 100-scenario slice.
 - Graduate stable open-loop replay candidates into an optional Waymax/JAX path.
 - Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.

@@ -156,6 +156,13 @@ selector": from 15 continuation candidates, 3 are branchable today and 1 passes
 the strict route guard. It also names 5 topology blockers, 2 single-chain
 branch-expansion targets, and the guard false hold as the next expansion queue.
 
+The expanded branch coverage pass raises that same local-slice queue to 30
+continuation candidates. It produces 20 replay cases, 10 topology probes, 10
+branch-selection cases, 6 branchable cases, 1 accepted branch replay, and 1
+route-context margin negative control. The paired expanded guard calibration
+keeps the current -0.05 endpoint gate as the provisional target with 0 false
+holds and 0 false promotions on the expanded 2-case replay queue.
+
 The topology gap audit now measures what remains after linked-lane closure
 materialization. The ingestion layer preserves the first 240 map features and
 adds a bounded two-hop closure set for referenced lane links, cutting study
@@ -211,9 +218,8 @@ and links to the public reports.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
 - Broaden the terminal-neighborhood selector experiment across more candidates.
-- Validate route-context guard calibration on expanded branchable and
-  replay-rejected negative-control queues.
-- Rerun the closure-enabled branch queue across more validation shards.
+- Rerun the expanded closure-enabled branch queue across more validation shards.
+- Reduce topology blockers and add more replay-held branch negatives.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.
 - Analyze heading-aware replay stability across more validation shards.

@@ -1,6 +1,6 @@
 # ScenarioLens Route-Context Guard Calibration
 
-This report calibrates the conservative route-context guard that held one branch replay candidate despite replay acceptance. It sweeps a small endpoint-alignment gate grid, compares each policy against branch-replay labels, and recommends the least-relaxed policy that removes the current false hold on this queue.
+This report calibrates the conservative route-context guard that held a branch replay candidate despite replay acceptance. It sweeps a small endpoint-alignment gate grid, compares each policy against branch-replay labels, and recommends the least-relaxed policy that removes the current false hold on this queue.
 
 The calibration is intentionally narrow. It is not a route planner, not a learned policy, not a default scorer change, and not a Waymo benchmark claim.
 
@@ -57,7 +57,7 @@ Recommended action:
 
 ## Interpretation
 
-- The current guard is intentionally conservative and creates one false hold on this branch queue.
+- The current guard is intentionally conservative and creates 1 false hold on this branch queue.
 - The recommended endpoint gate is a calibration candidate, not an automatic default change.
 - The current real queue has no replay-rejected negative controls, so zero false promotions here is evidence of agreement on this queue, not proof of broad safety.
 - The next stronger validation step is to rerun this calibration after expanding the branchable queue across more shards.

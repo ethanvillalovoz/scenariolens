@@ -416,7 +416,16 @@ audit at
 `docs/reports/waymo_lane_continuation_branch_coverage.md` connects the full
 continuation-to-branch funnel: 15 continuation candidates, 10 replay-ready
 candidates, 5 branch-selection cases, 3 branchable cases, 1 route-guard
-promotion, 5 topology blockers, and 8 expansion queue items. Linked-lane
+promotion, 5 topology blockers, and 8 expansion queue items. The expanded
+branch coverage audit at
+`docs/reports/waymo_lane_continuation_branch_coverage_expanded.md` raises the
+same local slice to 30 continuation candidates, 20 replay cases, 10 topology
+probes, 10 branch-selection cases, and 6 branchable cases. Its paired expanded
+guard calibration at
+`docs/reports/waymo_lane_continuation_route_context_guard_calibration_expanded.md`
+adds 1 replay-held route-context margin negative and validates the current
+-0.05 endpoint gate with 0 false holds and 0 false promotions on the expanded
+2-case replay queue. Linked-lane
 closure materialization now cuts study topology gaps from 33 to 17 and raises
 linked-lane improvements from 96 to 133. The topology gap audit at
 `docs/reports/waymo_lane_continuation_topology_gap_audit.md` then shows that
@@ -432,9 +441,9 @@ terminal-neighborhood selector experiment at
 `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector.md` then
 promotes 1 heading-aligned alternate lane, holds 1 low-heading case, and
 matches the replay gate on 2/2 decisions. Next work should broaden that
-selector experiment, validate route-context guard calibration on expanded
-negative controls, and expand the closure-enabled queue before claiming broader
-selector readiness.
+selector experiment, reduce expanded topology blockers, add more replay-held
+branch negatives, and run the closure-enabled queue beyond the current
+100-scenario slice before claiming broader selector readiness.
 
 ## Stretch Goals
 

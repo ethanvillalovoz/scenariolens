@@ -184,15 +184,16 @@ def lane_continuation_route_context_guard_calibration_markdown(
     search = _required_mapping(payload, "search_grid")
     policies = _required_list(payload, "policy_candidates")
     cases = _required_list(payload, "cases")
+    current_false_holds = int(current.get("false_hold_count", 0) or 0)
+    replay_held_count = int(aggregate.get("replay_held_count", 0) or 0)
 
     lines = [
         "# ScenarioLens Route-Context Guard Calibration",
         "",
-        "This report calibrates the conservative route-context guard that held "
-        "one branch replay candidate despite replay acceptance. It sweeps a "
-        "small endpoint-alignment gate grid, compares each policy against "
-        "branch-replay labels, and recommends the least-relaxed policy that "
-        "removes the current false hold on this queue.",
+        _opening_summary(
+            current_false_hold_count=current_false_holds,
+            replay_held_count=replay_held_count,
+        ),
         "",
         "The calibration is intentionally narrow. It is not a route planner, "
         "not a learned policy, not a default scorer change, and not a Waymo "
@@ -279,13 +280,74 @@ def lane_continuation_route_context_guard_calibration_markdown(
             "",
             "## Interpretation",
             "",
-            "- The current guard is intentionally conservative and creates one false hold on this branch queue.",
+            _current_guard_interpretation(current_false_holds),
             "- The recommended endpoint gate is a calibration candidate, not an automatic default change.",
-            "- The current real queue has no replay-rejected negative controls, so zero false promotions here is evidence of agreement on this queue, not proof of broad safety.",
+            _negative_control_interpretation(replay_held_count),
             "- The next stronger validation step is to rerun this calibration after expanding the branchable queue across more shards.",
         ]
     )
     return "\n".join(lines).rstrip() + "\n"
+
+
+def _opening_summary(
+    current_false_hold_count: int,
+    replay_held_count: int,
+) -> str:
+    if current_false_hold_count > 0:
+        return (
+            "This report calibrates the conservative route-context guard that "
+            "held a branch replay candidate despite replay acceptance. It "
+            "sweeps a small endpoint-alignment gate grid, compares each policy "
+            "against branch-replay labels, and recommends the least-relaxed "
+            "policy that removes the current false hold on this queue."
+        )
+    if replay_held_count > 0:
+        return (
+            "This report validates the route-context guard against an expanded "
+            "branch replay queue that includes both replay-accepted and "
+            "replay-held route-context cases. It sweeps a small "
+            "endpoint-alignment gate grid and checks whether the current gate "
+            "still avoids false holds and false promotions on this queue."
+        )
+    return (
+        "This report calibrates the route-context guard against the current "
+        "branch replay queue. It sweeps a small endpoint-alignment gate grid "
+        "and checks whether candidate policies avoid false holds and false "
+        "promotions on the available replay labels."
+    )
+
+
+def _current_guard_interpretation(current_false_hold_count: int) -> str:
+    if current_false_hold_count == 0:
+        return (
+            "- The current guard has 0 false holds on this branch queue; the "
+            "calibration sweep is a validation check, not a default-policy "
+            "change."
+        )
+    return (
+        "- The current guard is intentionally conservative and creates "
+        f"{current_false_hold_count} false {_plural('hold', current_false_hold_count)} "
+        "on this branch queue."
+    )
+
+
+def _negative_control_interpretation(replay_held_count: int) -> str:
+    if replay_held_count == 0:
+        return (
+            "- The current real queue has no replay-rejected negative controls, "
+            "so zero false promotions here is evidence of agreement on this "
+            "queue, not proof of broad safety."
+        )
+    return (
+        f"- The current real queue includes {replay_held_count} replay-held "
+        f"negative {_plural('control', replay_held_count)}, so false-promotion "
+        "counts are measured on this queue; broader safety still requires "
+        "more branchable negatives across shards."
+    )
+
+
+def _plural(word: str, count: int) -> str:
+    return word if count == 1 else f"{word}s"
 
 
 def _calibration_case(case: dict[str, object]) -> dict[str, object]:

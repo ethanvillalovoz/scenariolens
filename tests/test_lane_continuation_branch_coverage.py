@@ -91,6 +91,19 @@ class LaneContinuationBranchCoverageTest(unittest.TestCase):
             self.assertIn("not a Waymo benchmark claim", markdown)
             self.assertIn("Raw scenario data committed: no", markdown)
 
+            expanded_payload = {
+                **payload,
+                "aggregate": {
+                    **payload["aggregate"],
+                    "candidate_top_per_bucket": 10,
+                },
+            }
+            expanded_markdown = lane_continuation_branch_coverage_markdown(
+                expanded_payload
+            )
+            self.assertIn("Expanded Branch Coverage Audit", expanded_markdown)
+            self.assertIn("route-context negative controls", expanded_markdown)
+
     def test_generate_writes_manifest_and_public_report(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)

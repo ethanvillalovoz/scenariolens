@@ -270,6 +270,18 @@ replay-ready candidates, 5 branch-selection cases, 3 branchable cases, 1
 route-guard promotion, 5 topology blockers, and 8 expansion items. It does not
 read raw Waymo TFRecords and is not a benchmark coverage claim.
 
+The expanded branch coverage audit is checked in at
+[`docs/reports/waymo_lane_continuation_branch_coverage_expanded.md`](reports/waymo_lane_continuation_branch_coverage_expanded.md),
+with the paired expanded guard calibration at
+[`docs/reports/waymo_lane_continuation_route_context_guard_calibration_expanded.md`](reports/waymo_lane_continuation_route_context_guard_calibration_expanded.md).
+These reports read ignored expanded manifests only. They raise the same
+100-scenario local slice to 30 continuation candidates, 20 replay cases, 10
+topology probes, 10 branch-selection cases, 6 branchable cases, 1 accepted
+branch replay, and 1 replay-held route-context margin negative. The expanded
+guard/calibration pass records 2/2 replay-gate matches with 0 false holds and
+0 false promotions on that small replay queue. Raw TFRecords and local replay
+packets remain ignored, and this is still not a full Waymo benchmark claim.
+
 The topology gap audit is checked in at
 [`docs/reports/waymo_lane_continuation_topology_gap_audit.md`](reports/waymo_lane_continuation_topology_gap_audit.md).
 It reloads the ignored local source scenarios referenced by the replay manifest,
