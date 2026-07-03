@@ -154,8 +154,14 @@ The topology gap audit now measures what remains after linked-lane closure
 materialization. The ingestion layer preserves the first 240 map features and
 adds a bounded two-hop closure set for referenced lane links, cutting study
 topology gaps from 33 to 17. The remaining top replay blockers are 2
-cap-recoverable cases and 3 terminal or directional-link cases, so the next work
-is selected-lane neighborhood analysis rather than a simple cap increase.
+cap-recoverable cases and 3 terminal or directional-link cases.
+
+The terminal-neighborhood audit follows those 3 terminal/directional cases.
+It reloads the local slices, inspects nearby heading-aligned lane alternatives,
+and finds 2 nearby alternate-lane recovery candidates plus 1 directional-link
+mismatch. The important boundary is that these are replay/gating inputs, not a
+selector change: ScenarioLens now knows where to test bounded neighborhood
+recovery before claiming broader branch behavior.
 
 ## Map-Match Audit
 
@@ -186,7 +192,7 @@ and links to the public reports.
 - Add a dataset adapter for another public motion dataset.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
-- Audit terminal/directional topology cases and selected-lane neighborhoods.
+- Replay and gate terminal-neighborhood recovery candidates.
 - Calibrate the route-context guard false hold against accepted branch replay
   evidence.
 - Rerun the closure-enabled branch queue across more validation shards.

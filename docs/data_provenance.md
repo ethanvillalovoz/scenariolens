@@ -269,6 +269,14 @@ audited, 2 cap-recoverable blocker cases, 3 terminal or directional-link
 confirmations, 0 raw target misses, and 4 maps at or above the base feature cap.
 Raw Waymo records and local per-case packets remain ignored.
 
+The terminal-neighborhood audit is checked in at
+[`docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md`](reports/waymo_lane_continuation_terminal_neighborhood_audit.md).
+It reloads only the 3 terminal/directional blocker cases, inspects bounded
+nearby-lane metadata, and publishes derived decisions: 2 nearby alternate-lane
+recovery candidates, 1 directional-link mismatch, and 0 true terminal/map
+boundary cases in the current queue. It does not publish raw map geometry or
+change selector behavior.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

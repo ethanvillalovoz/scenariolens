@@ -555,6 +555,21 @@ remain cap-recoverable after linked-lane closure materialization, and confirms
 3 terminal or directional-link cases. Treat it as an ingestion/topology
 expansion target, not as route-planning evidence.
 
+## Lane-Continuation Terminal Neighborhood Audit
+
+```bash
+scenariolens lane-continuation-terminal-neighborhood-audit \
+  --topology-manifest data/processed/waymo_lane_continuation_topology_gap_audit/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_audit \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md
+```
+
+This audit reloads the terminal/directional blockers from the topology-gap
+manifest and inspects a bounded selected-lane neighborhood. The current
+real-data report audits 3 cases, finds 2 nearby aligned lane recovery
+candidates and 1 directional-link mismatch, and keeps the result framed as
+replay/gating input rather than selector behavior.
+
 ## Baseline Ablation
 
 ```bash

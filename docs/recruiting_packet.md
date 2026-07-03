@@ -26,6 +26,7 @@ robotics, AI/ML, and software engineering internship conversations.
 - Route-context guard study: `docs/reports/waymo_lane_continuation_route_context_guard.md`
 - Branch coverage audit: `docs/reports/waymo_lane_continuation_branch_coverage.md`
 - Topology gap audit: `docs/reports/waymo_lane_continuation_topology_gap_audit.md`
+- Terminal neighborhood audit: `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md`
 - Real lane-aware baseline diagnostic: `docs/reports/waymo_lane_aware_baseline_cross_shard.md`
 - Lane-aware debug casebook: `docs/reports/waymo_lane_aware_debug_casebook.md`
 - Replay candidate plan: `docs/reports/waymo_replay_candidate_plan.md`
@@ -242,6 +243,9 @@ Testing and verification:
   ScenarioLens map features with raw parsed map-feature IDs: 2 blocker cases
   remain cap-recoverable, 3 are terminal or directional-link cases, and 0 raw
   target misses remain unexplained.
+- A terminal-neighborhood audit reloads the 3 terminal/directional blockers and
+  finds 2 nearby alternate-lane recovery candidates plus 1 directional-link
+  mismatch, keeping them as replay/gating targets rather than selector claims.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
@@ -249,7 +253,7 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Audit remaining terminal/directional topology cases and calibrate the
+3. Replay/gate terminal-neighborhood recovery candidates and calibrate the
    conservative route-context guard false hold.
 4. Create curated scenario collections for pedestrian, cyclist, merge, and
    unprotected-turn cases.

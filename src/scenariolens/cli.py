@@ -86,6 +86,11 @@ from scenariolens.lane_continuation_replay import (
 from scenariolens.lane_continuation_topology_gap_audit import (
     generate_lane_continuation_topology_gap_audit,
 )
+from scenariolens.lane_continuation_terminal_neighborhood_audit import (
+    DEFAULT_HEADING_ALIGNMENT_MIN,
+    DEFAULT_NEIGHBORHOOD_RADIUS_M,
+    generate_lane_continuation_terminal_neighborhood_audit,
+)
 from scenariolens.map_match_audit import (
     DEFAULT_AUDIT_THRESHOLDS_M,
     generate_map_match_audit,
@@ -1091,6 +1096,50 @@ def lane_continuation_topology_gap_audit_command(
         f"{result.cap_recovered_count} recovered case(s), "
         f"{result.cap_recoverable_count} cap-recoverable case(s), "
         f"{result.terminal_confirmed_count} terminal confirmation(s)."
+    )
+    return 0
+
+
+def lane_continuation_terminal_neighborhood_audit_command(
+    topology_manifest: str,
+    output_dir: str,
+    neighborhood_radius_m: float,
+    heading_alignment_min: float,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_lane_continuation_terminal_neighborhood_audit(
+            topology_manifest_path=topology_manifest,
+            output_dir=output_dir,
+            neighborhood_radius_m=neighborhood_radius_m,
+            heading_alignment_min=heading_alignment_min,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(
+        "Wrote lane-continuation-terminal-neighborhood-audit manifest "
+        f"to {result.manifest_path}"
+    )
+    print(
+        "Wrote lane-continuation-terminal-neighborhood-audit report "
+        f"to {result.report_path}"
+    )
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print(
+            "Lane-continuation terminal-neighborhood audit is not ready. "
+            "See manifest.json."
+        )
+        return 2
+    print(
+        f"Generated terminal-neighborhood audit for {result.case_count} case(s): "
+        f"{result.nearby_recovery_count} nearby recovery candidate(s), "
+        f"{result.directional_gap_count} directional gap(s), "
+        f"{result.true_terminal_count} true terminal/map-boundary case(s)."
     )
     return 0
 
@@ -2251,6 +2300,46 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe topology-gap report copy.",
     )
+    lane_continuation_terminal_parser = subparsers.add_parser(
+        "lane-continuation-terminal-neighborhood-audit",
+        help=(
+            "Inspect selected terminal-lane neighborhoods for nearby aligned "
+            "lane recovery, directional-link gaps, and true map-boundary blockers."
+        ),
+    )
+    lane_continuation_terminal_parser.add_argument(
+        "--topology-manifest",
+        required=True,
+        help=(
+            "Manifest produced by scenariolens "
+            "lane-continuation-topology-gap-audit."
+        ),
+    )
+    lane_continuation_terminal_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_lane_continuation_terminal_neighborhood_audit",
+        help="Directory for terminal-neighborhood audit manifest.json and report.md.",
+    )
+    lane_continuation_terminal_parser.add_argument(
+        "--neighborhood-radius-m",
+        type=float,
+        default=DEFAULT_NEIGHBORHOOD_RADIUS_M,
+        help="Maximum anchor-to-lane distance for nearby-lane candidates.",
+    )
+    lane_continuation_terminal_parser.add_argument(
+        "--heading-alignment-min",
+        type=float,
+        default=DEFAULT_HEADING_ALIGNMENT_MIN,
+        help="Minimum lane/anchor heading alignment for recovery candidates.",
+    )
+    lane_continuation_terminal_parser.add_argument(
+        "--public-report",
+        default=None,
+        help=(
+            "Optional Markdown path for a public-safe terminal-neighborhood "
+            "report copy."
+        ),
+    )
     heading_replay_parser = subparsers.add_parser(
         "heading-replay-prototype",
         help=(
@@ -2738,6 +2827,14 @@ def main() -> int:
         return lane_continuation_topology_gap_audit_command(
             replay_manifest=args.replay_manifest,
             output_dir=args.output_dir,
+            public_report=args.public_report,
+        )
+    if args.command == "lane-continuation-terminal-neighborhood-audit":
+        return lane_continuation_terminal_neighborhood_audit_command(
+            topology_manifest=args.topology_manifest,
+            output_dir=args.output_dir,
+            neighborhood_radius_m=args.neighborhood_radius_m,
+            heading_alignment_min=args.heading_alignment_min,
             public_report=args.public_report,
         )
     if args.command == "heading-replay-prototype":

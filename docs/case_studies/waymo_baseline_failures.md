@@ -111,6 +111,13 @@ gaps. The top replay blockers are now 2 cap-recoverable cases and 3 terminal or
 directional-link cases with no raw target misses, turning the next step into
 selected-lane neighborhood and guard-calibration work.
 
+The terminal-neighborhood audit then reloads those 3 terminal/directional
+blockers and asks a sharper map-selection question: is the selected lane truly
+terminal, or is there a nearby heading-aligned lane with parsed continuation?
+On the current slice, 2 cases have nearby alternate-lane recovery candidates
+and 1 case is a directional-link mismatch. Those are not promoted as selector
+wins yet; they become replay and gating targets for the next branch-queue pass.
+
 ## Why It Matters
 
 Autonomy teams need tooling that finds where average-case performance hides
@@ -120,7 +127,7 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Audit the remaining terminal/directional topology cases, expose alternatives for
-the two single-chain branch-selection cases, calibrate the route-context guard
-false hold, and expand the closure-enabled branch queue beyond shards `00007`
-through `00010`.
+Replay and gate the two terminal-neighborhood recovery candidates, expose
+alternatives for the two single-chain branch-selection cases, calibrate the
+route-context guard false hold, and expand the closure-enabled branch queue
+beyond shards `00007` through `00010`.

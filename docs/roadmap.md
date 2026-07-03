@@ -413,9 +413,15 @@ continuation-to-branch funnel: 15 continuation candidates, 10 replay-ready
 candidates, 5 branch-selection cases, 3 branchable cases, 1 route-guard
 promotion, 5 topology blockers, and 8 expansion queue items. Linked-lane
 closure materialization now cuts study topology gaps from 33 to 17 and raises
-linked-lane improvements from 96 to 133. Next work should audit terminal and
-directional topology cases, calibrate the route-context guard false hold, and
-expand the closure-enabled queue before claiming broader selector readiness.
+linked-lane improvements from 96 to 133. The topology gap audit at
+`docs/reports/waymo_lane_continuation_topology_gap_audit.md` then shows that
+2 blocker cases remain cap-recoverable and 3 are terminal/directional. The
+terminal-neighborhood audit at
+`docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md` follows
+those 3 cases, finding 2 nearby alternate-lane recovery candidates and 1
+directional-link mismatch. Next work should replay and gate those recovery
+candidates, calibrate the route-context guard false hold, and expand the
+closure-enabled queue before claiming broader selector readiness.
 
 ## Stretch Goals
 

@@ -105,6 +105,7 @@ Then open `http://localhost:8000/demo/`.
 - [Route-context guard study](docs/reports/waymo_lane_continuation_route_context_guard.md)
 - [Branch coverage audit](docs/reports/waymo_lane_continuation_branch_coverage.md)
 - [Topology gap audit](docs/reports/waymo_lane_continuation_topology_gap_audit.md)
+- [Terminal neighborhood audit](docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md)
 - [Real Waymo lane-aware baseline diagnostic](docs/reports/waymo_lane_aware_baseline_cross_shard.md)
 - [Lane-aware baseline debug casebook](docs/reports/waymo_lane_aware_debug_casebook.md)
 - [Replay candidate plan](docs/reports/waymo_replay_candidate_plan.md)
@@ -272,6 +273,9 @@ smoke test. The prototype can:
   with raw parsed map-feature IDs, showing 2 blocker cases remain
   cap-recoverable and 3 lanes are terminal or directional-link cases after
   closure materialization,
+- audit those 3 terminal/directional lane neighborhoods, finding 2 nearby
+  alternate-lane recovery candidates and 1 directional-link mismatch before
+  promoting anything into branch-selection claims,
 - expose public-safe heading-aware improvement, regression, and fallback-heavy
   cases in the live Scenario Explorer,
 - turn heading-aware debug cases into a replay-readiness queue for the next
@@ -283,9 +287,10 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to audit the remaining terminal/directional topology
-cases, calibrate the conservative route-context guard false hold, and expand the
-closure-enabled branch queue beyond the current 100-scenario slice.
+The next milestone is to replay and gate the two nearby-lane recovery
+candidates from the terminal-neighborhood audit, calibrate the conservative
+route-context guard false hold, and expand the closure-enabled branch queue
+beyond the current 100-scenario slice.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -636,6 +641,16 @@ PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-topology-gap-audit 
   --replay-manifest data/processed/waymo_lane_continuation_replay_prototype/manifest.json \
   --output-dir data/processed/waymo_lane_continuation_topology_gap_audit \
   --public-report docs/reports/waymo_lane_continuation_topology_gap_audit.md
+```
+
+Audit selected terminal/directional lane neighborhoods from the topology-gap
+manifest:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-terminal-neighborhood-audit \
+  --topology-manifest data/processed/waymo_lane_continuation_topology_gap_audit/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_audit \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md
 ```
 
 Run the no-auth baseline ablation:

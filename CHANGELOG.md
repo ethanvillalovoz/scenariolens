@@ -114,6 +114,11 @@ All notable changes to ScenarioLens are documented here.
   5 topology blockers from the replay manifest and showing that 2 blocker cases
   remain cap-recoverable while 3 lanes are terminal or directional-link cases
   after linked-lane closure materialization.
+- `scenariolens lane-continuation-terminal-neighborhood-audit` workflow and
+  `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md`,
+  reloading the 3 terminal/directional blockers and finding 2 nearby
+  alternate-lane recovery candidates plus 1 directional-link mismatch without
+  changing the default scorer.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.
