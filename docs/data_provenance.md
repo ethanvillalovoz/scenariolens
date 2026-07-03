@@ -277,6 +277,14 @@ recovery candidates, 1 directional-link mismatch, and 0 true terminal/map
 boundary cases in the current queue. It does not publish raw map geometry or
 change selector behavior.
 
+The terminal-neighborhood replay gate is checked in at
+[`docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md`](reports/waymo_lane_continuation_terminal_neighborhood_replay.md).
+It force-replays the 2 nearby recovery candidates, applies 8 deterministic
+perturbation trials, and publishes derived gate decisions: 1 alternate lane is
+accepted for a bounded selector experiment and 1 candidate is held because the
+alternate regresses. Raw Waymo records, local per-case packets, and map geometry
+remain ignored.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

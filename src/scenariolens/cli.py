@@ -91,6 +91,11 @@ from scenariolens.lane_continuation_terminal_neighborhood_audit import (
     DEFAULT_NEIGHBORHOOD_RADIUS_M,
     generate_lane_continuation_terminal_neighborhood_audit,
 )
+from scenariolens.lane_continuation_terminal_neighborhood_replay import (
+    DEFAULT_MIN_STABLE_GAIN_M,
+    DEFAULT_TOP as DEFAULT_TERMINAL_NEIGHBORHOOD_REPLAY_TOP,
+    generate_lane_continuation_terminal_neighborhood_replay,
+)
 from scenariolens.map_match_audit import (
     DEFAULT_AUDIT_THRESHOLDS_M,
     generate_map_match_audit,
@@ -1140,6 +1145,49 @@ def lane_continuation_terminal_neighborhood_audit_command(
         f"{result.nearby_recovery_count} nearby recovery candidate(s), "
         f"{result.directional_gap_count} directional gap(s), "
         f"{result.true_terminal_count} true terminal/map-boundary case(s)."
+    )
+    return 0
+
+
+def lane_continuation_terminal_neighborhood_replay_command(
+    terminal_neighborhood_manifest: str,
+    output_dir: str,
+    top: int,
+    minimum_stable_gain_m: float,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_lane_continuation_terminal_neighborhood_replay(
+            terminal_neighborhood_manifest_path=terminal_neighborhood_manifest,
+            output_dir=output_dir,
+            top=top,
+            minimum_stable_gain_m=minimum_stable_gain_m,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(
+        "Wrote lane-continuation-terminal-neighborhood-replay manifest "
+        f"to {result.manifest_path}"
+    )
+    print(
+        "Wrote lane-continuation-terminal-neighborhood-replay report "
+        f"to {result.report_path}"
+    )
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print(
+            "Lane-continuation terminal-neighborhood replay is not ready. "
+            "See manifest.json."
+        )
+        return 2
+    print(
+        f"Generated terminal-neighborhood replay for {result.case_count} "
+        f"case(s): {result.accepted_case_count} accepted candidate(s), "
+        f"{result.held_case_count} held candidate(s)."
     )
     return 0
 
@@ -2340,6 +2388,46 @@ def main() -> int:
             "report copy."
         ),
     )
+    lane_continuation_terminal_replay_parser = subparsers.add_parser(
+        "lane-continuation-terminal-neighborhood-replay",
+        help=(
+            "Replay and gate nearby-lane recovery candidates from the "
+            "terminal-neighborhood audit."
+        ),
+    )
+    lane_continuation_terminal_replay_parser.add_argument(
+        "--terminal-neighborhood-manifest",
+        required=True,
+        help=(
+            "Manifest produced by scenariolens "
+            "lane-continuation-terminal-neighborhood-audit."
+        ),
+    )
+    lane_continuation_terminal_replay_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_lane_continuation_terminal_neighborhood_replay",
+        help="Directory for terminal-neighborhood replay manifest.json and report.md.",
+    )
+    lane_continuation_terminal_replay_parser.add_argument(
+        "--top",
+        type=int,
+        default=DEFAULT_TERMINAL_NEIGHBORHOOD_REPLAY_TOP,
+        help="Maximum nearby recovery candidates to replay.",
+    )
+    lane_continuation_terminal_replay_parser.add_argument(
+        "--minimum-stable-gain-m",
+        type=float,
+        default=DEFAULT_MIN_STABLE_GAIN_M,
+        help="Minimum FDE gain required for nominal and perturbed acceptance.",
+    )
+    lane_continuation_terminal_replay_parser.add_argument(
+        "--public-report",
+        default=None,
+        help=(
+            "Optional Markdown path for a public-safe terminal-neighborhood "
+            "replay report copy."
+        ),
+    )
     heading_replay_parser = subparsers.add_parser(
         "heading-replay-prototype",
         help=(
@@ -2835,6 +2923,14 @@ def main() -> int:
             output_dir=args.output_dir,
             neighborhood_radius_m=args.neighborhood_radius_m,
             heading_alignment_min=args.heading_alignment_min,
+            public_report=args.public_report,
+        )
+    if args.command == "lane-continuation-terminal-neighborhood-replay":
+        return lane_continuation_terminal_neighborhood_replay_command(
+            terminal_neighborhood_manifest=args.terminal_neighborhood_manifest,
+            output_dir=args.output_dir,
+            top=args.top,
+            minimum_stable_gain_m=args.minimum_stable_gain_m,
             public_report=args.public_report,
         )
     if args.command == "heading-replay-prototype":

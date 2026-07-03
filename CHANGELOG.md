@@ -119,6 +119,10 @@ All notable changes to ScenarioLens are documented here.
   reloading the 3 terminal/directional blockers and finding 2 nearby
   alternate-lane recovery candidates plus 1 directional-link mismatch without
   changing the default scorer.
+- `scenariolens lane-continuation-terminal-neighborhood-replay` workflow and
+  `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md`,
+  force-replaying the 2 nearby recovery candidates, accepting 1 alternate lane
+  for a bounded selector experiment, and holding 1 regression case.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

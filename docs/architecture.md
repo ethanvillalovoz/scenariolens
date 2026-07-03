@@ -40,6 +40,7 @@ flowchart LR
     AI --> AJ["Branch coverage audit"]
     AJ --> AK["Topology gap audit"]
     AK --> AL["Terminal neighborhood audit"]
+    AL --> AM["Terminal neighborhood replay gate"]
     Q --> T["Map-match threshold audit"]
     F --> I["Static dashboard payload"]
     V --> I
@@ -54,6 +55,7 @@ flowchart LR
     AJ --> K
     AK --> K
     AL --> K
+    AM --> K
     T --> K
     U --> K
     W --> K
@@ -90,6 +92,7 @@ flowchart LR
 | Branch coverage audit | `src/scenariolens/lane_continuation_branch_coverage.py` | Joins continuation candidates, replay, route diagnostics, branch selection, branch replay, and route-context guard manifests into a public-safe funnel with bottlenecks and expansion queue items. |
 | Lane-continuation topology gap audit | `src/scenariolens/lane_continuation_topology_gap_audit.py` | Reloads topology blocker cases, compares capped ScenarioLens map features with raw parsed map-feature IDs, and identifies cap-recoverable blocker cases versus confirmed terminal lanes. |
 | Lane-continuation terminal neighborhood audit | `src/scenariolens/lane_continuation_terminal_neighborhood_audit.py` | Reloads terminal/directional topology blockers, inspects nearby aligned lane alternatives, and separates recoverable selected-lane neighborhoods from directional-link and true-terminal follow-up. |
+| Lane-continuation terminal neighborhood replay | `src/scenariolens/lane_continuation_terminal_neighborhood_replay.py` | Force-replays selected terminal lanes against nearby alternate-lane recovery candidates, applies deterministic perturbations, and gates candidates before broader selector experiments. |
 | Heading replay prototype | `src/scenariolens/heading_replay_prototype.py` | Reloads heading-ready local scenarios, compares nearest-lane and heading-aware open-loop rollouts, applies deterministic perturbations, and publishes selector stability summaries. |
 | Map-match audit | `src/scenariolens/map_match_audit.py` | Reloads fallback-heavy debug cases, sweeps lane-match thresholds, and publishes public-safe evidence about whether wider lane acceptance improves or worsens FDE before changing matcher behavior. |
 | Failure study | `src/scenariolens/failure_study.py` | Aggregates ADE/FDE, miss rate, tag-level failures, score-component failures, and hardest scenario ids without publishing raw data. |

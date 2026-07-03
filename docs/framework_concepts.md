@@ -163,6 +163,12 @@ mismatch. The important boundary is that these are replay/gating inputs, not a
 selector change: ScenarioLens now knows where to test bounded neighborhood
 recovery before claiming broader branch behavior.
 
+The terminal-neighborhood replay gate then force-replays those 2 nearby
+recovery candidates against their selected terminal lanes. It accepts 1
+alternate lane for a bounded selector experiment, holds 1 regression case, and
+keeps the result public-safe by publishing derived replay/gate summaries rather
+than raw map geometry or per-scenario packets.
+
 ## Map-Match Audit
 
 The map-match audit handles cases that are not ready to be treated as replay
@@ -192,7 +198,8 @@ and links to the public reports.
 - Add a dataset adapter for another public motion dataset.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
-- Replay and gate terminal-neighborhood recovery candidates.
+- Turn the accepted terminal-neighborhood replay candidate into a bounded
+  selector experiment.
 - Calibrate the route-context guard false hold against accepted branch replay
   evidence.
 - Rerun the closure-enabled branch queue across more validation shards.

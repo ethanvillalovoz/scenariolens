@@ -570,6 +570,21 @@ real-data report audits 3 cases, finds 2 nearby aligned lane recovery
 candidates and 1 directional-link mismatch, and keeps the result framed as
 replay/gating input rather than selector behavior.
 
+## Lane-Continuation Terminal Neighborhood Replay
+
+```bash
+scenariolens lane-continuation-terminal-neighborhood-replay \
+  --terminal-neighborhood-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_audit/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_replay \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md
+```
+
+This gate force-replays the nearby-lane recovery candidates from the
+terminal-neighborhood audit against their selected terminal lanes. The current
+real-data report evaluates 2 cases, accepts 1 alternate lane for a bounded
+selector experiment, holds 1 regression case, and keeps the result framed as
+diagnostic evidence rather than default selector behavior.
+
 ## Baseline Ablation
 
 ```bash

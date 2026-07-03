@@ -27,6 +27,7 @@ robotics, AI/ML, and software engineering internship conversations.
 - Branch coverage audit: `docs/reports/waymo_lane_continuation_branch_coverage.md`
 - Topology gap audit: `docs/reports/waymo_lane_continuation_topology_gap_audit.md`
 - Terminal neighborhood audit: `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md`
+- Terminal neighborhood replay gate: `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md`
 - Real lane-aware baseline diagnostic: `docs/reports/waymo_lane_aware_baseline_cross_shard.md`
 - Lane-aware debug casebook: `docs/reports/waymo_lane_aware_debug_casebook.md`
 - Replay candidate plan: `docs/reports/waymo_replay_candidate_plan.md`
@@ -246,6 +247,9 @@ Testing and verification:
 - A terminal-neighborhood audit reloads the 3 terminal/directional blockers and
   finds 2 nearby alternate-lane recovery candidates plus 1 directional-link
   mismatch, keeping them as replay/gating targets rather than selector claims.
+- A terminal-neighborhood replay gate force-replays those 2 nearby recovery
+  candidates, accepts 1 alternate lane for a bounded selector experiment, and
+  holds 1 regression case instead of overclaiming a selector win.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
@@ -253,8 +257,9 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Replay/gate terminal-neighborhood recovery candidates and calibrate the
-   conservative route-context guard false hold.
+3. Turn the accepted terminal-neighborhood replay candidate into a bounded
+   selector experiment and calibrate the conservative route-context guard false
+   hold.
 4. Create curated scenario collections for pedestrian, cyclist, merge, and
    unprotected-turn cases.
 

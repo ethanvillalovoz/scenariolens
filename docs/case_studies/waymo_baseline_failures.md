@@ -118,6 +118,13 @@ On the current slice, 2 cases have nearby alternate-lane recovery candidates
 and 1 case is a directional-link mismatch. Those are not promoted as selector
 wins yet; they become replay and gating targets for the next branch-queue pass.
 
+The terminal-neighborhood replay gate now force-replays those 2 nearby recovery
+candidates against the selected terminal lanes. One alternate lane passes the
+gate with a +125.481 m nominal FDE gain and 4/4 stable perturbation trials; the
+other regresses and remains held as diagnostic evidence. That gives the next
+selector experiment one bounded promotion target without pretending every
+nearby lane is better.
+
 ## Why It Matters
 
 Autonomy teams need tooling that finds where average-case performance hides
@@ -127,7 +134,7 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Replay and gate the two terminal-neighborhood recovery candidates, expose
-alternatives for the two single-chain branch-selection cases, calibrate the
-route-context guard false hold, and expand the closure-enabled branch queue
-beyond shards `00007` through `00010`.
+Turn the accepted terminal-neighborhood replay candidate into a bounded
+selector experiment, expose alternatives for the two single-chain
+branch-selection cases, calibrate the route-context guard false hold, and
+expand the closure-enabled branch queue beyond shards `00007` through `00010`.
