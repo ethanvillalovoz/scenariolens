@@ -1,0 +1,63 @@
+# ScenarioLens Route-Context Guard Calibration
+
+This report calibrates the conservative route-context guard that held one branch replay candidate despite replay acceptance. It sweeps a small endpoint-alignment gate grid, compares each policy against branch-replay labels, and recommends the least-relaxed policy that removes the current false hold on this queue.
+
+The calibration is intentionally narrow. It is not a route planner, not a learned policy, not a default scorer change, and not a Waymo benchmark claim.
+
+## Scope
+
+- Route-context guard manifest: `data/processed/waymo_lane_continuation_route_context_guard/manifest.json`
+- Branch-selection manifest: `data/processed/waymo_lane_continuation_branch_selection/manifest.json`
+- Branch-replay manifest: `data/processed/waymo_lane_continuation_branch_replay/manifest.json`
+- Ready for calibration: True
+- Cases analyzed: 2
+- Replay accepted cases: 2
+- Replay held cases: 0
+- Current route-fit gate: 0.000
+- Current endpoint-alignment gate: -0.050
+- Current speed-limit-drop gate: +0.100
+- Endpoint gate search: 0.000, -0.050, -0.100, -0.150, -0.200, -0.250, -0.300
+- Raw scenario data committed: no
+- Local per-case replay packets committed: no
+
+## Calibration Summary
+
+| Metric | Current | Recommended |
+| --- | ---: | ---: |
+| Endpoint-alignment gate | -0.050 | -0.250 |
+| Promoted candidates | 1 | 2 |
+| Held candidates | 1 | 0 |
+| Replay-gate matches | 1 | 2 |
+| False promotions | 0 | 0 |
+| False holds | 1 | 0 |
+| Mean promoted gain | +40.840 m | +40.301 m |
+
+Recommended action:
+
+- Use this as a provisional calibration target for the next expanded branchable queue; do not change the default guard until negative coverage improves.
+
+## Policy Sweep
+
+| Endpoint gate | Promotes | Holds | Matches | False promotes | False holds | Mean promoted gain |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 0.000 | 0 | 2 | 0 | 0 | 2 | n/a |
+| -0.050 | 1 | 1 | 1 | 0 | 1 | +40.840 m |
+| -0.100 | 1 | 1 | 1 | 0 | 1 | +40.840 m |
+| -0.150 | 1 | 1 | 1 | 0 | 1 | +40.840 m |
+| -0.200 | 1 | 1 | 1 | 0 | 1 | +40.840 m |
+| -0.250 | 2 | 0 | 2 | 0 | 0 | +40.301 m |
+| -0.300 | 2 | 0 | 2 | 0 | 0 | +40.301 m |
+
+## Case Impact
+
+| Rank | Scenario | Track | Replay label | Endpoint delta | Current decision | Recommended decision | Changed | Motion gain |
+| ---: | --- | --- | --- | ---: | --- | --- | --- | ---: |
+| 1 | `260785192cf6c991` | `1754` | `accepted_for_selector_rollout` | -0.010 | `promote_motion_context_candidate` | `promote_motion_context_candidate` | False | +40.840 m |
+| 3 | `d30709cd60e60395` | `164` | `accepted_for_selector_rollout` | -0.236 | `hold_for_route_context_evidence` | `promote_motion_context_candidate` | True | +39.762 m |
+
+## Interpretation
+
+- The current guard is intentionally conservative and creates one false hold on this branch queue.
+- The recommended endpoint gate is a calibration candidate, not an automatic default change.
+- The current real queue has no replay-rejected negative controls, so zero false promotions here is evidence of agreement on this queue, not proof of broad safety.
+- The next stronger validation step is to rerun this calibration after expanding the branchable queue across more shards.

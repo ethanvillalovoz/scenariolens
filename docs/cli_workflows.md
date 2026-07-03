@@ -517,6 +517,22 @@ route-feature follow-up, and records 1 replay-gate match plus 1 false hold.
 Treat it as a candidate policy for larger branchable queues, not as a route
 planner or benchmark.
 
+## Lane-Continuation Route-Context Guard Calibration
+
+```bash
+scenariolens lane-continuation-route-context-guard-calibration \
+  --route-context-guard-manifest data/processed/waymo_lane_continuation_route_context_guard/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_route_context_guard_calibration \
+  --public-report docs/reports/waymo_lane_continuation_route_context_guard_calibration.md
+```
+
+This sweeps a small endpoint-alignment gate grid over the current guard
+decisions and compares each candidate policy with branch-replay labels. The
+current real-data report recommends a provisional -0.25 endpoint gate that
+clears the current false hold on the 2-case queue while keeping false
+promotions at 0. Treat it as calibration evidence for a larger branchable queue,
+not as a default policy change.
+
 ## Lane-Continuation Branch Coverage Audit
 
 ```bash

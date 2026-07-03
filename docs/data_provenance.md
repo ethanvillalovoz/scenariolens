@@ -252,6 +252,15 @@ and downstream speed-limit context; replay outcomes are used only to evaluate
 the guard, not to choose a branch. Raw TFRecords and local replay packets
 remain ignored.
 
+The route-context guard calibration is checked in at
+[`docs/reports/waymo_lane_continuation_route_context_guard_calibration.md`](reports/waymo_lane_continuation_route_context_guard_calibration.md).
+It reads the ignored route-context guard manifest, sweeps a small
+endpoint-alignment gate grid, and publishes only derived policy summaries. On
+the current 2-case guard queue it moves the current false-hold count from 1 to
+0 with a provisional -0.25 endpoint gate, while keeping false promotions at 0.
+The report does not commit raw data, does not change the default guard, and
+explicitly notes that the current queue lacks replay-rejected negative controls.
+
 The branch coverage audit is checked in at
 [`docs/reports/waymo_lane_continuation_branch_coverage.md`](reports/waymo_lane_continuation_branch_coverage.md).
 It reads ignored candidate, replay, route-diagnostic, branch-selection,

@@ -142,6 +142,12 @@ speed-limit deltas from branch selection. On the current 2-case replay queue it
 promotes 1 robust branch, holds 1 accepted replay candidate for route-feature
 follow-up, and exposes 1 false hold for calibration.
 
+The route-context guard calibration layer turns that false hold into a
+repeatable threshold sweep. It compares endpoint-alignment gate candidates
+against the existing branch-replay labels, recommends a provisional -0.25 gate
+for the current 2-case queue, and keeps the default guard unchanged until
+negative-control coverage improves.
+
 The branch coverage audit is the planning layer after the guard. It joins the
 continuation candidate plan, replay prototype, route diagnostics, branch
 selection, branch replay, and route-context guard manifests into one funnel.
@@ -205,8 +211,8 @@ and links to the public reports.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
 - Broaden the terminal-neighborhood selector experiment across more candidates.
-- Calibrate the route-context guard false hold against accepted branch replay
-  evidence.
+- Validate route-context guard calibration on expanded branchable and
+  replay-rejected negative-control queues.
 - Rerun the closure-enabled branch queue across more validation shards.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.

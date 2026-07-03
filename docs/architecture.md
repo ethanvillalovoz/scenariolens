@@ -37,7 +37,8 @@ flowchart LR
     AF --> AG["Motion-context branch replay"]
     AG --> AH["Branch rollout gate"]
     AH --> AI["Route-context guard study"]
-    AI --> AJ["Branch coverage audit"]
+    AI --> AIA["Route-context guard calibration"]
+    AIA --> AJ["Branch coverage audit"]
     AJ --> AK["Topology gap audit"]
     AK --> AL["Terminal neighborhood audit"]
     AL --> AM["Terminal neighborhood replay gate"]
@@ -91,6 +92,7 @@ flowchart LR
 | Lane-continuation branch replay | `src/scenariolens/lane_continuation_branch_replay.py` | Replays motion-context branch choices under deterministic anchor perturbations, reports acceptance gates, tests an experimental history-speed prior, and publishes replay/guard diagnostics while keeping route-planning claims out of public artifacts. |
 | Branch rollout gate | `src/scenariolens/lane_continuation_branch_rollout.py` | Converts branch replay diagnostics into public-safe promote/hold decisions, separating broader selector-evaluation candidates from route-context and selector-stability holds. |
 | Route-context guard study | `src/scenariolens/lane_continuation_route_context_guard.py` | Tests a non-oracle route-context promotion guard over branch-selection candidates, comparing route-fit, endpoint-alignment, and speed-limit-drop cues against branch replay outcomes. |
+| Route-context guard calibration | `src/scenariolens/lane_continuation_route_context_guard_calibration.py` | Sweeps route-context guard endpoint gates against branch replay labels, recommends provisional calibration targets, and keeps default guard/scorer behavior unchanged until negative coverage improves. |
 | Branch coverage audit | `src/scenariolens/lane_continuation_branch_coverage.py` | Joins continuation candidates, replay, route diagnostics, branch selection, branch replay, and route-context guard manifests into a public-safe funnel with bottlenecks and expansion queue items. |
 | Lane-continuation topology gap audit | `src/scenariolens/lane_continuation_topology_gap_audit.py` | Reloads topology blocker cases, compares capped ScenarioLens map features with raw parsed map-feature IDs, and identifies cap-recoverable blocker cases versus confirmed terminal lanes. |
 | Lane-continuation terminal neighborhood audit | `src/scenariolens/lane_continuation_terminal_neighborhood_audit.py` | Reloads terminal/directional topology blockers, inspects nearby aligned lane alternatives, and separates recoverable selected-lane neighborhoods from directional-link and true-terminal follow-up. |

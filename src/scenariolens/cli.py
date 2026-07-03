@@ -79,6 +79,9 @@ from scenariolens.lane_continuation_diagnostics import (
 from scenariolens.lane_continuation_route_context_guard import (
     generate_lane_continuation_route_context_guard,
 )
+from scenariolens.lane_continuation_route_context_guard_calibration import (
+    generate_lane_continuation_route_context_guard_calibration,
+)
 from scenariolens.lane_continuation_replay import (
     LANE_CONTINUATION_REPLAY_INPUT_FORMATS,
     generate_lane_continuation_replay_prototype,
@@ -1035,6 +1038,47 @@ def lane_continuation_route_context_guard_command(
         f"{result.promoted_case_count} promoted candidate(s), "
         f"{result.held_case_count} hold(s), "
         f"{result.replay_gate_match_count} replay-gate match(es)."
+    )
+    return 0
+
+
+def lane_continuation_route_context_guard_calibration_command(
+    route_context_guard_manifest: str,
+    output_dir: str,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_lane_continuation_route_context_guard_calibration(
+            route_context_guard_manifest_path=route_context_guard_manifest,
+            output_dir=output_dir,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(
+        "Wrote lane-continuation-route-context-guard-calibration manifest "
+        f"to {result.manifest_path}"
+    )
+    print(
+        "Wrote lane-continuation-route-context-guard-calibration report "
+        f"to {result.report_path}"
+    )
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print(
+            "Lane-continuation route-context guard calibration is not ready. "
+            "See manifest.json."
+        )
+        return 2
+    print(
+        f"Generated route-context guard calibration for {result.case_count} "
+        f"case(s) and {result.policy_count} policy candidate(s): "
+        f"current false hold(s): {result.current_false_hold_count}, "
+        f"recommended false hold(s): {result.recommended_false_hold_count}, "
+        f"recommended false promote(s): {result.recommended_false_promote_count}."
     )
     return 0
 
@@ -2330,6 +2374,37 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe route-context guard report copy.",
     )
+    lane_continuation_route_context_calibration_parser = subparsers.add_parser(
+        "lane-continuation-route-context-guard-calibration",
+        help=(
+            "Sweep route-context guard thresholds against branch replay labels "
+            "and recommend a calibration target."
+        ),
+    )
+    lane_continuation_route_context_calibration_parser.add_argument(
+        "--route-context-guard-manifest",
+        required=True,
+        help=(
+            "Manifest produced by scenariolens "
+            "lane-continuation-route-context-guard."
+        ),
+    )
+    lane_continuation_route_context_calibration_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_lane_continuation_route_context_guard_calibration",
+        help=(
+            "Directory for route-context guard calibration manifest.json "
+            "and report.md."
+        ),
+    )
+    lane_continuation_route_context_calibration_parser.add_argument(
+        "--public-report",
+        default=None,
+        help=(
+            "Optional Markdown path for a public-safe route-context guard "
+            "calibration report copy."
+        ),
+    )
     lane_continuation_branch_coverage_parser = subparsers.add_parser(
         "lane-continuation-branch-coverage",
         help=(
@@ -2997,6 +3072,12 @@ def main() -> int:
         return lane_continuation_route_context_guard_command(
             branch_selection_manifest=args.branch_selection_manifest,
             branch_replay_manifest=args.branch_replay_manifest,
+            output_dir=args.output_dir,
+            public_report=args.public_report,
+        )
+    if args.command == "lane-continuation-route-context-guard-calibration":
+        return lane_continuation_route_context_guard_calibration_command(
+            route_context_guard_manifest=args.route_context_guard_manifest,
             output_dir=args.output_dir,
             public_report=args.public_report,
         )

@@ -24,6 +24,7 @@ robotics, AI/ML, and software engineering internship conversations.
 - Motion-context branch replay: `docs/reports/waymo_lane_continuation_branch_replay.md`
 - Branch rollout gate: `docs/reports/waymo_lane_continuation_branch_rollout_gate.md`
 - Route-context guard study: `docs/reports/waymo_lane_continuation_route_context_guard.md`
+- Route-context guard calibration: `docs/reports/waymo_lane_continuation_route_context_guard_calibration.md`
 - Branch coverage audit: `docs/reports/waymo_lane_continuation_branch_coverage.md`
 - Topology gap audit: `docs/reports/waymo_lane_continuation_topology_gap_audit.md`
 - Terminal neighborhood audit: `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md`
@@ -230,12 +231,14 @@ Testing and verification:
   calibration idea on the same branch choices. It preserves both accepted cases
   and leaves no speed-prior margin target unresolved.
 - A branch rollout gate converts the replay outputs into a promote/hold queue:
-  one branch is ready for broader selector evaluation and one route-context
-  margin case remains held with a concrete next action.
+  both replay-accepted branches are ready for broader selector evaluation.
 - A route-context guard study tests a stricter non-oracle promotion rule over
   the same branchable queue: one robust branch is promoted, one replay-accepted
   branch is held for route-feature follow-up, and the guard records one
   replay-gate match plus one false hold for calibration.
+- A route-context guard calibration sweep tests 7 endpoint-gate policies against
+  those replay labels, moving current false holds from 1 to 0 with a provisional
+  -0.25 gate while documenting the lack of replay-rejected negative controls.
 - A branch coverage audit connects the continuation candidate, replay,
   diagnostics, branch-selection, branch-replay, and route-context guard
   manifests into one funnel: 15 continuation candidates, 10 replay-ready
@@ -262,8 +265,8 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Broaden the terminal-neighborhood selector experiment and calibrate the
-   conservative route-context guard false hold.
+3. Broaden the terminal-neighborhood selector experiment and validate
+   route-context guard calibration on expanded negative controls.
 4. Create curated scenario collections for pedestrian, cyclist, merge, and
    unprotected-turn cases.
 

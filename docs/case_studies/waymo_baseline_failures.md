@@ -92,13 +92,17 @@ branch choices under eight deterministic perturbations. The selected branch is
 preserved in all eight trials, positive recoverable FDE holds in all eight
 trials, both branches are accepted for broader selector evaluation, and the
 minimum robustness margin is +28.627 m. A simple history-speed-prior replay
-ablation preserves both accepted cases, so the next step is guard calibration
-and broader branchable coverage rather than speed smoothing.
+ablation preserves both accepted cases, so the sharper policy target becomes
+guard calibration and broader branchable coverage rather than speed smoothing.
 The branch rollout gate then converts those replay outcomes into a
 release-style promote/hold queue: both replayed motion-context branches are
 promoted for broader selector evaluation. The stricter route-context guard stays
 more conservative: it promotes 1 branch, holds 1 accepted replay candidate for
 route-feature follow-up, and records that false hold as calibration evidence.
+The follow-up calibration sweep tests endpoint-alignment gates against those
+replay labels and recommends a provisional -0.25 gate that would promote both
+accepted replay candidates on this queue, while explicitly noting that broader
+negative-control coverage is still missing.
 The branch coverage audit then zooms out and turns the limitation into a
 measurable expansion queue: 15 continuation candidates, 10 replay-ready
 candidates, 5 branch-selection cases, 3 branchable cases, 1 route-guard
@@ -141,6 +145,6 @@ failures, and produce reviewable evidence.
 ## Next Step
 
 Broaden the terminal-neighborhood selector experiment, expose alternatives for
-the two single-chain branch-selection cases, calibrate the route-context guard
-false hold, and expand the closure-enabled branch queue beyond shards `00007`
-through `00010`.
+the two single-chain branch-selection cases, validate route-context guard
+calibration on expanded negative controls, and expand the closure-enabled
+branch queue beyond shards `00007` through `00010`.

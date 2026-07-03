@@ -105,6 +105,10 @@ All notable changes to ScenarioLens are documented here.
   `docs/reports/waymo_lane_continuation_route_context_guard.md`, testing a
   stricter non-oracle route-context promotion guard against branch replay
   outcomes.
+- `scenariolens lane-continuation-route-context-guard-calibration` workflow
+  and `docs/reports/waymo_lane_continuation_route_context_guard_calibration.md`,
+  sweeping endpoint-alignment gates and recommending a provisional -0.25 gate
+  that clears the current false hold while noting missing negative controls.
 - `scenariolens lane-continuation-branch-coverage` workflow and
   `docs/reports/waymo_lane_continuation_branch_coverage.md`, connecting the
   continuation candidate, replay, diagnostics, branch-selection, branch-replay,

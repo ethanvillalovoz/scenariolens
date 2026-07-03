@@ -70,8 +70,9 @@ prototype, a context route/intent audit for the stable replay warning,
 a lane-link continuation prototype, validation study, candidate plan, replay
 prototype, route-diagnostics casebook, branch-selection diagnostic, and
 motion-context branch replay, branch rollout gate, route-context guard, and
-branch coverage, topology gap and terminal-neighborhood audits, plus a
-terminal-neighborhood replay gate and bounded selector experiment,
+route-context guard calibration, branch coverage, topology gap and
+terminal-neighborhood audits, plus a terminal-neighborhood replay gate and
+bounded selector experiment,
 Markdown/JSON reports, a local real-data validation packet workflow, static
 dashboard data, and 2D SVG trajectory rendering with forecast overlays.
 

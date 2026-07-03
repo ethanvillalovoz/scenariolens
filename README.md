@@ -103,6 +103,7 @@ Then open `http://localhost:8000/demo/`.
 - [Motion-context branch replay diagnostic](docs/reports/waymo_lane_continuation_branch_replay.md)
 - [Branch rollout gate](docs/reports/waymo_lane_continuation_branch_rollout_gate.md)
 - [Route-context guard study](docs/reports/waymo_lane_continuation_route_context_guard.md)
+- [Route-context guard calibration](docs/reports/waymo_lane_continuation_route_context_guard_calibration.md)
 - [Branch coverage audit](docs/reports/waymo_lane_continuation_branch_coverage.md)
 - [Topology gap audit](docs/reports/waymo_lane_continuation_topology_gap_audit.md)
 - [Terminal neighborhood audit](docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md)
@@ -259,15 +260,18 @@ smoke test. The prototype can:
   evaluation and 0 route-context margin follow-ups,
 - test an experimental history-speed-prior replay score on the same branch
   cases, showing that both accepted branches remain stable under the speed
-  prior and leaving guard calibration as the better next target,
+  prior and confirming endpoint-gate calibration is the sharper policy target,
 - retain route-context diagnostics for replay/guard disagreement, using
   selected-vs-default route-feature deltas to guide the next selector
-  calibration pass,
+  and guard-calibration pass,
 - turn branch replay evidence into a conservative rollout gate with 2 promoted
   candidates and 0 route-context holds,
 - test a stricter route-context promotion guard that promotes 1 robust branch,
   holds 1 accepted replay candidate for route-feature follow-up, and reports 1
   replay-gate match plus 1 false hold for calibration,
+- calibrate that guard over a small endpoint-alignment sweep, recommending a
+  provisional -0.25 endpoint gate that removes the current false hold on the
+  2-case queue while noting missing negative controls,
 - audit the continuation-to-branch funnel across 15 real-data candidates,
   showing 3 branchable cases, 1 guarded promotion, 5 topology blockers, and
   8 concrete expansion items for the next v1.0 branch queue,
@@ -294,10 +298,10 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to broaden the terminal-neighborhood selector experiment
-across more candidates, calibrate the conservative route-context guard false
-hold, and expand the closure-enabled branch queue beyond the current
-100-scenario slice.
+The next milestone is to broaden terminal-neighborhood selector and
+route-context guard calibration across more candidates and negative controls,
+then expand the closure-enabled branch queue beyond the current 100-scenario
+slice.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
@@ -625,6 +629,15 @@ PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-route-context-guard
   --branch-replay-manifest data/processed/waymo_lane_continuation_branch_replay/manifest.json \
   --output-dir data/processed/waymo_lane_continuation_route_context_guard \
   --public-report docs/reports/waymo_lane_continuation_route_context_guard.md
+```
+
+Calibrate the route-context guard endpoint gate against replay labels:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-route-context-guard-calibration \
+  --route-context-guard-manifest data/processed/waymo_lane_continuation_route_context_guard/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_route_context_guard_calibration \
+  --public-report docs/reports/waymo_lane_continuation_route_context_guard_calibration.md
 ```
 
 Audit the branch-selection coverage funnel and expansion queue:

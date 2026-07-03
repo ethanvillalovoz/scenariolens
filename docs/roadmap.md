@@ -407,7 +407,12 @@ guard study at
 non-oracle promotion policy over those two branchable candidates, promoting the
 robust branch, holding one replay-accepted branch for route-feature follow-up,
 and matching the replay gate on one of the two replay-accepted cases. The branch
-coverage audit at
+route-context guard calibration at
+`docs/reports/waymo_lane_continuation_route_context_guard_calibration.md`
+sweeps endpoint-alignment gates and recommends a provisional -0.25 endpoint
+gate that removes the current false hold on the 2-case queue while keeping the
+default guard unchanged until negative controls improve. The branch coverage
+audit at
 `docs/reports/waymo_lane_continuation_branch_coverage.md` connects the full
 continuation-to-branch funnel: 15 continuation candidates, 10 replay-ready
 candidates, 5 branch-selection cases, 3 branchable cases, 1 route-guard
@@ -427,8 +432,9 @@ terminal-neighborhood selector experiment at
 `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector.md` then
 promotes 1 heading-aligned alternate lane, holds 1 low-heading case, and
 matches the replay gate on 2/2 decisions. Next work should broaden that
-selector experiment, calibrate the route-context guard false hold, and expand
-the closure-enabled queue before claiming broader selector readiness.
+selector experiment, validate route-context guard calibration on expanded
+negative controls, and expand the closure-enabled queue before claiming broader
+selector readiness.
 
 ## Stretch Goals
 
