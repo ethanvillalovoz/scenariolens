@@ -44,8 +44,8 @@ The result is intentionally narrow. It is not a route planner, not a default sco
 
 | Rank | Scenario | Track | Selector | Replay gate | Alternate distance | Heading min | Route extension | Chain extended | Replay gain | First next action |
 | ---: | --- | --- | --- | --- | ---: | ---: | ---: | --- | ---: | --- |
-| 12 | `2f366a31ab03f8b` | `1061` | `promote_terminal_neighborhood_alternate` | `accept_for_selector_experiment` | 3.534 m | 1.000 | 228.779 m | True | +125.481 m | Evaluate this selector rule on a broader terminal-neighborhood queue. |
-| 13 | `74a5b3325a534a87` | `3178` | `hold_for_terminal_neighborhood_context` | `hold_recovery_regressed` | 2.533 m | 0.690 | 72.451 m | True | -15.163 m | Add richer route, heading, or map-neighborhood context before promotion. |
+| 11 | `2f366a31ab03f8b` | `1061` | `promote_terminal_neighborhood_alternate` | `accept_for_selector_experiment` | 3.534 m | 1.000 | 228.779 m | True | +125.481 m | Evaluate this selector rule on a broader terminal-neighborhood queue. |
+| 12 | `74a5b3325a534a87` | `3178` | `hold_for_terminal_neighborhood_context` | `hold_recovery_regressed` | 2.533 m | 0.690 | 72.451 m | True | -15.163 m | Add richer route, heading, or map-neighborhood context before promotion. |
 
 ## Promote Queue
 

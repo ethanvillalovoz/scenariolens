@@ -123,30 +123,29 @@ reloads the motion-context-improved branch cases, applies the same deterministic
 anchor perturbations used elsewhere in ScenarioLens, and checks whether the
 selected branch and positive recoverable FDE survive. The current real-data
 run preserves the branch in 8/8 perturbation trials and positive gain in 8/8.
-Its acceptance gate marks both replayed branches ready for broader selector
-evaluation, with a +28.627 m minimum robustness margin. The experimental
-history-speed-prior replay score preserves both accepted cases and leaves no
-speed-prior margin target unresolved, so the next iteration moves to guard
-calibration and larger branchable queues.
+Its acceptance gate marks 1 branch ready for broader selector evaluation and
+holds 1 speed-sensitive route-context margin case. The experimental
+history-speed-prior replay score preserves the accepted case while keeping the
+route-context margin case held, so the next iteration moves to guard
+calibration and larger negative-control queues.
 
 The branch rollout gate is the triage layer after replay. It does not change
 the selector or claim production readiness; it turns replay outcomes into a
-public-safe promote/hold queue. The current real-data report promotes 2
-branches for broader selector evaluation and holds 0 route-context margin cases,
+public-safe promote/hold queue. The current real-data report promotes 1
+branch for broader selector evaluation and holds 1 route-context margin case,
 making the diagnostic feel closer to an autonomy evaluation workflow.
 
 The route-context guard study is the conservative policy layer after branch
 replay. It keeps the existing selector unchanged, then tests a stricter
 non-oracle promotion guard using route-fit, endpoint-alignment, and downstream
 speed-limit deltas from branch selection. On the current 2-case replay queue it
-promotes 1 robust branch, holds 1 accepted replay candidate for route-feature
-follow-up, and exposes 1 false hold for calibration.
+promotes 1 robust branch, holds 1 route-context margin case for route-feature
+follow-up, and matches replay labels on 2/2 cases with 0 false holds.
 
-The route-context guard calibration layer turns that false hold into a
+The route-context guard calibration layer keeps that agreement visible as a
 repeatable threshold sweep. It compares endpoint-alignment gate candidates
-against the existing branch-replay labels, recommends a provisional -0.25 gate
-for the current 2-case queue, and keeps the default guard unchanged until
-negative-control coverage improves.
+against the existing branch-replay labels and keeps the current -0.05 gate
+with 0 false holds and 0 false promotions on the current 2-case queue.
 
 The branch coverage audit is the planning layer after the guard. It joins the
 continuation candidate plan, replay prototype, route diagnostics, branch
@@ -154,7 +153,8 @@ selection, branch replay, and route-context guard manifests into one funnel.
 The current real-data audit shows why the next milestone is not "ship the
 selector": from 15 continuation candidates, 3 are branchable today and 1 passes
 the strict route guard. It also names 5 topology blockers, 2 single-chain
-branch-expansion targets, and the guard false hold as the next expansion queue.
+branch-expansion targets, and the route-context margin hold as the next
+expansion queue.
 
 The expanded branch coverage pass raises that same local-slice queue to 30
 continuation candidates. It produces 20 replay cases, 10 topology probes, 10
@@ -164,22 +164,22 @@ keeps the current -0.05 endpoint gate as the provisional target with 0 false
 holds and 0 false promotions on the expanded 2-case replay queue.
 
 The expanded topology follow-up turns those 10 topology probes into a sharper
-work queue. It finds 3 cap-recoverable linked-target materialization gaps and
-7 terminal/directional selected-lane cases. The terminal-neighborhood audit
-then finds 3 nearby recovery candidates, replay accepts 2 under deterministic
-perturbation gates, and the bounded selector promotes 1 candidate while holding
-2 for additional context.
+work queue. It finds 1 remaining cap-recoverable linked-target materialization
+gap and 9 terminal/directional selected-lane cases. The terminal-neighborhood
+audit then finds 5 nearby recovery candidates, replay accepts 3 under
+deterministic perturbation gates, and the bounded selector promotes 1 candidate
+while holding 4 for additional context.
 
 The topology gap audit now measures what remains after linked-lane closure
 materialization. The ingestion layer preserves the first 240 map features and
-adds a bounded two-hop closure set for referenced lane links, cutting study
-topology gaps from 33 to 17. The remaining top replay blockers are 2
-cap-recoverable cases and 3 terminal or directional-link cases.
+adds a bounded five-hop closure set for referenced lane links, cutting study
+topology gaps from 33 to 14. The remaining top replay blockers are 1
+cap-recoverable case and 4 terminal or directional-link cases.
 
-The terminal-neighborhood audit follows those 3 terminal/directional cases.
+The terminal-neighborhood audit follows those 4 terminal/directional cases.
 It reloads the local slices, inspects nearby heading-aligned lane alternatives,
-and finds 2 nearby alternate-lane recovery candidates plus 1 directional-link
-mismatch. The important boundary is that these are replay/gating inputs, not a
+and finds 2 nearby alternate-lane recovery candidates plus 2 directional-link
+mismatches. The important boundary is that these are replay/gating inputs, not a
 selector change: ScenarioLens now knows where to test bounded neighborhood
 recovery before claiming broader branch behavior.
 
@@ -224,7 +224,7 @@ and links to the public reports.
 - Add a dataset adapter for another public motion dataset.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
-- Materialize cap-recoverable closure features for expanded topology blockers.
+- Investigate the remaining cap-recoverable closure target.
 - Broaden the terminal-neighborhood selector experiment across more candidates.
 - Rerun the expanded closure-enabled branch queue across more validation shards.
 - Add more replay-held branch negatives.

@@ -12,7 +12,7 @@ The replay is intentionally narrow: it does not change the default ScenarioLens 
 - Ready: True
 - Max scenarios per source: 25
 - Max lane-link hops: 2
-- Selected candidates: 3
+- Selected candidates: 5
 - Minimum stable gain: 1.000 m
 - Acceptance gate: Accept a terminal-neighborhood recovery candidate only when the forced alternate lane improves selected-lane FDE by at least 1.0 m nominally and every valid perturbation preserves the alternate chain with the same minimum gain.
 - Raw scenario data committed: no
@@ -22,17 +22,17 @@ The replay is intentionally narrow: it does not change the default ScenarioLens 
 
 | Metric | Value |
 | --- | ---: |
-| Cases analyzed | 3 |
-| Replayed cases | 3 |
-| Accepted recovery candidates | 2 |
-| Held candidates | 1 |
-| Nominal improvement cases | 2 |
-| Nominal regression cases | 1 |
-| Perturbation trials | 12 |
-| Chain-preserving trials | 12 |
-| Stable-gain trials | 8 |
-| Mean nominal gain | +49.141 m |
-| Mean perturbed gain | +47.703 m |
+| Cases analyzed | 5 |
+| Replayed cases | 5 |
+| Accepted recovery candidates | 3 |
+| Held candidates | 2 |
+| Nominal improvement cases | 3 |
+| Nominal regression cases | 2 |
+| Perturbation trials | 20 |
+| Chain-preserving trials | 20 |
+| Stable-gain trials | 12 |
+| Mean nominal gain | +32.240 m |
+| Mean perturbed gain | +31.378 m |
 | Min perturbed gain | -18.328 m |
 | Max perturbed gain | +125.481 m |
 
@@ -47,9 +47,11 @@ The replay is intentionally narrow: it does not change the default ScenarioLens 
 
 | Rank | Scenario | Track | Selected lane | Alternate lane | Selected FDE | Alternate FDE | Gain | Stable trials | Decision | First next action |
 | ---: | --- | --- | --- | --- | ---: | ---: | ---: | ---: | --- | --- |
-| 22 | `2f366a31ab03f8b` | `1061` | 219 | 220 -> 210 | 133.872 m | 8.391 m | +125.481 m | 4/4 | `accept_for_selector_experiment` | Promote this alternate-lane recovery into the next bounded selector experiment. |
-| 23 | `74a5b3325a534a87` | `3178` | 333 | 331 -> 205 | 88.934 m | 104.097 m | -15.163 m | 0/4 | `hold_recovery_regressed` | Do not promote this alternate; inspect selected-lane quality and local topology manually. |
-| 29 | `fe4a6425278fbd5b` | `816` | 155 | 344 -> 346 -> 353 | 41.649 m | 4.544 m | +37.105 m | 4/4 | `accept_for_selector_experiment` | Promote this alternate-lane recovery into the next bounded selector experiment. |
+| 21 | `2f366a31ab03f8b` | `1061` | 219 | 220 -> 210 | 133.872 m | 8.391 m | +125.481 m | 4/4 | `accept_for_selector_experiment` | Promote this alternate-lane recovery into the next bounded selector experiment. |
+| 22 | `74a5b3325a534a87` | `3178` | 333 | 331 -> 205 | 88.934 m | 104.097 m | -15.163 m | 0/4 | `hold_recovery_regressed` | Do not promote this alternate; inspect selected-lane quality and local topology manually. |
+| 28 | `fe4a6425278fbd5b` | `816` | 155 | 344 -> 346 -> 353 | 41.649 m | 4.544 m | +37.105 m | 4/4 | `accept_for_selector_experiment` | Promote this alternate-lane recovery into the next bounded selector experiment. |
+| 29 | `2f035a284480e981` | `732` | 265 | 264 -> 262 -> 332 | 33.227 m | 10.362 m | +22.865 m | 4/4 | `accept_for_selector_experiment` | Promote this alternate-lane recovery into the next bounded selector experiment. |
+| 30 | `d30e6448f14e4c75` | `150` | 269 | 268 -> 265 -> 263 | 28.584 m | 37.671 m | -9.087 m | 0/4 | `hold_recovery_regressed` | Do not promote this alternate; inspect selected-lane quality and local topology manually. |
 
 ## `2f366a31ab03f8b` / track `1061`
 
@@ -146,6 +148,70 @@ Perturbation trials:
 | `speed_plus_10pct` | 155 | 344 -> 346 -> 353 | +37.105 m | True | True | `stable_recovery` |
 | `heading_left_5deg` | 155 | 344 -> 346 -> 353 | +37.105 m | True | True | `stable_recovery` |
 | `heading_right_5deg` | 155 | 344 -> 346 -> 353 | +37.105 m | True | True | `stable_recovery` |
+
+## `2f035a284480e981` / track `732`
+
+- Source: `validation.tfrecord-00010-of-00150`
+- Ready: True
+- Decision: **accept_for_selector_experiment**
+- Reason: The alternate lane beats the selected terminal lane nominally and under every deterministic perturbation.
+- Recommended next action: Promote this alternate-lane recovery into the next bounded selector experiment.
+- Selected feature: `265`
+- Alternate feature: `264`
+- Selected chain: 265
+- Alternate chain: 264 -> 262 -> 332
+- Selected route status/count: `no_exit_lanes` / 0
+- Alternate route status/count: `linked_lane_chain` / 2
+- Selected/alternate lane distance: 1.101 m / 1.659 m
+- Selected/alternate heading alignment: 1.0 / 0.999
+- Selected/alternate route remaining: 12.753 m / 55.364 m
+- Selected/alternate FDE: 33.227 m / 10.362 m
+- Nominal gain: +22.865 m
+- Stable trials: 4/4
+- Chain-preserving trials: 4/4
+- Worst trial: `speed_minus_10pct`
+- Min/mean/max perturbed gain: +22.865 m / +22.865 m / +22.865 m
+
+Perturbation trials:
+
+| Trial | Selected chain | Alternate chain | Gain | Chain preserved | Stable gain | Verdict |
+| --- | --- | --- | ---: | --- | --- | --- |
+| `speed_minus_10pct` | 265 | 264 -> 262 -> 332 | +22.865 m | True | True | `stable_recovery` |
+| `speed_plus_10pct` | 265 | 264 -> 262 -> 332 | +22.865 m | True | True | `stable_recovery` |
+| `heading_left_5deg` | 265 | 264 -> 262 -> 332 | +22.865 m | True | True | `stable_recovery` |
+| `heading_right_5deg` | 265 | 264 -> 262 -> 332 | +22.865 m | True | True | `stable_recovery` |
+
+## `d30e6448f14e4c75` / track `150`
+
+- Source: `validation.tfrecord-00010-of-00150`
+- Ready: True
+- Decision: **hold_recovery_regressed**
+- Reason: The alternate lane does not beat the selected terminal-lane replay on this open-loop check.
+- Recommended next action: Do not promote this alternate; inspect selected-lane quality and local topology manually.
+- Selected feature: `269`
+- Alternate feature: `268`
+- Selected chain: 269
+- Alternate chain: 268 -> 265 -> 263
+- Selected route status/count: `no_exit_lanes` / 0
+- Alternate route status/count: `linked_lane_chain` / 2
+- Selected/alternate lane distance: 0.016 m / 2.509 m
+- Selected/alternate heading alignment: 0.975 / 0.974
+- Selected/alternate route remaining: 27.667 m / 44.088 m
+- Selected/alternate FDE: 28.584 m / 37.671 m
+- Nominal gain: -9.087 m
+- Stable trials: 0/4
+- Chain-preserving trials: 4/4
+- Worst trial: `speed_minus_10pct`
+- Min/mean/max perturbed gain: -9.087 m / -9.087 m / -9.087 m
+
+Perturbation trials:
+
+| Trial | Selected chain | Alternate chain | Gain | Chain preserved | Stable gain | Verdict |
+| --- | --- | --- | ---: | --- | --- | --- |
+| `speed_minus_10pct` | 269 | 268 -> 265 -> 263 | -9.087 m | True | False | `alternate_regressed` |
+| `speed_plus_10pct` | 269 | 268 -> 265 -> 263 | -9.087 m | True | False | `alternate_regressed` |
+| `heading_left_5deg` | 269 | 268 -> 265 -> 263 | -9.087 m | True | False | `alternate_regressed` |
+| `heading_right_5deg` | 269 | 268 -> 265 -> 263 | -9.087 m | True | False | `alternate_regressed` |
 
 ## Interpretation
 

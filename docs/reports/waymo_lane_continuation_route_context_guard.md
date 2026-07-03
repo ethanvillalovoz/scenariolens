@@ -23,21 +23,21 @@ The guard does not replace ScenarioLens scoring or the existing motion-context s
 | Ready cases | 2 |
 | Guard promotions | 1 |
 | Guard holds | 1 |
-| Replay gate accepted | 2 |
-| Replay route-context holds | 0 |
-| Guard/replay gate matches | 1 |
+| Replay gate accepted | 1 |
+| Replay route-context holds | 1 |
+| Guard/replay gate matches | 2 |
 | Guard false promotions | 0 |
-| Guard false holds | 1 |
-| Speed-minus margin cases held | 0 |
-| Mean promoted nominal gain | +40.840 m |
-| Mean held nominal gain | +39.762 m |
+| Guard false holds | 0 |
+| Speed-minus margin cases held | 1 |
+| Mean promoted nominal gain | +37.766 m |
+| Mean held nominal gain | +3.301 m |
 
 ## Guard Decisions
 
 | Rank | Scenario | Track | Guard | Replay gate | Route context | Motion gain | Endpoint delta | Speed-limit delta | Route-fit delta | First next action |
 | ---: | --- | --- | --- | --- | --- | ---: | ---: | ---: | ---: | --- |
-| 1 | `260785192cf6c991` | `1754` | `promote_motion_context_candidate` | `accepted_for_selector_rollout` | `accepted_no_route_context_followup` | +40.840 m | -0.010 | 0.000 | +0.493 | Keep this branch in the broader selector-evaluation queue. |
-| 3 | `d30709cd60e60395` | `164` | `hold_for_route_context_evidence` | `accepted_for_selector_rollout` | `accepted_no_route_context_followup` | +39.762 m | -0.236 | 0.000 | +0.578 | Collect richer route-context evidence before promoting this branch. |
+| 1 | `260785192cf6c991` | `1754` | `promote_motion_context_candidate` | `accepted_for_selector_rollout` | `accepted_no_route_context_followup` | +37.766 m | -0.001 | 0.000 | +0.077 | Keep this branch in the broader selector-evaluation queue. |
+| 4 | `5c49e681a66c720` | `2627` | `hold_for_route_context_evidence` | `needs_route_context_margin` | `speed_minus_route_context_margin` | +3.301 m | -0.234 | +0.286 | +0.200 | Add turn-lane, downstream topology, and traffic-control context before selector rollout. |
 
 ## `260785192cf6c991` / track `1754`
 
@@ -47,41 +47,41 @@ The guard does not replace ScenarioLens scoring or the existing motion-context s
 - Replay acceptance: **accepted_for_selector_rollout**
 - Replay route-context label: **accepted_no_route_context_followup**
 - Guard matched replay gate: True
-- Default chain: 235 -> 241 -> 315 -> 337
-- Motion-context chain: 235 -> 307 -> 306 -> 314
-- Guard-selected chain: 235 -> 307 -> 306 -> 314
-- Nominal recoverable FDE: +40.840 m
+- Default chain: 235 -> 241 -> 315
+- Motion-context chain: 235 -> 307 -> 306
+- Guard-selected chain: 235 -> 307 -> 306
+- Nominal recoverable FDE: +37.766 m
 - Route-context flags: none
 
 Guard checks:
 
 | Check | Value | Passed |
 | --- | ---: | --- |
-| Route-fit delta | +0.493 | True |
-| Endpoint-alignment delta | -0.010 | True |
+| Route-fit delta | +0.077 | True |
+| Endpoint-alignment delta | -0.001 | True |
 | Speed-limit-drop delta | 0.000 | True |
 
-## `d30709cd60e60395` / track `164`
+## `5c49e681a66c720` / track `2627`
 
-- Source: `validation.tfrecord-00007-of-00150`
+- Source: `validation.tfrecord-00010-of-00150`
 - Guard label: **hold_for_route_context_evidence**
-- Guard reason: The branch has nominal recoverable FDE, but route-context guardrails fired: endpoint_alignment_drop.
-- Replay acceptance: **accepted_for_selector_rollout**
-- Replay route-context label: **accepted_no_route_context_followup**
-- Guard matched replay gate: False
-- Default chain: 603 -> 610 -> 371 -> 394
-- Motion-context chain: 603 -> 609 -> 606 -> 597
-- Guard-selected chain: 603 -> 610 -> 371 -> 394
-- Nominal recoverable FDE: +39.762 m
-- Route-context flags: endpoint_alignment_drop
+- Guard reason: The branch has nominal recoverable FDE, but route-context guardrails fired: endpoint_alignment_drop, downstream_speed_limit_drop.
+- Replay acceptance: **needs_route_context_margin**
+- Replay route-context label: **speed_minus_route_context_margin**
+- Guard matched replay gate: True
+- Default chain: 285 -> 120 -> 119
+- Motion-context chain: 285 -> 286 -> 287
+- Guard-selected chain: 285 -> 120 -> 119
+- Nominal recoverable FDE: +3.301 m
+- Route-context flags: endpoint_alignment_drop, downstream_speed_limit_drop
 
 Guard checks:
 
 | Check | Value | Passed |
 | --- | ---: | --- |
-| Route-fit delta | +0.578 | True |
-| Endpoint-alignment delta | -0.236 | False |
-| Speed-limit-drop delta | 0.000 | True |
+| Route-fit delta | +0.200 | True |
+| Endpoint-alignment delta | -0.234 | False |
+| Speed-limit-drop delta | +0.286 | False |
 
 ## Interpretation
 

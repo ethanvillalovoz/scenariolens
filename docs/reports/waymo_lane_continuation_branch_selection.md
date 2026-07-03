@@ -10,7 +10,7 @@ The `anchor_heading` selector uses only the anchor velocity and parsed route geo
 - Replay manifest: `data/processed/waymo_lane_continuation_replay_prototype/manifest.json`
 - Ready for branch diagnostics: True
 - Cases analyzed: 5
-- Max lane-link hops: 3
+- Max lane-link hops: 2
 - Raw scenario data committed: no
 - Local per-case replay packets committed: no
 
@@ -23,25 +23,25 @@ The `anchor_heading` selector uses only the anchor velocity and parsed route geo
 | Branchable cases | 3 |
 | Single-chain cases | 2 |
 | Oracle upper-bound improvements | 3 |
-| Anchor-heading selector improvements | 0 |
-| Anchor-heading selector changed route | 0 |
-| Motion-context selector improvements | 2 |
-| Motion-context selector changed route | 2 |
-| Motion-context matched oracle on branchable cases | 2 |
-| Mean motion-context recoverable FDE | +40.301 m |
-| Max motion-context recoverable FDE | +40.840 m |
+| Anchor-heading selector improvements | 1 |
+| Anchor-heading selector changed route | 1 |
+| Motion-context selector improvements | 3 |
+| Motion-context selector changed route | 3 |
+| Motion-context matched oracle on branchable cases | 3 |
+| Mean motion-context recoverable FDE | +26.943 m |
+| Max motion-context recoverable FDE | +39.762 m |
 | Default route still best | 2 |
-| Mean oracle recoverable FDE | +27.968 m |
-| Max oracle recoverable FDE | +40.840 m |
+| Mean oracle recoverable FDE | +26.943 m |
+| Max oracle recoverable FDE | +39.762 m |
 
 ## Case Results
 
 | Rank | Scenario | Track | Diagnosis | Routes | Default chain | Motion-context chain | Oracle chain | Motion gain | Oracle gain | Verdict |
 | ---: | --- | --- | --- | ---: | --- | --- | --- | ---: | ---: | --- |
-| 1 | `260785192cf6c991` | `1754` | `route_horizon_limit` | 3 | 235 -> 241 -> 315 -> 337 | 235 -> 307 -> 306 -> 314 | 235 -> 307 -> 306 -> 314 | +40.840 m | +40.840 m | `motion_context_selector_improves` |
+| 1 | `260785192cf6c991` | `1754` | `route_horizon_limit` | 2 | 235 -> 241 -> 315 | 235 -> 307 -> 306 | 235 -> 307 -> 306 | +37.766 m | +37.766 m | `motion_context_selector_improves` |
 | 2 | `e3f6a29b59e42c1` | `741` | `stable_route_choice_regression` | 1 | 161 -> 127 -> 116 | 161 -> 127 -> 116 | 161 -> 127 -> 116 | 0.000 m | 0.000 m | `single_chain_no_branch_choice` |
-| 3 | `d30709cd60e60395` | `164` | `stable_route_choice_regression` | 3 | 603 -> 610 -> 371 -> 394 | 603 -> 609 -> 606 -> 597 | 603 -> 609 -> 606 -> 597 | +39.762 m | +39.762 m | `motion_context_selector_improves` |
-| 4 | `5c49e681a66c720` | `2627` | `stable_route_choice_regression` | 3 | 285 -> 120 -> 119 | 285 -> 120 -> 119 | 285 -> 286 -> 287 -> 289 | 0.000 m | +3.301 m | `oracle_branch_upper_bound_improves` |
+| 3 | `d30709cd60e60395` | `164` | `stable_route_choice_regression` | 2 | 603 -> 610 -> 371 | 603 -> 609 -> 606 | 603 -> 609 -> 606 | +39.762 m | +39.762 m | `anchor_heading_selector_improves` |
+| 4 | `5c49e681a66c720` | `2627` | `stable_route_choice_regression` | 2 | 285 -> 120 -> 119 | 285 -> 286 -> 287 | 285 -> 286 -> 287 | +3.301 m | +3.301 m | `motion_context_selector_improves` |
 | 5 | `e9db41e904b349a2` | `406` | `stable_route_choice_regression` | 1 | 295 -> 228 -> 201 | 295 -> 228 -> 201 | 295 -> 228 -> 201 | 0.000 m | 0.000 m | `single_chain_no_branch_choice` |
 
 ## `260785192cf6c991` / track `1754`
@@ -51,22 +51,21 @@ The `anchor_heading` selector uses only the anchor velocity and parsed route geo
 - Ready: True
 - Verdict: **motion_context_selector_improves**
 - Why it matters: A non-oracle motion-context prior changes the parsed branch and reduces open-loop error using recent speed, route length, and downstream speed limits.
-- Default linked-route FDE: 87.147 m
-- Anchor-heading route FDE: 87.147 m
-- Motion-context route FDE: 46.307 m
-- Oracle upper-bound route FDE: 46.307 m
-- Motion-context recoverable FDE: +40.840 m
-- Oracle recoverable FDE: +40.840 m
+- Default linked-route FDE: 81.112 m
+- Anchor-heading route FDE: 81.112 m
+- Motion-context route FDE: 43.346 m
+- Oracle upper-bound route FDE: 43.346 m
+- Motion-context recoverable FDE: +37.766 m
+- Oracle recoverable FDE: +37.766 m
 - Motion-context estimated travel: 82.933 m
-- Route candidate count: 3
+- Route candidate count: 2
 
 Route candidates:
 
 | Chain | Status | Heading score | Motion score | FDE | Gain vs default | Selector flags |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
-| 235 -> 241 -> 315 -> 337 | `linked_lane_chain` | 1.020 | -0.005 | 87.147 m | 0.000 m | default, anchor_heading |
-| 235 -> 307 -> 306 -> 314 | `linked_lane_chain` | 0.757 | 0.410 | 46.307 m | +40.840 m | motion_context, oracle_upper_bound |
-| 235 -> 307 -> 306 -> 313 | `linked_lane_chain` | 0.930 | 0.248 | 71.620 m | +15.527 m | n/a |
+| 235 -> 241 -> 315 | `linked_lane_chain` | 0.966 | 0.244 | 81.112 m | 0.000 m | default, anchor_heading |
+| 235 -> 307 -> 306 | `linked_lane_chain` | 0.629 | 0.310 | 43.346 m | +37.766 m | motion_context, oracle_upper_bound |
 
 Recommended next actions:
 - Replay the motion-context selected branch under deterministic anchor perturbations.
@@ -93,7 +92,7 @@ Route candidates:
 
 | Chain | Status | Heading score | Motion score | FDE | Gain vs default | Selector flags |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
-| 161 -> 127 -> 116 | `no_exit_lanes` | 1.020 | 0.198 | 58.942 m | 0.000 m | default, anchor_heading, motion_context, oracle_upper_bound |
+| 161 -> 127 -> 116 | `linked_lane_chain` | 1.020 | 0.198 | 58.942 m | 0.000 m | default, anchor_heading, motion_context, oracle_upper_bound |
 
 Recommended next actions:
 - Audit lane topology depth, missing links, and selected-lane quality.
@@ -105,58 +104,56 @@ Recommended next actions:
 - Diagnosis source: `stable_route_choice_regression`
 - Source: `validation.tfrecord-00007-of-00150`
 - Ready: True
-- Verdict: **motion_context_selector_improves**
-- Why it matters: A non-oracle motion-context prior changes the parsed branch and reduces open-loop error using recent speed, route length, and downstream speed limits.
+- Verdict: **anchor_heading_selector_improves**
+- Why it matters: A simple anchor-heading route prior changes the parsed branch and reduces open-loop error on this diagnostic case.
 - Default linked-route FDE: 52.496 m
-- Anchor-heading route FDE: 52.496 m
+- Anchor-heading route FDE: 12.734 m
 - Motion-context route FDE: 12.734 m
 - Oracle upper-bound route FDE: 12.734 m
 - Motion-context recoverable FDE: +39.762 m
 - Oracle recoverable FDE: +39.762 m
 - Motion-context estimated travel: 75.892 m
-- Route candidate count: 3
+- Route candidate count: 2
 
 Route candidates:
 
 | Chain | Status | Heading score | Motion score | FDE | Gain vs default | Selector flags |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
-| 603 -> 610 -> 371 -> 394 | `linked_lane_chain` | 0.506 | -0.527 | 52.496 m | 0.000 m | default, anchor_heading |
-| 603 -> 609 -> 606 -> 597 | `linked_lane_chain` | 0.270 | -0.130 | 12.734 m | +39.762 m | motion_context, oracle_upper_bound |
-| 603 -> 609 -> 606 -> 598 | `linked_lane_chain` | -0.529 | -0.489 | 12.734 m | +39.762 m | n/a |
+| 603 -> 610 -> 371 | `linked_lane_chain` | 0.682 | -0.124 | 52.496 m | 0.000 m | default |
+| 603 -> 609 -> 606 | `linked_lane_chain` | 0.704 | 0.224 | 12.734 m | +39.762 m | anchor_heading, motion_context, oracle_upper_bound |
 
 Recommended next actions:
-- Replay the motion-context selected branch under deterministic anchor perturbations.
-- Compare the selector across the broader continuation candidate queue.
-- Keep the oracle upper bound as a diagnostic ceiling, not a deployable result.
+- Promote the anchor-heading route prior into the next replay pass.
+- Keep the default geometric route side by side as the control.
+- Verify the selector across the broader continuation candidate queue.
 
 ## `5c49e681a66c720` / track `2627`
 
 - Diagnosis source: `stable_route_choice_regression`
 - Source: `validation.tfrecord-00010-of-00150`
 - Ready: True
-- Verdict: **oracle_branch_upper_bound_improves**
-- Why it matters: Another parsed branch fits the observed future better, proving branch choice is a plausible source of the continuation regression.
+- Verdict: **motion_context_selector_improves**
+- Why it matters: A non-oracle motion-context prior changes the parsed branch and reduces open-loop error using recent speed, route length, and downstream speed limits.
 - Default linked-route FDE: 38.598 m
 - Anchor-heading route FDE: 38.598 m
-- Motion-context route FDE: 38.598 m
+- Motion-context route FDE: 35.297 m
 - Oracle upper-bound route FDE: 35.297 m
-- Motion-context recoverable FDE: 0.000 m
+- Motion-context recoverable FDE: +3.301 m
 - Oracle recoverable FDE: +3.301 m
 - Motion-context estimated travel: 61.023 m
-- Route candidate count: 3
+- Route candidate count: 2
 
 Route candidates:
 
 | Chain | Status | Heading score | Motion score | FDE | Gain vs default | Selector flags |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
-| 285 -> 120 -> 119 | `no_exit_lanes` | 1.020 | -0.286 | 38.598 m | 0.000 m | default, anchor_heading, motion_context |
-| 285 -> 286 -> 287 -> 289 | `linked_lane_chain` | 0.609 | -0.374 | 35.297 m | +3.301 m | oracle_upper_bound |
-| 285 -> 286 -> 287 -> 292 | `linked_lane_chain` | 0.662 | -0.329 | 35.297 m | +3.301 m | n/a |
+| 285 -> 120 -> 119 | `linked_lane_chain` | 1.020 | -0.286 | 38.598 m | 0.000 m | default, anchor_heading |
+| 285 -> 286 -> 287 | `linked_lane_chain` | 0.785 | 0.076 | 35.297 m | +3.301 m | motion_context, oracle_upper_bound |
 
 Recommended next actions:
-- Add a richer non-oracle route prior using turn-lane semantics, traffic controls, or near-term intent cues.
-- Use the oracle branch only as an upper-bound diagnostic, not as a deployed predictor.
-- Rerun perturbation checks after adding the non-oracle prior.
+- Replay the motion-context selected branch under deterministic anchor perturbations.
+- Compare the selector across the broader continuation candidate queue.
+- Keep the oracle upper bound as a diagnostic ceiling, not a deployable result.
 
 ## `e9db41e904b349a2` / track `406`
 
@@ -178,7 +175,7 @@ Route candidates:
 
 | Chain | Status | Heading score | Motion score | FDE | Gain vs default | Selector flags |
 | --- | --- | ---: | ---: | ---: | ---: | --- |
-| 295 -> 228 -> 201 | `no_exit_lanes` | 1.020 | -0.885 | 38.292 m | 0.000 m | default, anchor_heading, motion_context, oracle_upper_bound |
+| 295 -> 228 -> 201 | `linked_lane_chain` | 1.020 | -0.885 | 38.292 m | 0.000 m | default, anchor_heading, motion_context, oracle_upper_bound |
 
 Recommended next actions:
 - Audit lane topology depth, missing links, and selected-lane quality.

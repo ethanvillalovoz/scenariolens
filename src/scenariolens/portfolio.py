@@ -239,7 +239,7 @@ def portfolio_markdown(
             "",
             "- Expand the documented local-slice recipe across more Waymo Motion validation shards.",
             "- Compare baseline ADE/FDE distributions across more validation shards.",
-            "- Materialize cap-recoverable closure features for expanded topology blockers.",
+            "- Investigate the remaining cap-recoverable closure target.",
             "- Broaden the terminal-neighborhood selector experiment across more candidates.",
             "- Add more replay-held branch negatives.",
             "- Expand the closure-enabled branch queue beyond the current 100-scenario slice.",

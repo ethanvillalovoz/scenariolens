@@ -26,8 +26,8 @@ It is intentionally scoped: this is not a route planner, not closed-loop simulat
 | Horizon-limit cases | 1 |
 | Link worse than constant velocity | 0 |
 | Topology blockers | 5 |
-| Missing linked features | 2 |
-| Terminal/no-exit lane probes | 3 |
+| Missing linked features | 1 |
+| Terminal/no-exit lane probes | 4 |
 
 ## Stable Regression Diagnostics
 
@@ -43,11 +43,11 @@ It is intentionally scoped: this is not a route planner, not closed-loop simulat
 
 | Rank | Scenario | Track | Priority | Diagnosis | Nearest FDE | Lane-link FDE | Delta | Chain | First action |
 | ---: | --- | --- | ---: | --- | ---: | ---: | ---: | --- | --- |
-| 6 | `6bdc7f92afefff73` | `59` | 4.93 | `missing_linked_feature` | 134.082 m | 134.082 m | 0.000 m | 1056 | Audit the selected map feature's parsed entry/exit lane IDs. |
-| 7 | `2f366a31ab03f8b` | `1061` | 4.93 | `terminal_lane_or_parser_gap` | 133.872 m | 133.872 m | 0.000 m | 219 | Audit the selected map feature's parsed entry/exit lane IDs. |
-| 8 | `74a5b3325a534a87` | `3178` | 4.03 | `terminal_lane_or_parser_gap` | 88.934 m | 88.934 m | 0.000 m | 333 | Audit the selected map feature's parsed entry/exit lane IDs. |
-| 9 | `2f035a284480e981` | `715` | 3.42 | `missing_linked_feature` | 58.747 m | 58.747 m | 0.000 m | 513 | Audit the selected map feature's parsed entry/exit lane IDs. |
-| 10 | `4dfe7c285670839f` | `0` | 3.28 | `terminal_lane_or_parser_gap` | 51.637 m | 51.637 m | 0.000 m | 44 | Audit the selected map feature's parsed entry/exit lane IDs. |
+| 6 | `2f366a31ab03f8b` | `1061` | 4.93 | `terminal_lane_or_parser_gap` | 133.872 m | 133.872 m | 0.000 m | 219 | Audit the selected map feature's parsed entry/exit lane IDs. |
+| 7 | `74a5b3325a534a87` | `3178` | 4.03 | `terminal_lane_or_parser_gap` | 88.934 m | 88.934 m | 0.000 m | 333 | Audit the selected map feature's parsed entry/exit lane IDs. |
+| 8 | `f64f295c8083bfd6` | `894` | 3.93 | `missing_linked_feature` | 83.812 m | 83.812 m | 0.000 m | 349 | Audit the selected map feature's parsed entry/exit lane IDs. |
+| 9 | `4dfe7c285670839f` | `0` | 3.28 | `terminal_lane_or_parser_gap` | 51.637 m | 51.637 m | 0.000 m | 44 | Audit the selected map feature's parsed entry/exit lane IDs. |
+| 10 | `f672132039e83c40` | `519` | 3.28 | `terminal_lane_or_parser_gap` | 51.599 m | 51.599 m | 0.000 m | 73 | Audit the selected map feature's parsed entry/exit lane IDs. |
 
 ## `260785192cf6c991` / track `1754`
 
@@ -170,32 +170,6 @@ Recommended next actions:
 Blockers / cautions:
 - Raw Waymo TFRecords and local replay packets must stay ignored.
 
-## `6bdc7f92afefff73` / track `59`
-
-- Queue: `topology_audit`
-- Diagnosis: **missing_linked_feature**
-- Priority score: 4.93
-- Why it matters: The selected feature references a continuation that the lightweight parser did not make usable.
-- Source: `validation.tfrecord-00009-of-00150`
-- Replay stability: `not_evaluable`
-- Link status/count: `linked_feature_missing` / 0
-- Feature chain: 1056
-- Nearest-lane FDE: 134.082 m
-- Lane-link FDE: 134.082 m
-- Link improvement over nearest: 0.000 m
-- Link improvement over constant velocity: -118.819 m
-- Horizon / route remaining: 150.972 m / 1.793 m
-
-Recommended next actions:
-- Audit the selected map feature's parsed entry/exit lane IDs.
-- Check whether the feature cap dropped the referenced continuation.
-- Regenerate continuation studies after parser/topology changes.
-
-Blockers / cautions:
-- No usable parsed linked-lane chain is available yet.
-- The linked lane chain is still shorter than the target horizon.
-- Raw Waymo TFRecords and local replay packets must stay ignored.
-
 ## `2f366a31ab03f8b` / track `1061`
 
 - Queue: `topology_audit`
@@ -248,21 +222,21 @@ Blockers / cautions:
 - The linked lane chain is still shorter than the target horizon.
 - Raw Waymo TFRecords and local replay packets must stay ignored.
 
-## `2f035a284480e981` / track `715`
+## `f64f295c8083bfd6` / track `894`
 
 - Queue: `topology_audit`
 - Diagnosis: **missing_linked_feature**
-- Priority score: 3.42
+- Priority score: 3.93
 - Why it matters: The selected feature references a continuation that the lightweight parser did not make usable.
-- Source: `validation.tfrecord-00010-of-00150`
+- Source: `validation.tfrecord-00009-of-00150`
 - Replay stability: `not_evaluable`
 - Link status/count: `linked_feature_missing` / 0
-- Feature chain: 513
-- Nearest-lane FDE: 58.747 m
-- Lane-link FDE: 58.747 m
+- Feature chain: 349
+- Nearest-lane FDE: 83.812 m
+- Lane-link FDE: 83.812 m
 - Link improvement over nearest: 0.000 m
-- Link improvement over constant velocity: -36.366 m
-- Horizon / route remaining: 35.054 m / 0.000 m
+- Link improvement over constant velocity: -70.028 m
+- Horizon / route remaining: 90.986 m / 20.926 m
 
 Recommended next actions:
 - Audit the selected map feature's parsed entry/exit lane IDs.
@@ -289,6 +263,32 @@ Blockers / cautions:
 - Link improvement over nearest: 0.000 m
 - Link improvement over constant velocity: -33.688 m
 - Horizon / route remaining: 85.416 m / 15.863 m
+
+Recommended next actions:
+- Audit the selected map feature's parsed entry/exit lane IDs.
+- Check whether the feature cap dropped the referenced continuation.
+- Regenerate continuation studies after parser/topology changes.
+
+Blockers / cautions:
+- No usable parsed linked-lane chain is available yet.
+- The linked lane chain is still shorter than the target horizon.
+- Raw Waymo TFRecords and local replay packets must stay ignored.
+
+## `f672132039e83c40` / track `519`
+
+- Queue: `topology_audit`
+- Diagnosis: **terminal_lane_or_parser_gap**
+- Priority score: 3.28
+- Why it matters: The selected lane appears terminal or lacks parsed exit/entry links even though the target continues beyond it.
+- Source: `validation.tfrecord-00010-of-00150`
+- Replay stability: `not_evaluable`
+- Link status/count: `no_exit_lanes` / 0
+- Feature chain: 73
+- Nearest-lane FDE: 51.599 m
+- Lane-link FDE: 51.599 m
+- Link improvement over nearest: 0.000 m
+- Link improvement over constant velocity: -34.200 m
+- Horizon / route remaining: 55.400 m / 21.194 m
 
 Recommended next actions:
 - Audit the selected map feature's parsed entry/exit lane IDs.

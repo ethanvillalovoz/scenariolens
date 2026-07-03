@@ -10,18 +10,18 @@ It is intentionally scoped: this is not route planning, not closed-loop simulati
 - Ready for planning: True
 - Top rows per bucket: 5
 - Study scenarios scanned: 100
-- Study candidate tracks: 209
+- Study candidate tracks: 220
 - Raw scenario data committed: no
 
 ## Source Study Snapshot
 
 | Metric | Count / Value |
 | --- | ---: |
-| Tracks using linked lanes | 192 |
-| Tracks improved over nearest lane | 133 |
-| Tracks regressed vs nearest lane | 57 |
-| Topology gaps | 17 |
-| Mean lane-link improvement | +17.682 m |
+| Tracks using linked lanes | 206 |
+| Tracks improved over nearest lane | 141 |
+| Tracks regressed vs nearest lane | 62 |
+| Topology gaps | 14 |
+| Mean lane-link improvement | +17.624 m |
 
 ## Queue Summary
 
@@ -57,11 +57,11 @@ It is intentionally scoped: this is not route planning, not closed-loop simulati
 
 | Rank | Source | Scenario | Track | Priority | Nearest FDE | Lane-link FDE | Delta | Chain | First action |
 | ---: | --- | --- | --- | ---: | ---: | ---: | ---: | --- | --- |
-| 11 | `validation.tfrecord-00009-of-00150` | `6bdc7f92afefff73` | `59` | 4.93 | 134.082 m | 134.082 m | 0.000 m | 1056 | Inspect parsed entry/exit links for the selected feature and its missing continuation. |
-| 12 | `validation.tfrecord-00007-of-00150` | `2f366a31ab03f8b` | `1061` | 4.93 | 133.872 m | 133.872 m | 0.000 m | 219 | Inspect parsed entry/exit links for the selected feature and its missing continuation. |
-| 13 | `validation.tfrecord-00010-of-00150` | `74a5b3325a534a87` | `3178` | 4.03 | 88.934 m | 88.934 m | 0.000 m | 333 | Inspect parsed entry/exit links for the selected feature and its missing continuation. |
-| 14 | `validation.tfrecord-00010-of-00150` | `2f035a284480e981` | `715` | 3.42 | 58.747 m | 58.747 m | 0.000 m | 513 | Inspect parsed entry/exit links for the selected feature and its missing continuation. |
-| 15 | `validation.tfrecord-00008-of-00150` | `4dfe7c285670839f` | `0` | 3.28 | 51.637 m | 51.637 m | 0.000 m | 44 | Inspect parsed entry/exit links for the selected feature and its missing continuation. |
+| 11 | `validation.tfrecord-00007-of-00150` | `2f366a31ab03f8b` | `1061` | 4.93 | 133.872 m | 133.872 m | 0.000 m | 219 | Inspect parsed entry/exit links for the selected feature and its missing continuation. |
+| 12 | `validation.tfrecord-00010-of-00150` | `74a5b3325a534a87` | `3178` | 4.03 | 88.934 m | 88.934 m | 0.000 m | 333 | Inspect parsed entry/exit links for the selected feature and its missing continuation. |
+| 13 | `validation.tfrecord-00009-of-00150` | `f64f295c8083bfd6` | `894` | 3.93 | 83.812 m | 83.812 m | 0.000 m | 349 | Inspect parsed entry/exit links for the selected feature and its missing continuation. |
+| 14 | `validation.tfrecord-00008-of-00150` | `4dfe7c285670839f` | `0` | 3.28 | 51.637 m | 51.637 m | 0.000 m | 44 | Inspect parsed entry/exit links for the selected feature and its missing continuation. |
+| 15 | `validation.tfrecord-00010-of-00150` | `f672132039e83c40` | `519` | 3.28 | 51.599 m | 51.599 m | 0.000 m | 73 | Inspect parsed entry/exit links for the selected feature and its missing continuation. |
 
 ## `937eb2fa17da45c0` / track `979`
 
@@ -286,30 +286,6 @@ Recommended next actions:
 Blockers / cautions:
 - Raw Waymo TFRecords must remain local and ignored for replay.
 
-## `6bdc7f92afefff73` / track `59`
-
-- Queue: `topology_audit`
-- Readiness: `needs_topology_audit`
-- Priority score: 4.93
-- Why it matters: The selected lane still lacks a usable parsed continuation chain, making this parser/topology coverage work before replay.
-- Source: `validation.tfrecord-00009-of-00150`
-- Feature chain: 1056
-- Link status: `linked_feature_missing`
-- Nearest-lane FDE: 134.082 m
-- Lane-link FDE: 134.082 m
-- Link improvement: 0.000 m
-- Before/after remaining lane distance: 1.793 m / 1.793 m
-
-Recommended next actions:
-- Inspect parsed entry/exit links for the selected feature and its missing continuation.
-- Check whether the lightweight map-feature cap, link direction, or raw map topology caused the gap.
-- Rerun the continuation study after parser/topology coverage changes before replaying this case.
-
-Blockers / cautions:
-- Raw Waymo TFRecords must remain local and ignored for replay.
-- No usable parsed linked-lane chain is available yet.
-- The target still out-travels the linked lane chain within the prediction horizon.
-
 ## `2f366a31ab03f8b` / track `1061`
 
 - Queue: `topology_audit`
@@ -358,19 +334,19 @@ Blockers / cautions:
 - No usable parsed linked-lane chain is available yet.
 - The target still out-travels the linked lane chain within the prediction horizon.
 
-## `2f035a284480e981` / track `715`
+## `f64f295c8083bfd6` / track `894`
 
 - Queue: `topology_audit`
 - Readiness: `needs_topology_audit`
-- Priority score: 3.42
+- Priority score: 3.93
 - Why it matters: The selected lane still lacks a usable parsed continuation chain, making this parser/topology coverage work before replay.
-- Source: `validation.tfrecord-00010-of-00150`
-- Feature chain: 513
+- Source: `validation.tfrecord-00009-of-00150`
+- Feature chain: 349
 - Link status: `linked_feature_missing`
-- Nearest-lane FDE: 58.747 m
-- Lane-link FDE: 58.747 m
+- Nearest-lane FDE: 83.812 m
+- Lane-link FDE: 83.812 m
 - Link improvement: 0.000 m
-- Before/after remaining lane distance: 0.000 m / 0.000 m
+- Before/after remaining lane distance: 20.926 m / 20.926 m
 
 Recommended next actions:
 - Inspect parsed entry/exit links for the selected feature and its missing continuation.
@@ -395,6 +371,30 @@ Blockers / cautions:
 - Lane-link FDE: 51.637 m
 - Link improvement: 0.000 m
 - Before/after remaining lane distance: 15.863 m / 15.863 m
+
+Recommended next actions:
+- Inspect parsed entry/exit links for the selected feature and its missing continuation.
+- Check whether the lightweight map-feature cap, link direction, or raw map topology caused the gap.
+- Rerun the continuation study after parser/topology coverage changes before replaying this case.
+
+Blockers / cautions:
+- Raw Waymo TFRecords must remain local and ignored for replay.
+- No usable parsed linked-lane chain is available yet.
+- The target still out-travels the linked lane chain within the prediction horizon.
+
+## `f672132039e83c40` / track `519`
+
+- Queue: `topology_audit`
+- Readiness: `needs_topology_audit`
+- Priority score: 3.28
+- Why it matters: The selected lane still lacks a usable parsed continuation chain, making this parser/topology coverage work before replay.
+- Source: `validation.tfrecord-00010-of-00150`
+- Feature chain: 73
+- Link status: `no_exit_lanes`
+- Nearest-lane FDE: 51.599 m
+- Lane-link FDE: 51.599 m
+- Link improvement: 0.000 m
+- Before/after remaining lane distance: 21.194 m / 21.194 m
 
 Recommended next actions:
 - Inspect parsed entry/exit links for the selected feature and its missing continuation.

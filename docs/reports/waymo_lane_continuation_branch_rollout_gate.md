@@ -24,35 +24,34 @@ The gate is intentionally conservative. It is useful because it shows how Scenar
 | --- | ---: |
 | Cases analyzed | 2 |
 | Replayed cases | 2 |
-| Promoted candidates | 2 |
-| Held for route context | 0 |
+| Promoted candidates | 1 |
+| Held for route context | 1 |
 | Held for selector stability | 0 |
 | Held for route and selector context | 0 |
 | Manual-review holds | 0 |
 | Not evaluable | 0 |
-| Speed-minus margin holds | 0 |
+| Speed-minus margin holds | 1 |
 | Speed-prior resolved holds | 0 |
-| Oracle-matched holds | 0 |
-| Mean promoted margin | +29.834 m |
-| Min promoted margin | +28.627 m |
-| Max hold priority | n/a |
-| Max hold gap to gate | n/a |
+| Oracle-matched holds | 1 |
+| Mean promoted margin | +31.588 m |
+| Min promoted margin | +31.588 m |
+| Max hold priority | 5.182 |
+| Max hold gap to gate | +0.443 m |
 
 ## Decisions
 
 | Rank | Scenario | Track | Decision | Acceptance | Route context | Margin | Speed-prior margin | First next action |
 | ---: | --- | --- | --- | --- | --- | ---: | ---: | --- |
-| 1 | `260785192cf6c991` | `1754` | `promote_for_broader_selector_eval` | `accepted_for_selector_rollout` | `accepted_no_route_context_followup` | +28.627 m | +28.627 m | Evaluate this selector behavior on a broader branchable continuation queue. |
-| 3 | `d30709cd60e60395` | `164` | `promote_for_broader_selector_eval` | `accepted_for_selector_rollout` | `accepted_no_route_context_followup` | +31.042 m | +34.418 m | Evaluate this selector behavior on a broader branchable continuation queue. |
+| 1 | `260785192cf6c991` | `1754` | `promote_for_broader_selector_eval` | `accepted_for_selector_rollout` | `accepted_no_route_context_followup` | +31.588 m | +31.588 m | Evaluate this selector behavior on a broader branchable continuation queue. |
+| 4 | `5c49e681a66c720` | `2627` | `hold_for_route_context_margin` | `needs_route_context_margin` | `speed_minus_route_context_margin` | -0.443 m | -3.099 m | Add route-context features that can explain reduced-speed branch intent. |
 
 ## Promote Queue
 
-- `260785192cf6c991` track `1754`: +28.627 m margin, default chain 235 -> 241 -> 315 -> 337, motion-context chain 235 -> 307 -> 306 -> 314.
-- `d30709cd60e60395` track `164`: +31.042 m margin, default chain 603 -> 610 -> 371 -> 394, motion-context chain 603 -> 609 -> 606 -> 597.
+- `260785192cf6c991` track `1754`: +31.588 m margin, default chain 235 -> 241 -> 315, motion-context chain 235 -> 307 -> 306.
 
 ## Hold Queue
 
-- No cases are held by this rollout gate.
+- `5c49e681a66c720` track `2627`: **hold_for_route_context_margin** because the branch is stable but its route-context recoverable-FDE margin is too thin. First action: Add route-context features that can explain reduced-speed branch intent.
 
 ## `260785192cf6c991` / track `1754`
 
@@ -63,9 +62,9 @@ The gate is intentionally conservative. It is useful because it shows how Scenar
 - Stability: **stable_motion_context_branch**
 - Route-context diagnostic: **accepted_no_route_context_followup**
 - History speed-prior acceptance: **accepted_for_selector_rollout**
-- Nominal recoverable FDE: +40.840 m
-- Minimum perturbed recoverable FDE: +29.627 m
-- Robustness margin: +28.627 m
+- Nominal recoverable FDE: +37.766 m
+- Minimum perturbed recoverable FDE: +32.588 m
+- Robustness margin: +31.588 m
 - Route-context gap to gate: 0.000 m
 - Route-context priority: 0.000
 - Selected route matches diagnostic oracle: True
@@ -76,27 +75,27 @@ Next actions:
 - Broaden the branch replay queue with the same acceptance gate.
 - Keep this case as a positive control for selector rollout checks.
 
-## `d30709cd60e60395` / track `164`
+## `5c49e681a66c720` / track `2627`
 
-- Source: `validation.tfrecord-00007-of-00150`
-- Decision: **promote_for_broader_selector_eval**
-- Decision reason: the branch preserved its choice and cleared the recoverable-FDE gate.
-- Acceptance: **accepted_for_selector_rollout**
-- Stability: **stable_motion_context_branch**
-- Route-context diagnostic: **accepted_no_route_context_followup**
-- History speed-prior acceptance: **accepted_for_selector_rollout**
-- Nominal recoverable FDE: +39.762 m
-- Minimum perturbed recoverable FDE: +32.042 m
-- Robustness margin: +31.042 m
-- Route-context gap to gate: 0.000 m
-- Route-context priority: 0.000
+- Source: `validation.tfrecord-00010-of-00150`
+- Decision: **hold_for_route_context_margin**
+- Decision reason: the branch is stable but its route-context recoverable-FDE margin is too thin.
+- Acceptance: **needs_route_context_margin**
+- Stability: **branch_stable_gain_sensitive**
+- Route-context diagnostic: **speed_minus_route_context_margin**
+- History speed-prior acceptance: **needs_route_context_margin**
+- Nominal recoverable FDE: +3.301 m
+- Minimum perturbed recoverable FDE: +0.557 m
+- Robustness margin: -0.443 m
+- Route-context gap to gate: +0.443 m
+- Route-context priority: 5.182
 - Selected route matches diagnostic oracle: True
 
 Next actions:
 
-- Evaluate this selector behavior on a broader branchable continuation queue.
-- Broaden the branch replay queue with the same acceptance gate.
-- Keep this case as a positive control for selector rollout checks.
+- Add route-context features that can explain reduced-speed branch intent.
+- Test turn-lane, downstream topology, and traffic-control context before selector rollout.
+- Keep the speed-prior ablation as negative evidence, not a promoted default.
 
 ## Interpretation
 

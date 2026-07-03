@@ -73,7 +73,11 @@ All notable changes to ScenarioLens are documented here.
   reducing nearest-lane FDE by 63.578 m in the checked-in diagnostic report.
 - Waymo Motion ingestion now preserves the first 240 map features and appends a
   bounded two-hop linked-lane closure set, cutting continuation topology gaps
-  from 33 to 17 on the 100-scenario local validation slice.
+  from 33 to 17 on an earlier 100-scenario local validation slice.
+- Waymo Motion ingestion now extends that bounded linked-lane closure to five
+  hops and up to 240 closure features, raising the 100-scenario
+  lane-continuation study to 220 candidates, 141 linked-lane improvements, and
+  14 remaining topology gaps.
 - `scenariolens lane-continuation-study` workflow and
   `docs/reports/waymo_lane_continuation_study.md`, scanning the 100-scenario
   local Waymo slice for lane-end clamp candidates and publishing linked-lane
@@ -107,8 +111,8 @@ All notable changes to ScenarioLens are documented here.
   outcomes.
 - `scenariolens lane-continuation-route-context-guard-calibration` workflow
   and `docs/reports/waymo_lane_continuation_route_context_guard_calibration.md`,
-  sweeping endpoint-alignment gates and recommending a provisional -0.25 gate
-  that clears the current false hold while noting missing negative controls.
+  sweeping endpoint-alignment gates and keeping the current -0.05 gate with
+  0 false holds and 0 false promotions on the current branch replay queue.
 - Expanded lane-continuation branch queue artifacts at
   `docs/reports/waymo_lane_continuation_branch_coverage_expanded.md` and
   `docs/reports/waymo_lane_continuation_route_context_guard_calibration_expanded.md`,
@@ -120,8 +124,8 @@ All notable changes to ScenarioLens are documented here.
   `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_expanded.md`,
   and
   `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md`,
-  triaging 10 expanded topology blockers into 3 cap-recoverable linked-target
-  gaps and 7 terminal/directional selected-lane cases, replay-accepting 2/3
+  triaging 10 expanded topology blockers into 1 cap-recoverable linked-target
+  gap and 9 terminal/directional selected-lane cases, replay-accepting 3/5
   nearby recovery candidates, and selector-promoting 1 candidate with 0 false
   promotions.
 - `scenariolens lane-continuation-branch-coverage` workflow and
@@ -130,13 +134,13 @@ All notable changes to ScenarioLens are documented here.
   and route-context guard manifests into a public-safe expansion funnel.
 - `scenariolens lane-continuation-topology-gap-audit` workflow and
   `docs/reports/waymo_lane_continuation_topology_gap_audit.md`, reloading the
-  5 topology blockers from the replay manifest and showing that 2 blocker cases
-  remain cap-recoverable while 3 lanes are terminal or directional-link cases
+  5 topology blockers from the replay manifest and showing that 1 blocker case
+  remains cap-recoverable while 4 lanes are terminal or directional-link cases
   after linked-lane closure materialization.
 - `scenariolens lane-continuation-terminal-neighborhood-audit` workflow and
   `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md`,
-  reloading the 3 terminal/directional blockers and finding 2 nearby
-  alternate-lane recovery candidates plus 1 directional-link mismatch without
+  reloading the 4 terminal/directional blockers and finding 2 nearby
+  alternate-lane recovery candidates plus 2 directional-link mismatches without
   changing the default scorer.
 - `scenariolens lane-continuation-terminal-neighborhood-replay` workflow and
   `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md`,

@@ -211,8 +211,8 @@ Testing and verification:
   deterministic fixture, resolves the real stable warning's parsed lane chain
   `144 -> 190 -> 193`, and cuts nearest-lane FDE by 63.578 m on that case.
 - A lane-continuation validation study scans 100 real local Waymo scenarios and
-  finds 209 lane-end clamp candidates after linked-lane closure materialization:
-  133 linked-lane improvements, 57 regressions, and 17 topology gaps for
+  finds 220 lane-end clamp candidates after linked-lane closure materialization:
+  141 linked-lane improvements, 62 regressions, and 14 topology gaps for
   follow-up audit work.
 - A lane-continuation candidate plan turns that study into 15 follow-up items:
   five replay controls, five regression debug targets, and five topology-audit
@@ -224,27 +224,27 @@ Testing and verification:
   buckets: three stable route-choice regressions, one horizon-limit case, one
   link-worse-than-constant-velocity case, and five topology blockers.
 - A branch-selection diagnostic sweeps parsed alternatives for the five
-  continuation regression diagnostics, finding two branchable cases, three
-  single-chain cases, two non-oracle motion-context improvements, and two
+  continuation regression diagnostics, finding three branchable cases, two
+  single-chain cases, three non-oracle motion-context improvements, and three
   oracle upper-bound improvements while showing the simple anchor-heading
   selector is not enough.
 - A motion-context branch replay diagnostic replays those two branch choices
   under eight deterministic perturbations: the selected branch is preserved in
-  all eight trials, positive recoverable FDE holds in all eight trials, both
-  branches are accepted for broader selector evaluation, and the minimum
-  robustness margin is +28.627 m.
+  all eight trials, one branch is accepted for broader selector evaluation, and
+  one speed-sensitive route-context margin case is held.
 - An experimental history-speed-prior replay score tests a simple non-oracle
-  calibration idea on the same branch choices. It preserves both accepted cases
-  and leaves no speed-prior margin target unresolved.
+  calibration idea on the same branch choices. It preserves the accepted case
+  while keeping the route-context margin case held.
 - A branch rollout gate converts the replay outputs into a promote/hold queue:
-  both replay-accepted branches are ready for broader selector evaluation.
+  one replay-accepted branch is ready for broader selector evaluation and one
+  route-context margin case remains held.
 - A route-context guard study tests a stricter non-oracle promotion rule over
-  the same branchable queue: one robust branch is promoted, one replay-accepted
-  branch is held for route-feature follow-up, and the guard records one
-  replay-gate match plus one false hold for calibration.
+  the same branchable queue: one robust branch is promoted, one route-context
+  margin case is held for route-feature follow-up, and the guard records 2/2
+  replay-gate matches with 0 false holds.
 - A route-context guard calibration sweep tests 7 endpoint-gate policies against
-  those replay labels, moving current false holds from 1 to 0 with a provisional
-  -0.25 gate while documenting the lack of replay-rejected negative controls.
+  those replay labels, preserving 0 false holds and 0 false promotions with the
+  current -0.05 endpoint gate.
 - A branch coverage audit connects the continuation candidate, replay,
   diagnostics, branch-selection, branch-replay, and route-context guard
   manifests into one funnel: 15 continuation candidates, 10 replay-ready
@@ -257,18 +257,18 @@ Testing and verification:
   calibration keeps the current -0.05 endpoint gate with 0 false holds and 0
   false promotions on the expanded replay queue.
 - The expanded topology blocker follow-up reloads those 10 topology probes:
-  3 are cap-recoverable linked-target materialization gaps and 7 are
+  1 is a cap-recoverable linked-target materialization gap and 9 are
   terminal/directional selected-lane cases. A bounded neighborhood audit finds
-  3 nearby recovery candidates, replay accepts 2 under perturbation gates, and
-  the non-oracle selector promotes 1 while recording 0 false promotions and 1
-  false hold.
+  5 nearby recovery candidates, replay accepts 3 under perturbation gates, and
+  the non-oracle selector promotes 1 while recording 0 false promotions and 2
+  false holds.
 - A topology gap audit reloads those 5 topology blockers and compares capped
-  ScenarioLens map features with raw parsed map-feature IDs: 2 blocker cases
-  remain cap-recoverable, 3 are terminal or directional-link cases, and 0 raw
+  ScenarioLens map features with raw parsed map-feature IDs: 1 blocker case
+  remains cap-recoverable, 4 are terminal or directional-link cases, and 0 raw
   target misses remain unexplained.
-- A terminal-neighborhood audit reloads the 3 terminal/directional blockers and
-  finds 2 nearby alternate-lane recovery candidates plus 1 directional-link
-  mismatch, keeping them as replay/gating targets rather than selector claims.
+- A terminal-neighborhood audit reloads the 4 terminal/directional blockers and
+  finds 2 nearby alternate-lane recovery candidates plus 2 directional-link
+  mismatches, keeping them as replay/gating targets rather than selector claims.
 - A terminal-neighborhood replay gate force-replays those 2 nearby recovery
   candidates, accepts 1 alternate lane for a bounded selector experiment, and
   holds 1 regression case instead of overclaiming a selector win.
@@ -283,8 +283,9 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Materialize cap-recoverable closure features, broaden terminal-neighborhood
-   selector candidates, and add more replay-held branch negatives.
+3. Investigate the remaining cap-recoverable closure target, broaden
+   terminal-neighborhood selector candidates, and add more replay-held branch
+   negatives.
 4. Create curated scenario collections for pedestrian, cyclist, merge, and
    unprotected-turn cases.
 

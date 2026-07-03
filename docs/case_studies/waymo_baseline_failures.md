@@ -67,9 +67,9 @@ mechanism on a deterministic linked-lane fixture and resolves the real stable
 warning's parsed lane chain `144 -> 190 -> 193`, cutting the clamped
 nearest-lane FDE by 63.578 m on that case.
 The lane-continuation validation study then scans the same 100-scenario local
-Waymo slice and finds 209 lane-end clamp candidates after linked-lane closure
-materialization: 133 improve with linked lanes, 57 regress, and 17 remain
-topology gaps.
+Waymo slice and finds 220 lane-end clamp candidates after five-hop linked-lane
+closure materialization: 141 improve with linked lanes, 62 regress, and 14
+remain topology gaps.
 The candidate plan then promotes 15 rows into concrete follow-up queues: five
 replay controls, five regression debug targets, and five topology-audit
 blockers.
@@ -81,28 +81,28 @@ The route diagnostics report then classifies the follow-up work: three stable
 route-choice regressions, one horizon-limit case, one linked route that is worse
 than constant velocity, and five topology blockers.
 The branch-selection diagnostic then sweeps parsed alternatives for the five
-continuation regression diagnostics. Two cases expose branch alternatives with
-motion-context and oracle upper-bound gains, three cases have only a single
-parsed chain, and the simple anchor-heading selector improves none of them.
+continuation regression diagnostics. Three cases expose branch alternatives
+with motion-context and oracle upper-bound gains, two cases have only a single
+parsed chain, and the simple anchor-heading selector remains insufficient on
+its own.
 That is useful evidence: recent speed, horizon length, route-chain length, and
 downstream speed limits can recover some branch-choice error without using the
 observed future trajectory.
-The follow-up branch replay diagnostic then replays those two motion-context
-branch choices under eight deterministic perturbations. The selected branch is
-preserved in all eight trials, positive recoverable FDE holds in all eight
-trials, both branches are accepted for broader selector evaluation, and the
-minimum robustness margin is +28.627 m. A simple history-speed-prior replay
-ablation preserves both accepted cases, so the sharper policy target becomes
-guard calibration and broader branchable coverage rather than speed smoothing.
+The follow-up branch replay diagnostic then replays two motion-context branch
+choices under eight deterministic perturbations. The selected branch is
+preserved in all eight trials, one branch is accepted for broader selector
+evaluation, and one speed-sensitive route-context margin case is held. A simple
+history-speed-prior replay ablation preserves the accepted case, so the sharper
+policy target becomes route-context gating and broader negative-control
+coverage rather than speed smoothing.
 The branch rollout gate then converts those replay outcomes into a
-release-style promote/hold queue: both replayed motion-context branches are
-promoted for broader selector evaluation. The stricter route-context guard stays
-more conservative: it promotes 1 branch, holds 1 accepted replay candidate for
-route-feature follow-up, and records that false hold as calibration evidence.
-The follow-up calibration sweep tests endpoint-alignment gates against those
-replay labels and recommends a provisional -0.25 gate that would promote both
-accepted replay candidates on this queue, while explicitly noting that broader
-negative-control coverage was still missing at that stage.
+release-style promote/hold queue: one replayed motion-context branch is
+promoted for broader selector evaluation and one route-context margin case is
+held. The stricter route-context guard matches those replay labels exactly:
+it promotes 1 branch, holds 1 route-context margin case for route-feature
+follow-up, and records 0 false holds. The follow-up calibration sweep tests
+endpoint-alignment gates against those replay labels and keeps the current
+-0.05 endpoint gate with 0 false holds and 0 false promotions.
 The branch coverage audit then zooms out and turns the limitation into a
 measurable expansion queue: 15 continuation candidates, 10 replay-ready
 candidates, 5 branch-selection cases, 3 branchable cases, 1 route-guard
@@ -115,17 +115,17 @@ replay queue, the current route-context guard matches replay labels 2/2 with 0
 false holds and 0 false promotions.
 
 The topology gap audit follows the largest blocker class directly. After
-linked-lane closure materialization, the 100-scenario study now finds 209
-lane-continuation candidates, 133 linked-lane improvements, and 17 topology
-gaps. The top replay blockers are now 2 cap-recoverable cases and 3 terminal or
+five-hop linked-lane closure materialization, the 100-scenario study now finds
+220 lane-continuation candidates, 141 linked-lane improvements, and 14 topology
+gaps. The top replay blockers are now 1 cap-recoverable case and 4 terminal or
 directional-link cases with no raw target misses, turning the next step into
-selected-lane neighborhood and guard-calibration work.
+selected-lane neighborhood and one remaining parser-budget target.
 
-The terminal-neighborhood audit then reloads those 3 terminal/directional
+The terminal-neighborhood audit then reloads those 4 terminal/directional
 blockers and asks a sharper map-selection question: is the selected lane truly
 terminal, or is there a nearby heading-aligned lane with parsed continuation?
 On the current slice, 2 cases have nearby alternate-lane recovery candidates
-and 1 case is a directional-link mismatch. Those are not promoted as selector
+and 2 cases are directional-link mismatches. Those are not promoted as selector
 wins yet; they become replay and gating targets for the next branch-queue pass.
 
 The terminal-neighborhood replay gate now force-replays those 2 nearby recovery
@@ -150,6 +150,7 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Broaden the terminal-neighborhood selector experiment, reduce the expanded
-topology blockers, add more replay-held branch negatives, and rerun the
-closure-enabled branch queue beyond shards `00007` through `00010`.
+Investigate the remaining cap-recoverable lane-link target, broaden the
+terminal-neighborhood selector experiment, add more replay-held branch
+negatives, and rerun the closure-enabled branch queue beyond shards `00007`
+through `00010`.

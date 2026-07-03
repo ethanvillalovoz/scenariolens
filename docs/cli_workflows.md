@@ -396,7 +396,7 @@ scenariolens lane-continuation-study \
 This scans the same 100-scenario local Waymo slice for targets whose
 nearest-lane rollout would clamp at the end of a selected lane. The checked-in
 report keeps both sides of the diagnostic after linked-lane closure
-materialization: 133 linked-lane improvements, 57 regressions, and 17 topology
+materialization: 141 linked-lane improvements, 62 regressions, and 14 topology
 gaps.
 
 ## Lane-Continuation Candidate Plan
@@ -477,11 +477,11 @@ scenariolens lane-continuation-branch-replay \
 This replays motion-context branch choices under deterministic anchor-velocity
 perturbations. The checked-in report covers 2 branchable real-data cases and 8
 perturbation trials. The acceptance gate requires branch preservation and at
-least 1.0 m recoverable FDE in every valid perturbation: both branches pass that
-gate for broader selector evaluation, with 8/8 positive-gain trials and a
-+28.627 m minimum robustness margin. The report also evaluates an experimental
-history-speed-prior replay score; it preserves both accepted cases and leaves no
-speed-prior margin target unresolved. Treat this as open-loop selector evidence,
+least 1.0 m recoverable FDE in every valid perturbation: 1 branch passes that
+gate for broader selector evaluation while 1 speed-sensitive route-context
+margin case remains held. The report also evaluates an experimental
+history-speed-prior replay score; it preserves the accepted case while keeping
+the route-context margin case held. Treat this as open-loop selector evidence,
 not as route planning or a benchmark claim.
 
 ## Lane-Continuation Branch Rollout Gate
@@ -494,8 +494,8 @@ scenariolens lane-continuation-branch-rollout-gate \
 ```
 
 This converts branch replay diagnostics into a conservative promote/hold
-packet. The current real-data report promotes 2 branches for broader selector
-evaluation and holds 0 route-context margin cases. It is release-style evidence
+packet. The current real-data report promotes 1 branch for broader selector
+evaluation and holds 1 route-context margin case. It is release-style evidence
 triage, not a production release process, route planner, or benchmark claim.
 
 ## Lane-Continuation Route-Context Guard
@@ -512,8 +512,8 @@ This evaluates a stricter non-oracle promotion guard over the two current
 motion-context branch candidates. The guard uses route-fit, endpoint-alignment,
 and downstream speed-limit context from branch selection, then checks whether
 its promote/hold decision agrees with the replay gate. The current real-data
-report promotes 1 robust branch, holds 1 replay-accepted branch for
-route-feature follow-up, and records 1 replay-gate match plus 1 false hold.
+report promotes 1 robust branch, holds 1 route-context margin case for
+route-feature follow-up, and records 2/2 replay-gate matches with 0 false holds.
 Treat it as a candidate policy for larger branchable queues, not as a route
 planner or benchmark.
 
@@ -528,10 +528,9 @@ scenariolens lane-continuation-route-context-guard-calibration \
 
 This sweeps a small endpoint-alignment gate grid over the current guard
 decisions and compares each candidate policy with branch-replay labels. The
-current real-data report recommends a provisional -0.25 endpoint gate that
-clears the current false hold on the 2-case queue while keeping false
-promotions at 0. Treat it as calibration evidence for a larger branchable queue,
-not as a default policy change.
+current real-data report keeps the existing -0.05 endpoint gate with 0 false
+holds and 0 false promotions on the 2-case queue. Treat it as calibration
+evidence for a larger branchable queue, not as a default policy change.
 
 ## Lane-Continuation Branch Coverage Audit
 
@@ -640,9 +639,9 @@ scenariolens lane-continuation-terminal-neighborhood-selector \
 ```
 
 This follows the expanded branch queue's 10 topology blockers. The checked-in
-public reports classify 3 cap-recoverable linked-target gaps and 7
-terminal/directional selected-lane cases, find 3 nearby recovery candidates,
-accept 2/3 under deterministic replay perturbations, and promote 1 candidate
+public reports classify 1 cap-recoverable linked-target gap and 9
+terminal/directional selected-lane cases, find 5 nearby recovery candidates,
+accept 3/5 under deterministic replay perturbations, and promote 1 candidate
 under the bounded non-oracle selector with 0 false promotions. Treat these as
 diagnostic selector inputs, not default routing behavior.
 
@@ -657,9 +656,9 @@ scenariolens lane-continuation-topology-gap-audit \
 
 This audit reloads the topology blocker cases named by the replay manifest and
 compares capped ScenarioLens map features with raw parsed map-feature IDs. The
-current real-data report audits 5 topology blockers, finds 2 blocker cases that
-remain cap-recoverable after linked-lane closure materialization, and confirms
-3 terminal or directional-link cases. Treat it as an ingestion/topology
+current real-data report audits 5 topology blockers, finds 1 blocker case that
+remains cap-recoverable after linked-lane closure materialization, and confirms
+4 terminal or directional-link cases. Treat it as an ingestion/topology
 expansion target, not as route-planning evidence.
 
 ## Lane-Continuation Terminal Neighborhood Audit
@@ -673,8 +672,8 @@ scenariolens lane-continuation-terminal-neighborhood-audit \
 
 This audit reloads the terminal/directional blockers from the topology-gap
 manifest and inspects a bounded selected-lane neighborhood. The current
-real-data report audits 3 cases, finds 2 nearby aligned lane recovery
-candidates and 1 directional-link mismatch, and keeps the result framed as
+real-data report audits 4 cases, finds 2 nearby aligned lane recovery
+candidates and 2 directional-link mismatches, and keeps the result framed as
 replay/gating input rather than selector behavior.
 
 ## Lane-Continuation Terminal Neighborhood Replay
