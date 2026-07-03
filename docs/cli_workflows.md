@@ -585,6 +585,20 @@ real-data report evaluates 2 cases, accepts 1 alternate lane for a bounded
 selector experiment, holds 1 regression case, and keeps the result framed as
 diagnostic evidence rather than default selector behavior.
 
+## Lane-Continuation Terminal Neighborhood Selector
+
+```bash
+scenariolens lane-continuation-terminal-neighborhood-selector \
+  --terminal-neighborhood-replay-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_replay/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector.md
+```
+
+This experiment applies a bounded, non-oracle selector policy to the
+terminal-neighborhood replay candidates. The current real-data report promotes
+1 heading-aligned alternate lane, holds 1 low-heading case, and matches the
+replay gate on 2/2 decisions without changing default scorer behavior.
+
 ## Baseline Ablation
 
 ```bash

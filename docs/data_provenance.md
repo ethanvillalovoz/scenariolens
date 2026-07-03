@@ -285,6 +285,13 @@ accepted for a bounded selector experiment and 1 candidate is held because the
 alternate regresses. Raw Waymo records, local per-case packets, and map geometry
 remain ignored.
 
+The terminal-neighborhood selector experiment is checked in at
+[`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector.md`](reports/waymo_lane_continuation_terminal_neighborhood_selector.md).
+It applies a bounded, non-oracle geometry and route-extension policy to those 2
+replay candidates, promoting 1 alternate lane, holding 1 low-heading case, and
+matching the replay gate on 2/2 decisions. Replay labels validate the selector
+after the policy decision; they are not selector inputs.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

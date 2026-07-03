@@ -125,6 +125,12 @@ other regresses and remains held as diagnostic evidence. That gives the next
 selector experiment one bounded promotion target without pretending every
 nearby lane is better.
 
+The terminal-neighborhood selector experiment then applies a non-oracle
+geometry and route-extension policy to those 2 replay cases. It promotes the
+heading-aligned alternate lane, holds the low-heading regression case, and
+matches the replay gate on 2/2 decisions, turning the replay result into a
+testable selector rule rather than a hand-picked claim.
+
 ## Why It Matters
 
 Autonomy teams need tooling that finds where average-case performance hides
@@ -134,7 +140,7 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Turn the accepted terminal-neighborhood replay candidate into a bounded
-selector experiment, expose alternatives for the two single-chain
-branch-selection cases, calibrate the route-context guard false hold, and
-expand the closure-enabled branch queue beyond shards `00007` through `00010`.
+Broaden the terminal-neighborhood selector experiment, expose alternatives for
+the two single-chain branch-selection cases, calibrate the route-context guard
+false hold, and expand the closure-enabled branch queue beyond shards `00007`
+through `00010`.

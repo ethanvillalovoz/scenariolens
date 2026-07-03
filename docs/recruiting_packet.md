@@ -28,6 +28,7 @@ robotics, AI/ML, and software engineering internship conversations.
 - Topology gap audit: `docs/reports/waymo_lane_continuation_topology_gap_audit.md`
 - Terminal neighborhood audit: `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md`
 - Terminal neighborhood replay gate: `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md`
+- Terminal neighborhood selector experiment: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector.md`
 - Real lane-aware baseline diagnostic: `docs/reports/waymo_lane_aware_baseline_cross_shard.md`
 - Lane-aware debug casebook: `docs/reports/waymo_lane_aware_debug_casebook.md`
 - Replay candidate plan: `docs/reports/waymo_replay_candidate_plan.md`
@@ -250,6 +251,10 @@ Testing and verification:
 - A terminal-neighborhood replay gate force-replays those 2 nearby recovery
   candidates, accepts 1 alternate lane for a bounded selector experiment, and
   holds 1 regression case instead of overclaiming a selector win.
+- A terminal-neighborhood selector experiment applies a bounded non-oracle
+  geometry and route-extension policy, promoting 1 heading-aligned alternate
+  lane, holding 1 low-heading case, and matching the replay gate on 2/2
+  decisions.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
@@ -257,9 +262,8 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Turn the accepted terminal-neighborhood replay candidate into a bounded
-   selector experiment and calibrate the conservative route-context guard false
-   hold.
+3. Broaden the terminal-neighborhood selector experiment and calibrate the
+   conservative route-context guard false hold.
 4. Create curated scenario collections for pedestrian, cyclist, merge, and
    unprotected-turn cases.
 

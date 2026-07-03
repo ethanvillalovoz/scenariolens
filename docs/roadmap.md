@@ -422,10 +422,13 @@ those 3 cases, finding 2 nearby alternate-lane recovery candidates and 1
 directional-link mismatch. The terminal-neighborhood replay gate at
 `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md` then
 force-replays the 2 nearby recovery candidates, accepting 1 alternate lane for
-a bounded selector experiment and holding 1 regression case. Next work should
-turn the accepted candidate into a selector experiment, calibrate the
-route-context guard false hold, and expand the closure-enabled queue before
-claiming broader selector readiness.
+a bounded selector experiment and holding 1 regression case. The
+terminal-neighborhood selector experiment at
+`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector.md` then
+promotes 1 heading-aligned alternate lane, holds 1 low-heading case, and
+matches the replay gate on 2/2 decisions. Next work should broaden that
+selector experiment, calibrate the route-context guard false hold, and expand
+the closure-enabled queue before claiming broader selector readiness.
 
 ## Stretch Goals
 

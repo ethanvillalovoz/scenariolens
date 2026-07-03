@@ -171,6 +171,8 @@ and links back to reports and provenance.
   [`docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md`](reports/waymo_lane_continuation_terminal_neighborhood_audit.md)
 - Terminal neighborhood replay gate:
   [`docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md`](reports/waymo_lane_continuation_terminal_neighborhood_replay.md)
+- Terminal neighborhood selector experiment:
+  [`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector.md`](reports/waymo_lane_continuation_terminal_neighborhood_selector.md)
 - No-auth baseline ablation:
   [`docs/reports/baseline_ablation_study.md`](reports/baseline_ablation_study.md)
 - Shard expansion plan:

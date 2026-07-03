@@ -96,6 +96,12 @@ from scenariolens.lane_continuation_terminal_neighborhood_replay import (
     DEFAULT_TOP as DEFAULT_TERMINAL_NEIGHBORHOOD_REPLAY_TOP,
     generate_lane_continuation_terminal_neighborhood_replay,
 )
+from scenariolens.lane_continuation_terminal_neighborhood_selector import (
+    DEFAULT_MAX_ALTERNATE_DISTANCE_M,
+    DEFAULT_MIN_HEADING_ALIGNMENT as DEFAULT_TERMINAL_SELECTOR_HEADING_MIN,
+    DEFAULT_MIN_ROUTE_EXTENSION_M,
+    generate_lane_continuation_terminal_neighborhood_selector,
+)
 from scenariolens.map_match_audit import (
     DEFAULT_AUDIT_THRESHOLDS_M,
     generate_map_match_audit,
@@ -1188,6 +1194,54 @@ def lane_continuation_terminal_neighborhood_replay_command(
         f"Generated terminal-neighborhood replay for {result.case_count} "
         f"case(s): {result.accepted_case_count} accepted candidate(s), "
         f"{result.held_case_count} held candidate(s)."
+    )
+    return 0
+
+
+def lane_continuation_terminal_neighborhood_selector_command(
+    terminal_neighborhood_replay_manifest: str,
+    output_dir: str,
+    max_alternate_distance_m: float,
+    min_heading_alignment: float,
+    min_route_extension_m: float,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_lane_continuation_terminal_neighborhood_selector(
+            terminal_neighborhood_replay_manifest_path=(
+                terminal_neighborhood_replay_manifest
+            ),
+            output_dir=output_dir,
+            max_alternate_distance_m=max_alternate_distance_m,
+            min_heading_alignment=min_heading_alignment,
+            min_route_extension_m=min_route_extension_m,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(
+        "Wrote lane-continuation-terminal-neighborhood-selector manifest "
+        f"to {result.manifest_path}"
+    )
+    print(
+        "Wrote lane-continuation-terminal-neighborhood-selector report "
+        f"to {result.report_path}"
+    )
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print(
+            "Lane-continuation terminal-neighborhood selector is not ready. "
+            "See manifest.json."
+        )
+        return 2
+    print(
+        f"Generated terminal-neighborhood selector for {result.case_count} "
+        f"case(s): {result.promoted_case_count} promoted candidate(s), "
+        f"{result.held_case_count} held candidate(s), "
+        f"{result.replay_gate_match_count} replay-gate match(es)."
     )
     return 0
 
@@ -2428,6 +2482,52 @@ def main() -> int:
             "replay report copy."
         ),
     )
+    lane_continuation_terminal_selector_parser = subparsers.add_parser(
+        "lane-continuation-terminal-neighborhood-selector",
+        help=(
+            "Run a bounded selector experiment over terminal-neighborhood "
+            "replay candidates."
+        ),
+    )
+    lane_continuation_terminal_selector_parser.add_argument(
+        "--terminal-neighborhood-replay-manifest",
+        required=True,
+        help=(
+            "Manifest produced by scenariolens "
+            "lane-continuation-terminal-neighborhood-replay."
+        ),
+    )
+    lane_continuation_terminal_selector_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_lane_continuation_terminal_neighborhood_selector",
+        help="Directory for terminal-neighborhood selector manifest.json and report.md.",
+    )
+    lane_continuation_terminal_selector_parser.add_argument(
+        "--max-alternate-distance-m",
+        type=float,
+        default=DEFAULT_MAX_ALTERNATE_DISTANCE_M,
+        help="Maximum alternate-lane distance allowed by the selector policy.",
+    )
+    lane_continuation_terminal_selector_parser.add_argument(
+        "--min-heading-alignment",
+        type=float,
+        default=DEFAULT_TERMINAL_SELECTOR_HEADING_MIN,
+        help="Minimum selected/alternate lane heading alignment.",
+    )
+    lane_continuation_terminal_selector_parser.add_argument(
+        "--min-route-extension-m",
+        type=float,
+        default=DEFAULT_MIN_ROUTE_EXTENSION_M,
+        help="Minimum added route remaining distance for alternate promotion.",
+    )
+    lane_continuation_terminal_selector_parser.add_argument(
+        "--public-report",
+        default=None,
+        help=(
+            "Optional Markdown path for a public-safe terminal-neighborhood "
+            "selector report copy."
+        ),
+    )
     heading_replay_parser = subparsers.add_parser(
         "heading-replay-prototype",
         help=(
@@ -2931,6 +3031,17 @@ def main() -> int:
             output_dir=args.output_dir,
             top=args.top,
             minimum_stable_gain_m=args.minimum_stable_gain_m,
+            public_report=args.public_report,
+        )
+    if args.command == "lane-continuation-terminal-neighborhood-selector":
+        return lane_continuation_terminal_neighborhood_selector_command(
+            terminal_neighborhood_replay_manifest=(
+                args.terminal_neighborhood_replay_manifest
+            ),
+            output_dir=args.output_dir,
+            max_alternate_distance_m=args.max_alternate_distance_m,
+            min_heading_alignment=args.min_heading_alignment,
+            min_route_extension_m=args.min_route_extension_m,
             public_report=args.public_report,
         )
     if args.command == "heading-replay-prototype":

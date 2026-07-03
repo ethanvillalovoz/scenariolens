@@ -123,6 +123,10 @@ All notable changes to ScenarioLens are documented here.
   `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md`,
   force-replaying the 2 nearby recovery candidates, accepting 1 alternate lane
   for a bounded selector experiment, and holding 1 regression case.
+- `scenariolens lane-continuation-terminal-neighborhood-selector` workflow and
+  `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector.md`,
+  applying a bounded non-oracle selector policy that promotes 1 alternate lane,
+  holds 1 low-heading case, and matches the replay gate on 2/2 decisions.
 - Lane-aware fallback reason summaries in Markdown/JSON reports and the static
   Scenario Explorer dashboard payload.
 - Short animated demo GIF for the README public surface.

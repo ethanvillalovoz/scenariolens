@@ -169,6 +169,12 @@ alternate lane for a bounded selector experiment, holds 1 regression case, and
 keeps the result public-safe by publishing derived replay/gate summaries rather
 than raw map geometry or per-scenario packets.
 
+The terminal-neighborhood selector experiment turns that replay evidence into
+a bounded non-oracle policy. It promotes the heading-aligned alternate lane,
+holds the low-heading regression case, and matches the replay gate on 2/2
+decisions while using replay labels only as validation after the selector
+decision.
+
 ## Map-Match Audit
 
 The map-match audit handles cases that are not ready to be treated as replay
@@ -198,8 +204,7 @@ and links to the public reports.
 - Add a dataset adapter for another public motion dataset.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
-- Turn the accepted terminal-neighborhood replay candidate into a bounded
-  selector experiment.
+- Broaden the terminal-neighborhood selector experiment across more candidates.
 - Calibrate the route-context guard false hold against accepted branch replay
   evidence.
 - Rerun the closure-enabled branch queue across more validation shards.
