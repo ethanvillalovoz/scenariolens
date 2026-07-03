@@ -282,6 +282,23 @@ guard/calibration pass records 2/2 replay-gate matches with 0 false holds and
 0 false promotions on that small replay queue. Raw TFRecords and local replay
 packets remain ignored, and this is still not a full Waymo benchmark claim.
 
+The expanded topology gap audit is checked in at
+[`docs/reports/waymo_lane_continuation_topology_gap_audit_expanded.md`](reports/waymo_lane_continuation_topology_gap_audit_expanded.md).
+It reloads the 10 topology blockers from the expanded replay manifest and
+publishes only derived topology classifications: 3 cap-recoverable linked
+targets, 7 terminal/directional selected lanes, 0 raw target misses, and 6 maps
+at the feature cap. The paired expanded terminal-neighborhood audit, replay
+gate, and selector experiment are checked in at
+[`docs/reports/waymo_lane_continuation_terminal_neighborhood_audit_expanded.md`](reports/waymo_lane_continuation_terminal_neighborhood_audit_expanded.md),
+[`docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_expanded.md`](reports/waymo_lane_continuation_terminal_neighborhood_replay_expanded.md),
+and
+[`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md`](reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md).
+Those reports inspect 7 terminal/directional cases, find 3 nearby recovery
+candidates and 4 directional gaps, replay the 3 recovery candidates, accept 2
+under perturbation gates, and promote 1 candidate under a bounded non-oracle
+selector. Raw Waymo records, raw map geometry, and per-case local packets remain
+ignored.
+
 The topology gap audit is checked in at
 [`docs/reports/waymo_lane_continuation_topology_gap_audit.md`](reports/waymo_lane_continuation_topology_gap_audit.md).
 It reloads the ignored local source scenarios referenced by the replay manifest,

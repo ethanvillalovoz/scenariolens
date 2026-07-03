@@ -171,6 +171,14 @@ and links back to reports and provenance.
   [`docs/reports/waymo_lane_continuation_branch_coverage_expanded.md`](reports/waymo_lane_continuation_branch_coverage_expanded.md)
 - Expanded route-context guard calibration:
   [`docs/reports/waymo_lane_continuation_route_context_guard_calibration_expanded.md`](reports/waymo_lane_continuation_route_context_guard_calibration_expanded.md)
+- Expanded topology gap audit:
+  [`docs/reports/waymo_lane_continuation_topology_gap_audit_expanded.md`](reports/waymo_lane_continuation_topology_gap_audit_expanded.md)
+- Expanded terminal neighborhood audit:
+  [`docs/reports/waymo_lane_continuation_terminal_neighborhood_audit_expanded.md`](reports/waymo_lane_continuation_terminal_neighborhood_audit_expanded.md)
+- Expanded terminal neighborhood replay gate:
+  [`docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_expanded.md`](reports/waymo_lane_continuation_terminal_neighborhood_replay_expanded.md)
+- Expanded terminal neighborhood selector experiment:
+  [`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md`](reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md)
 - Topology gap audit:
   [`docs/reports/waymo_lane_continuation_topology_gap_audit.md`](reports/waymo_lane_continuation_topology_gap_audit.md)
 - Terminal neighborhood audit:

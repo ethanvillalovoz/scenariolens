@@ -428,6 +428,19 @@ adds 1 replay-held route-context margin negative and validates the current
 2-case replay queue. Linked-lane
 closure materialization now cuts study topology gaps from 33 to 17 and raises
 linked-lane improvements from 96 to 133. The topology gap audit at
+`docs/reports/waymo_lane_continuation_topology_gap_audit_expanded.md` follows
+the expanded topology probes and classifies 10 blockers into 3 cap-recoverable
+linked-target materialization gaps and 7 terminal/directional selected-lane
+cases. The expanded terminal-neighborhood audit at
+`docs/reports/waymo_lane_continuation_terminal_neighborhood_audit_expanded.md`
+finds 3 nearby alternate-lane recovery candidates and 4 directional gaps. The
+expanded replay gate at
+`docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_expanded.md`
+accepts 2 of those 3 recovery candidates under deterministic perturbations,
+and the expanded selector experiment at
+`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md`
+promotes 1 candidate with 0 false promotions and 1 false hold. The initial
+topology gap audit at
 `docs/reports/waymo_lane_continuation_topology_gap_audit.md` then shows that
 2 blocker cases remain cap-recoverable and 3 are terminal/directional. The
 terminal-neighborhood audit at
@@ -440,10 +453,11 @@ a bounded selector experiment and holding 1 regression case. The
 terminal-neighborhood selector experiment at
 `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector.md` then
 promotes 1 heading-aligned alternate lane, holds 1 low-heading case, and
-matches the replay gate on 2/2 decisions. Next work should broaden that
-selector experiment, reduce expanded topology blockers, add more replay-held
-branch negatives, and run the closure-enabled queue beyond the current
-100-scenario slice before claiming broader selector readiness.
+matches the replay gate on 2/2 decisions. Next work should materialize the
+3 expanded cap-recoverable linked targets, broaden the terminal-neighborhood
+selector experiment, add more replay-held branch negatives, and run the
+closure-enabled queue beyond the current 100-scenario slice before claiming
+broader selector readiness.
 
 ## Stretch Goals
 

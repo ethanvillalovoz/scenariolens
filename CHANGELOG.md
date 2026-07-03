@@ -114,6 +114,16 @@ All notable changes to ScenarioLens are documented here.
   `docs/reports/waymo_lane_continuation_route_context_guard_calibration_expanded.md`,
   raising the queue to 30 candidates, 20 replay cases, 10 topology probes, 6
   branchable cases, and 1 replay-held route-context negative control.
+- Expanded topology/terminal-neighborhood follow-up reports at
+  `docs/reports/waymo_lane_continuation_topology_gap_audit_expanded.md`,
+  `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit_expanded.md`,
+  `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_expanded.md`,
+  and
+  `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md`,
+  triaging 10 expanded topology blockers into 3 cap-recoverable linked-target
+  gaps and 7 terminal/directional selected-lane cases, replay-accepting 2/3
+  nearby recovery candidates, and selector-promoting 1 candidate with 0 false
+  promotions.
 - `scenariolens lane-continuation-branch-coverage` workflow and
   `docs/reports/waymo_lane_continuation_branch_coverage.md`, connecting the
   continuation candidate, replay, diagnostics, branch-selection, branch-replay,

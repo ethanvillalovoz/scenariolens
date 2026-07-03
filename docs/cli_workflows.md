@@ -615,6 +615,37 @@ margin negative. The expanded guard calibration keeps the current -0.05
 endpoint gate with 0 false holds and 0 false promotions on the expanded replay
 queue. Treat this as a larger real-slice diagnostic, not full-dataset coverage.
 
+## Expanded Lane-Continuation Topology Follow-Up
+
+```bash
+scenariolens lane-continuation-topology-gap-audit \
+  --replay-manifest data/processed/waymo_lane_continuation_replay_prototype_expanded/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_topology_gap_audit_expanded \
+  --public-report docs/reports/waymo_lane_continuation_topology_gap_audit_expanded.md
+
+scenariolens lane-continuation-terminal-neighborhood-audit \
+  --topology-manifest data/processed/waymo_lane_continuation_topology_gap_audit_expanded/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_audit_expanded \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_audit_expanded.md
+
+scenariolens lane-continuation-terminal-neighborhood-replay \
+  --terminal-neighborhood-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_audit_expanded/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_replay_expanded \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_expanded.md
+
+scenariolens lane-continuation-terminal-neighborhood-selector \
+  --terminal-neighborhood-replay-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_replay_expanded/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector_expanded \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md
+```
+
+This follows the expanded branch queue's 10 topology blockers. The checked-in
+public reports classify 3 cap-recoverable linked-target gaps and 7
+terminal/directional selected-lane cases, find 3 nearby recovery candidates,
+accept 2/3 under deterministic replay perturbations, and promote 1 candidate
+under the bounded non-oracle selector with 0 false promotions. Treat these as
+diagnostic selector inputs, not default routing behavior.
+
 ## Lane-Continuation Topology Gap Audit
 
 ```bash

@@ -163,6 +163,13 @@ route-context margin negative control. The paired expanded guard calibration
 keeps the current -0.05 endpoint gate as the provisional target with 0 false
 holds and 0 false promotions on the expanded 2-case replay queue.
 
+The expanded topology follow-up turns those 10 topology probes into a sharper
+work queue. It finds 3 cap-recoverable linked-target materialization gaps and
+7 terminal/directional selected-lane cases. The terminal-neighborhood audit
+then finds 3 nearby recovery candidates, replay accepts 2 under deterministic
+perturbation gates, and the bounded selector promotes 1 candidate while holding
+2 for additional context.
+
 The topology gap audit now measures what remains after linked-lane closure
 materialization. The ingestion layer preserves the first 240 map features and
 adds a bounded two-hop closure set for referenced lane links, cutting study
@@ -217,9 +224,10 @@ and links to the public reports.
 - Add a dataset adapter for another public motion dataset.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
+- Materialize cap-recoverable closure features for expanded topology blockers.
 - Broaden the terminal-neighborhood selector experiment across more candidates.
 - Rerun the expanded closure-enabled branch queue across more validation shards.
-- Reduce topology blockers and add more replay-held branch negatives.
+- Add more replay-held branch negatives.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and
   route/intent priors.
 - Analyze heading-aware replay stability across more validation shards.

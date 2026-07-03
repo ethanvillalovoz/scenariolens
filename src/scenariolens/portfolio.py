@@ -149,6 +149,14 @@ def portfolio_markdown(
         "`docs/reports/waymo_lane_continuation_branch_coverage_expanded.md`.",
         "- Expanded route-context guard calibration is checked in under "
         "`docs/reports/waymo_lane_continuation_route_context_guard_calibration_expanded.md`.",
+        "- Expanded topology gap audit is checked in under "
+        "`docs/reports/waymo_lane_continuation_topology_gap_audit_expanded.md`.",
+        "- Expanded terminal-neighborhood audit is checked in under "
+        "`docs/reports/waymo_lane_continuation_terminal_neighborhood_audit_expanded.md`.",
+        "- Expanded terminal-neighborhood replay gate is checked in under "
+        "`docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_expanded.md`.",
+        "- Expanded terminal-neighborhood selector experiment is checked in under "
+        "`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md`.",
         "- Topology gap audit is checked in under "
         "`docs/reports/waymo_lane_continuation_topology_gap_audit.md`.",
         "- Terminal-neighborhood audit is checked in under "
@@ -221,7 +229,7 @@ def portfolio_markdown(
             "- The context replay candidate plan is a readiness queue, not completed simulation.",
             "- The context replay prototype is open-loop diagnostic evidence, not closed-loop simulation.",
             "- The context route/intent audit is a diagnostic follow-up, not a route planner.",
-            "- The lane-link continuation prototype, validation study, candidate plan, replay prototype, route diagnostics, branch-selection diagnostic, branch replay, branch rollout gate, route-context guard, guard calibration, branch coverage audit, topology gap audit, terminal-neighborhood audit, replay gate, and selector experiment are topology diagnostic evidence, not route planning or a production release process.",
+            "- The lane-link continuation prototype, validation study, candidate plan, replay prototype, route diagnostics, branch-selection diagnostic, branch replay, branch rollout gate, route-context guard, guard calibration, branch coverage audits, topology gap audits, terminal-neighborhood audits, replay gates, and selector experiments are topology diagnostic evidence, not route planning or a production release process.",
             "- The heading-aware lane selector is an ablation, not a replacement for the default scorer.",
             "- The heading-aware replay candidate plan is a queue for replay experiments, not completed simulation.",
             "- The heading-aware replay prototype is open-loop diagnostic evidence, not closed-loop simulation.",
@@ -231,8 +239,9 @@ def portfolio_markdown(
             "",
             "- Expand the documented local-slice recipe across more Waymo Motion validation shards.",
             "- Compare baseline ADE/FDE distributions across more validation shards.",
+            "- Materialize cap-recoverable closure features for expanded topology blockers.",
             "- Broaden the terminal-neighborhood selector experiment across more candidates.",
-            "- Reduce expanded topology blockers and add more replay-held branch negatives.",
+            "- Add more replay-held branch negatives.",
             "- Expand the closure-enabled branch queue beyond the current 100-scenario slice.",
             "- Graduate stable open-loop replay candidates into an optional Waymax/JAX path.",
             "- Create curated scenario collections for pedestrian, cyclist, merge, and unprotected-turn cases.",

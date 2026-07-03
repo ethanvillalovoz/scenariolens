@@ -28,6 +28,10 @@ robotics, AI/ML, and software engineering internship conversations.
 - Branch coverage audit: `docs/reports/waymo_lane_continuation_branch_coverage.md`
 - Expanded branch coverage audit: `docs/reports/waymo_lane_continuation_branch_coverage_expanded.md`
 - Expanded guard calibration: `docs/reports/waymo_lane_continuation_route_context_guard_calibration_expanded.md`
+- Expanded topology gap audit: `docs/reports/waymo_lane_continuation_topology_gap_audit_expanded.md`
+- Expanded terminal neighborhood audit: `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit_expanded.md`
+- Expanded terminal neighborhood replay gate: `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_expanded.md`
+- Expanded terminal neighborhood selector experiment: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md`
 - Topology gap audit: `docs/reports/waymo_lane_continuation_topology_gap_audit.md`
 - Terminal neighborhood audit: `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md`
 - Terminal neighborhood replay gate: `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md`
@@ -252,6 +256,12 @@ Testing and verification:
   replay-held route-context margin negative. The paired expanded guard
   calibration keeps the current -0.05 endpoint gate with 0 false holds and 0
   false promotions on the expanded replay queue.
+- The expanded topology blocker follow-up reloads those 10 topology probes:
+  3 are cap-recoverable linked-target materialization gaps and 7 are
+  terminal/directional selected-lane cases. A bounded neighborhood audit finds
+  3 nearby recovery candidates, replay accepts 2 under perturbation gates, and
+  the non-oracle selector promotes 1 while recording 0 false promotions and 1
+  false hold.
 - A topology gap audit reloads those 5 topology blockers and compares capped
   ScenarioLens map features with raw parsed map-feature IDs: 2 blocker cases
   remain cap-recoverable, 3 are terminal or directional-link cases, and 0 raw
@@ -273,8 +283,8 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Broaden the terminal-neighborhood selector experiment, reduce expanded
-   topology blockers, and add more replay-held branch negatives.
+3. Materialize cap-recoverable closure features, broaden terminal-neighborhood
+   selector candidates, and add more replay-held branch negatives.
 4. Create curated scenario collections for pedestrian, cyclist, merge, and
    unprotected-turn cases.
 

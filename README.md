@@ -107,6 +107,10 @@ Then open `http://localhost:8000/demo/`.
 - [Branch coverage audit](docs/reports/waymo_lane_continuation_branch_coverage.md)
 - [Expanded branch coverage audit](docs/reports/waymo_lane_continuation_branch_coverage_expanded.md)
 - [Expanded route-context guard calibration](docs/reports/waymo_lane_continuation_route_context_guard_calibration_expanded.md)
+- [Expanded topology gap audit](docs/reports/waymo_lane_continuation_topology_gap_audit_expanded.md)
+- [Expanded terminal neighborhood audit](docs/reports/waymo_lane_continuation_terminal_neighborhood_audit_expanded.md)
+- [Expanded terminal neighborhood replay gate](docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_expanded.md)
+- [Expanded terminal neighborhood selector experiment](docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md)
 - [Topology gap audit](docs/reports/waymo_lane_continuation_topology_gap_audit.md)
 - [Terminal neighborhood audit](docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md)
 - [Terminal neighborhood replay gate](docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md)
@@ -282,8 +286,21 @@ smoke test. The prototype can:
   branchable cases, 1 accepted branch replay, 1 route-context margin negative,
   and a route-context guard/calibration pass with 0 false holds and 0 false
   promotions on the expanded replay queue,
-- audit the topology blockers by comparing capped ScenarioLens map features
-  with raw parsed map-feature IDs, showing 2 blocker cases remain
+- audit the expanded topology blockers by comparing capped ScenarioLens map
+  features with raw parsed map-feature IDs, showing 3 blocker cases remain
+  cap-recoverable and 7 selected lanes are terminal/directional cases after
+  closure materialization,
+- audit those 7 expanded terminal/directional lane neighborhoods, finding 3
+  nearby alternate-lane recovery candidates, 4 directional-link mismatches, and
+  0 true terminal/map-boundary cases before promoting selector claims,
+- replay and gate those 3 expanded nearby recovery candidates, accepting 2
+  alternate lanes for bounded selector experiments and holding 1 regression
+  case,
+- run a bounded expanded terminal-neighborhood selector experiment that promotes
+  1 alternate lane, holds 2 cases for context, matches 2/3 replay labels, and
+  records 0 false promotions plus 1 false hold,
+- audit the initial topology blockers by comparing capped ScenarioLens map
+  features with raw parsed map-feature IDs, showing 2 blocker cases remain
   cap-recoverable and 3 lanes are terminal or directional-link cases after
   closure materialization,
 - audit those 3 terminal/directional lane neighborhoods, finding 2 nearby
@@ -305,9 +322,10 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to expand the closure-enabled branch queue beyond the
-current 100-scenario slice, reduce topology blockers, and turn the new
-route-context margin negative into richer selector-context tests.
+The next milestone is to materialize cap-recoverable closure features for the
+expanded topology queue, broaden terminal-neighborhood selector candidates, add
+more replay-held negatives, and then expand beyond the current 100-scenario
+slice.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).
