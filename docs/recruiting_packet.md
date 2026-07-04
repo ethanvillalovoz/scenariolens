@@ -33,6 +33,7 @@ robotics, AI/ML, and software engineering internship conversations.
 - Expanded terminal neighborhood replay gate: `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_expanded.md`
 - Expanded terminal neighborhood selector experiment: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md`
 - Expanded terminal neighborhood selector calibration: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md`
+- Expanded terminal selector visual casebook: `docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_expanded.md`
 - Topology gap audit: `docs/reports/waymo_lane_continuation_topology_gap_audit.md`
 - Terminal neighborhood audit: `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md`
 - Terminal neighborhood replay gate: `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md`
@@ -281,6 +282,9 @@ Testing and verification:
   gate candidates and recommends a provisional 40 m route-extension gate that
   changes 2 false holds into accepted promotions while keeping 0 false
   promotions on the current 6-case replay queue.
+- A visual terminal selector casebook turns those 6 decisions into derived SVG
+  cards, showing replay gain, route extension, heading alignment, distance
+  gates, and hold reasons without publishing raw trajectories or map geometry.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 

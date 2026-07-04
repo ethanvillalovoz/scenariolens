@@ -181,6 +181,8 @@ and links back to reports and provenance.
   [`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md`](reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md)
 - Expanded terminal neighborhood selector calibration:
   [`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md`](reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md)
+- Expanded terminal selector visual casebook:
+  [`docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_expanded.md`](reports/waymo_lane_continuation_terminal_neighborhood_casebook_expanded.md)
 - Topology gap audit:
   [`docs/reports/waymo_lane_continuation_topology_gap_audit.md`](reports/waymo_lane_continuation_topology_gap_audit.md)
 - Terminal neighborhood audit:

@@ -637,6 +637,16 @@ scenariolens lane-continuation-terminal-neighborhood-selector \
   --terminal-neighborhood-replay-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_replay_expanded/manifest.json \
   --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector_expanded \
   --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md
+
+scenariolens lane-continuation-terminal-neighborhood-selector-calibration \
+  --terminal-neighborhood-replay-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_replay_expanded/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md
+
+scenariolens lane-continuation-terminal-neighborhood-casebook \
+  --selector-calibration-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_casebook_expanded \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_expanded.md
 ```
 
 This follows the expanded branch queue's 10 topology blockers. The checked-in
@@ -644,8 +654,9 @@ public reports classify 0 cap-recoverable linked-target gaps and 10
 terminal/directional selected-lane cases, find 6 nearby recovery candidates,
 accept 3/6 ready candidates under deterministic replay perturbations, and
 promote 1 candidate under the bounded non-oracle selector with 0 false
-promotions. Treat these as diagnostic selector inputs, not default routing
-behavior.
+promotions. The calibration reaches 6/6 replay-label agreement, and the visual
+casebook turns those six decisions into derived SVG cards for quick review.
+Treat these as diagnostic selector inputs, not default routing behavior.
 
 ## Lane-Continuation Topology Gap Audit
 
@@ -722,6 +733,21 @@ terminal-neighborhood replay labels. The checked-in report recommends a
 provisional 40 m route-extension gate, improving replay-label agreement from
 4/6 to 6/6 with 0 false promotions on the current queue. Treat it as a
 calibration target for broader evidence, not a production route selector.
+
+## Lane-Continuation Terminal Neighborhood Casebook
+
+```bash
+scenariolens lane-continuation-terminal-neighborhood-casebook \
+  --selector-calibration-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_casebook_expanded \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_expanded.md
+```
+
+This converts the expanded selector calibration into a public-safe visual
+casebook. The checked-in report publishes six derived SVG cards: 3
+replay-accepted recoveries, 3 held negative controls, the current versus
+recommended selector decision, and the gate evidence behind each choice. The
+cards are metric diagrams, not trajectory or raw map overlays.
 
 ## Baseline Ablation
 

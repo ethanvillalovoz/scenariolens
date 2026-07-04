@@ -6,6 +6,11 @@ All notable changes to ScenarioLens are documented here.
 
 ### Added
 
+- `scenariolens lane-continuation-terminal-neighborhood-casebook` workflow and
+  `docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_expanded.md`,
+  publishing six derived SVG decision cards for the expanded terminal selector
+  queue: 3 replay-accepted recoveries, 3 held negative controls, and 0 raw
+  Waymo trajectories or map geometry.
 - `scenariolens lane-continuation-terminal-neighborhood-selector-calibration`
   workflow and
   `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md`,

@@ -72,7 +72,8 @@ prototype, route-diagnostics casebook, branch-selection diagnostic, and
 motion-context branch replay, branch rollout gate, route-context guard, and
 route-context guard calibration, branch coverage, expanded branch coverage,
 guard validation, expanded topology gap and terminal-neighborhood audits, plus
-terminal-neighborhood replay gates and bounded selector experiments,
+terminal-neighborhood replay gates, bounded selector experiments, and derived
+terminal selector visual casebooks,
 Markdown/JSON reports, a local real-data validation packet workflow, static
 dashboard data, and 2D SVG trajectory rendering with forecast overlays.
 

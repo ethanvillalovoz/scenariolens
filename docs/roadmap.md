@@ -442,7 +442,11 @@ expanded selector calibration at
 `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md`
 sweeps 30 gate candidates and recommends a provisional 40 m route-extension
 gate that reaches 6/6 replay-label agreement with 0 false promotions on the
-current queue while leaving the default selector unchanged. The initial
+current queue while leaving the default selector unchanged. The visual
+casebook at
+`docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_expanded.md`
+turns those 6 decisions into derived SVG cards for reviewer inspection without
+publishing raw trajectories or map geometry. The initial
 topology gap audit at
 `docs/reports/waymo_lane_continuation_topology_gap_audit.md` then shows that
 0 blocker cases remain cap-recoverable and 5 are terminal/directional. The

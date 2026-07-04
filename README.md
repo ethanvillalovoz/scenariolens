@@ -112,6 +112,7 @@ Then open `http://localhost:8000/demo/`.
 - [Expanded terminal neighborhood replay gate](docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_expanded.md)
 - [Expanded terminal neighborhood selector experiment](docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md)
 - [Expanded terminal neighborhood selector calibration](docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md)
+- [Expanded terminal selector visual casebook](docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_expanded.md)
 - [Topology gap audit](docs/reports/waymo_lane_continuation_topology_gap_audit.md)
 - [Terminal neighborhood audit](docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md)
 - [Terminal neighborhood replay gate](docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md)
@@ -719,6 +720,15 @@ PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-terminal-neighborho
   --terminal-neighborhood-replay-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_replay/manifest.json \
   --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector \
   --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector.md
+```
+
+Generate derived visual cards from the expanded selector calibration:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-terminal-neighborhood-casebook \
+  --selector-calibration-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_casebook_expanded \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_expanded.md
 ```
 
 Run the no-auth baseline ablation:

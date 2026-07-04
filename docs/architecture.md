@@ -43,6 +43,7 @@ flowchart LR
     AK --> AL["Terminal neighborhood audit"]
     AL --> AM["Terminal neighborhood replay gate"]
     AM --> AN["Terminal neighborhood selector experiment"]
+    AN --> AO["Terminal selector visual casebook"]
     Q --> T["Map-match threshold audit"]
     F --> I["Static dashboard payload"]
     V --> I
@@ -59,6 +60,7 @@ flowchart LR
     AL --> K
     AM --> K
     AN --> K
+    AO --> K
     T --> K
     U --> K
     W --> K
@@ -99,6 +101,7 @@ flowchart LR
 | Lane-continuation terminal neighborhood replay | `src/scenariolens/lane_continuation_terminal_neighborhood_replay.py` | Force-replays selected terminal lanes against nearby alternate-lane recovery candidates, applies deterministic perturbations, and gates candidates before broader selector experiments. |
 | Lane-continuation terminal neighborhood selector | `src/scenariolens/lane_continuation_terminal_neighborhood_selector.py` | Tests a bounded non-oracle selector policy over terminal-neighborhood replay cases, using local geometry and route-extension cues before checking agreement with replay-gate labels. |
 | Lane-continuation terminal neighborhood selector calibration | `src/scenariolens/lane_continuation_terminal_neighborhood_selector_calibration.py` | Sweeps selector distance, heading, and route-extension gates against terminal-neighborhood replay labels, recommends provisional calibration targets, and keeps default selector/scorer behavior unchanged until coverage improves. |
+| Lane-continuation terminal neighborhood casebook | `src/scenariolens/lane_continuation_terminal_neighborhood_casebook.py` | Converts selector calibration manifests into public-safe SVG decision cards and a casebook, showing replay gain, route extension, heading alignment, hold flags, and recommended decisions without publishing raw trajectories or map geometry. |
 | Heading replay prototype | `src/scenariolens/heading_replay_prototype.py` | Reloads heading-ready local scenarios, compares nearest-lane and heading-aware open-loop rollouts, applies deterministic perturbations, and publishes selector stability summaries. |
 | Map-match audit | `src/scenariolens/map_match_audit.py` | Reloads fallback-heavy debug cases, sweeps lane-match thresholds, and publishes public-safe evidence about whether wider lane acceptance improves or worsens FDE before changing matcher behavior. |
 | Failure study | `src/scenariolens/failure_study.py` | Aggregates ADE/FDE, miss rate, tag-level failures, score-component failures, and hardest scenario ids without publishing raw data. |

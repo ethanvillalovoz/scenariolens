@@ -202,6 +202,12 @@ candidates. It recommends a provisional 40 m route-extension gate that changes
 the current queue, and keeps the default selector unchanged until broader
 negative coverage exists.
 
+The terminal selector casebook then turns that calibration manifest into a
+public-safe visual artifact. It writes six derived SVG cards with replay gain,
+route extension, heading alignment, alternate-lane distance, current decision,
+recommended decision, and hold flags. These cards are metric diagrams for
+reviewers, not raw trajectory or map overlays.
+
 ## Map-Match Audit
 
 The map-match audit handles cases that are not ready to be treated as replay

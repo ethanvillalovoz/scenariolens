@@ -338,6 +338,15 @@ replay-label agreement from 4/6 to 6/6 with 0 false promotions on this queue.
 The default selector is unchanged, and raw Waymo records plus map geometry
 remain local and ignored.
 
+The expanded terminal-neighborhood selector casebook is checked in at
+[`docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_expanded.md`](reports/waymo_lane_continuation_terminal_neighborhood_casebook_expanded.md).
+It converts those 6 calibration cases into derived SVG decision cards under
+[`docs/reports/assets/`](reports/assets/): 3 replay-accepted recoveries, 3
+held negative controls, and the current versus recommended selector decision
+for each case. The cards show metric bars for replay gain, route extension,
+heading alignment, and alternate-lane distance; they do not publish raw
+trajectory points or raw map polylines.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

@@ -108,6 +108,9 @@ from scenariolens.lane_continuation_terminal_neighborhood_selector import (
 from scenariolens.lane_continuation_terminal_neighborhood_selector_calibration import (
     generate_lane_continuation_terminal_neighborhood_selector_calibration,
 )
+from scenariolens.lane_continuation_terminal_neighborhood_casebook import (
+    generate_lane_continuation_terminal_neighborhood_casebook,
+)
 from scenariolens.map_match_audit import (
     DEFAULT_AUDIT_THRESHOLDS_M,
     generate_map_match_audit,
@@ -1333,6 +1336,44 @@ def lane_continuation_terminal_neighborhood_selector_calibration_command(
         f"{result.current_false_hold_count}, recommended false hold(s): "
         f"{result.recommended_false_hold_count}, recommended false promote(s): "
         f"{result.recommended_false_promote_count}."
+    )
+    return 0
+
+
+def lane_continuation_terminal_neighborhood_casebook_command(
+    selector_calibration_manifest: str,
+    output_dir: str,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_lane_continuation_terminal_neighborhood_casebook(
+            selector_calibration_manifest_path=selector_calibration_manifest,
+            output_dir=output_dir,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(
+        "Wrote lane-continuation-terminal-neighborhood-casebook manifest "
+        f"to {result.manifest_path}"
+    )
+    print(
+        "Wrote lane-continuation-terminal-neighborhood-casebook report "
+        f"to {result.report_path}"
+    )
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print(
+            "Lane-continuation terminal-neighborhood casebook is not ready. "
+            "See manifest.json."
+        )
+        return 2
+    print(
+        f"Generated terminal-neighborhood selector casebook for "
+        f"{result.case_count} case(s) with {result.asset_count} SVG card(s)."
     )
     return 0
 
@@ -2684,6 +2725,40 @@ def main() -> int:
             "selector calibration report copy."
         ),
     )
+    lane_continuation_terminal_casebook_parser = subparsers.add_parser(
+        "lane-continuation-terminal-neighborhood-casebook",
+        help=(
+            "Generate a public-safe visual casebook from terminal-neighborhood "
+            "selector calibration evidence."
+        ),
+    )
+    lane_continuation_terminal_casebook_parser.add_argument(
+        "--selector-calibration-manifest",
+        required=True,
+        help=(
+            "Manifest produced by scenariolens "
+            "lane-continuation-terminal-neighborhood-selector-calibration."
+        ),
+    )
+    lane_continuation_terminal_casebook_parser.add_argument(
+        "--output-dir",
+        default=(
+            "data/processed/"
+            "waymo_lane_continuation_terminal_neighborhood_casebook"
+        ),
+        help=(
+            "Directory for terminal-neighborhood selector casebook "
+            "manifest.json, report.md, and derived SVG cards."
+        ),
+    )
+    lane_continuation_terminal_casebook_parser.add_argument(
+        "--public-report",
+        default=None,
+        help=(
+            "Optional Markdown path for a public-safe terminal-neighborhood "
+            "selector casebook report copy."
+        ),
+    )
     heading_replay_parser = subparsers.add_parser(
         "heading-replay-prototype",
         help=(
@@ -3211,6 +3286,12 @@ def main() -> int:
             terminal_neighborhood_replay_manifest=(
                 args.terminal_neighborhood_replay_manifest
             ),
+            output_dir=args.output_dir,
+            public_report=args.public_report,
+        )
+    if args.command == "lane-continuation-terminal-neighborhood-casebook":
+        return lane_continuation_terminal_neighborhood_casebook_command(
+            selector_calibration_manifest=args.selector_calibration_manifest,
             output_dir=args.output_dir,
             public_report=args.public_report,
         )
