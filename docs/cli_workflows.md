@@ -47,6 +47,20 @@ This verifies the curated public evidence spine: live demo assets, provenance,
 real-data reports, selector-validation artifacts, static demo payloads, and CI.
 The output is a local ignored run packet plus checked-in Markdown/JSON copies.
 
+## Public Surface Check
+
+```bash
+scenariolens public-surface-check \
+  --output-dir data/processed/scenariolens_public_surface_check \
+  --public-report docs/reports/scenariolens_public_surface_check.md \
+  --repo-root .
+```
+
+This is the v1 release-readiness gate for the public repo surface. It checks the
+evidence index, static demo JSON contracts, local README/demo/report links,
+referenced SVG assets, raw-data boundary, public-safety language, and CI smoke
+coverage without reading local Waymo shards or fetching external URLs.
+
 ## Waymo-Shaped Fixtures
 
 ```bash

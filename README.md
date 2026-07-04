@@ -49,7 +49,7 @@ ScenarioLens builds a small but polished pipeline that can:
 | Real-data path | Native Waymo Motion JSON/proto/TFRecord slice reader with local preflight and validation |
 | Baseline evidence | Constant-velocity ADE/FDE, miss rate, lane-aware comparison, map/signal context coverage, map-match audit, tag studies, and stability studies |
 | Public demo | Static Scenario Explorer with filters, SVG trajectories, score components, failure cards, real-data diagnostic cases, and selector decision cards |
-| Evidence index | Generated v1 artifact map verifying 15 public reports, payloads, provenance docs, and CI files |
+| Evidence index | Generated v1 artifact map verifying 16 public reports, payloads, provenance docs, and CI files |
 | Repo quality | MIT license, contributor docs, changelog, citation, issue templates, CI, and release checklist |
 
 ## Quick Start
@@ -85,6 +85,7 @@ Then open `http://localhost:8000/demo/`.
 ## Public Evidence
 
 - [ScenarioLens v1 evidence index](docs/reports/scenariolens_evidence_index.md)
+- [Public surface check](docs/reports/scenariolens_public_surface_check.md)
 - [Portfolio report](docs/reports/portfolio_report.md)
 - [Waymo Motion validation summary](docs/reports/waymo_motion_validation_summary.md)
 - [Real-slice failure study](docs/reports/waymo_motion_failure_study.md)
@@ -952,6 +953,21 @@ PYTHONPATH=src python3 -m scenariolens.cli dashboard-data \
   --output docs/demo/scenarios.json \
   --assets-dir docs/demo/assets \
   --lane-selection-manifest data/processed/waymo_lane_selection_study/manifest.json
+```
+
+Regenerate the v1 public evidence and surface-readiness reports:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli evidence-index \
+  --output-dir data/processed/scenariolens_evidence_index \
+  --public-report docs/reports/scenariolens_evidence_index.md \
+  --demo-json docs/demo/evidence_index.json \
+  --repo-root .
+
+PYTHONPATH=src python3 -m scenariolens.cli public-surface-check \
+  --output-dir data/processed/scenariolens_public_surface_check \
+  --public-report docs/reports/scenariolens_public_surface_check.md \
+  --repo-root .
 ```
 
 Run tests with only the Python standard library:

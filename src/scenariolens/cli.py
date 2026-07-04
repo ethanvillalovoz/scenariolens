@@ -133,6 +133,7 @@ from scenariolens.map_match_audit import (
     generate_map_match_audit,
 )
 from scenariolens.portfolio import generate_portfolio_report
+from scenariolens.public_surface_check import generate_public_surface_check
 from scenariolens.report import json_report, markdown_report, ranked_scores
 from scenariolens.replay_candidates import generate_replay_candidate_plan
 from scenariolens.replay_prototype import generate_replay_prototype
@@ -526,6 +527,36 @@ def evidence_index_command(
     print(
         f"Indexed {result.artifact_count} evidence artifact(s): "
         f"{result.present_count} present, {result.missing_count} missing."
+    )
+    return 0
+
+
+def public_surface_check_command(
+    output_dir: str,
+    public_report: str | None,
+    repo_root: str,
+) -> int:
+    try:
+        result = generate_public_surface_check(
+            output_dir=output_dir,
+            public_report_path=public_report,
+            repo_root=repo_root,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote public-surface-check manifest to {result.manifest_path}")
+    print(f"Wrote public-surface-check report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print("Public surface check failed. See manifest.json for details.")
+        return 2
+    print(
+        f"Ran {result.check_count} public-surface check(s): "
+        f"{result.passed_count} passed, {result.failed_count} failed, "
+        f"{result.warning_count} warning(s)."
     )
     return 0
 
@@ -3558,6 +3589,28 @@ def main() -> int:
         default=".",
         help="Repository root used to verify required public artifacts.",
     )
+    public_surface_check_parser = subparsers.add_parser(
+        "public-surface-check",
+        help=(
+            "Verify public README/demo/report links, JSON contracts, raw-data "
+            "boundary, and CI smoke coverage."
+        ),
+    )
+    public_surface_check_parser.add_argument(
+        "--output-dir",
+        default="data/processed/scenariolens_public_surface_check",
+        help="Directory for public-surface-check manifest.json and report.md.",
+    )
+    public_surface_check_parser.add_argument(
+        "--public-report",
+        default="docs/reports/scenariolens_public_surface_check.md",
+        help="Optional Markdown path for a public-surface-check report copy.",
+    )
+    public_surface_check_parser.add_argument(
+        "--repo-root",
+        default=".",
+        help="Repository root used to verify public files.",
+    )
     render_parser = subparsers.add_parser(
         "render",
         help="Render scenarios as SVG trajectory views.",
@@ -3970,6 +4023,12 @@ def main() -> int:
             output_dir=args.output_dir,
             public_report=args.public_report,
             demo_json=args.demo_json,
+            repo_root=args.repo_root,
+        )
+    if args.command == "public-surface-check":
+        return public_surface_check_command(
+            output_dir=args.output_dir,
+            public_report=args.public_report,
             repo_root=args.repo_root,
         )
     if args.command == "render":

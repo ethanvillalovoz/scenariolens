@@ -44,6 +44,10 @@ jobs:
             --public-report /tmp/scenariolens-evidence-index.md \
             --demo-json /tmp/scenariolens-evidence-index.json \
             --repo-root .
+          scenariolens public-surface-check \
+            --output-dir /tmp/scenariolens-public-surface-check \
+            --public-report /tmp/scenariolens-public-surface-check.md \
+            --repo-root .
           scenariolens report --input /tmp/scenariolens-synthetic.json --format markdown --limit 3
           scenariolens baseline-compare --input /tmp/scenariolens-synthetic.json --format json --limit 3
           scenariolens baseline-ablation --input /tmp/scenariolens-synthetic.json --format json

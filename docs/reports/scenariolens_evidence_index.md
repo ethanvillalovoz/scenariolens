@@ -7,10 +7,10 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 ## Readiness
 
 - Ready: yes
-- Required artifacts present: 15 / 15
+- Required artifacts present: 16 / 16
 - Missing required artifacts: 0
 - Evidence stages: 8
-- Public-safe artifacts indexed: 15
+- Public-safe artifacts indexed: 16
 - Local real-data/Waymo-derived artifacts indexed: 13
 
 ## Stage Summary
@@ -24,7 +24,7 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 | Replay bridge | 1 | 1 | Connects mined cases to laptop-safe open-loop replay diagnostics. |
 | Lane continuation | 2 | 2 | Audits map-link and lane-continuation failure modes at larger scale. |
 | Selector validation | 4 | 4 | Validates conservative selector gates before changing default behavior. |
-| Release readiness | 1 | 1 | Keeps the public repo tested and contribution-ready. |
+| Release readiness | 2 | 2 | Keeps the public repo tested and contribution-ready. |
 
 ## Evidence Artifacts
 
@@ -45,6 +45,7 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 | [Terminal Selector Decision Atlas](waymo_lane_continuation_terminal_neighborhood_selector_decision_atlas_200.md) | Selector validation | 7 derived selector cards joined to candidate-validation labels | Visual cards: 7; Candidate agreement: 6/7 | yes |
 | [Selector Atlas Demo Payload](../demo/selector_decisions.json) | Product surface | Public-safe selector decision cards loaded by the static Explorer | Cards: 7 | yes |
 | [CI Validation Workflow](../../.github/workflows/ci.yml) | Release readiness | Unit tests plus CLI smoke workflows on every push | CI raw Waymo dependency: none | yes |
+| [Public Surface Check](scenariolens_public_surface_check.md) | Release readiness | Offline check for public links, payload contracts, raw-data boundary, and CI smoke coverage | Offline checks: 7; Raw-data guard: yes | yes |
 
 ## Artifact Notes
 
@@ -182,6 +183,15 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 - Data status: CI-safe fixtures only
 - Why it matters: Shows the framework is maintained as software, not just a set of static reports.
 - Limitation: Live Waymo shards remain local and are not required in CI.
+
+### Public Surface Check
+
+- Path: `docs/reports/scenariolens_public_surface_check.md`
+- Proof type: readiness gate
+- Command: `scenariolens public-surface-check --repo-root .`
+- Data status: CI-safe repository metadata and derived public artifacts only
+- Why it matters: Turns the public repo surface into a testable release gate instead of relying on manual README/demo inspection.
+- Limitation: External links are counted but not fetched to keep CI deterministic.
 
 ## Public-Safety Boundary
 

@@ -335,6 +335,26 @@ DEFAULT_EVIDENCE_CATALOG: tuple[EvidenceCatalogItem, ...] = (
         limitation="Live Waymo shards remain local and are not required in CI.",
         metrics=(EvidenceMetric("CI raw Waymo dependency", "none"),),
     ),
+    EvidenceCatalogItem(
+        identifier="public_surface_check",
+        title="Public Surface Check",
+        stage="release_readiness",
+        stage_label="Release readiness",
+        proof_type="readiness gate",
+        scope="Offline check for public links, payload contracts, raw-data boundary, and CI smoke coverage",
+        path="docs/reports/scenariolens_public_surface_check.md",
+        command="scenariolens public-surface-check --repo-root .",
+        data_status="CI-safe repository metadata and derived public artifacts only",
+        why_it_matters=(
+            "Turns the public repo surface into a testable release gate instead "
+            "of relying on manual README/demo inspection."
+        ),
+        limitation="External links are counted but not fetched to keep CI deterministic.",
+        metrics=(
+            EvidenceMetric("Offline checks", "7"),
+            EvidenceMetric("Raw-data guard", "yes"),
+        ),
+    ),
 )
 
 

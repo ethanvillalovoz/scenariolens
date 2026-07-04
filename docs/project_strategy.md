@@ -115,6 +115,8 @@ and links back to reports and provenance.
 
 - V1 evidence index:
   [`docs/reports/scenariolens_evidence_index.md`](reports/scenariolens_evidence_index.md)
+- Public surface check:
+  [`docs/reports/scenariolens_public_surface_check.md`](reports/scenariolens_public_surface_check.md)
 - Static explorer: [`docs/demo`](demo)
 - Data provenance: [`docs/data_provenance.md`](data_provenance.md)
 - Architecture: [`docs/architecture.md`](architecture.md)
