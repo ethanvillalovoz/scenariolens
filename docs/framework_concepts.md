@@ -213,7 +213,10 @@ validation shard. It scans 451 lane-continuation targets, replays/probes 45
 queued cases, audits 15 topology blockers, and produces a 7-card terminal
 selector casebook. The larger calibration is intentionally less tidy: it
 improves agreement from 4/7 to 6/7 with 0 false promotions, but leaves 1 false
-hold, which becomes the next selector-evidence target.
+hold. A transfer-validation pass then applies the 6-case provisional policy to
+the broader replay queue, separates overlap from 4 novel validation cases, and
+keeps 0 false promotions while exposing 2 false holds; that is the framework's
+signal to collect more evidence before changing defaults.
 
 ## Map-Match Audit
 

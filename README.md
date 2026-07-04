@@ -121,6 +121,7 @@ Then open `http://localhost:8000/demo/`.
 - [200-scenario terminal replay gate](docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_200.md)
 - [200-scenario terminal selector experiment](docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_200.md)
 - [200-scenario terminal selector calibration](docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200.md)
+- [200-scenario terminal selector transfer validation](docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200.md)
 - [200-scenario terminal selector visual casebook](docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md)
 - [Topology gap audit](docs/reports/waymo_lane_continuation_topology_gap_audit.md)
 - [Terminal neighborhood audit](docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md)
@@ -744,6 +745,12 @@ For the larger 200-scenario local shard pass, use distinct output directories
 and SVG prefixes so both casebooks can coexist:
 
 ```bash
+PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-terminal-neighborhood-selector-transfer \
+  --selector-calibration-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded/manifest.json \
+  --terminal-neighborhood-replay-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_replay_200/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200 \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200.md
+
 PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-terminal-neighborhood-casebook \
   --selector-calibration-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200/manifest.json \
   --asset-prefix terminal_selector_casebook_200 \

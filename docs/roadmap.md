@@ -455,6 +455,13 @@ lane-continuation targets, replays/probes 45 queued cases, and produces a
 7-card selector casebook. The broader calibration reaches 6/7 replay-label
 agreement with 0 false promotions but still leaves 1 false hold, so the next
 selector milestone is evidence expansion rather than default-policy adoption.
+The selector transfer validation at
+`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200.md`
+then applies the 6-case provisional calibration to the broader 7-case replay
+queue: 3 cases overlap with the calibration queue, 4 are novel validation
+cases, replay-label agreement improves from the current default's 4/7 to 5/7,
+and false promotions remain 0 while 2 false holds remain. That makes the
+policy useful diagnostic evidence, not a default selector update.
 The initial
 topology gap audit at
 `docs/reports/waymo_lane_continuation_topology_gap_audit.md` then shows that

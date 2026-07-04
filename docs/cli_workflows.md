@@ -801,6 +801,12 @@ scenariolens lane-continuation-terminal-neighborhood-selector-calibration \
   --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200 \
   --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200.md
 
+scenariolens lane-continuation-terminal-neighborhood-selector-transfer \
+  --selector-calibration-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded/manifest.json \
+  --terminal-neighborhood-replay-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_replay_200/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200 \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200.md
+
 scenariolens lane-continuation-terminal-neighborhood-casebook \
   --selector-calibration-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200/manifest.json \
   --asset-prefix terminal_selector_casebook_200 \
@@ -814,7 +820,10 @@ replay/audit cases, replay 30 target tracks with 120 perturbation trials, audit
 15 topology blockers, and replay 7 terminal-neighborhood candidates. The
 selector calibration improves replay agreement from 4/7 to 6/7 with 0 false
 promotions, but leaves 1 false hold; the report frames that as a remaining
-selector limitation rather than a solved policy.
+selector limitation rather than a solved policy. The transfer-validation step
+applies the 6-case provisional calibration to the broader 7-case replay queue:
+it sees 3 overlap cases and 4 novel cases, improves default replay-gate
+agreement from 4/7 to 5/7, keeps 0 false promotions, and leaves 2 false holds.
 
 ## Baseline Ablation
 

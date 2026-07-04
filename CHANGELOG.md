@@ -16,6 +16,13 @@ All notable changes to ScenarioLens are documented here.
   cases, audits 15 topology blockers, and publishes 7 terminal-selector visual
   cards with 0 false promotions and 1 remaining false hold under the best
   zero-false-promotion calibration candidate.
+- `scenariolens lane-continuation-terminal-neighborhood-selector-transfer`
+  workflow and
+  `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200.md`,
+  applying the 6-case provisional selector calibration to the broader
+  200-scenario replay queue. The transfer validation covers 7 cases, including
+  4 novel validation cases, improves replay-gate matches from 4/7 to 5/7, and
+  keeps 0 false promotions while leaving 2 false holds.
 - `scenariolens lane-continuation-terminal-neighborhood-casebook` now supports
   `--asset-prefix` so multiple public casebooks can share
   `docs/reports/assets/` without overwriting SVG cards.

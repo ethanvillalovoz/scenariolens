@@ -108,6 +108,10 @@ from scenariolens.lane_continuation_terminal_neighborhood_selector import (
 from scenariolens.lane_continuation_terminal_neighborhood_selector_calibration import (
     generate_lane_continuation_terminal_neighborhood_selector_calibration,
 )
+from scenariolens.lane_continuation_terminal_neighborhood_selector_transfer import (
+    SELECTOR_TRANSFER_POLICY_SOURCES,
+    generate_lane_continuation_terminal_neighborhood_selector_transfer,
+)
 from scenariolens.lane_continuation_terminal_neighborhood_casebook import (
     generate_lane_continuation_terminal_neighborhood_casebook,
 )
@@ -1336,6 +1340,54 @@ def lane_continuation_terminal_neighborhood_selector_calibration_command(
         f"{result.current_false_hold_count}, recommended false hold(s): "
         f"{result.recommended_false_hold_count}, recommended false promote(s): "
         f"{result.recommended_false_promote_count}."
+    )
+    return 0
+
+
+def lane_continuation_terminal_neighborhood_selector_transfer_command(
+    selector_calibration_manifest: str,
+    terminal_neighborhood_replay_manifest: str,
+    output_dir: str,
+    policy_source: str,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_lane_continuation_terminal_neighborhood_selector_transfer(
+            selector_calibration_manifest_path=selector_calibration_manifest,
+            terminal_neighborhood_replay_manifest_path=(
+                terminal_neighborhood_replay_manifest
+            ),
+            output_dir=output_dir,
+            policy_source=policy_source,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(
+        "Wrote lane-continuation-terminal-neighborhood-selector-transfer "
+        f"manifest to {result.manifest_path}"
+    )
+    print(
+        "Wrote lane-continuation-terminal-neighborhood-selector-transfer "
+        f"report to {result.report_path}"
+    )
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print(
+            "Lane-continuation terminal-neighborhood selector transfer "
+            "validation is not ready. See manifest.json."
+        )
+        return 2
+    print(
+        "Generated terminal-neighborhood selector transfer validation for "
+        f"{result.validation_case_count} validation case(s): "
+        f"{result.overlap_case_count} overlap, {result.novel_case_count} "
+        f"novel, {result.transfer_match_count} replay-gate match(es), "
+        f"{result.transfer_false_promote_count} false promote(s), "
+        f"{result.transfer_false_hold_count} false hold(s)."
     )
     return 0
 
@@ -2727,6 +2779,54 @@ def main() -> int:
             "selector calibration report copy."
         ),
     )
+    lane_continuation_terminal_selector_transfer_parser = subparsers.add_parser(
+        "lane-continuation-terminal-neighborhood-selector-transfer",
+        help=(
+            "Validate a calibrated terminal-neighborhood selector policy on "
+            "a broader replay queue."
+        ),
+    )
+    lane_continuation_terminal_selector_transfer_parser.add_argument(
+        "--selector-calibration-manifest",
+        required=True,
+        help=(
+            "Manifest produced by scenariolens "
+            "lane-continuation-terminal-neighborhood-selector-calibration."
+        ),
+    )
+    lane_continuation_terminal_selector_transfer_parser.add_argument(
+        "--terminal-neighborhood-replay-manifest",
+        required=True,
+        help=(
+            "Validation manifest produced by scenariolens "
+            "lane-continuation-terminal-neighborhood-replay."
+        ),
+    )
+    lane_continuation_terminal_selector_transfer_parser.add_argument(
+        "--policy-source",
+        choices=SELECTOR_TRANSFER_POLICY_SOURCES,
+        default="recommended",
+        help="Selector policy from the calibration manifest to validate.",
+    )
+    lane_continuation_terminal_selector_transfer_parser.add_argument(
+        "--output-dir",
+        default=(
+            "data/processed/"
+            "waymo_lane_continuation_terminal_neighborhood_selector_transfer"
+        ),
+        help=(
+            "Directory for terminal-neighborhood selector transfer "
+            "manifest.json and report.md."
+        ),
+    )
+    lane_continuation_terminal_selector_transfer_parser.add_argument(
+        "--public-report",
+        default=None,
+        help=(
+            "Optional Markdown path for a public-safe terminal-neighborhood "
+            "selector transfer-validation report copy."
+        ),
+    )
     lane_continuation_terminal_casebook_parser = subparsers.add_parser(
         "lane-continuation-terminal-neighborhood-casebook",
         help=(
@@ -3297,6 +3397,16 @@ def main() -> int:
                 args.terminal_neighborhood_replay_manifest
             ),
             output_dir=args.output_dir,
+            public_report=args.public_report,
+        )
+    if args.command == "lane-continuation-terminal-neighborhood-selector-transfer":
+        return lane_continuation_terminal_neighborhood_selector_transfer_command(
+            selector_calibration_manifest=args.selector_calibration_manifest,
+            terminal_neighborhood_replay_manifest=(
+                args.terminal_neighborhood_replay_manifest
+            ),
+            output_dir=args.output_dir,
+            policy_source=args.policy_source,
             public_report=args.public_report,
         )
     if args.command == "lane-continuation-terminal-neighborhood-casebook":

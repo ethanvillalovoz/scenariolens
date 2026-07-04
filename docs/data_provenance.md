@@ -353,15 +353,18 @@ The 200-scenario lane-continuation scale-up is checked in at
 [`docs/reports/waymo_lane_continuation_topology_gap_audit_200.md`](reports/waymo_lane_continuation_topology_gap_audit_200.md),
 [`docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_200.md`](reports/waymo_lane_continuation_terminal_neighborhood_replay_200.md),
 [`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200.md`](reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200.md),
+[`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200.md`](reports/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200.md),
 and
 [`docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md`](reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md).
 It scans 50 scenarios per local validation shard, for 200 scenarios total,
 and publishes only derived metrics: 451 lane-continuation targets, 45
 replay/audit cases, 15 topology blockers, 7 terminal-neighborhood replay
-candidates, and 7 derived selector cards. The broader calibration improves
-selector/replay agreement from 4/7 to 6/7 with 0 false promotions, but still
-leaves 1 false hold; the artifact treats that as an open limitation, not a
-production-ready selector claim.
+candidates, a selector transfer validation over 4 novel cases, and 7 derived
+selector cards. The broader calibration improves selector/replay agreement
+from 4/7 to 6/7 with 0 false promotions, while transfer validation of the
+6-case provisional policy reaches 5/7 with 0 false promotions and 2 false
+holds; both artifacts treat the remaining false holds as open limitations, not
+production-ready selector claims.
 
 ## Interpretation Rules
 

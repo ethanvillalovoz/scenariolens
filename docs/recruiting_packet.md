@@ -36,6 +36,7 @@ robotics, AI/ML, and software engineering internship conversations.
 - Expanded terminal selector visual casebook: `docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_expanded.md`
 - 200-scenario lane-continuation study: `docs/reports/waymo_lane_continuation_study_200.md`
 - 200-scenario terminal selector calibration: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200.md`
+- 200-scenario terminal selector transfer validation: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200.md`
 - 200-scenario terminal selector visual casebook: `docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md`
 - Topology gap audit: `docs/reports/waymo_lane_continuation_topology_gap_audit.md`
 - Terminal neighborhood audit: `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md`
@@ -292,6 +293,10 @@ Testing and verification:
   replay/audit cases, audits 15 topology blockers, and produces a 7-card
   terminal selector casebook; the best zero-false-promotion calibration reaches
   6/7 replay agreement and leaves 1 false hold as an explicit limitation.
+- A selector transfer validation applies the 6-case provisional calibration to
+  the broader 7-case replay queue, covers 4 novel validation cases, improves
+  replay agreement from 4/7 to 5/7, and keeps 0 false promotions while leaving
+  2 false holds.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
