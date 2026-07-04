@@ -76,7 +76,7 @@ terminal-neighborhood replay gates, bounded selector experiments, and derived
 terminal selector visual casebooks, including a 200-scenario scale-up that
 scans 451 lane-continuation targets plus transfer validation for a provisional
 selector policy, an error audit, and a route/context audit for the remaining
-false holds,
+false holds, plus context-aware candidate validation,
 Markdown/JSON reports, a local real-data validation packet workflow, static
 dashboard data, and 2D SVG trajectory rendering with forecast overlays.
 

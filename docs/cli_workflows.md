@@ -818,6 +818,12 @@ scenariolens lane-continuation-terminal-neighborhood-selector-route-context-audi
   --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector_route_context_audit_200 \
   --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_route_context_audit_200.md
 
+scenariolens lane-continuation-terminal-neighborhood-selector-candidate-validation \
+  --selector-transfer-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200/manifest.json \
+  --selector-route-context-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_route_context_audit_200/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector_candidate_validation_200 \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_candidate_validation_200.md
+
 scenariolens lane-continuation-terminal-neighborhood-casebook \
   --selector-calibration-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200/manifest.json \
   --asset-prefix terminal_selector_casebook_200 \
@@ -842,6 +848,11 @@ The route/context audit then joins both false holds back to derived replay
 diagnostics: one becomes a borderline heading-relaxation validation candidate,
 while the severe selected-heading disagreement stays held for lane-direction,
 route-context, and coordinate-frame inspection.
+The candidate-validation step applies only that context-aware heading candidate
+on top of the transferred selector: replay agreement improves from 5/7 to 6/7,
+false promotions remain 0, 2/2 replay-held negative controls stay held, and
+the severe route/context case remains a false hold instead of becoming a broad
+gate relaxation.
 
 ## Baseline Ablation
 

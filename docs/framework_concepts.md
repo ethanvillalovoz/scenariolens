@@ -230,6 +230,12 @@ diagnostic candidate. This keeps one borderline case in the next validation
 queue and keeps the severe selected-heading disagreement held for map/context
 inspection.
 
+Candidate validation turns that queue item into a bounded selector check. It
+inherits the transferred selector policy, promotes only false holds classified
+as `heading_relaxation_candidate`, and rechecks replay-held negative controls.
+On the 7-case transfer queue, this improves agreement from 5/7 to 6/7 while
+preserving 0 false promotions and leaving the severe route/context case held.
+
 ## Map-Match Audit
 
 The map-match audit handles cases that are not ready to be treated as replay

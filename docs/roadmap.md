@@ -475,6 +475,12 @@ stable linked-chain recoveries with selected terminal lanes shorter than the
 forecast horizon, but only one is a reasonable heading-relaxation validation
 candidate. The other has severe selected-lane heading disagreement and stays
 held for lane-direction, route-context, and coordinate-frame inspection.
+The candidate validation at
+`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_candidate_validation_200.md`
+then tests exactly that context-aware heading candidate: replay-label agreement
+improves from 5/7 to 6/7, 2/2 replay-held negative controls remain held, false
+promotions stay 0, and the severe route/context case remains held rather than
+being swept into a broad gate relaxation.
 The initial
 topology gap audit at
 `docs/reports/waymo_lane_continuation_topology_gap_audit.md` then shows that

@@ -118,6 +118,9 @@ from scenariolens.lane_continuation_terminal_neighborhood_selector_error_audit i
 from scenariolens.lane_continuation_terminal_neighborhood_selector_route_context_audit import (
     generate_lane_continuation_terminal_neighborhood_selector_route_context_audit,
 )
+from scenariolens.lane_continuation_terminal_neighborhood_selector_candidate_validation import (
+    generate_lane_continuation_terminal_neighborhood_selector_candidate_validation,
+)
 from scenariolens.lane_continuation_terminal_neighborhood_casebook import (
     generate_lane_continuation_terminal_neighborhood_casebook,
 )
@@ -1485,6 +1488,51 @@ def lane_continuation_terminal_neighborhood_selector_route_context_audit_command
         f"{result.heading_relaxation_candidate_count} heading-relaxation "
         f"candidate(s), {result.route_context_hold_count} route/context "
         "hold(s)."
+    )
+    return 0
+
+
+def lane_continuation_terminal_neighborhood_selector_candidate_validation_command(
+    selector_transfer_manifest: str,
+    selector_route_context_manifest: str,
+    output_dir: str,
+    public_report: str | None,
+) -> int:
+    try:
+        result = (
+            generate_lane_continuation_terminal_neighborhood_selector_candidate_validation(
+                selector_transfer_manifest_path=selector_transfer_manifest,
+                selector_route_context_manifest_path=selector_route_context_manifest,
+                output_dir=output_dir,
+                public_report_path=public_report,
+            )
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(
+        "Wrote lane-continuation-terminal-neighborhood-selector-candidate-validation "
+        f"manifest to {result.manifest_path}"
+    )
+    print(
+        "Wrote lane-continuation-terminal-neighborhood-selector-candidate-validation "
+        f"report to {result.report_path}"
+    )
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print(
+            "Lane-continuation terminal-neighborhood selector candidate "
+            "validation is not ready. See manifest.json."
+        )
+        return 2
+    print(
+        "Generated terminal-neighborhood selector candidate validation for "
+        f"{result.case_count} case(s): {result.candidate_match_count} "
+        f"candidate match(es), {result.candidate_false_promote_count} false "
+        f"promote(s), {result.candidate_false_hold_count} false hold(s), "
+        f"{result.recovered_false_hold_count} recovered false hold(s)."
     )
     return 0
 
@@ -3011,6 +3059,50 @@ def main() -> int:
             "selector route/context audit report copy."
         ),
     )
+    lane_continuation_terminal_selector_candidate_validation_parser = (
+        subparsers.add_parser(
+            "lane-continuation-terminal-neighborhood-selector-candidate-validation",
+            help=(
+                "Validate a diagnostic context-aware terminal-neighborhood "
+                "selector candidate against transfer labels."
+            ),
+        )
+    )
+    lane_continuation_terminal_selector_candidate_validation_parser.add_argument(
+        "--selector-transfer-manifest",
+        required=True,
+        help=(
+            "Manifest produced by scenariolens "
+            "lane-continuation-terminal-neighborhood-selector-transfer."
+        ),
+    )
+    lane_continuation_terminal_selector_candidate_validation_parser.add_argument(
+        "--selector-route-context-manifest",
+        required=True,
+        help=(
+            "Manifest produced by scenariolens "
+            "lane-continuation-terminal-neighborhood-selector-route-context-audit."
+        ),
+    )
+    lane_continuation_terminal_selector_candidate_validation_parser.add_argument(
+        "--output-dir",
+        default=(
+            "data/processed/"
+            "waymo_lane_continuation_terminal_neighborhood_selector_candidate_validation"
+        ),
+        help=(
+            "Directory for terminal-neighborhood selector candidate validation "
+            "manifest.json and report.md."
+        ),
+    )
+    lane_continuation_terminal_selector_candidate_validation_parser.add_argument(
+        "--public-report",
+        default=None,
+        help=(
+            "Optional Markdown path for a public-safe terminal-neighborhood "
+            "selector candidate-validation report copy."
+        ),
+    )
     lane_continuation_terminal_casebook_parser = subparsers.add_parser(
         "lane-continuation-terminal-neighborhood-casebook",
         help=(
@@ -3611,6 +3703,18 @@ def main() -> int:
                 ),
                 output_dir=args.output_dir,
                 diagnostic_heading_gate=args.diagnostic_heading_gate,
+                public_report=args.public_report,
+            )
+        )
+    if (
+        args.command
+        == "lane-continuation-terminal-neighborhood-selector-candidate-validation"
+    ):
+        return (
+            lane_continuation_terminal_neighborhood_selector_candidate_validation_command(
+                selector_transfer_manifest=args.selector_transfer_manifest,
+                selector_route_context_manifest=args.selector_route_context_manifest,
+                output_dir=args.output_dir,
                 public_report=args.public_report,
             )
         )

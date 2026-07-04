@@ -38,6 +38,13 @@ All notable changes to ScenarioLens are documented here.
   route/context audit separates 1 borderline heading-relaxation validation
   candidate from 1 severe selected-heading disagreement that should remain held
   for lane-direction, route-context, and coordinate-frame inspection.
+- `scenariolens lane-continuation-terminal-neighborhood-selector-candidate-validation`
+  workflow and
+  `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_candidate_validation_200.md`,
+  validating a narrow context-aware heading candidate on the 7-case transfer
+  queue. The candidate improves replay-label agreement from 5/7 to 6/7,
+  recovers 1 false hold, preserves 2/2 replay-held negative controls, keeps 0
+  false promotions, and leaves the severe route/context case held.
 - `scenariolens lane-continuation-terminal-neighborhood-casebook` now supports
   `--asset-prefix` so multiple public casebooks can share
   `docs/reports/assets/` without overwriting SVG cards.

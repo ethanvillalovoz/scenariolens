@@ -39,6 +39,7 @@ robotics, AI/ML, and software engineering internship conversations.
 - 200-scenario terminal selector transfer validation: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200.md`
 - 200-scenario terminal selector error audit: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_error_audit_200.md`
 - 200-scenario terminal selector route/context audit: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_route_context_audit_200.md`
+- 200-scenario terminal selector candidate validation: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_candidate_validation_200.md`
 - 200-scenario terminal selector visual casebook: `docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md`
 - Topology gap audit: `docs/reports/waymo_lane_continuation_topology_gap_audit.md`
 - Terminal neighborhood audit: `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md`
@@ -307,6 +308,10 @@ Testing and verification:
   diagnostics, identifying 1 borderline heading-relaxation validation candidate
   and 1 severe selected-heading disagreement that stays held for lane-direction,
   route-context, and coordinate-frame inspection.
+- A candidate-validation report tests only that context-aware heading candidate:
+  agreement improves from 5/7 to 6/7, 0 false promotions remain, 2/2
+  replay-held negative controls stay held, and the severe context case remains
+  held instead of being swept into a broad gate relaxation.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
