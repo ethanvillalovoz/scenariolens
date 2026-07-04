@@ -829,6 +829,14 @@ scenariolens lane-continuation-terminal-neighborhood-casebook \
   --asset-prefix terminal_selector_casebook_200 \
   --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_casebook_200 \
   --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md
+
+scenariolens lane-continuation-terminal-neighborhood-selector-decision-atlas \
+  --casebook-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_casebook_200/manifest.json \
+  --candidate-validation-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_candidate_validation_200/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector_decision_atlas_200 \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_decision_atlas_200.md \
+  --demo-json docs/demo/selector_decisions.json \
+  --demo-assets-dir docs/demo/assets
 ```
 
 This doubles the local shard window to 200 scenarios while staying laptop-safe.
@@ -852,7 +860,10 @@ The candidate-validation step applies only that context-aware heading candidate
 on top of the transferred selector: replay agreement improves from 5/7 to 6/7,
 false promotions remain 0, 2/2 replay-held negative controls stay held, and
 the severe route/context case remains a false hold instead of becoming a broad
-gate relaxation.
+gate relaxation. The decision-atlas step joins those labels back to the 7
+derived SVG cards so the Explorer can show 1 recovered false hold, 3 accepted
+recoveries, 2 negative controls, and 1 retained route/context hold without
+publishing raw Waymo records.
 
 ## Baseline Ablation
 

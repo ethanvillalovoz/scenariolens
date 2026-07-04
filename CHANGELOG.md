@@ -45,6 +45,14 @@ All notable changes to ScenarioLens are documented here.
   queue. The candidate improves replay-label agreement from 5/7 to 6/7,
   recovers 1 false hold, preserves 2/2 replay-held negative controls, keeps 0
   false promotions, and leaves the severe route/context case held.
+- `scenariolens lane-continuation-terminal-neighborhood-selector-decision-atlas`
+  workflow,
+  `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_decision_atlas_200.md`,
+  and `docs/demo/selector_decisions.json`, joining the 7 visual selector
+  cards to candidate-validation labels. The static Explorer now shows the
+  recovered false hold, 3 accepted recoveries, 2 negative controls, and 1
+  retained route/context hold without publishing raw Waymo records or changing
+  default selector behavior.
 - `scenariolens lane-continuation-terminal-neighborhood-casebook` now supports
   `--asset-prefix` so multiple public casebooks can share
   `docs/reports/assets/` without overwriting SVG cards.

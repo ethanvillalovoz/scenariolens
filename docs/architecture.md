@@ -44,9 +44,11 @@ flowchart LR
     AL --> AM["Terminal neighborhood replay gate"]
     AM --> AN["Terminal neighborhood selector experiment"]
     AN --> AO["Terminal selector visual casebook"]
+    AO --> AP["Terminal selector decision atlas"]
     Q --> T["Map-match threshold audit"]
     F --> I["Static dashboard payload"]
     V --> I
+    AP --> I
     I --> J["Scenario Explorer"]
     G --> K["Public-safe case studies"]
     Q --> K
@@ -61,6 +63,7 @@ flowchart LR
     AM --> K
     AN --> K
     AO --> K
+    AP --> K
     T --> K
     U --> K
     W --> K
@@ -106,6 +109,7 @@ flowchart LR
 | Lane-continuation terminal neighborhood selector route/context audit | `src/scenariolens/lane_continuation_terminal_neighborhood_selector_route_context_audit.py` | Joins selector false holds to derived replay route context, separating heading-relaxation validation candidates from cases that should stay held for map/context inspection. |
 | Lane-continuation terminal neighborhood selector candidate validation | `src/scenariolens/lane_continuation_terminal_neighborhood_selector_candidate_validation.py` | Tests a context-aware diagnostic selector candidate against transfer labels, recovering a route/context-approved false hold while preserving replay-held negative controls and default selector behavior. |
 | Lane-continuation terminal neighborhood casebook | `src/scenariolens/lane_continuation_terminal_neighborhood_casebook.py` | Converts selector calibration manifests into public-safe SVG decision cards and a casebook, showing replay gain, route extension, heading alignment, hold flags, and recommended decisions without publishing raw trajectories or map geometry. |
+| Lane-continuation terminal selector decision atlas | `src/scenariolens/lane_continuation_terminal_neighborhood_selector_decision_atlas.py` | Joins selector casebook cards to candidate-validation labels, copies public-safe SVG cards into the demo, and exposes recovered false holds, negative controls, and retained holds without changing selector defaults. |
 | Heading replay prototype | `src/scenariolens/heading_replay_prototype.py` | Reloads heading-ready local scenarios, compares nearest-lane and heading-aware open-loop rollouts, applies deterministic perturbations, and publishes selector stability summaries. |
 | Map-match audit | `src/scenariolens/map_match_audit.py` | Reloads fallback-heavy debug cases, sweeps lane-match thresholds, and publishes public-safe evidence about whether wider lane acceptance improves or worsens FDE before changing matcher behavior. |
 | Failure study | `src/scenariolens/failure_study.py` | Aggregates ADE/FDE, miss rate, tag-level failures, score-component failures, and hardest scenario ids without publishing raw data. |
@@ -113,7 +117,7 @@ flowchart LR
 | Taxonomy | `src/scenariolens/taxonomy.py` | Normalizes scenario tags and adds category-level ranking signal. |
 | Reports | `src/scenariolens/report.py`, `src/scenariolens/portfolio.py` | Generates Markdown/JSON summaries for humans and downstream tools. |
 | Rendering | `src/scenariolens/visualize.py` | Produces dependency-free SVG trajectory previews with map context when available. |
-| Dashboard | `src/scenariolens/dashboard.py`, `docs/demo/` | Builds and presents deterministic static explorer data, including public-safe lane-selection diagnostic cases when a study manifest is available. |
+| Dashboard | `src/scenariolens/dashboard.py`, `docs/demo/` | Builds and presents deterministic static explorer data, public-safe lane-selection diagnostic cases, and terminal-selector decision cards when generated artifacts are available. |
 
 ## Data Trust Boundary
 

@@ -481,6 +481,11 @@ then tests exactly that context-aware heading candidate: replay-label agreement
 improves from 5/7 to 6/7, 2/2 replay-held negative controls remain held, false
 promotions stay 0, and the severe route/context case remains held rather than
 being swept into a broad gate relaxation.
+The selector decision atlas at
+`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_decision_atlas_200.md`
+joins those candidate labels back to the 7 derived SVG cards and surfaces the
+same evidence in the static Explorer: 1 recovered false hold, 3 accepted
+recoveries, 2 preserved negative controls, and 1 retained route/context hold.
 The initial
 topology gap audit at
 `docs/reports/waymo_lane_continuation_topology_gap_audit.md` then shows that

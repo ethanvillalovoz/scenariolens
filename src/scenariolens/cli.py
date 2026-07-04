@@ -124,6 +124,9 @@ from scenariolens.lane_continuation_terminal_neighborhood_selector_candidate_val
 from scenariolens.lane_continuation_terminal_neighborhood_casebook import (
     generate_lane_continuation_terminal_neighborhood_casebook,
 )
+from scenariolens.lane_continuation_terminal_neighborhood_selector_decision_atlas import (
+    generate_lane_continuation_terminal_neighborhood_selector_decision_atlas,
+)
 from scenariolens.map_match_audit import (
     DEFAULT_AUDIT_THRESHOLDS_M,
     generate_map_match_audit,
@@ -1573,6 +1576,56 @@ def lane_continuation_terminal_neighborhood_casebook_command(
     print(
         f"Generated terminal-neighborhood selector casebook for "
         f"{result.case_count} case(s) with {result.asset_count} SVG card(s)."
+    )
+    return 0
+
+
+def lane_continuation_terminal_neighborhood_selector_decision_atlas_command(
+    casebook_manifest: str,
+    candidate_validation_manifest: str,
+    output_dir: str,
+    public_report: str | None,
+    demo_json: str | None,
+    demo_assets_dir: str | None,
+) -> int:
+    try:
+        result = (
+            generate_lane_continuation_terminal_neighborhood_selector_decision_atlas(
+                casebook_manifest_path=casebook_manifest,
+                candidate_validation_manifest_path=candidate_validation_manifest,
+                output_dir=output_dir,
+                public_report_path=public_report,
+                demo_json_path=demo_json,
+                demo_assets_dir=demo_assets_dir,
+            )
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(
+        "Wrote lane-continuation-terminal-neighborhood-selector-decision-atlas "
+        f"manifest to {result.manifest_path}"
+    )
+    print(
+        "Wrote lane-continuation-terminal-neighborhood-selector-decision-atlas "
+        f"report to {result.report_path}"
+    )
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if result.demo_json_path is not None:
+        print(f"Wrote demo atlas JSON to {result.demo_json_path}")
+    if not result.ready:
+        print(
+            "Lane-continuation terminal-neighborhood selector decision atlas "
+            "is not ready. See manifest.json."
+        )
+        return 2
+    print(
+        "Generated terminal-neighborhood selector decision atlas for "
+        f"{result.case_count} case(s) with {result.visual_asset_count} SVG "
+        f"card(s): {result.candidate_match_count} candidate match(es), "
+        f"{result.recovered_false_hold_count} recovered false hold(s)."
     )
     return 0
 
@@ -3145,6 +3198,63 @@ def main() -> int:
             "selector casebook report copy."
         ),
     )
+    lane_continuation_terminal_selector_decision_atlas_parser = (
+        subparsers.add_parser(
+            "lane-continuation-terminal-neighborhood-selector-decision-atlas",
+            help=(
+                "Join terminal-neighborhood selector visual cards with "
+                "candidate-validation outcomes for the static Explorer."
+            ),
+        )
+    )
+    lane_continuation_terminal_selector_decision_atlas_parser.add_argument(
+        "--casebook-manifest",
+        required=True,
+        help=(
+            "Manifest produced by scenariolens "
+            "lane-continuation-terminal-neighborhood-casebook."
+        ),
+    )
+    lane_continuation_terminal_selector_decision_atlas_parser.add_argument(
+        "--candidate-validation-manifest",
+        required=True,
+        help=(
+            "Manifest produced by scenariolens "
+            "lane-continuation-terminal-neighborhood-selector-candidate-validation."
+        ),
+    )
+    lane_continuation_terminal_selector_decision_atlas_parser.add_argument(
+        "--output-dir",
+        default=(
+            "data/processed/"
+            "waymo_lane_continuation_terminal_neighborhood_selector_decision_atlas"
+        ),
+        help=(
+            "Directory for selector decision atlas manifest.json, report.md, "
+            "and copied SVG cards."
+        ),
+    )
+    lane_continuation_terminal_selector_decision_atlas_parser.add_argument(
+        "--public-report",
+        default=None,
+        help=(
+            "Optional Markdown path for a public-safe selector decision atlas "
+            "report copy."
+        ),
+    )
+    lane_continuation_terminal_selector_decision_atlas_parser.add_argument(
+        "--demo-json",
+        default=None,
+        help=(
+            "Optional static Explorer JSON path for selector decision cards, "
+            "for example docs/demo/selector_decisions.json."
+        ),
+    )
+    lane_continuation_terminal_selector_decision_atlas_parser.add_argument(
+        "--demo-assets-dir",
+        default="docs/demo/assets",
+        help="Directory where demo-visible selector SVG cards should be copied.",
+    )
     heading_replay_parser = subparsers.add_parser(
         "heading-replay-prototype",
         help=(
@@ -3724,6 +3834,18 @@ def main() -> int:
             output_dir=args.output_dir,
             asset_prefix=args.asset_prefix,
             public_report=args.public_report,
+        )
+    if (
+        args.command
+        == "lane-continuation-terminal-neighborhood-selector-decision-atlas"
+    ):
+        return lane_continuation_terminal_neighborhood_selector_decision_atlas_command(
+            casebook_manifest=args.casebook_manifest,
+            candidate_validation_manifest=args.candidate_validation_manifest,
+            output_dir=args.output_dir,
+            public_report=args.public_report,
+            demo_json=args.demo_json,
+            demo_assets_dir=args.demo_assets_dir,
         )
     if args.command == "heading-replay-prototype":
         return heading_replay_prototype_command(

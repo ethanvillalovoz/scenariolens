@@ -11,6 +11,9 @@ from scenariolens.dashboard import (
     generate_dashboard_data,
     load_lane_selection_case_diagnostics,
 )
+from scenariolens.lane_continuation_terminal_neighborhood_selector_decision_atlas import (
+    LANE_CONTINUATION_TERMINAL_NEIGHBORHOOD_SELECTOR_DECISION_ATLAS_FORMAT,
+)
 from scenariolens.samples import synthetic_scenarios
 
 
@@ -21,6 +24,9 @@ class DashboardDataTest(unittest.TestCase):
         landing = (docs_root / "index.html").read_text(encoding="utf-8")
         html = (root / "index.html").read_text(encoding="utf-8")
         payload = json.loads((root / "scenarios.json").read_text(encoding="utf-8"))
+        selector_atlas = json.loads(
+            (root / "selector_decisions.json").read_text(encoding="utf-8")
+        )
 
         self.assertIn('url=demo/', landing)
         self.assertTrue((docs_root / ".nojekyll").exists())
@@ -31,10 +37,15 @@ class DashboardDataTest(unittest.TestCase):
         self.assertIn('id="heroMaxFde"', html)
         self.assertIn('id="baselineCard"', html)
         self.assertIn('id="diagnosticRows"', html)
+        self.assertIn('id="selectorAtlasCards"', html)
         self.assertIn('../reports/waymo_motion_failure_stability.md', html)
         self.assertIn('../reports/waymo_motion_shard_plan.md', html)
         self.assertIn('../reports/waymo_heading_aware_lane_selection_study.md', html)
         self.assertIn('../reports/waymo_heading_aware_debug_casebook.md', html)
+        self.assertIn(
+            '../reports/waymo_lane_continuation_terminal_neighborhood_selector_decision_atlas_200.md',
+            html,
+        )
         self.assertTrue((docs_root / "data_provenance.md").exists())
         self.assertTrue((docs_root / "reports" / "waymo_motion_failure_stability.md").exists())
         self.assertTrue((docs_root / "reports" / "waymo_motion_shard_plan.md").exists())
@@ -45,8 +56,21 @@ class DashboardDataTest(unittest.TestCase):
             payload["case_diagnostics"]["format"],
             CASE_DIAGNOSTICS_FORMAT,
         )
+        self.assertEqual(
+            selector_atlas["format"],
+            LANE_CONTINUATION_TERMINAL_NEIGHBORHOOD_SELECTOR_DECISION_ATLAS_FORMAT,
+        )
+        self.assertEqual(selector_atlas["aggregate"]["case_count"], 7)
+        self.assertEqual(selector_atlas["aggregate"]["candidate_match_count"], 6)
+        self.assertEqual(selector_atlas["aggregate"]["candidate_false_promote_count"], 0)
+        self.assertEqual(
+            selector_atlas["aggregate"]["category_counts"]["candidate_recovery"],
+            1,
+        )
         for item in payload["scenarios"]:
             self.assertTrue((root / item["svg_path"]).exists())
+        for item in selector_atlas["cases"]:
+            self.assertTrue((root / item["asset_path"]).exists())
 
     def test_dashboard_payload_contains_stable_contract_fields(self) -> None:
         scenarios = synthetic_scenarios()[:2]

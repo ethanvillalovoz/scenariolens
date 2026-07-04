@@ -357,6 +357,7 @@ The 200-scenario lane-continuation scale-up is checked in at
 [`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_error_audit_200.md`](reports/waymo_lane_continuation_terminal_neighborhood_selector_error_audit_200.md),
 [`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_route_context_audit_200.md`](reports/waymo_lane_continuation_terminal_neighborhood_selector_route_context_audit_200.md),
 [`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_candidate_validation_200.md`](reports/waymo_lane_continuation_terminal_neighborhood_selector_candidate_validation_200.md),
+[`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_decision_atlas_200.md`](reports/waymo_lane_continuation_terminal_neighborhood_selector_decision_atlas_200.md),
 and
 [`docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md`](reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md).
 It scans 50 scenarios per local validation shard, for 200 scenarios total,
@@ -365,7 +366,7 @@ replay/audit cases, 15 topology blockers, 7 terminal-neighborhood replay
 candidates, a selector transfer validation over 4 novel cases, a selector
 error audit over 5 counterfactual gates, a route/context false-hold join over
 2 derived replay cases, a context-aware selector candidate validation, and 7
-derived selector cards. The
+derived selector cards joined to candidate-validation labels. The
 broader calibration improves selector/replay agreement from 4/7 to 6/7 with 0
 false promotions, while transfer validation of the 6-case provisional policy
 reaches 5/7 with 0 false promotions and 2 false holds. The error audit shows
@@ -377,9 +378,11 @@ separating 1 borderline heading-relaxation validation candidate from 1 severe
 selected-heading disagreement that remains held for context inspection. The
 candidate validation recovers that borderline false hold, reaches 6/7
 replay-label agreement, preserves 2/2 replay-held negative controls, and keeps
-0 false promotions while leaving the severe route/context case held. All five
-selector artifacts treat the remaining false holds as open limitations, not
-production-ready selector claims.
+0 false promotions while leaving the severe route/context case held. The
+decision atlas copies only derived SVG cards into the demo so reviewers can see
+1 recovered false hold, 3 accepted recoveries, 2 negative controls, and 1
+retained route/context hold. All selector artifacts treat the remaining false
+holds as open limitations, not production-ready selector claims.
 
 ## Interpretation Rules
 

@@ -236,6 +236,12 @@ as `heading_relaxation_candidate`, and rechecks replay-held negative controls.
 On the 7-case transfer queue, this improves agreement from 5/7 to 6/7 while
 preserving 0 false promotions and leaving the severe route/context case held.
 
+The selector decision atlas is the reviewer-facing layer for that evidence. It
+joins the 7 derived SVG casebook cards to candidate-validation labels so the
+Explorer can show which cards are accepted recoveries, negative controls, the
+recovered false hold, and the retained route/context hold without exposing raw
+Waymo records or changing the default selector.
+
 ## Map-Match Audit
 
 The map-match audit handles cases that are not ready to be treated as replay

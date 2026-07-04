@@ -40,6 +40,7 @@ robotics, AI/ML, and software engineering internship conversations.
 - 200-scenario terminal selector error audit: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_error_audit_200.md`
 - 200-scenario terminal selector route/context audit: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_route_context_audit_200.md`
 - 200-scenario terminal selector candidate validation: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_candidate_validation_200.md`
+- 200-scenario terminal selector decision atlas: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_decision_atlas_200.md`
 - 200-scenario terminal selector visual casebook: `docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md`
 - Topology gap audit: `docs/reports/waymo_lane_continuation_topology_gap_audit.md`
 - Terminal neighborhood audit: `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md`
@@ -312,6 +313,10 @@ Testing and verification:
   agreement improves from 5/7 to 6/7, 0 false promotions remain, 2/2
   replay-held negative controls stay held, and the severe context case remains
   held instead of being swept into a broad gate relaxation.
+- A selector decision atlas joins those validation labels back to the 7 derived
+  SVG cards and the live Explorer, making the recovered false hold, accepted
+  recoveries, negative controls, and retained route/context hold inspectable
+  without exposing raw Waymo records.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 

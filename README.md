@@ -47,7 +47,7 @@ ScenarioLens builds a small but polished pipeline that can:
 | Working framework | Python package, installable CLI, schema, metrics, reports, rendering, dashboard exporter |
 | Real-data path | Native Waymo Motion JSON/proto/TFRecord slice reader with local preflight and validation |
 | Baseline evidence | Constant-velocity ADE/FDE, miss rate, lane-aware comparison, map/signal context coverage, map-match audit, tag studies, and stability studies |
-| Public demo | Static Scenario Explorer with filters, SVG trajectories, score components, failure cards, and real-data diagnostic cases |
+| Public demo | Static Scenario Explorer with filters, SVG trajectories, score components, failure cards, real-data diagnostic cases, and selector decision cards |
 | Repo quality | MIT license, contributor docs, changelog, citation, issue templates, CI, and release checklist |
 
 ## Quick Start
@@ -125,6 +125,7 @@ Then open `http://localhost:8000/demo/`.
 - [200-scenario terminal selector error audit](docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_error_audit_200.md)
 - [200-scenario terminal selector route/context audit](docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_route_context_audit_200.md)
 - [200-scenario terminal selector candidate validation](docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_candidate_validation_200.md)
+- [200-scenario terminal selector decision atlas](docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_decision_atlas_200.md)
 - [200-scenario terminal selector visual casebook](docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md)
 - [Topology gap audit](docs/reports/waymo_lane_continuation_topology_gap_audit.md)
 - [Terminal neighborhood audit](docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md)
@@ -776,6 +777,14 @@ PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-terminal-neighborho
   --asset-prefix terminal_selector_casebook_200 \
   --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_casebook_200 \
   --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md
+
+PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-terminal-neighborhood-selector-decision-atlas \
+  --casebook-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_casebook_200/manifest.json \
+  --candidate-validation-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_candidate_validation_200/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector_decision_atlas_200 \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_decision_atlas_200.md \
+  --demo-json docs/demo/selector_decisions.json \
+  --demo-assets-dir docs/demo/assets
 ```
 
 Run the no-auth baseline ablation:
