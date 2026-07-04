@@ -396,7 +396,7 @@ scenariolens lane-continuation-study \
 This scans the same 100-scenario local Waymo slice for targets whose
 nearest-lane rollout would clamp at the end of a selected lane. The checked-in
 report keeps both sides of the diagnostic after linked-lane closure
-materialization: 141 linked-lane improvements, 62 regressions, and 14 topology
+materialization: 143 linked-lane improvements, 63 regressions, and 13 topology
 gaps.
 
 ## Lane-Continuation Candidate Plan
@@ -639,9 +639,9 @@ scenariolens lane-continuation-terminal-neighborhood-selector \
 ```
 
 This follows the expanded branch queue's 10 topology blockers. The checked-in
-public reports classify 1 cap-recoverable linked-target gap and 9
-terminal/directional selected-lane cases, find 5 nearby recovery candidates,
-accept 3/5 under deterministic replay perturbations, and promote 1 candidate
+public reports classify 0 cap-recoverable linked-target gaps and 10
+terminal/directional selected-lane cases, find 6 nearby recovery candidates,
+accept 3/5 ready candidates under deterministic replay perturbations, and promote 1 candidate
 under the bounded non-oracle selector with 0 false promotions. Treat these as
 diagnostic selector inputs, not default routing behavior.
 
@@ -656,9 +656,9 @@ scenariolens lane-continuation-topology-gap-audit \
 
 This audit reloads the topology blocker cases named by the replay manifest and
 compares capped ScenarioLens map features with raw parsed map-feature IDs. The
-current real-data report audits 5 topology blockers, finds 1 blocker case that
-remains cap-recoverable after linked-lane closure materialization, and confirms
-4 terminal or directional-link cases. Treat it as an ingestion/topology
+current real-data report audits 5 topology blockers, finds 0 blocker cases that
+remain cap-recoverable after linked-lane closure materialization, and confirms
+5 terminal or directional-link cases. Treat it as an ingestion/topology
 expansion target, not as route-planning evidence.
 
 ## Lane-Continuation Terminal Neighborhood Audit
@@ -672,8 +672,8 @@ scenariolens lane-continuation-terminal-neighborhood-audit \
 
 This audit reloads the terminal/directional blockers from the topology-gap
 manifest and inspects a bounded selected-lane neighborhood. The current
-real-data report audits 4 cases, finds 2 nearby aligned lane recovery
-candidates and 2 directional-link mismatches, and keeps the result framed as
+real-data report audits 5 cases, finds 2 nearby aligned lane recovery
+candidates and 3 directional-link mismatches, and keeps the result framed as
 replay/gating input rather than selector behavior.
 
 ## Lane-Continuation Terminal Neighborhood Replay

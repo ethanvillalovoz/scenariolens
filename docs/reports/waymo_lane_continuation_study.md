@@ -11,8 +11,8 @@ It is intentionally scoped: this is not route planning, not a default scorer cha
 - Ready for analysis: True
 - Sources scanned: 4
 - Scenarios scanned: 100
-- Candidate cases: 82
-- Candidate tracks: 220
+- Candidate cases: 83
+- Candidate tracks: 223
 - Max scenarios per input: 25
 - Max lane-link hops: 2
 - Lane-match threshold: 3.500 m
@@ -23,15 +23,15 @@ It is intentionally scoped: this is not route planning, not a default scorer cha
 
 | Metric | Value |
 | --- | ---: |
-| Candidate tracks | 220 |
-| Tracks using linked lanes | 206 |
-| Tracks improved over nearest lane | 141 |
-| Tracks regressed vs nearest lane | 62 |
-| Topology gaps | 14 |
-| Tracks still clamped after links | 63 |
-| Mean nearest FDE | 51.313 m |
-| Mean lane-link FDE | 33.689 m |
-| Mean lane-link improvement over nearest | +17.624 m |
+| Candidate tracks | 223 |
+| Tracks using linked lanes | 210 |
+| Tracks improved over nearest lane | 143 |
+| Tracks regressed vs nearest lane | 63 |
+| Topology gaps | 13 |
+| Tracks still clamped after links | 64 |
+| Mean nearest FDE | 52.112 m |
+| Mean lane-link FDE | 34.206 m |
+| Mean lane-link improvement over nearest | +17.906 m |
 
 ## Per-Source Summary
 
@@ -39,8 +39,8 @@ It is intentionally scoped: this is not route planning, not a default scorer cha
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | `validation.tfrecord-00007-of-00150` | 25 | 21 | 63 | 62 | 37 | 24 | 1 | +13.892 m |
 | `validation.tfrecord-00008-of-00150` | 25 | 17 | 36 | 33 | 22 | 10 | 3 | +18.337 m |
-| `validation.tfrecord-00009-of-00150` | 25 | 22 | 57 | 54 | 42 | 12 | 3 | +26.166 m |
-| `validation.tfrecord-00010-of-00150` | 25 | 22 | 64 | 57 | 40 | 16 | 7 | +13.287 m |
+| `validation.tfrecord-00009-of-00150` | 25 | 23 | 59 | 57 | 44 | 13 | 2 | +27.238 m |
+| `validation.tfrecord-00010-of-00150` | 25 | 22 | 65 | 58 | 40 | 16 | 7 | +13.087 m |
 
 ## Largest Lane-Link Improvements
 
@@ -82,14 +82,14 @@ These candidates still could not use a linked-lane chain. They point to parser c
 | ---: | --- | --- | --- | ---: | ---: | ---: | --- | --- | --- |
 | 1 | `validation.tfrecord-00007-of-00150` | `2f366a31ab03f8b` | `1061` | 133.872 m | 133.872 m | 0.000 m | 219 | 26.476 m / 26.476 m | `topology_gap` |
 | 2 | `validation.tfrecord-00010-of-00150` | `74a5b3325a534a87` | `3178` | 88.934 m | 88.934 m | 0.000 m | 333 | 15.947 m / 23.515 m | `topology_gap` |
-| 3 | `validation.tfrecord-00009-of-00150` | `f64f295c8083bfd6` | `894` | 83.812 m | 83.812 m | 0.000 m | 349 | 20.926 m / 20.926 m | `topology_gap` |
-| 4 | `validation.tfrecord-00008-of-00150` | `4dfe7c285670839f` | `0` | 51.637 m | 51.637 m | 0.000 m | 44 | 15.863 m / 15.863 m | `topology_gap` |
-| 5 | `validation.tfrecord-00010-of-00150` | `f672132039e83c40` | `519` | 51.599 m | 51.599 m | 0.000 m | 73 | 21.194 m / 21.194 m | `topology_gap` |
-| 6 | `validation.tfrecord-00010-of-00150` | `f672132039e83c40` | `520` | 49.691 m | 49.691 m | 0.000 m | 72 | 20.811 m / 20.811 m | `topology_gap` |
-| 7 | `validation.tfrecord-00010-of-00150` | `f672132039e83c40` | `522` | 48.129 m | 48.129 m | 0.000 m | 77 | 32.738 m / 32.738 m | `topology_gap` |
-| 8 | `validation.tfrecord-00010-of-00150` | `fe4a6425278fbd5b` | `816` | 41.649 m | 41.649 m | 0.000 m | 155 | 14.029 m / 14.029 m | `topology_gap` |
-| 9 | `validation.tfrecord-00010-of-00150` | `2f035a284480e981` | `732` | 33.227 m | 33.227 m | 0.000 m | 265 | 12.753 m / 12.753 m | `topology_gap` |
-| 10 | `validation.tfrecord-00010-of-00150` | `d30e6448f14e4c75` | `150` | 28.584 m | 28.584 m | 0.000 m | 269 | 27.667 m / 27.667 m | `topology_gap` |
+| 3 | `validation.tfrecord-00008-of-00150` | `4dfe7c285670839f` | `0` | 51.637 m | 51.637 m | 0.000 m | 44 | 15.863 m / 15.863 m | `topology_gap` |
+| 4 | `validation.tfrecord-00010-of-00150` | `f672132039e83c40` | `519` | 51.599 m | 51.599 m | 0.000 m | 73 | 21.194 m / 21.194 m | `topology_gap` |
+| 5 | `validation.tfrecord-00010-of-00150` | `f672132039e83c40` | `520` | 49.691 m | 49.691 m | 0.000 m | 72 | 20.811 m / 20.811 m | `topology_gap` |
+| 6 | `validation.tfrecord-00010-of-00150` | `f672132039e83c40` | `522` | 48.129 m | 48.129 m | 0.000 m | 77 | 32.738 m / 32.738 m | `topology_gap` |
+| 7 | `validation.tfrecord-00010-of-00150` | `fe4a6425278fbd5b` | `816` | 41.649 m | 41.649 m | 0.000 m | 155 | 14.029 m / 14.029 m | `topology_gap` |
+| 8 | `validation.tfrecord-00010-of-00150` | `2f035a284480e981` | `732` | 33.227 m | 33.227 m | 0.000 m | 265 | 12.753 m / 12.753 m | `topology_gap` |
+| 9 | `validation.tfrecord-00010-of-00150` | `d30e6448f14e4c75` | `150` | 28.584 m | 28.584 m | 0.000 m | 269 | 27.667 m / 27.667 m | `topology_gap` |
+| 10 | `validation.tfrecord-00009-of-00150` | `d508bc55d1510865` | `2283` | 16.082 m | 16.082 m | 0.000 m | 191 | 33.604 m / 33.604 m | `topology_gap` |
 
 ## Interpretation
 

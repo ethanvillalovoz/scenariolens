@@ -243,9 +243,10 @@ smoke test. The prototype can:
 - run a lane-link continuation prototype that proves the linked-lane follow-up
   on a deterministic fixture, resolves the real warning's parsed lane chain,
   and cuts nearest-lane FDE by 63.578 m on that stable case,
-- scan the same 100-scenario local Waymo slice for 220 lane-continuation
+- scan the same 100-scenario local Waymo slice for 223 lane-continuation
   candidates after linked-lane closure materialization, where linked lanes
-  improve 141 targets and expose 62 regressions plus 14 topology gaps for
+  cover 210 targets, improve 143 targets, and expose 63 regressions plus
+  13 topology gaps for
   follow-up audits,
 - turn those continuation-study rows into 15 replay/audit candidates: 5
   improvement controls, 5 regression debug targets, and 5 topology-audit
@@ -286,24 +287,24 @@ smoke test. The prototype can:
   and a route-context guard/calibration pass with 0 false holds and 0 false
   promotions on the expanded replay queue,
 - audit the expanded topology blockers by comparing capped ScenarioLens map
-  features with raw parsed map-feature IDs, showing 1 blocker case remains
-  cap-recoverable and 9 selected lanes are terminal/directional cases after
-  five-hop closure materialization,
-- audit those 9 expanded terminal/directional lane neighborhoods, finding 5
+  features with raw parsed map-feature IDs, showing 0 blocker cases remain
+  cap-recoverable and 10 selected lanes are terminal/directional cases after
+  seven-hop closure materialization,
+- audit those 10 expanded terminal/directional lane neighborhoods, finding 6
   nearby alternate-lane recovery candidates, 4 directional-link mismatches, and
   0 true terminal/map-boundary cases before promoting selector claims,
-- replay and gate those 5 expanded nearby recovery candidates, accepting 3
+- replay and gate the 5 ready expanded nearby recovery candidates, accepting 3
   alternate lanes for bounded selector experiments and holding 2 regression
   cases,
 - run a bounded expanded terminal-neighborhood selector experiment that promotes
   1 alternate lane, holds 4 cases for context, matches 3/5 replay labels, and
   records 0 false promotions plus 2 false holds,
 - audit the initial topology blockers by comparing capped ScenarioLens map
-  features with raw parsed map-feature IDs, showing 1 blocker case remains
-  cap-recoverable and 4 lanes are terminal or directional-link cases after
-  five-hop closure materialization,
-- audit those 4 terminal/directional lane neighborhoods, finding 2 nearby
-  alternate-lane recovery candidates and 2 directional-link mismatches before
+  features with raw parsed map-feature IDs, showing 0 blocker cases remain
+  cap-recoverable and 5 lanes are terminal or directional-link cases after
+  seven-hop closure materialization,
+- audit those 5 terminal/directional lane neighborhoods, finding 2 nearby
+  alternate-lane recovery candidates and 3 directional-link mismatches before
   promoting anything into branch-selection claims,
 - replay and gate those 2 nearby recovery candidates, accepting 1 alternate
   lane for the next bounded selector experiment and holding 1 regression case,
@@ -321,9 +322,9 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to investigate the remaining cap-recoverable lane-link
-target, broaden terminal-neighborhood selector candidates, add more replay-held
-negatives, and then expand beyond the current 100-scenario slice.
+The next milestone is to broaden terminal-neighborhood selector candidates, add
+more replay-held negatives, and then expand beyond the current 100-scenario
+slice.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).

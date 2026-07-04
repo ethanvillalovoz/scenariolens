@@ -59,9 +59,9 @@ Topology-audit candidates are re-probed as blockers instead of being treated as 
 | ---: | --- | --- | --- | ---: | ---: | ---: | --- |
 | 11 | `2f366a31ab03f8b` | `1061` | `no_exit_lanes` | 0 | 133.872 m | 133.872 m | No usable parsed linked-lane chain is available yet. |
 | 12 | `74a5b3325a534a87` | `3178` | `no_entry_lanes` | 0 | 88.934 m | 88.934 m | No usable parsed linked-lane chain is available yet. |
-| 13 | `f64f295c8083bfd6` | `894` | `linked_feature_missing` | 0 | 83.812 m | 83.812 m | No usable parsed linked-lane chain is available yet. |
-| 14 | `4dfe7c285670839f` | `0` | `no_exit_lanes` | 0 | 51.637 m | 51.637 m | No usable parsed linked-lane chain is available yet. |
-| 15 | `f672132039e83c40` | `519` | `no_exit_lanes` | 0 | 51.599 m | 51.599 m | No usable parsed linked-lane chain is available yet. |
+| 13 | `4dfe7c285670839f` | `0` | `no_exit_lanes` | 0 | 51.637 m | 51.637 m | No usable parsed linked-lane chain is available yet. |
+| 14 | `f672132039e83c40` | `519` | `no_exit_lanes` | 0 | 51.599 m | 51.599 m | No usable parsed linked-lane chain is available yet. |
+| 15 | `f672132039e83c40` | `520` | `no_exit_lanes` | 0 | 49.691 m | 49.691 m | No usable parsed linked-lane chain is available yet. |
 
 ## `937eb2fa17da45c0` / track `979`
 
@@ -412,29 +412,6 @@ Blockers / cautions:
 - The target still out-travels the linked lane chain within the prediction horizon.
 - Raw Waymo TFRecords and local replay packets must stay ignored.
 
-## `f64f295c8083bfd6` / track `894`
-
-- Queue: `topology_audit`
-- Readiness: `needs_topology_audit`
-- Source: `validation.tfrecord-00009-of-00150`
-- Result: **topology_blocker**
-- Why: The selected feature still lacks a usable linked-lane chain.
-- Recommended next action: Audit parsed lane links, map-feature caps, and link direction before replaying this case.
-- Feature chain: 349
-- Link status/count: `linked_feature_missing` / 0
-- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/13-topology-audit-f64f295c8083bfd6-894/lane_continuation_replay_packet.json`
-
-Target replay row:
-
-| CV FDE | Nearest FDE | Heading FDE | Lane-link FDE | Link vs nearest | Link vs CV | Clamp after link |
-| ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| 13.784 m | 83.812 m | 83.812 m | 83.812 m | 0.000 m | -70.028 m | True |
-
-Blockers / cautions:
-- No usable parsed linked-lane chain is available yet.
-- The target still out-travels the linked lane chain within the prediction horizon.
-- Raw Waymo TFRecords and local replay packets must stay ignored.
-
 ## `4dfe7c285670839f` / track `0`
 
 - Queue: `topology_audit`
@@ -445,7 +422,7 @@ Blockers / cautions:
 - Recommended next action: Audit parsed lane links, map-feature caps, and link direction before replaying this case.
 - Feature chain: 44
 - Link status/count: `no_exit_lanes` / 0
-- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/14-topology-audit-4dfe7c285670839f-0/lane_continuation_replay_packet.json`
+- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/13-topology-audit-4dfe7c285670839f-0/lane_continuation_replay_packet.json`
 
 Target replay row:
 
@@ -468,13 +445,36 @@ Blockers / cautions:
 - Recommended next action: Audit parsed lane links, map-feature caps, and link direction before replaying this case.
 - Feature chain: 73
 - Link status/count: `no_exit_lanes` / 0
-- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/15-topology-audit-f672132039e83c40-519/lane_continuation_replay_packet.json`
+- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/14-topology-audit-f672132039e83c40-519/lane_continuation_replay_packet.json`
 
 Target replay row:
 
 | CV FDE | Nearest FDE | Heading FDE | Lane-link FDE | Link vs nearest | Link vs CV | Clamp after link |
 | ---: | ---: | ---: | ---: | ---: | ---: | --- |
 | 17.399 m | 51.599 m | 51.599 m | 51.599 m | 0.000 m | -34.200 m | True |
+
+Blockers / cautions:
+- No usable parsed linked-lane chain is available yet.
+- The target still out-travels the linked lane chain within the prediction horizon.
+- Raw Waymo TFRecords and local replay packets must stay ignored.
+
+## `f672132039e83c40` / track `520`
+
+- Queue: `topology_audit`
+- Readiness: `needs_topology_audit`
+- Source: `validation.tfrecord-00010-of-00150`
+- Result: **topology_blocker**
+- Why: The selected feature still lacks a usable linked-lane chain.
+- Recommended next action: Audit parsed lane links, map-feature caps, and link direction before replaying this case.
+- Feature chain: 72
+- Link status/count: `no_exit_lanes` / 0
+- Local replay packet: `data/processed/waymo_lane_continuation_replay_prototype/cases/15-topology-audit-f672132039e83c40-520/lane_continuation_replay_packet.json`
+
+Target replay row:
+
+| CV FDE | Nearest FDE | Heading FDE | Lane-link FDE | Link vs nearest | Link vs CV | Clamp after link |
+| ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| 15.627 m | 49.691 m | 49.691 m | 49.691 m | 0.000 m | -34.064 m | True |
 
 Blockers / cautions:
 - No usable parsed linked-lane chain is available yet.

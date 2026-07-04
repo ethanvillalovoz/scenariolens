@@ -164,21 +164,21 @@ keeps the current -0.05 endpoint gate as the provisional target with 0 false
 holds and 0 false promotions on the expanded 2-case replay queue.
 
 The expanded topology follow-up turns those 10 topology probes into a sharper
-work queue. It finds 1 remaining cap-recoverable linked-target materialization
-gap and 9 terminal/directional selected-lane cases. The terminal-neighborhood
-audit then finds 5 nearby recovery candidates, replay accepts 3 under
-deterministic perturbation gates, and the bounded selector promotes 1 candidate
-while holding 4 for additional context.
+work queue. It finds no cap-recoverable linked-target materialization gaps and
+10 terminal/directional selected-lane cases. The terminal-neighborhood
+audit then finds 6 nearby recovery candidates, replay accepts 3 of 5 ready
+candidates under deterministic perturbation gates, and the bounded selector
+promotes 1 candidate while holding 4 for additional context.
 
 The topology gap audit now measures what remains after linked-lane closure
 materialization. The ingestion layer preserves the first 240 map features and
-adds a bounded five-hop closure set for referenced lane links, cutting study
-topology gaps from 33 to 14. The remaining top replay blockers are 1
-cap-recoverable case and 4 terminal or directional-link cases.
+adds a bounded seven-hop closure set for referenced lane links, cutting study
+topology gaps from 33 to 13. The remaining top replay blockers are 0
+cap-recoverable cases and 5 terminal or directional-link cases.
 
-The terminal-neighborhood audit follows those 4 terminal/directional cases.
+The terminal-neighborhood audit follows those 5 terminal/directional cases.
 It reloads the local slices, inspects nearby heading-aligned lane alternatives,
-and finds 2 nearby alternate-lane recovery candidates plus 2 directional-link
+and finds 2 nearby alternate-lane recovery candidates plus 3 directional-link
 mismatches. The important boundary is that these are replay/gating inputs, not a
 selector change: ScenarioLens now knows where to test bounded neighborhood
 recovery before claiming broader branch behavior.
@@ -224,7 +224,6 @@ and links to the public reports.
 - Add a dataset adapter for another public motion dataset.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
-- Investigate the remaining cap-recoverable closure target.
 - Broaden the terminal-neighborhood selector experiment across more candidates.
 - Rerun the expanded closure-enabled branch queue across more validation shards.
 - Add more replay-held branch negatives.

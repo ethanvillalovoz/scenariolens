@@ -46,9 +46,9 @@ The result is intentionally narrow. It is not a route planner, not a default sco
 | ---: | --- | --- | --- | --- | ---: | ---: | ---: | --- | ---: | --- |
 | 21 | `2f366a31ab03f8b` | `1061` | `promote_terminal_neighborhood_alternate` | `accept_for_selector_experiment` | 3.534 m | 1.000 | 228.779 m | True | +125.481 m | Evaluate this selector rule on a broader terminal-neighborhood queue. |
 | 22 | `74a5b3325a534a87` | `3178` | `hold_for_terminal_neighborhood_context` | `hold_recovery_regressed` | 2.533 m | 0.690 | 72.451 m | True | -15.163 m | Add richer route, heading, or map-neighborhood context before promotion. |
-| 28 | `fe4a6425278fbd5b` | `816` | `hold_for_terminal_neighborhood_context` | `accept_for_selector_experiment` | 0.988 m | 0.984 | 48.036 m | True | +37.105 m | Add richer route, heading, or map-neighborhood context before promotion. |
-| 29 | `2f035a284480e981` | `732` | `hold_for_terminal_neighborhood_context` | `accept_for_selector_experiment` | 1.659 m | 0.999 | 42.611 m | True | +22.865 m | Add richer route, heading, or map-neighborhood context before promotion. |
-| 30 | `d30e6448f14e4c75` | `150` | `hold_for_terminal_neighborhood_context` | `hold_recovery_regressed` | 2.509 m | 0.974 | 16.421 m | True | -9.087 m | Add richer route, heading, or map-neighborhood context before promotion. |
+| 27 | `fe4a6425278fbd5b` | `816` | `hold_for_terminal_neighborhood_context` | `accept_for_selector_experiment` | 0.988 m | 0.984 | 48.036 m | True | +37.105 m | Add richer route, heading, or map-neighborhood context before promotion. |
+| 28 | `2f035a284480e981` | `732` | `hold_for_terminal_neighborhood_context` | `accept_for_selector_experiment` | 1.659 m | 0.999 | 42.611 m | True | +22.865 m | Add richer route, heading, or map-neighborhood context before promotion. |
+| 29 | `d30e6448f14e4c75` | `150` | `hold_for_terminal_neighborhood_context` | `hold_recovery_regressed` | 2.509 m | 0.974 | 16.421 m | True | -9.087 m | Add richer route, heading, or map-neighborhood context before promotion. |
 
 ## Promote Queue
 

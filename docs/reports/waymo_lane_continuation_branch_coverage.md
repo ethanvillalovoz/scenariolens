@@ -56,7 +56,7 @@ It is intentionally public-safe. It reads summary manifests only, publishes coun
 
 | Bottleneck | Count | Evidence | Expansion move |
 | --- | ---: | --- | --- |
-| `topology_parser_gap` | 5 | missing_linked_feature: 1, terminal_lane_or_parser_gap: 4 | Audit missing linked features, terminal lanes, and parser feature caps before expanding branch replay. |
+| `topology_parser_gap` | 5 | terminal_lane_or_parser_gap: 5 | Audit missing linked features, terminal lanes, and parser feature caps before expanding branch replay. |
 | `single_chain_no_branch_choice` | 2 | e3f6a29b59e42c1 / track 741, e9db41e904b349a2 / track 406 | Expose alternate continuations through deeper topology search, better selected-lane choice, or richer lane-link parsing. |
 | `route_context_margin_hold` | 1 | 5c49e681a66c720 / track 2627 | Add endpoint-alignment, downstream topology, traffic-control, and speed-limit context before selector rollout. |
 | `narrow_regression_branch_queue` | 5 | 5 regression-debug candidates feed the current branch-selection stage. | After topology blockers shrink, raise top-per-bucket and rerun continuation replay, route diagnostics, branch selection, replay, and guard reports. |
@@ -70,9 +70,9 @@ It is intentionally public-safe. It reads summary manifests only, publishes coun
 | 3 | `single_chain_branch_expansion` | `e9db41e904b349a2` | `406` | `validation.tfrecord-00007-of-00150` | The parsed topology exposes only one usable linked chain, so this case needs richer topology or a different selected lane before branch selection can help. | Audit lane topology depth, missing links, and selected-lane quality. |
 | 4 | `topology_parser_gap` | `2f366a31ab03f8b` | `1061` | `validation.tfrecord-00007-of-00150` | The selected lane appears terminal or lacks parsed exit/entry links even though the target continues beyond it. | Audit the selected map feature's parsed entry/exit lane IDs. |
 | 5 | `topology_parser_gap` | `74a5b3325a534a87` | `3178` | `validation.tfrecord-00010-of-00150` | The selected lane appears terminal or lacks parsed exit/entry links even though the target continues beyond it. | Audit the selected map feature's parsed entry/exit lane IDs. |
-| 6 | `topology_parser_gap` | `f64f295c8083bfd6` | `894` | `validation.tfrecord-00009-of-00150` | The selected feature references a continuation that the lightweight parser did not make usable. | Audit the selected map feature's parsed entry/exit lane IDs. |
-| 7 | `topology_parser_gap` | `4dfe7c285670839f` | `0` | `validation.tfrecord-00008-of-00150` | The selected lane appears terminal or lacks parsed exit/entry links even though the target continues beyond it. | Audit the selected map feature's parsed entry/exit lane IDs. |
-| 8 | `topology_parser_gap` | `f672132039e83c40` | `519` | `validation.tfrecord-00010-of-00150` | The selected lane appears terminal or lacks parsed exit/entry links even though the target continues beyond it. | Audit the selected map feature's parsed entry/exit lane IDs. |
+| 6 | `topology_parser_gap` | `4dfe7c285670839f` | `0` | `validation.tfrecord-00008-of-00150` | The selected lane appears terminal or lacks parsed exit/entry links even though the target continues beyond it. | Audit the selected map feature's parsed entry/exit lane IDs. |
+| 7 | `topology_parser_gap` | `f672132039e83c40` | `519` | `validation.tfrecord-00010-of-00150` | The selected lane appears terminal or lacks parsed exit/entry links even though the target continues beyond it. | Audit the selected map feature's parsed entry/exit lane IDs. |
+| 8 | `topology_parser_gap` | `f672132039e83c40` | `520` | `validation.tfrecord-00010-of-00150` | The selected lane appears terminal or lacks parsed exit/entry links even though the target continues beyond it. | Audit the selected map feature's parsed entry/exit lane IDs. |
 
 ## Source Coverage
 
@@ -80,8 +80,8 @@ It is intentionally public-safe. It reads summary manifests only, publishes coun
 | --- | ---: | ---: | ---: | ---: | ---: |
 | `validation.tfrecord-00007-of-00150` | 4 | 2 | 1 | 0 | 0 |
 | `validation.tfrecord-00008-of-00150` | 2 | 1 | 0 | 0 | 0 |
-| `validation.tfrecord-00009-of-00150` | 5 | 1 | 1 | 1 | 0 |
-| `validation.tfrecord-00010-of-00150` | 4 | 1 | 1 | 0 | 1 |
+| `validation.tfrecord-00009-of-00150` | 4 | 1 | 1 | 1 | 0 |
+| `validation.tfrecord-00010-of-00150` | 5 | 1 | 1 | 0 | 1 |
 
 ## Interpretation
 

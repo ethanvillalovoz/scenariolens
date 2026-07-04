@@ -211,9 +211,9 @@ Testing and verification:
   deterministic fixture, resolves the real stable warning's parsed lane chain
   `144 -> 190 -> 193`, and cuts nearest-lane FDE by 63.578 m on that case.
 - A lane-continuation validation study scans 100 real local Waymo scenarios and
-  finds 220 lane-end clamp candidates after linked-lane closure materialization:
-  141 linked-lane improvements, 62 regressions, and 14 topology gaps for
-  follow-up audit work.
+  finds 223 lane-end clamp candidates after linked-lane closure materialization:
+  210 linked-lane rollouts, 143 linked-lane improvements, 63 regressions, and
+  13 topology gaps for follow-up audit work.
 - A lane-continuation candidate plan turns that study into 15 follow-up items:
   five replay controls, five regression debug targets, and five topology-audit
   blockers.
@@ -257,17 +257,17 @@ Testing and verification:
   calibration keeps the current -0.05 endpoint gate with 0 false holds and 0
   false promotions on the expanded replay queue.
 - The expanded topology blocker follow-up reloads those 10 topology probes:
-  1 is a cap-recoverable linked-target materialization gap and 9 are
+  0 are cap-recoverable linked-target materialization gaps and 10 are
   terminal/directional selected-lane cases. A bounded neighborhood audit finds
-  5 nearby recovery candidates, replay accepts 3 under perturbation gates, and
-  the non-oracle selector promotes 1 while recording 0 false promotions and 2
-  false holds.
+  6 nearby recovery candidates, replay accepts 3 of 5 ready candidates under
+  perturbation gates, and the non-oracle selector promotes 1 while recording 0
+  false promotions and 2 false holds.
 - A topology gap audit reloads those 5 topology blockers and compares capped
-  ScenarioLens map features with raw parsed map-feature IDs: 1 blocker case
-  remains cap-recoverable, 4 are terminal or directional-link cases, and 0 raw
+  ScenarioLens map features with raw parsed map-feature IDs: 0 blocker cases
+  remain cap-recoverable, 5 are terminal or directional-link cases, and 0 raw
   target misses remain unexplained.
-- A terminal-neighborhood audit reloads the 4 terminal/directional blockers and
-  finds 2 nearby alternate-lane recovery candidates plus 2 directional-link
+- A terminal-neighborhood audit reloads the 5 terminal/directional blockers and
+  finds 2 nearby alternate-lane recovery candidates plus 3 directional-link
   mismatches, keeping them as replay/gating targets rather than selector claims.
 - A terminal-neighborhood replay gate force-replays those 2 nearby recovery
   candidates, accepts 1 alternate lane for a bounded selector experiment, and
@@ -283,10 +283,10 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Investigate the remaining cap-recoverable closure target, broaden
-   terminal-neighborhood selector candidates, and add more replay-held branch
-   negatives.
-4. Create curated scenario collections for pedestrian, cyclist, merge, and
+3. Broaden terminal-neighborhood selector candidates and add more replay-held
+   branch negatives.
+4. Expand the closure-enabled queue beyond the current 100-scenario slice.
+5. Create curated scenario collections for pedestrian, cyclist, merge, and
    unprotected-turn cases.
 
 ## Claims To Keep Honest

@@ -23,16 +23,16 @@ The report is intentionally narrow: it does not change the default prediction ba
 | Metric | Value |
 | --- | ---: |
 | Source topology cases | 5 |
-| Terminal/directional cases selected | 4 |
-| Cases audited | 4 |
-| Ready cases | 4 |
+| Terminal/directional cases selected | 5 |
+| Cases audited | 5 |
+| Ready cases | 5 |
 | Nearby alternate-lane recovery candidates | 2 |
-| Directional-link mismatch candidates | 2 |
+| Directional-link mismatch candidates | 3 |
 | True terminal / map-boundary cases | 0 |
 | Selected-lane issue candidates | 2 |
-| Mean nearby lane candidates | 4.25 |
-| Mean linked alternate count | 1.75 |
-| Mean route gap to horizon | +69.710 m |
+| Mean nearby lane candidates | 3.8 |
+| Mean linked alternate count | 1.4 |
+| Mean route gap to horizon | +62.591 m |
 
 ## Decisions
 
@@ -40,8 +40,9 @@ The report is intentionally narrow: it does not change the default prediction ba
 | ---: | --- | --- | --- | --- | --- | ---: | ---: | ---: | --- | --- |
 | 11 | `2f366a31ab03f8b` | `1061` | `219` | `exit_lanes` | `nearby_alternate_lane_recovery` | 0.223 m | 3 | 1 | `220` (255.255 m) | Add a bounded selected-lane neighborhood search before branch selection. |
 | 12 | `74a5b3325a534a87` | `3178` | `333` | `entry_lanes` | `nearby_alternate_lane_recovery` | 0.163 m | 10 | 6 | `331` (95.966 m) | Add a bounded selected-lane neighborhood search before branch selection. |
-| 14 | `4dfe7c285670839f` | `0` | `44` | `exit_lanes` | `directional_link_mismatch` | 0.323 m | 2 | 0 | none | Audit anchor heading, lane direction, and entry/exit semantics for this case. |
-| 15 | `f672132039e83c40` | `519` | `73` | `exit_lanes` | `directional_link_mismatch` | 0.094 m | 2 | 0 | none | Audit anchor heading, lane direction, and entry/exit semantics for this case. |
+| 13 | `4dfe7c285670839f` | `0` | `44` | `exit_lanes` | `directional_link_mismatch` | 0.323 m | 2 | 0 | none | Audit anchor heading, lane direction, and entry/exit semantics for this case. |
+| 14 | `f672132039e83c40` | `519` | `73` | `exit_lanes` | `directional_link_mismatch` | 0.094 m | 2 | 0 | none | Audit anchor heading, lane direction, and entry/exit semantics for this case. |
+| 15 | `f672132039e83c40` | `520` | `72` | `exit_lanes` | `directional_link_mismatch` | 0.004 m | 2 | 0 | none | Audit anchor heading, lane direction, and entry/exit semantics for this case. |
 
 ## `2f366a31ab03f8b` / track `1061`
 
@@ -143,6 +144,31 @@ Nearby lane candidates:
 | --- | --- | ---: | ---: | --- | ---: | --- | ---: | --- |
 | `77` | False | 3.268 m | 1.0 | `exit_lanes` | 0 | `no_exit_lanes` | 21.106 m | False |
 | `73` | True | 0.094 m | 1.0 | `exit_lanes` | 0 | `no_exit_lanes` | 21.194 m | False |
+
+Recommended next actions:
+- Audit anchor heading, lane direction, and entry/exit semantics for this case.
+- Require replay evidence before allowing opposite-direction link recovery.
+
+## `f672132039e83c40` / track `520`
+
+- Source: `validation.tfrecord-00010-of-00150`
+- Diagnosis: **directional_link_mismatch**
+- Reason: The selected lane has links only opposite the inferred travel direction, so the blocker may be direction or anchor-context sensitive.
+- Selected feature: `72`
+- Lane-link status: `no_exit_lanes`
+- Link field: `exit_lanes`
+- Selected distance / alignment: 0.004 m / 1.0
+- Selected directional/opposite links: 0 / 2
+- Horizon / selected route remaining: 54.924 m / 20.811 m
+- Route gap to horizon: +34.113 m
+- Nearby aligned lanes / linked alternates: 2 / 0
+
+Nearby lane candidates:
+
+| Feature | Selected | Distance | Alignment | Link field | Directional links | Route status | Route remaining | Recovery candidate |
+| --- | --- | ---: | ---: | --- | ---: | --- | ---: | --- |
+| `77` | False | 3.433 m | 1.0 | `exit_lanes` | 0 | `no_exit_lanes` | 20.845 m | False |
+| `72` | True | 0.004 m | 1.0 | `exit_lanes` | 0 | `no_exit_lanes` | 20.811 m | False |
 
 Recommended next actions:
 - Audit anchor heading, lane direction, and entry/exit semantics for this case.

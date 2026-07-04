@@ -23,16 +23,16 @@ The report is intentionally narrow: it does not change the default prediction ba
 | Metric | Value |
 | --- | ---: |
 | Source topology cases | 10 |
-| Terminal/directional cases selected | 9 |
-| Cases audited | 9 |
-| Ready cases | 9 |
-| Nearby alternate-lane recovery candidates | 5 |
+| Terminal/directional cases selected | 10 |
+| Cases audited | 10 |
+| Ready cases | 10 |
+| Nearby alternate-lane recovery candidates | 6 |
 | Directional-link mismatch candidates | 4 |
 | True terminal / map-boundary cases | 0 |
-| Selected-lane issue candidates | 5 |
-| Mean nearby lane candidates | 4.667 |
-| Mean linked alternate count | 1.667 |
-| Mean route gap to horizon | +53.149 m |
+| Selected-lane issue candidates | 6 |
+| Mean nearby lane candidates | 4.5 |
+| Mean linked alternate count | 1.7 |
+| Mean route gap to horizon | +50.204 m |
 
 ## Decisions
 
@@ -40,13 +40,14 @@ The report is intentionally narrow: it does not change the default prediction ba
 | ---: | --- | --- | --- | --- | --- | ---: | ---: | ---: | --- | --- |
 | 21 | `2f366a31ab03f8b` | `1061` | `219` | `exit_lanes` | `nearby_alternate_lane_recovery` | 0.223 m | 3 | 1 | `220` (255.255 m) | Add a bounded selected-lane neighborhood search before branch selection. |
 | 22 | `74a5b3325a534a87` | `3178` | `333` | `entry_lanes` | `nearby_alternate_lane_recovery` | 0.163 m | 10 | 6 | `331` (95.966 m) | Add a bounded selected-lane neighborhood search before branch selection. |
-| 24 | `4dfe7c285670839f` | `0` | `44` | `exit_lanes` | `directional_link_mismatch` | 0.323 m | 2 | 0 | none | Audit anchor heading, lane direction, and entry/exit semantics for this case. |
-| 25 | `f672132039e83c40` | `519` | `73` | `exit_lanes` | `directional_link_mismatch` | 0.094 m | 2 | 0 | none | Audit anchor heading, lane direction, and entry/exit semantics for this case. |
-| 26 | `f672132039e83c40` | `520` | `72` | `exit_lanes` | `directional_link_mismatch` | 0.004 m | 2 | 0 | none | Audit anchor heading, lane direction, and entry/exit semantics for this case. |
-| 27 | `f672132039e83c40` | `522` | `77` | `exit_lanes` | `directional_link_mismatch` | 0.530 m | 3 | 0 | none | Audit anchor heading, lane direction, and entry/exit semantics for this case. |
-| 28 | `fe4a6425278fbd5b` | `816` | `155` | `exit_lanes` | `nearby_alternate_lane_recovery` | 0.284 m | 4 | 3 | `344` (62.065 m) | Add a bounded selected-lane neighborhood search before branch selection. |
-| 29 | `2f035a284480e981` | `732` | `265` | `exit_lanes` | `nearby_alternate_lane_recovery` | 1.101 m | 13 | 3 | `264` (55.364 m) | Add a bounded selected-lane neighborhood search before branch selection. |
-| 30 | `d30e6448f14e4c75` | `150` | `269` | `exit_lanes` | `nearby_alternate_lane_recovery` | 0.016 m | 3 | 2 | `268` (44.088 m) | Add a bounded selected-lane neighborhood search before branch selection. |
+| 23 | `4dfe7c285670839f` | `0` | `44` | `exit_lanes` | `directional_link_mismatch` | 0.323 m | 2 | 0 | none | Audit anchor heading, lane direction, and entry/exit semantics for this case. |
+| 24 | `f672132039e83c40` | `519` | `73` | `exit_lanes` | `directional_link_mismatch` | 0.094 m | 2 | 0 | none | Audit anchor heading, lane direction, and entry/exit semantics for this case. |
+| 25 | `f672132039e83c40` | `520` | `72` | `exit_lanes` | `directional_link_mismatch` | 0.004 m | 2 | 0 | none | Audit anchor heading, lane direction, and entry/exit semantics for this case. |
+| 26 | `f672132039e83c40` | `522` | `77` | `exit_lanes` | `directional_link_mismatch` | 0.530 m | 3 | 0 | none | Audit anchor heading, lane direction, and entry/exit semantics for this case. |
+| 27 | `fe4a6425278fbd5b` | `816` | `155` | `exit_lanes` | `nearby_alternate_lane_recovery` | 0.284 m | 4 | 3 | `344` (62.065 m) | Add a bounded selected-lane neighborhood search before branch selection. |
+| 28 | `2f035a284480e981` | `732` | `265` | `exit_lanes` | `nearby_alternate_lane_recovery` | 1.101 m | 13 | 3 | `264` (55.364 m) | Add a bounded selected-lane neighborhood search before branch selection. |
+| 29 | `d30e6448f14e4c75` | `150` | `269` | `exit_lanes` | `nearby_alternate_lane_recovery` | 0.016 m | 3 | 2 | `268` (44.088 m) | Add a bounded selected-lane neighborhood search before branch selection. |
+| 30 | `d508bc55d1510865` | `2283` | `191` | `exit_lanes` | `nearby_alternate_lane_recovery` | 0.252 m | 3 | 2 | `186` (39.146 m) | Add a bounded selected-lane neighborhood search before branch selection. |
 
 ## `2f366a31ab03f8b` / track `1061`
 
@@ -285,6 +286,32 @@ Nearby lane candidates:
 Recommended next actions:
 - Add a bounded selected-lane neighborhood search before branch selection.
 - Replay alternate lane `268` before changing default scoring behavior.
+
+## `d508bc55d1510865` / track `2283`
+
+- Source: `validation.tfrecord-00009-of-00150`
+- Diagnosis: **nearby_alternate_lane_recovery**
+- Reason: The selected lane is terminal for the requested direction, but a nearby heading-aligned lane has parsed directional continuation.
+- Selected feature: `191`
+- Lane-link status: `no_exit_lanes`
+- Link field: `exit_lanes`
+- Selected distance / alignment: 0.252 m / 0.992
+- Selected directional/opposite links: 0 / 2
+- Horizon / selected route remaining: 57.305 m / 33.604 m
+- Route gap to horizon: +23.701 m
+- Nearby aligned lanes / linked alternates: 3 / 2
+
+Nearby lane candidates:
+
+| Feature | Selected | Distance | Alignment | Link field | Directional links | Route status | Route remaining | Recovery candidate |
+| --- | --- | ---: | ---: | --- | ---: | --- | ---: | --- |
+| `186` | False | 5.548 m | 0.992 | `exit_lanes` | 1 | `no_exit_lanes` | 39.146 m | True |
+| `190` | False | 5.548 m | 0.992 | `exit_lanes` | 1 | `no_exit_lanes` | 39.146 m | True |
+| `191` | True | 0.252 m | 0.992 | `exit_lanes` | 0 | `no_exit_lanes` | 33.604 m | False |
+
+Recommended next actions:
+- Add a bounded selected-lane neighborhood search before branch selection.
+- Replay alternate lane `186` before changing default scoring behavior.
 
 ## Interpretation
 

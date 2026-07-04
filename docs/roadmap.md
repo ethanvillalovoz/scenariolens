@@ -374,9 +374,9 @@ continuation prototype at
 following on a deterministic fixture and resolves the real stable warning's
 parsed lane chain, reducing the clamped nearest-lane FDE by 63.578 m. The
 validation study at `docs/reports/waymo_lane_continuation_study.md` then scans
-100 local Waymo scenarios and finds 220 lane-continuation candidates after
-linked-lane closure materialization, including 141 linked-lane improvements,
-62 regressions, and 14 topology gaps. The
+100 local Waymo scenarios and finds 223 lane-continuation candidates after
+linked-lane closure materialization, including 210 linked-lane rollouts, 143
+linked-lane improvements, 63 regressions, and 13 topology gaps. The
 candidate plan at `docs/reports/waymo_lane_continuation_candidate_plan.md`
 promotes 15 of those rows into replay controls, regression debug targets, and
 topology-audit blockers. The replay prototype at
@@ -424,14 +424,14 @@ guard calibration at
 adds 1 replay-held route-context margin negative and validates the current
 -0.05 endpoint gate with 0 false holds and 0 false promotions on the expanded
 2-case replay queue. Linked-lane
-closure materialization now cuts study topology gaps from 33 to 14 and raises
-linked-lane improvements from 96 to 141. The topology gap audit at
+closure materialization now cuts study topology gaps from 33 to 13 and raises
+linked-lane improvements from 96 to 143. The topology gap audit at
 `docs/reports/waymo_lane_continuation_topology_gap_audit_expanded.md` follows
-the expanded topology probes and classifies 10 blockers into 1 cap-recoverable
-linked-target materialization gap and 9 terminal/directional selected-lane
+the expanded topology probes and classifies 10 blockers into 0 cap-recoverable
+linked-target materialization gaps and 10 terminal/directional selected-lane
 cases. The expanded terminal-neighborhood audit at
 `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit_expanded.md`
-finds 5 nearby alternate-lane recovery candidates and 4 directional gaps. The
+finds 6 nearby alternate-lane recovery candidates and 4 directional gaps. The
 expanded replay gate at
 `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_expanded.md`
 accepts 3 of those 5 recovery candidates under deterministic perturbations,
@@ -440,10 +440,10 @@ and the expanded selector experiment at
 promotes 1 candidate with 0 false promotions and 2 false holds. The initial
 topology gap audit at
 `docs/reports/waymo_lane_continuation_topology_gap_audit.md` then shows that
-1 blocker case remains cap-recoverable and 4 are terminal/directional. The
+0 blocker cases remain cap-recoverable and 5 are terminal/directional. The
 terminal-neighborhood audit at
 `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md` follows
-those 4 cases, finding 2 nearby alternate-lane recovery candidates and 2
+those 5 cases, finding 2 nearby alternate-lane recovery candidates and 3
 directional-link mismatches. The terminal-neighborhood replay gate at
 `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md` then
 force-replays the 2 nearby recovery candidates, accepting 1 alternate lane for
@@ -451,11 +451,10 @@ a bounded selector experiment and holding 1 regression case. The
 terminal-neighborhood selector experiment at
 `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector.md` then
 promotes 1 heading-aligned alternate lane, holds 1 low-heading case, and
-matches the replay gate on 2/2 decisions. Next work should investigate the
-remaining cap-recoverable linked target, broaden the terminal-neighborhood
-selector experiment, add more replay-held branch negatives, and run the
-closure-enabled queue beyond the current 100-scenario slice before claiming
-broader selector readiness.
+matches the replay gate on 2/2 decisions. Next work should broaden the
+terminal-neighborhood selector experiment, add more replay-held branch
+negatives, and run the closure-enabled queue beyond the current 100-scenario
+slice before claiming broader selector readiness.
 
 ## Stretch Goals
 

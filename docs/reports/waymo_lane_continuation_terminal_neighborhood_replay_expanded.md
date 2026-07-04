@@ -49,9 +49,9 @@ The replay is intentionally narrow: it does not change the default ScenarioLens 
 | ---: | --- | --- | --- | --- | ---: | ---: | ---: | ---: | --- | --- |
 | 21 | `2f366a31ab03f8b` | `1061` | 219 | 220 -> 210 | 133.872 m | 8.391 m | +125.481 m | 4/4 | `accept_for_selector_experiment` | Promote this alternate-lane recovery into the next bounded selector experiment. |
 | 22 | `74a5b3325a534a87` | `3178` | 333 | 331 -> 205 | 88.934 m | 104.097 m | -15.163 m | 0/4 | `hold_recovery_regressed` | Do not promote this alternate; inspect selected-lane quality and local topology manually. |
-| 28 | `fe4a6425278fbd5b` | `816` | 155 | 344 -> 346 -> 353 | 41.649 m | 4.544 m | +37.105 m | 4/4 | `accept_for_selector_experiment` | Promote this alternate-lane recovery into the next bounded selector experiment. |
-| 29 | `2f035a284480e981` | `732` | 265 | 264 -> 262 -> 332 | 33.227 m | 10.362 m | +22.865 m | 4/4 | `accept_for_selector_experiment` | Promote this alternate-lane recovery into the next bounded selector experiment. |
-| 30 | `d30e6448f14e4c75` | `150` | 269 | 268 -> 265 -> 263 | 28.584 m | 37.671 m | -9.087 m | 0/4 | `hold_recovery_regressed` | Do not promote this alternate; inspect selected-lane quality and local topology manually. |
+| 27 | `fe4a6425278fbd5b` | `816` | 155 | 344 -> 346 -> 353 | 41.649 m | 4.544 m | +37.105 m | 4/4 | `accept_for_selector_experiment` | Promote this alternate-lane recovery into the next bounded selector experiment. |
+| 28 | `2f035a284480e981` | `732` | 265 | 264 -> 262 -> 332 | 33.227 m | 10.362 m | +22.865 m | 4/4 | `accept_for_selector_experiment` | Promote this alternate-lane recovery into the next bounded selector experiment. |
+| 29 | `d30e6448f14e4c75` | `150` | 269 | 268 -> 265 -> 263 | 28.584 m | 37.671 m | -9.087 m | 0/4 | `hold_recovery_regressed` | Do not promote this alternate; inspect selected-lane quality and local topology manually. |
 
 ## `2f366a31ab03f8b` / track `1061`
 

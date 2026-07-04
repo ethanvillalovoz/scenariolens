@@ -67,9 +67,9 @@ mechanism on a deterministic linked-lane fixture and resolves the real stable
 warning's parsed lane chain `144 -> 190 -> 193`, cutting the clamped
 nearest-lane FDE by 63.578 m on that case.
 The lane-continuation validation study then scans the same 100-scenario local
-Waymo slice and finds 220 lane-end clamp candidates after five-hop linked-lane
-closure materialization: 141 improve with linked lanes, 62 regress, and 14
-remain topology gaps.
+Waymo slice and finds 223 lane-end clamp candidates after seven-hop linked-lane
+closure materialization: 210 receive linked-lane rollouts, 143 improve with
+linked lanes, 63 regress, and 13 remain topology gaps.
 The candidate plan then promotes 15 rows into concrete follow-up queues: five
 replay controls, five regression debug targets, and five topology-audit
 blockers.
@@ -115,17 +115,18 @@ replay queue, the current route-context guard matches replay labels 2/2 with 0
 false holds and 0 false promotions.
 
 The topology gap audit follows the largest blocker class directly. After
-five-hop linked-lane closure materialization, the 100-scenario study now finds
-220 lane-continuation candidates, 141 linked-lane improvements, and 14 topology
-gaps. The top replay blockers are now 1 cap-recoverable case and 4 terminal or
+seven-hop linked-lane closure materialization, the 100-scenario study now finds
+223 lane-continuation candidates, 143 linked-lane improvements, and 13 topology
+gaps. The top replay blockers are now 0 cap-recoverable cases and 5 terminal or
 directional-link cases with no raw target misses, turning the next step into
-selected-lane neighborhood and one remaining parser-budget target.
+selected-lane neighborhood and negative-control expansion rather than a
+parser-budget target.
 
-The terminal-neighborhood audit then reloads those 4 terminal/directional
+The terminal-neighborhood audit then reloads those 5 terminal/directional
 blockers and asks a sharper map-selection question: is the selected lane truly
 terminal, or is there a nearby heading-aligned lane with parsed continuation?
 On the current slice, 2 cases have nearby alternate-lane recovery candidates
-and 2 cases are directional-link mismatches. Those are not promoted as selector
+and 3 cases are directional-link mismatches. Those are not promoted as selector
 wins yet; they become replay and gating targets for the next branch-queue pass.
 
 The terminal-neighborhood replay gate now force-replays those 2 nearby recovery
@@ -150,7 +151,6 @@ failures, and produce reviewable evidence.
 
 ## Next Step
 
-Investigate the remaining cap-recoverable lane-link target, broaden the
-terminal-neighborhood selector experiment, add more replay-held branch
-negatives, and rerun the closure-enabled branch queue beyond shards `00007`
-through `00010`.
+Broaden the terminal-neighborhood selector experiment, add more replay-held
+branch negatives, and rerun the closure-enabled branch queue beyond shards
+`00007` through `00010`.

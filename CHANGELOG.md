@@ -74,10 +74,10 @@ All notable changes to ScenarioLens are documented here.
 - Waymo Motion ingestion now preserves the first 240 map features and appends a
   bounded two-hop linked-lane closure set, cutting continuation topology gaps
   from 33 to 17 on an earlier 100-scenario local validation slice.
-- Waymo Motion ingestion now extends that bounded linked-lane closure to five
+- Waymo Motion ingestion now extends that bounded linked-lane closure to seven
   hops and up to 240 closure features, raising the 100-scenario
-  lane-continuation study to 220 candidates, 141 linked-lane improvements, and
-  14 remaining topology gaps.
+  lane-continuation study to 223 candidates, 210 linked-lane rollouts, 143
+  linked-lane improvements, and 13 remaining topology gaps.
 - `scenariolens lane-continuation-study` workflow and
   `docs/reports/waymo_lane_continuation_study.md`, scanning the 100-scenario
   local Waymo slice for lane-end clamp candidates and publishing linked-lane
@@ -124,23 +124,23 @@ All notable changes to ScenarioLens are documented here.
   `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_expanded.md`,
   and
   `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md`,
-  triaging 10 expanded topology blockers into 1 cap-recoverable linked-target
-  gap and 9 terminal/directional selected-lane cases, replay-accepting 3/5
-  nearby recovery candidates, and selector-promoting 1 candidate with 0 false
-  promotions.
+  triaging 10 expanded topology blockers into 0 cap-recoverable linked-target
+  gaps and 10 terminal/directional selected-lane cases, finding 6 nearby
+  recovery candidates, replay-accepting 3/5 ready candidates, and
+  selector-promoting 1 candidate with 0 false promotions.
 - `scenariolens lane-continuation-branch-coverage` workflow and
   `docs/reports/waymo_lane_continuation_branch_coverage.md`, connecting the
   continuation candidate, replay, diagnostics, branch-selection, branch-replay,
   and route-context guard manifests into a public-safe expansion funnel.
 - `scenariolens lane-continuation-topology-gap-audit` workflow and
   `docs/reports/waymo_lane_continuation_topology_gap_audit.md`, reloading the
-  5 topology blockers from the replay manifest and showing that 1 blocker case
-  remains cap-recoverable while 4 lanes are terminal or directional-link cases
+  5 topology blockers from the replay manifest and showing that 0 blocker cases
+  remain cap-recoverable while 5 lanes are terminal or directional-link cases
   after linked-lane closure materialization.
 - `scenariolens lane-continuation-terminal-neighborhood-audit` workflow and
   `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md`,
-  reloading the 4 terminal/directional blockers and finding 2 nearby
-  alternate-lane recovery candidates plus 2 directional-link mismatches without
+  reloading the 5 terminal/directional blockers and finding 2 nearby
+  alternate-lane recovery candidates plus 3 directional-link mismatches without
   changing the default scorer.
 - `scenariolens lane-continuation-terminal-neighborhood-replay` workflow and
   `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md`,

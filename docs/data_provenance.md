@@ -189,8 +189,8 @@ retains 240 map features per scenario. That cuts the clamped nearest-lane FDE by
 The lane-continuation validation study is checked in at
 [`docs/reports/waymo_lane_continuation_study.md`](reports/waymo_lane_continuation_study.md).
 It scans the same 100-scenario local slice for lane-end clamp candidates and
-publishes aggregate/ranked diagnostics only: 220 candidate tracks, 206 linked
-lane rollouts, 141 improvements, 62 regressions, and 14 topology gaps. Raw
+publishes aggregate/ranked diagnostics only: 223 candidate tracks, 210 linked
+lane rollouts, 143 improvements, 63 regressions, and 13 topology gaps. Raw
 Waymo files and ignored local manifests remain outside git.
 
 The lane-continuation candidate plan is checked in at
@@ -285,16 +285,16 @@ packets remain ignored, and this is still not a full Waymo benchmark claim.
 The expanded topology gap audit is checked in at
 [`docs/reports/waymo_lane_continuation_topology_gap_audit_expanded.md`](reports/waymo_lane_continuation_topology_gap_audit_expanded.md).
 It reloads the 10 topology blockers from the expanded replay manifest and
-publishes only derived topology classifications: 1 cap-recoverable linked
-target, 9 terminal/directional selected lanes, 0 raw target misses, and 6 maps
+publishes only derived topology classifications: 0 cap-recoverable linked
+targets, 10 terminal/directional selected lanes, 0 raw target misses, and 5 maps
 at the feature cap. The paired expanded terminal-neighborhood audit, replay
 gate, and selector experiment are checked in at
 [`docs/reports/waymo_lane_continuation_terminal_neighborhood_audit_expanded.md`](reports/waymo_lane_continuation_terminal_neighborhood_audit_expanded.md),
 [`docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_expanded.md`](reports/waymo_lane_continuation_terminal_neighborhood_replay_expanded.md),
 and
 [`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md`](reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md).
-Those reports inspect 9 terminal/directional cases, find 5 nearby recovery
-candidates and 4 directional gaps, replay the 5 recovery candidates, accept 3
+Those reports inspect 10 terminal/directional cases, find 6 nearby recovery
+candidates and 4 directional gaps, replay the 5 ready recovery candidates, accept 3
 under perturbation gates, and promote 1 candidate under a bounded non-oracle
 selector. Raw Waymo records, raw map geometry, and per-case local packets remain
 ignored.
@@ -303,15 +303,15 @@ The topology gap audit is checked in at
 [`docs/reports/waymo_lane_continuation_topology_gap_audit.md`](reports/waymo_lane_continuation_topology_gap_audit.md).
 It reloads the ignored local source scenarios referenced by the replay manifest,
 then publishes only derived topology classifications: 5 topology blockers
-audited, 1 cap-recoverable blocker case, 4 terminal or directional-link
-confirmations, 0 raw target misses, and 3 maps at or above the base feature cap.
+audited, 0 cap-recoverable blocker cases, 5 terminal or directional-link
+confirmations, 0 raw target misses, and 2 maps at or above the base feature cap.
 Raw Waymo records and local per-case packets remain ignored.
 
 The terminal-neighborhood audit is checked in at
 [`docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md`](reports/waymo_lane_continuation_terminal_neighborhood_audit.md).
-It reloads only the 4 terminal/directional blocker cases, inspects bounded
+It reloads only the 5 terminal/directional blocker cases, inspects bounded
 nearby-lane metadata, and publishes derived decisions: 2 nearby alternate-lane
-recovery candidates, 2 directional-link mismatches, and 0 true terminal/map
+recovery candidates, 3 directional-link mismatches, and 0 true terminal/map
 boundary cases in the current queue. It does not publish raw map geometry or
 change selector behavior.
 
