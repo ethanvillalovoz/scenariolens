@@ -112,6 +112,9 @@ from scenariolens.lane_continuation_terminal_neighborhood_selector_transfer impo
     SELECTOR_TRANSFER_POLICY_SOURCES,
     generate_lane_continuation_terminal_neighborhood_selector_transfer,
 )
+from scenariolens.lane_continuation_terminal_neighborhood_selector_error_audit import (
+    generate_lane_continuation_terminal_neighborhood_selector_error_audit,
+)
 from scenariolens.lane_continuation_terminal_neighborhood_casebook import (
     generate_lane_continuation_terminal_neighborhood_casebook,
 )
@@ -1388,6 +1391,47 @@ def lane_continuation_terminal_neighborhood_selector_transfer_command(
         f"novel, {result.transfer_match_count} replay-gate match(es), "
         f"{result.transfer_false_promote_count} false promote(s), "
         f"{result.transfer_false_hold_count} false hold(s)."
+    )
+    return 0
+
+
+def lane_continuation_terminal_neighborhood_selector_error_audit_command(
+    selector_transfer_manifest: str,
+    output_dir: str,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_lane_continuation_terminal_neighborhood_selector_error_audit(
+            selector_transfer_manifest_path=selector_transfer_manifest,
+            output_dir=output_dir,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(
+        "Wrote lane-continuation-terminal-neighborhood-selector-error-audit "
+        f"manifest to {result.manifest_path}"
+    )
+    print(
+        "Wrote lane-continuation-terminal-neighborhood-selector-error-audit "
+        f"report to {result.report_path}"
+    )
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print(
+            "Lane-continuation terminal-neighborhood selector error audit is "
+            "not ready. See manifest.json."
+        )
+        return 2
+    print(
+        "Generated terminal-neighborhood selector error audit for "
+        f"{result.case_count} case(s): {result.false_promote_count} false "
+        f"promote(s), {result.false_hold_count} false hold(s), "
+        f"{result.counterfactual_policy_count} counterfactual policy "
+        "candidate(s)."
     )
     return 0
 
@@ -2827,6 +2871,40 @@ def main() -> int:
             "selector transfer-validation report copy."
         ),
     )
+    lane_continuation_terminal_selector_error_audit_parser = subparsers.add_parser(
+        "lane-continuation-terminal-neighborhood-selector-error-audit",
+        help=(
+            "Explain selector transfer false holds/false promotions and sweep "
+            "small counterfactual gates."
+        ),
+    )
+    lane_continuation_terminal_selector_error_audit_parser.add_argument(
+        "--selector-transfer-manifest",
+        required=True,
+        help=(
+            "Manifest produced by scenariolens "
+            "lane-continuation-terminal-neighborhood-selector-transfer."
+        ),
+    )
+    lane_continuation_terminal_selector_error_audit_parser.add_argument(
+        "--output-dir",
+        default=(
+            "data/processed/"
+            "waymo_lane_continuation_terminal_neighborhood_selector_error_audit"
+        ),
+        help=(
+            "Directory for terminal-neighborhood selector error-audit "
+            "manifest.json and report.md."
+        ),
+    )
+    lane_continuation_terminal_selector_error_audit_parser.add_argument(
+        "--public-report",
+        default=None,
+        help=(
+            "Optional Markdown path for a public-safe terminal-neighborhood "
+            "selector error-audit report copy."
+        ),
+    )
     lane_continuation_terminal_casebook_parser = subparsers.add_parser(
         "lane-continuation-terminal-neighborhood-casebook",
         help=(
@@ -3407,6 +3485,12 @@ def main() -> int:
             ),
             output_dir=args.output_dir,
             policy_source=args.policy_source,
+            public_report=args.public_report,
+        )
+    if args.command == "lane-continuation-terminal-neighborhood-selector-error-audit":
+        return lane_continuation_terminal_neighborhood_selector_error_audit_command(
+            selector_transfer_manifest=args.selector_transfer_manifest,
+            output_dir=args.output_dir,
             public_report=args.public_report,
         )
     if args.command == "lane-continuation-terminal-neighborhood-casebook":

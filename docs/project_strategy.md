@@ -187,6 +187,8 @@ and links back to reports and provenance.
   [`docs/reports/waymo_lane_continuation_study_200.md`](reports/waymo_lane_continuation_study_200.md)
 - 200-scenario terminal selector transfer validation:
   [`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200.md`](reports/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200.md)
+- 200-scenario terminal selector error audit:
+  [`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_error_audit_200.md`](reports/waymo_lane_continuation_terminal_neighborhood_selector_error_audit_200.md)
 - 200-scenario terminal selector visual casebook:
   [`docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md`](reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md)
 - Topology gap audit:

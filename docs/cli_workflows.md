@@ -807,6 +807,11 @@ scenariolens lane-continuation-terminal-neighborhood-selector-transfer \
   --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200 \
   --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200.md
 
+scenariolens lane-continuation-terminal-neighborhood-selector-error-audit \
+  --selector-transfer-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector_error_audit_200 \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_error_audit_200.md
+
 scenariolens lane-continuation-terminal-neighborhood-casebook \
   --selector-calibration-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200/manifest.json \
   --asset-prefix terminal_selector_casebook_200 \
@@ -824,6 +829,9 @@ selector limitation rather than a solved policy. The transfer-validation step
 applies the 6-case provisional calibration to the broader 7-case replay queue:
 it sees 3 overlap cases and 4 novel cases, improves default replay-gate
 agreement from 4/7 to 5/7, keeps 0 false promotions, and leaves 2 false holds.
+The error-audit step explains those false holds: both are novel heading-gate
+misses, one is recoverable by a heading-relaxed diagnostic candidate, and a
+combined heading/route relaxation would introduce a false promotion.
 
 ## Baseline Ablation
 

@@ -23,6 +23,14 @@ All notable changes to ScenarioLens are documented here.
   200-scenario replay queue. The transfer validation covers 7 cases, including
   4 novel validation cases, improves replay-gate matches from 4/7 to 5/7, and
   keeps 0 false promotions while leaving 2 false holds.
+- `scenariolens lane-continuation-terminal-neighborhood-selector-error-audit`
+  workflow and
+  `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_error_audit_200.md`,
+  explaining the transfer queue's remaining 2 false holds and testing 5
+  counterfactual selector gates. The audit shows that relaxing heading to 0.70
+  reduces false holds from 2 to 1 without false promotions on this small queue,
+  while combining heading relaxation with a 25 m route-extension gate introduces
+  a false promotion.
 - `scenariolens lane-continuation-terminal-neighborhood-casebook` now supports
   `--asset-prefix` so multiple public casebooks can share
   `docs/reports/assets/` without overwriting SVG cards.

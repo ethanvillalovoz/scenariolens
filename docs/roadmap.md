@@ -461,7 +461,13 @@ then applies the 6-case provisional calibration to the broader 7-case replay
 queue: 3 cases overlap with the calibration queue, 4 are novel validation
 cases, replay-label agreement improves from the current default's 4/7 to 5/7,
 and false promotions remain 0 while 2 false holds remain. That makes the
-policy useful diagnostic evidence, not a default selector update.
+policy useful diagnostic evidence, not a default selector update. The selector
+error audit at
+`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_error_audit_200.md`
+then explains both false holds as novel heading-gate misses, shows that a
+heading-relaxed 0.70 diagnostic gate would reduce false holds from 2 to 1
+without false promotions on this queue, and rejects a combined heading/route
+relaxation because it introduces a false promotion.
 The initial
 topology gap audit at
 `docs/reports/waymo_lane_continuation_topology_gap_audit.md` then shows that
