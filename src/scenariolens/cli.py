@@ -1343,12 +1343,14 @@ def lane_continuation_terminal_neighborhood_selector_calibration_command(
 def lane_continuation_terminal_neighborhood_casebook_command(
     selector_calibration_manifest: str,
     output_dir: str,
+    asset_prefix: str,
     public_report: str | None,
 ) -> int:
     try:
         result = generate_lane_continuation_terminal_neighborhood_casebook(
             selector_calibration_manifest_path=selector_calibration_manifest,
             output_dir=output_dir,
+            asset_prefix=asset_prefix,
             public_report_path=public_report,
         )
     except (RuntimeError, ValueError, FileNotFoundError) as exc:
@@ -2752,6 +2754,14 @@ def main() -> int:
         ),
     )
     lane_continuation_terminal_casebook_parser.add_argument(
+        "--asset-prefix",
+        default="terminal_selector_casebook",
+        help=(
+            "Filename prefix for derived SVG cards, useful when multiple "
+            "public casebooks share docs/reports/assets."
+        ),
+    )
+    lane_continuation_terminal_casebook_parser.add_argument(
         "--public-report",
         default=None,
         help=(
@@ -3293,6 +3303,7 @@ def main() -> int:
         return lane_continuation_terminal_neighborhood_casebook_command(
             selector_calibration_manifest=args.selector_calibration_manifest,
             output_dir=args.output_dir,
+            asset_prefix=args.asset_prefix,
             public_report=args.public_report,
         )
     if args.command == "heading-replay-prototype":

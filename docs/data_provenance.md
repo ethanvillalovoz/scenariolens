@@ -347,6 +347,22 @@ for each case. The cards show metric bars for replay gain, route extension,
 heading alignment, and alternate-lane distance; they do not publish raw
 trajectory points or raw map polylines.
 
+The 200-scenario lane-continuation scale-up is checked in at
+[`docs/reports/waymo_lane_continuation_study_200.md`](reports/waymo_lane_continuation_study_200.md),
+[`docs/reports/waymo_lane_continuation_replay_prototype_200.md`](reports/waymo_lane_continuation_replay_prototype_200.md),
+[`docs/reports/waymo_lane_continuation_topology_gap_audit_200.md`](reports/waymo_lane_continuation_topology_gap_audit_200.md),
+[`docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_200.md`](reports/waymo_lane_continuation_terminal_neighborhood_replay_200.md),
+[`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200.md`](reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200.md),
+and
+[`docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md`](reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md).
+It scans 50 scenarios per local validation shard, for 200 scenarios total,
+and publishes only derived metrics: 451 lane-continuation targets, 45
+replay/audit cases, 15 topology blockers, 7 terminal-neighborhood replay
+candidates, and 7 derived selector cards. The broader calibration improves
+selector/replay agreement from 4/7 to 6/7 with 0 false promotions, but still
+leaves 1 false hold; the artifact treats that as an open limitation, not a
+production-ready selector claim.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

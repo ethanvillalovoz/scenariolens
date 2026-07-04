@@ -73,7 +73,8 @@ motion-context branch replay, branch rollout gate, route-context guard, and
 route-context guard calibration, branch coverage, expanded branch coverage,
 guard validation, expanded topology gap and terminal-neighborhood audits, plus
 terminal-neighborhood replay gates, bounded selector experiments, and derived
-terminal selector visual casebooks,
+terminal selector visual casebooks, including a 200-scenario scale-up that
+scans 451 lane-continuation targets,
 Markdown/JSON reports, a local real-data validation packet workflow, static
 dashboard data, and 2D SVG trajectory rendering with forecast overlays.
 

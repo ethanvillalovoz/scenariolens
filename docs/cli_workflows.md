@@ -749,6 +749,73 @@ replay-accepted recoveries, 3 held negative controls, the current versus
 recommended selector decision, and the gate evidence behind each choice. The
 cards are metric diagrams, not trajectory or raw map overlays.
 
+## 200-Scenario Terminal Selector Scale-Up
+
+```bash
+scenariolens lane-continuation-study \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00007-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00008-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00009-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00010-of-00150 \
+  --max-scenarios 50 \
+  --top 20 \
+  --output-dir data/processed/waymo_lane_continuation_study_200 \
+  --public-report docs/reports/waymo_lane_continuation_study_200.md
+
+scenariolens lane-continuation-candidates \
+  --study-manifest data/processed/waymo_lane_continuation_study_200/manifest.json \
+  --top-per-bucket 15 \
+  --output-dir data/processed/waymo_lane_continuation_candidates_200 \
+  --public-report docs/reports/waymo_lane_continuation_candidate_plan_200.md
+
+scenariolens lane-continuation-replay-prototype \
+  --candidate-manifest data/processed/waymo_lane_continuation_candidates_200/manifest.json \
+  --top-per-bucket 15 \
+  --max-scenarios-per-source 50 \
+  --output-dir data/processed/waymo_lane_continuation_replay_prototype_200 \
+  --public-report docs/reports/waymo_lane_continuation_replay_prototype_200.md
+
+scenariolens lane-continuation-topology-gap-audit \
+  --replay-manifest data/processed/waymo_lane_continuation_replay_prototype_200/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_topology_gap_audit_200 \
+  --public-report docs/reports/waymo_lane_continuation_topology_gap_audit_200.md
+
+scenariolens lane-continuation-terminal-neighborhood-audit \
+  --topology-manifest data/processed/waymo_lane_continuation_topology_gap_audit_200/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_audit_200 \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_audit_200.md
+
+scenariolens lane-continuation-terminal-neighborhood-replay \
+  --terminal-neighborhood-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_audit_200/manifest.json \
+  --top 7 \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_replay_200 \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_200.md
+
+scenariolens lane-continuation-terminal-neighborhood-selector \
+  --terminal-neighborhood-replay-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_replay_200/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector_200 \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_200.md
+
+scenariolens lane-continuation-terminal-neighborhood-selector-calibration \
+  --terminal-neighborhood-replay-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_replay_200/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200 \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200.md
+
+scenariolens lane-continuation-terminal-neighborhood-casebook \
+  --selector-calibration-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200/manifest.json \
+  --asset-prefix terminal_selector_casebook_200 \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_casebook_200 \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md
+```
+
+This doubles the local shard window to 200 scenarios while staying laptop-safe.
+The checked-in reports scan 451 lane-continuation targets, queue 45
+replay/audit cases, replay 30 target tracks with 120 perturbation trials, audit
+15 topology blockers, and replay 7 terminal-neighborhood candidates. The
+selector calibration improves replay agreement from 4/7 to 6/7 with 0 false
+promotions, but leaves 1 false hold; the report frames that as a remaining
+selector limitation rather than a solved policy.
+
 ## Baseline Ablation
 
 ```bash

@@ -218,11 +218,13 @@ def lane_continuation_terminal_neighborhood_selector_calibration_markdown(
     current_false_holds = int(current.get("false_hold_count", 0) or 0)
     replay_held_count = int(aggregate.get("replay_gate_held_count", 0) or 0)
 
+    recommended_false_holds = int(recommended.get("false_hold_count", 0) or 0)
     lines = [
         "# ScenarioLens Terminal-Neighborhood Selector Calibration",
         "",
         _opening_summary(
             current_false_hold_count=current_false_holds,
+            recommended_false_hold_count=recommended_false_holds,
             replay_held_count=replay_held_count,
         ),
         "",
@@ -334,9 +336,10 @@ def lane_continuation_terminal_neighborhood_selector_calibration_markdown(
 
 def _opening_summary(
     current_false_hold_count: int,
+    recommended_false_hold_count: int,
     replay_held_count: int,
 ) -> str:
-    if current_false_hold_count > 0:
+    if current_false_hold_count > 0 and recommended_false_hold_count == 0:
         return (
             "This report calibrates the conservative terminal-neighborhood "
             "selector that held replay-accepted nearby-lane candidates. It "
@@ -344,6 +347,14 @@ def _opening_summary(
             "compares each policy against replay-gate labels, and recommends "
             "the least-relaxed policy that removes the current false holds on "
             "this queue without adding false promotions."
+        )
+    if current_false_hold_count > 0:
+        return (
+            "This report stress-tests the conservative terminal-neighborhood "
+            "selector on a broader nearby-lane replay queue. It sweeps small "
+            "distance, heading, and route-extension gate grids, then reports "
+            "the best zero-false-promotion calibration candidate it found "
+            "while making clear that false holds remain."
         )
     if replay_held_count > 0:
         return (
@@ -522,8 +533,9 @@ def _recommended_policy(
         else {}
     )
     recommended["recommendation"] = (
-        "No candidate cleared both false holds and false promotions on this "
-        "queue; keep the current selector and expand evidence."
+        "Use this only as a diagnostic calibration candidate for the next "
+        "expanded queue; do not change the default selector because no grid "
+        "candidate cleared both false holds and false promotions."
     )
     return recommended
 

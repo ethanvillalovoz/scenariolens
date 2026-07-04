@@ -6,6 +6,19 @@ All notable changes to ScenarioLens are documented here.
 
 ### Added
 
+- 200-scenario lane-continuation and terminal-selector scale-up reports across
+  four local Waymo Motion validation shards:
+  `docs/reports/waymo_lane_continuation_study_200.md`,
+  `docs/reports/waymo_lane_continuation_replay_prototype_200.md`,
+  `docs/reports/waymo_lane_continuation_topology_gap_audit_200.md`, and
+  `docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md`.
+  The pass scans 451 lane-continuation targets, replays/probes 45 queued
+  cases, audits 15 topology blockers, and publishes 7 terminal-selector visual
+  cards with 0 false promotions and 1 remaining false hold under the best
+  zero-false-promotion calibration candidate.
+- `scenariolens lane-continuation-terminal-neighborhood-casebook` now supports
+  `--asset-prefix` so multiple public casebooks can share
+  `docs/reports/assets/` without overwriting SVG cards.
 - `scenariolens lane-continuation-terminal-neighborhood-casebook` workflow and
   `docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_expanded.md`,
   publishing six derived SVG decision cards for the expanded terminal selector

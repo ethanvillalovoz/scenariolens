@@ -1,6 +1,6 @@
 # ScenarioLens Terminal-Neighborhood Selector Casebook
 
-This casebook turns the expanded terminal-neighborhood replay and selector-calibration queue into six visual decision cards. Each card explains why a nearby lane alternate is promoted or held using only derived metrics: replay gain, route extension, heading alignment, alternate-lane distance, and selector gate outcomes.
+This casebook turns the expanded terminal-neighborhood replay and selector-calibration queue into 6 visual decision cards. Each card explains why a nearby lane alternate is promoted or held using only derived metrics: replay gain, route extension, heading alignment, alternate-lane distance, and selector gate outcomes.
 
 It is intentionally narrow: this is not a route planner, not a default scorer change, and not a Waymo benchmark claim.
 
@@ -184,7 +184,7 @@ Selector checks:
 
 ## Interpretation
 
-- The three promoted cases are replay-accepted recoveries under the recommended calibration, not default production behavior.
-- The three held cases are useful negative controls: low heading alignment, short route extension, or too much alternate-lane distance prevents over-promotion.
+- The 3 promoted cases are replay-accepted recoveries under the recommended calibration, not default production behavior.
+- The 3 held cases are useful negative controls: low heading alignment, short route extension, or too much alternate-lane distance prevents over-promotion.
 - The visual cards make the selector failure modes inspectable without committing raw Waymo trajectories or map geometry.
 - The next stronger validation step is to broaden terminal-neighborhood replay coverage across more shards before changing default scoring behavior.

@@ -183,6 +183,10 @@ and links back to reports and provenance.
   [`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md`](reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md)
 - Expanded terminal selector visual casebook:
   [`docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_expanded.md`](reports/waymo_lane_continuation_terminal_neighborhood_casebook_expanded.md)
+- 200-scenario lane-continuation study:
+  [`docs/reports/waymo_lane_continuation_study_200.md`](reports/waymo_lane_continuation_study_200.md)
+- 200-scenario terminal selector visual casebook:
+  [`docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md`](reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md)
 - Topology gap audit:
   [`docs/reports/waymo_lane_continuation_topology_gap_audit.md`](reports/waymo_lane_continuation_topology_gap_audit.md)
 - Terminal neighborhood audit:

@@ -96,8 +96,11 @@ Then open `http://localhost:8000/demo/`.
 - [Context route/intent audit](docs/reports/waymo_context_route_intent_audit.md)
 - [Lane-link continuation prototype](docs/reports/waymo_lane_continuation_prototype.md)
 - [Lane-continuation validation study](docs/reports/waymo_lane_continuation_study.md)
+- [200-scenario lane-continuation validation study](docs/reports/waymo_lane_continuation_study_200.md)
 - [Lane-continuation candidate plan](docs/reports/waymo_lane_continuation_candidate_plan.md)
+- [200-scenario lane-continuation candidate plan](docs/reports/waymo_lane_continuation_candidate_plan_200.md)
 - [Lane-continuation replay prototype](docs/reports/waymo_lane_continuation_replay_prototype.md)
+- [200-scenario lane-continuation replay prototype](docs/reports/waymo_lane_continuation_replay_prototype_200.md)
 - [Lane-continuation route diagnostics](docs/reports/waymo_lane_continuation_route_diagnostics.md)
 - [Lane-continuation branch selection diagnostic](docs/reports/waymo_lane_continuation_branch_selection.md)
 - [Motion-context branch replay diagnostic](docs/reports/waymo_lane_continuation_branch_replay.md)
@@ -113,6 +116,12 @@ Then open `http://localhost:8000/demo/`.
 - [Expanded terminal neighborhood selector experiment](docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md)
 - [Expanded terminal neighborhood selector calibration](docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md)
 - [Expanded terminal selector visual casebook](docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_expanded.md)
+- [200-scenario topology gap audit](docs/reports/waymo_lane_continuation_topology_gap_audit_200.md)
+- [200-scenario terminal neighborhood audit](docs/reports/waymo_lane_continuation_terminal_neighborhood_audit_200.md)
+- [200-scenario terminal replay gate](docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_200.md)
+- [200-scenario terminal selector experiment](docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_200.md)
+- [200-scenario terminal selector calibration](docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200.md)
+- [200-scenario terminal selector visual casebook](docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md)
 - [Topology gap audit](docs/reports/waymo_lane_continuation_topology_gap_audit.md)
 - [Terminal neighborhood audit](docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md)
 - [Terminal neighborhood replay gate](docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md)
@@ -729,6 +738,17 @@ PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-terminal-neighborho
   --selector-calibration-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded/manifest.json \
   --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_casebook_expanded \
   --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_expanded.md
+```
+
+For the larger 200-scenario local shard pass, use distinct output directories
+and SVG prefixes so both casebooks can coexist:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-terminal-neighborhood-casebook \
+  --selector-calibration-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200/manifest.json \
+  --asset-prefix terminal_selector_casebook_200 \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_casebook_200 \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md
 ```
 
 Run the no-auth baseline ablation:

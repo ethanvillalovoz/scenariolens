@@ -208,6 +208,13 @@ route extension, heading alignment, alternate-lane distance, current decision,
 recommended decision, and hold flags. These cards are metric diagrams for
 reviewers, not raw trajectory or map overlays.
 
+The 200-scenario scale-up repeats the same chain over 50 scenarios per local
+validation shard. It scans 451 lane-continuation targets, replays/probes 45
+queued cases, audits 15 topology blockers, and produces a 7-card terminal
+selector casebook. The larger calibration is intentionally less tidy: it
+improves agreement from 4/7 to 6/7 with 0 false promotions, but leaves 1 false
+hold, which becomes the next selector-evidence target.
+
 ## Map-Match Audit
 
 The map-match audit handles cases that are not ready to be treated as replay

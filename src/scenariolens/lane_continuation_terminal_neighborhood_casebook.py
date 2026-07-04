@@ -43,10 +43,12 @@ class LaneContinuationTerminalNeighborhoodCasebookResult:
 def generate_lane_continuation_terminal_neighborhood_casebook(
     selector_calibration_manifest_path: str | Path,
     output_dir: str | Path,
+    asset_prefix: str = "terminal_selector_casebook",
     public_report_path: str | Path | None = None,
 ) -> LaneContinuationTerminalNeighborhoodCasebookResult:
     """Generate a public-safe visual casebook from selector calibration output."""
 
+    _validate_asset_prefix(asset_prefix)
     source = Path(selector_calibration_manifest_path)
     target = Path(output_dir)
     target.mkdir(parents=True, exist_ok=True)
@@ -57,6 +59,7 @@ def generate_lane_continuation_terminal_neighborhood_casebook(
     payload = lane_continuation_terminal_neighborhood_casebook_payload(
         selector_calibration_manifest_path=source,
         output_dir=target,
+        asset_prefix=asset_prefix,
     )
     report = lane_continuation_terminal_neighborhood_casebook_markdown(payload)
     _write_json(manifest_path, payload)
@@ -85,9 +88,11 @@ def generate_lane_continuation_terminal_neighborhood_casebook(
 def lane_continuation_terminal_neighborhood_casebook_payload(
     selector_calibration_manifest_path: Path,
     output_dir: Path,
+    asset_prefix: str = "terminal_selector_casebook",
 ) -> dict[str, object]:
     """Return public-safe casebook data and write local derived SVG cards."""
 
+    _validate_asset_prefix(asset_prefix)
     calibration = json.loads(
         selector_calibration_manifest_path.read_text(encoding="utf-8")
     )
@@ -106,7 +111,10 @@ def lane_continuation_terminal_neighborhood_casebook_payload(
         for case in _required_list(calibration, "cases")
         if isinstance(case, dict)
     ]
-    cases = [_casebook_case(case, index + 1) for index, case in enumerate(raw_cases)]
+    cases = [
+        _casebook_case(case, index + 1, asset_prefix=asset_prefix)
+        for index, case in enumerate(raw_cases)
+    ]
     assets_dir = output_dir / "assets"
     _write_case_card_assets(cases=cases, assets_dir=assets_dir)
 
@@ -131,6 +139,7 @@ def lane_continuation_terminal_neighborhood_casebook_payload(
         "topology_manifest": calibration.get("topology_manifest"),
         "output_dir": str(output_dir),
         "assets_dir": "assets",
+        "asset_prefix": asset_prefix,
         "ready": bool(calibration.get("ready")) and bool(cases),
         "source_scope": calibration.get("source_scope", {}),
         "current_policy": calibration.get("current_policy", {}),
@@ -162,11 +171,16 @@ def lane_continuation_terminal_neighborhood_casebook_markdown(
     recommended = _required_mapping(payload, "recommended_policy")
     cases = _required_list(payload, "cases")
 
+    case_count = int(aggregate.get("case_count", 0) or 0)
+    promoted_count = int(aggregate.get("recommended_promote_count", 0) or 0)
+    held_count = int(aggregate.get("recommended_hold_count", 0) or 0)
+
     lines = [
         "# ScenarioLens Terminal-Neighborhood Selector Casebook",
         "",
         "This casebook turns the expanded terminal-neighborhood replay and "
-        "selector-calibration queue into six visual decision cards. Each card "
+        f"selector-calibration queue into {case_count} visual decision "
+        f"{_plural('card', case_count)}. Each card "
         "explains why a nearby lane alternate is promoted or held using only "
         "derived metrics: replay gain, route extension, heading alignment, "
         "alternate-lane distance, and selector gate outcomes.",
@@ -260,8 +274,8 @@ def lane_continuation_terminal_neighborhood_casebook_markdown(
             "",
             "## Interpretation",
             "",
-            "- The three promoted cases are replay-accepted recoveries under the recommended calibration, not default production behavior.",
-            "- The three held cases are useful negative controls: low heading alignment, short route extension, or too much alternate-lane distance prevents over-promotion.",
+            f"- The {promoted_count} promoted {_plural('case', promoted_count)} are replay-accepted recoveries under the recommended calibration, not default production behavior.",
+            f"- The {held_count} held {_plural('case', held_count)} are useful negative controls: low heading alignment, short route extension, or too much alternate-lane distance prevents over-promotion.",
             "- The visual cards make the selector failure modes inspectable without committing raw Waymo trajectories or map geometry.",
             "- The next stronger validation step is to broaden terminal-neighborhood replay coverage across more shards before changing default scoring behavior.",
         ]
@@ -269,15 +283,19 @@ def lane_continuation_terminal_neighborhood_casebook_markdown(
     return "\n".join(lines).rstrip() + "\n"
 
 
-def _casebook_case(case: dict[str, object], index: int) -> dict[str, object]:
+def _casebook_case(
+    case: dict[str, object],
+    index: int,
+    asset_prefix: str,
+) -> dict[str, object]:
     current_decision = str(case.get("current_decision", "not_evaluable"))
     recommended_decision = str(case.get("recommended_decision", "not_evaluable"))
     replay_accepted = bool(case.get("replay_gate_accepted"))
     changed = bool(case.get("changed_by_recommendation"))
     return {
         "case_label": f"Case {index:02d}",
-        "asset_name": f"terminal_selector_casebook_{index:02d}.svg",
-        "asset_path": f"assets/terminal_selector_casebook_{index:02d}.svg",
+        "asset_name": f"{asset_prefix}_{index:02d}.svg",
+        "asset_path": f"assets/{asset_prefix}_{index:02d}.svg",
         "rank": int(case.get("rank", 0) or 0),
         "scenario_id": str(case.get("scenario_id", "")),
         "track_id": str(case.get("track_id", "")),
@@ -597,6 +615,17 @@ def _scaled_width(value: float, max_value: float, width: int) -> int:
     if max_value <= 0.0:
         return 0
     return max(0, min(width, int(round(value / max_value * width))))
+
+
+def _validate_asset_prefix(asset_prefix: str) -> None:
+    if not asset_prefix:
+        raise ValueError("asset-prefix must not be empty.")
+    if not all(char.isalnum() or char in {"_", "-"} for char in asset_prefix):
+        raise ValueError("asset-prefix may contain only letters, numbers, hyphens, and underscores.")
+
+
+def _plural(noun: str, count: int) -> str:
+    return noun if count == 1 else f"{noun}s"
 
 
 def _wrapped_svg_text(text: str, x: int, y: int, width: int) -> list[str]:

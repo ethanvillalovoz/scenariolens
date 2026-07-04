@@ -34,6 +34,9 @@ robotics, AI/ML, and software engineering internship conversations.
 - Expanded terminal neighborhood selector experiment: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md`
 - Expanded terminal neighborhood selector calibration: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md`
 - Expanded terminal selector visual casebook: `docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_expanded.md`
+- 200-scenario lane-continuation study: `docs/reports/waymo_lane_continuation_study_200.md`
+- 200-scenario terminal selector calibration: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200.md`
+- 200-scenario terminal selector visual casebook: `docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md`
 - Topology gap audit: `docs/reports/waymo_lane_continuation_topology_gap_audit.md`
 - Terminal neighborhood audit: `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md`
 - Terminal neighborhood replay gate: `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md`
@@ -285,6 +288,10 @@ Testing and verification:
 - A visual terminal selector casebook turns those 6 decisions into derived SVG
   cards, showing replay gain, route extension, heading alignment, distance
   gates, and hold reasons without publishing raw trajectories or map geometry.
+- A 200-scenario scale-up scans 451 lane-continuation targets, queues 45
+  replay/audit cases, audits 15 topology blockers, and produces a 7-card
+  terminal selector casebook; the best zero-false-promotion calibration reaches
+  6/7 replay agreement and leaves 1 false hold as an explicit limitation.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 

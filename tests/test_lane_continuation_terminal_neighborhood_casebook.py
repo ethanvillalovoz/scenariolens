@@ -76,6 +76,7 @@ class LaneContinuationTerminalNeighborhoodCasebookTest(unittest.TestCase):
             result = generate_lane_continuation_terminal_neighborhood_casebook(
                 selector_calibration_manifest_path=_write_calibration_manifest(root),
                 output_dir=output_dir,
+                asset_prefix="terminal_selector_casebook_custom",
                 public_report_path=public_report,
             )
             manifest = json.loads(result.manifest_path.read_text(encoding="utf-8"))
@@ -86,8 +87,15 @@ class LaneContinuationTerminalNeighborhoodCasebookTest(unittest.TestCase):
             self.assertTrue(result.report_path.exists())
             self.assertTrue(public_report.exists())
             self.assertTrue(
-                (public_report.parent / "assets" / "terminal_selector_casebook_01.svg")
-                .exists()
+                (
+                    public_report.parent
+                    / "assets"
+                    / "terminal_selector_casebook_custom_01.svg"
+                ).exists()
+            )
+            self.assertEqual(
+                manifest["cases"][0]["asset_path"],
+                "assets/terminal_selector_casebook_custom_01.svg",
             )
             self.assertEqual(
                 manifest["format"],
@@ -112,6 +120,8 @@ class LaneContinuationTerminalNeighborhoodCasebookTest(unittest.TestCase):
                     str(output_dir),
                     "--public-report",
                     str(public_report),
+                    "--asset-prefix",
+                    "terminal_selector_casebook_cli",
                 ],
                 check=True,
                 env={"PYTHONPATH": "src"},
@@ -127,6 +137,13 @@ class LaneContinuationTerminalNeighborhoodCasebookTest(unittest.TestCase):
             self.assertTrue((output_dir / "manifest.json").exists())
             self.assertTrue((output_dir / "report.md").exists())
             self.assertTrue(public_report.exists())
+            self.assertTrue(
+                (
+                    public_report.parent
+                    / "assets"
+                    / "terminal_selector_casebook_cli_01.svg"
+                ).exists()
+            )
 
 
 def _write_calibration_manifest(root: Path) -> Path:

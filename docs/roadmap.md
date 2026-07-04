@@ -447,6 +447,15 @@ casebook at
 `docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_expanded.md`
 turns those 6 decisions into derived SVG cards for reviewer inspection without
 publishing raw trajectories or map geometry. The initial
+200-scenario scale-up at
+`docs/reports/waymo_lane_continuation_study_200.md` and
+`docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md`
+doubles the local shard window to 50 scenarios per shard, scans 451
+lane-continuation targets, replays/probes 45 queued cases, and produces a
+7-card selector casebook. The broader calibration reaches 6/7 replay-label
+agreement with 0 false promotions but still leaves 1 false hold, so the next
+selector milestone is evidence expansion rather than default-policy adoption.
+The initial
 topology gap audit at
 `docs/reports/waymo_lane_continuation_topology_gap_audit.md` then shows that
 0 blocker cases remain cap-recoverable and 5 are terminal/directional. The

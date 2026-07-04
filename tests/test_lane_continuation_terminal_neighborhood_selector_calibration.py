@@ -86,6 +86,33 @@ class LaneContinuationTerminalNeighborhoodSelectorCalibrationTest(unittest.TestC
             self.assertIn("not a route planner", markdown)
             self.assertIn("Raw scenario data committed: no", markdown)
 
+    def test_payload_keeps_recommendation_provisional_when_false_holds_remain(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+
+            payload = lane_continuation_terminal_neighborhood_selector_calibration_payload(
+                terminal_neighborhood_replay_manifest_path=(
+                    _write_unresolved_false_hold_manifest(root)
+                ),
+                output_dir=root / "calibration",
+            )
+            markdown = (
+                lane_continuation_terminal_neighborhood_selector_calibration_markdown(
+                    payload
+                )
+            )
+
+            recommended = payload["recommended_policy"]
+            self.assertEqual(recommended["false_promote_count"], 0)
+            self.assertEqual(recommended["false_hold_count"], 1)
+            self.assertIn(
+                "do not change the default selector",
+                recommended["recommendation"],
+            )
+            self.assertIn("false holds remain", markdown)
+
     def test_generate_calibration_writes_manifest_and_public_report(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -228,6 +255,72 @@ def _write_replay_manifest(root: Path) -> Path:
                     ),
                     _replay_case(
                         rank=22,
+                        scenario_id="held_low_heading",
+                        track_id="3178",
+                        selected_feature_id="333",
+                        alternate_feature_id="331",
+                        selected_chain=["333"],
+                        alternate_chain=["331", "205"],
+                        selected_link_count=0,
+                        alternate_link_count=1,
+                        selected_heading=0.691,
+                        alternate_heading=0.69,
+                        alternate_distance=2.533,
+                        selected_remaining=23.515,
+                        alternate_remaining=95.966,
+                        gain=-15.163,
+                        replay_label="hold_recovery_regressed",
+                        replay_accepted=False,
+                    ),
+                ],
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    return manifest
+
+
+def _write_unresolved_false_hold_manifest(root: Path) -> Path:
+    manifest = root / "unresolved_replay_manifest.json"
+    manifest.write_text(
+        json.dumps(
+            {
+                "format": LANE_CONTINUATION_TERMINAL_NEIGHBORHOOD_REPLAY_FORMAT,
+                "ready": True,
+                "terminal_neighborhood_manifest": "terminal/manifest.json",
+                "topology_manifest": "topology/manifest.json",
+                "replay_manifest": "replay/manifest.json",
+                "aggregate": {
+                    "case_count": 2,
+                    "replayed_case_count": 2,
+                    "accepted_case_count": 1,
+                    "held_case_count": 1,
+                    "perturbation_trial_count": 8,
+                },
+                "cases": [
+                    _replay_case(
+                        rank=1,
+                        scenario_id="accepted_too_far",
+                        track_id="999",
+                        selected_feature_id="1",
+                        alternate_feature_id="2",
+                        selected_chain=["1"],
+                        alternate_chain=["2", "3"],
+                        selected_link_count=0,
+                        alternate_link_count=1,
+                        selected_heading=1.0,
+                        alternate_heading=1.0,
+                        alternate_distance=6.0,
+                        selected_remaining=10.0,
+                        alternate_remaining=90.0,
+                        gain=20.0,
+                        replay_label="accept_for_selector_experiment",
+                        replay_accepted=True,
+                    ),
+                    _replay_case(
+                        rank=2,
                         scenario_id="held_low_heading",
                         track_id="3178",
                         selected_feature_id="333",
