@@ -123,6 +123,7 @@ Then open `http://localhost:8000/demo/`.
 - [200-scenario terminal selector calibration](docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200.md)
 - [200-scenario terminal selector transfer validation](docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200.md)
 - [200-scenario terminal selector error audit](docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_error_audit_200.md)
+- [200-scenario terminal selector route/context audit](docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_route_context_audit_200.md)
 - [200-scenario terminal selector visual casebook](docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md)
 - [Topology gap audit](docs/reports/waymo_lane_continuation_topology_gap_audit.md)
 - [Terminal neighborhood audit](docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md)
@@ -756,6 +757,12 @@ PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-terminal-neighborho
   --selector-transfer-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200/manifest.json \
   --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector_error_audit_200 \
   --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_error_audit_200.md
+
+PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-terminal-neighborhood-selector-route-context-audit \
+  --selector-transfer-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200/manifest.json \
+  --terminal-neighborhood-replay-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_replay_200/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector_route_context_audit_200 \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_route_context_audit_200.md
 
 PYTHONPATH=src python3 -m scenariolens.cli lane-continuation-terminal-neighborhood-casebook \
   --selector-calibration-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200/manifest.json \

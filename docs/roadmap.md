@@ -468,6 +468,13 @@ then explains both false holds as novel heading-gate misses, shows that a
 heading-relaxed 0.70 diagnostic gate would reduce false holds from 2 to 1
 without false promotions on this queue, and rejects a combined heading/route
 relaxation because it introduces a false promotion.
+The route/context audit at
+`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_route_context_audit_200.md`
+then joins those 2 false holds back to derived replay diagnostics: both are
+stable linked-chain recoveries with selected terminal lanes shorter than the
+forecast horizon, but only one is a reasonable heading-relaxation validation
+candidate. The other has severe selected-lane heading disagreement and stays
+held for lane-direction, route-context, and coordinate-frame inspection.
 The initial
 topology gap audit at
 `docs/reports/waymo_lane_continuation_topology_gap_audit.md` then shows that

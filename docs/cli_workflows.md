@@ -812,6 +812,12 @@ scenariolens lane-continuation-terminal-neighborhood-selector-error-audit \
   --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector_error_audit_200 \
   --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_error_audit_200.md
 
+scenariolens lane-continuation-terminal-neighborhood-selector-route-context-audit \
+  --selector-transfer-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200/manifest.json \
+  --terminal-neighborhood-replay-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_replay_200/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector_route_context_audit_200 \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_route_context_audit_200.md
+
 scenariolens lane-continuation-terminal-neighborhood-casebook \
   --selector-calibration-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200/manifest.json \
   --asset-prefix terminal_selector_casebook_200 \
@@ -832,6 +838,10 @@ agreement from 4/7 to 5/7, keeps 0 false promotions, and leaves 2 false holds.
 The error-audit step explains those false holds: both are novel heading-gate
 misses, one is recoverable by a heading-relaxed diagnostic candidate, and a
 combined heading/route relaxation would introduce a false promotion.
+The route/context audit then joins both false holds back to derived replay
+diagnostics: one becomes a borderline heading-relaxation validation candidate,
+while the severe selected-heading disagreement stays held for lane-direction,
+route-context, and coordinate-frame inspection.
 
 ## Baseline Ablation
 

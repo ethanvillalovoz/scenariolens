@@ -115,6 +115,9 @@ from scenariolens.lane_continuation_terminal_neighborhood_selector_transfer impo
 from scenariolens.lane_continuation_terminal_neighborhood_selector_error_audit import (
     generate_lane_continuation_terminal_neighborhood_selector_error_audit,
 )
+from scenariolens.lane_continuation_terminal_neighborhood_selector_route_context_audit import (
+    generate_lane_continuation_terminal_neighborhood_selector_route_context_audit,
+)
 from scenariolens.lane_continuation_terminal_neighborhood_casebook import (
     generate_lane_continuation_terminal_neighborhood_casebook,
 )
@@ -1432,6 +1435,56 @@ def lane_continuation_terminal_neighborhood_selector_error_audit_command(
         f"promote(s), {result.false_hold_count} false hold(s), "
         f"{result.counterfactual_policy_count} counterfactual policy "
         "candidate(s)."
+    )
+    return 0
+
+
+def lane_continuation_terminal_neighborhood_selector_route_context_audit_command(
+    selector_transfer_manifest: str,
+    terminal_neighborhood_replay_manifest: str,
+    output_dir: str,
+    diagnostic_heading_gate: float,
+    public_report: str | None,
+) -> int:
+    try:
+        result = (
+            generate_lane_continuation_terminal_neighborhood_selector_route_context_audit(
+                selector_transfer_manifest_path=selector_transfer_manifest,
+                terminal_neighborhood_replay_manifest_path=(
+                    terminal_neighborhood_replay_manifest
+                ),
+                output_dir=output_dir,
+                diagnostic_heading_gate=diagnostic_heading_gate,
+                public_report_path=public_report,
+            )
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(
+        "Wrote lane-continuation-terminal-neighborhood-selector-route-context-audit "
+        f"manifest to {result.manifest_path}"
+    )
+    print(
+        "Wrote lane-continuation-terminal-neighborhood-selector-route-context-audit "
+        f"report to {result.report_path}"
+    )
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print(
+            "Lane-continuation terminal-neighborhood selector route/context "
+            "audit is not ready. See manifest.json."
+        )
+        return 2
+    print(
+        "Generated terminal-neighborhood selector route/context audit for "
+        f"{result.false_hold_count} false hold(s): "
+        f"{result.joined_false_hold_count} joined to replay diagnostics, "
+        f"{result.heading_relaxation_candidate_count} heading-relaxation "
+        f"candidate(s), {result.route_context_hold_count} route/context "
+        "hold(s)."
     )
     return 0
 
@@ -2905,6 +2958,59 @@ def main() -> int:
             "selector error-audit report copy."
         ),
     )
+    lane_continuation_terminal_selector_route_context_audit_parser = (
+        subparsers.add_parser(
+            "lane-continuation-terminal-neighborhood-selector-route-context-audit",
+            help=(
+                "Join selector false holds to replay-derived route/context "
+                "diagnostics."
+            ),
+        )
+    )
+    lane_continuation_terminal_selector_route_context_audit_parser.add_argument(
+        "--selector-transfer-manifest",
+        required=True,
+        help=(
+            "Manifest produced by scenariolens "
+            "lane-continuation-terminal-neighborhood-selector-transfer."
+        ),
+    )
+    lane_continuation_terminal_selector_route_context_audit_parser.add_argument(
+        "--terminal-neighborhood-replay-manifest",
+        required=True,
+        help=(
+            "Manifest produced by scenariolens "
+            "lane-continuation-terminal-neighborhood-replay."
+        ),
+    )
+    lane_continuation_terminal_selector_route_context_audit_parser.add_argument(
+        "--diagnostic-heading-gate",
+        type=float,
+        default=0.70,
+        help=(
+            "Heading gate used only to classify false holds as diagnostic "
+            "heading-relaxation candidates."
+        ),
+    )
+    lane_continuation_terminal_selector_route_context_audit_parser.add_argument(
+        "--output-dir",
+        default=(
+            "data/processed/"
+            "waymo_lane_continuation_terminal_neighborhood_selector_route_context_audit"
+        ),
+        help=(
+            "Directory for terminal-neighborhood selector route/context "
+            "audit manifest.json and report.md."
+        ),
+    )
+    lane_continuation_terminal_selector_route_context_audit_parser.add_argument(
+        "--public-report",
+        default=None,
+        help=(
+            "Optional Markdown path for a public-safe terminal-neighborhood "
+            "selector route/context audit report copy."
+        ),
+    )
     lane_continuation_terminal_casebook_parser = subparsers.add_parser(
         "lane-continuation-terminal-neighborhood-casebook",
         help=(
@@ -3492,6 +3598,21 @@ def main() -> int:
             selector_transfer_manifest=args.selector_transfer_manifest,
             output_dir=args.output_dir,
             public_report=args.public_report,
+        )
+    if (
+        args.command
+        == "lane-continuation-terminal-neighborhood-selector-route-context-audit"
+    ):
+        return (
+            lane_continuation_terminal_neighborhood_selector_route_context_audit_command(
+                selector_transfer_manifest=args.selector_transfer_manifest,
+                terminal_neighborhood_replay_manifest=(
+                    args.terminal_neighborhood_replay_manifest
+                ),
+                output_dir=args.output_dir,
+                diagnostic_heading_gate=args.diagnostic_heading_gate,
+                public_report=args.public_report,
+            )
         )
     if args.command == "lane-continuation-terminal-neighborhood-casebook":
         return lane_continuation_terminal_neighborhood_casebook_command(

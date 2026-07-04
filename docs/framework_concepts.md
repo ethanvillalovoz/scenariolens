@@ -222,6 +222,14 @@ borderline heading miss is recoverable by a 0.70 heading candidate on the small
 queue, while a route-relaxed counterfactual introduces a false promotion and is
 rejected.
 
+The route/context audit then joins those selector false holds back to the
+derived replay packet. It checks whether each false hold has stable replay
+gain, a selected terminal lane shorter than the forecast horizon, a linked
+alternate route extension, and a heading profile that is safe to treat as a
+diagnostic candidate. This keeps one borderline case in the next validation
+queue and keeps the severe selected-heading disagreement held for map/context
+inspection.
+
 ## Map-Match Audit
 
 The map-match audit handles cases that are not ready to be treated as replay

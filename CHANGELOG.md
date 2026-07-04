@@ -31,6 +31,13 @@ All notable changes to ScenarioLens are documented here.
   reduces false holds from 2 to 1 without false promotions on this small queue,
   while combining heading relaxation with a 25 m route-extension gate introduces
   a false promotion.
+- `scenariolens lane-continuation-terminal-neighborhood-selector-route-context-audit`
+  workflow and
+  `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_route_context_audit_200.md`,
+  joining the 2 transfer false holds back to derived replay diagnostics. The
+  route/context audit separates 1 borderline heading-relaxation validation
+  candidate from 1 severe selected-heading disagreement that should remain held
+  for lane-direction, route-context, and coordinate-frame inspection.
 - `scenariolens lane-continuation-terminal-neighborhood-casebook` now supports
   `--asset-prefix` so multiple public casebooks can share
   `docs/reports/assets/` without overwriting SVG cards.

@@ -38,6 +38,7 @@ robotics, AI/ML, and software engineering internship conversations.
 - 200-scenario terminal selector calibration: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_200.md`
 - 200-scenario terminal selector transfer validation: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_transfer_200.md`
 - 200-scenario terminal selector error audit: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_error_audit_200.md`
+- 200-scenario terminal selector route/context audit: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_route_context_audit_200.md`
 - 200-scenario terminal selector visual casebook: `docs/reports/waymo_lane_continuation_terminal_neighborhood_casebook_200.md`
 - Topology gap audit: `docs/reports/waymo_lane_continuation_topology_gap_audit.md`
 - Terminal neighborhood audit: `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md`
@@ -302,6 +303,10 @@ Testing and verification:
   misses, shows that `relax_heading_to_0.70` reduces false holds from 2 to 1
   without false promotions on this small queue, and rejects a combined
   heading/route relaxation because it introduces a false promotion.
+- A route/context false-hold audit joins those 2 cases back to derived replay
+  diagnostics, identifying 1 borderline heading-relaxation validation candidate
+  and 1 severe selected-heading disagreement that stays held for lane-direction,
+  route-context, and coordinate-frame inspection.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
