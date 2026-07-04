@@ -9,6 +9,7 @@ ranking, visualizing, and explaining long-tail driving scenarios where simple
 prediction baselines fail.
 
 - **Live demo:** [ethanvillalovoz.com/scenariolens](https://ethanvillalovoz.com/scenariolens/)
+- **Evidence index:** [v1 public evidence spine](docs/reports/scenariolens_evidence_index.md)
 - **Case study:** [Finding baseline failures in Waymo Motion scenarios](docs/case_studies/waymo_baseline_failures.md)
 - **Latest release:** [v0.2.0 notes](docs/releases/v0.2.0.md)
 
@@ -48,6 +49,7 @@ ScenarioLens builds a small but polished pipeline that can:
 | Real-data path | Native Waymo Motion JSON/proto/TFRecord slice reader with local preflight and validation |
 | Baseline evidence | Constant-velocity ADE/FDE, miss rate, lane-aware comparison, map/signal context coverage, map-match audit, tag studies, and stability studies |
 | Public demo | Static Scenario Explorer with filters, SVG trajectories, score components, failure cards, real-data diagnostic cases, and selector decision cards |
+| Evidence index | Generated v1 artifact map verifying 15 public reports, payloads, provenance docs, and CI files |
 | Repo quality | MIT license, contributor docs, changelog, citation, issue templates, CI, and release checklist |
 
 ## Quick Start
@@ -82,6 +84,7 @@ Then open `http://localhost:8000/demo/`.
 
 ## Public Evidence
 
+- [ScenarioLens v1 evidence index](docs/reports/scenariolens_evidence_index.md)
 - [Portfolio report](docs/reports/portfolio_report.md)
 - [Waymo Motion validation summary](docs/reports/waymo_motion_validation_summary.md)
 - [Real-slice failure study](docs/reports/waymo_motion_failure_study.md)

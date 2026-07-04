@@ -32,11 +32,18 @@ jobs:
         run: node --check docs/demo/app.js
 
       - name: Check dashboard JSON
-        run: python -m json.tool docs/demo/scenarios.json
+        run: |
+          python -m json.tool docs/demo/scenarios.json
+          python -m json.tool docs/demo/evidence_index.json
 
       - name: Smoke test scenario export and report
         run: |
           scenariolens export-synthetic --output /tmp/scenariolens-synthetic.json
+          scenariolens evidence-index \
+            --output-dir /tmp/scenariolens-evidence-index \
+            --public-report /tmp/scenariolens-evidence-index.md \
+            --demo-json /tmp/scenariolens-evidence-index.json \
+            --repo-root .
           scenariolens report --input /tmp/scenariolens-synthetic.json --format markdown --limit 3
           scenariolens baseline-compare --input /tmp/scenariolens-synthetic.json --format json --limit 3
           scenariolens baseline-ablation --input /tmp/scenariolens-synthetic.json --format json

@@ -6,6 +6,11 @@ All notable changes to ScenarioLens are documented here.
 
 ### Added
 
+- `scenariolens evidence-index` workflow,
+  `docs/reports/scenariolens_evidence_index.md`, and
+  `docs/demo/evidence_index.json`, generating a v1 public evidence spine that
+  verifies 15 demo/report/provenance/selector/CI artifacts and makes the
+  project easier to review without publishing raw Waymo records.
 - 200-scenario lane-continuation and terminal-selector scale-up reports across
   four local Waymo Motion validation shards:
   `docs/reports/waymo_lane_continuation_study_200.md`,

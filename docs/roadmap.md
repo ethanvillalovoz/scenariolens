@@ -325,10 +325,13 @@ code.
 - document what the project is and is not claiming,
 - map ingestion, scoring, reports, rendering, and dashboard modules,
 - connect the live demo to data provenance and the real-data case study,
+- generate a v1 evidence index that verifies the public demo, reports,
+  provenance docs, selector payloads, and CI surface,
 - keep the README focused on the engineering artifact.
 
 Status: implemented in `docs/project_strategy.md`, `docs/architecture.md`, the
-README, and the Scenario Explorer navigation/status panel.
+README, `docs/reports/scenariolens_evidence_index.md`, and the Scenario
+Explorer navigation/status panel.
 
 ## Milestone 5: Real-Slice Distribution Study
 

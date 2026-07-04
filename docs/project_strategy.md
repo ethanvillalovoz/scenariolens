@@ -113,6 +113,8 @@ and links back to reports and provenance.
 
 ## Current Proof
 
+- V1 evidence index:
+  [`docs/reports/scenariolens_evidence_index.md`](reports/scenariolens_evidence_index.md)
 - Static explorer: [`docs/demo`](demo)
 - Data provenance: [`docs/data_provenance.md`](data_provenance.md)
 - Architecture: [`docs/architecture.md`](architecture.md)

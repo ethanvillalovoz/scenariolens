@@ -33,6 +33,20 @@ scenariolens report --format markdown --limit 5
 scenariolens render --top 3 --output-dir /tmp/scenariolens-gallery
 ```
 
+## V1 Evidence Index
+
+```bash
+scenariolens evidence-index \
+  --output-dir data/processed/scenariolens_evidence_index \
+  --public-report docs/reports/scenariolens_evidence_index.md \
+  --demo-json docs/demo/evidence_index.json \
+  --repo-root .
+```
+
+This verifies the curated public evidence spine: live demo assets, provenance,
+real-data reports, selector-validation artifacts, static demo payloads, and CI.
+The output is a local ignored run packet plus checked-in Markdown/JSON copies.
+
 ## Waymo-Shaped Fixtures
 
 ```bash

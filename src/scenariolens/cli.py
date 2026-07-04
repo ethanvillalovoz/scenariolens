@@ -34,6 +34,7 @@ from scenariolens.dashboard import (
     DEFAULT_LANE_SELECTION_MANIFEST,
     generate_dashboard_data,
 )
+from scenariolens.evidence_index import generate_evidence_index
 from scenariolens.failure_study import (
     FAILURE_STUDY_INPUT_FORMATS,
     generate_failure_study,
@@ -493,6 +494,39 @@ def dashboard_data(
         limit=limit,
     )
     print(f"Generated dashboard data at {output_path}")
+    return 0
+
+
+def evidence_index_command(
+    output_dir: str,
+    public_report: str | None,
+    demo_json: str | None,
+    repo_root: str,
+) -> int:
+    try:
+        result = generate_evidence_index(
+            output_dir=output_dir,
+            public_report_path=public_report,
+            demo_json_path=demo_json,
+            repo_root=repo_root,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote evidence-index manifest to {result.manifest_path}")
+    print(f"Wrote evidence-index report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if result.demo_json_path is not None:
+        print(f"Wrote demo evidence JSON to {result.demo_json_path}")
+    if not result.ready:
+        print("Evidence index is not ready. See manifest.json for missing artifacts.")
+        return 2
+    print(
+        f"Indexed {result.artifact_count} evidence artifact(s): "
+        f"{result.present_count} present, {result.missing_count} missing."
+    )
     return 0
 
 
@@ -3497,6 +3531,33 @@ def main() -> int:
         default=None,
         help="Optional maximum number of ranked scenarios to include.",
     )
+    evidence_index_parser = subparsers.add_parser(
+        "evidence-index",
+        help=(
+            "Generate a v1 public evidence index that verifies the demo, "
+            "reports, provenance docs, and CI artifacts exist."
+        ),
+    )
+    evidence_index_parser.add_argument(
+        "--output-dir",
+        default="data/processed/scenariolens_evidence_index",
+        help="Directory for evidence-index manifest.json and report.md.",
+    )
+    evidence_index_parser.add_argument(
+        "--public-report",
+        default="docs/reports/scenariolens_evidence_index.md",
+        help="Optional Markdown path for a public evidence-index report copy.",
+    )
+    evidence_index_parser.add_argument(
+        "--demo-json",
+        default="docs/demo/evidence_index.json",
+        help="Optional JSON path for static Explorer evidence-index data.",
+    )
+    evidence_index_parser.add_argument(
+        "--repo-root",
+        default=".",
+        help="Repository root used to verify required public artifacts.",
+    )
     render_parser = subparsers.add_parser(
         "render",
         help="Render scenarios as SVG trajectory views.",
@@ -3903,6 +3964,13 @@ def main() -> int:
             waymo_native_path=args.waymo_native,
             lane_selection_manifest_path=args.lane_selection_manifest,
             limit=args.limit,
+        )
+    if args.command == "evidence-index":
+        return evidence_index_command(
+            output_dir=args.output_dir,
+            public_report=args.public_report,
+            demo_json=args.demo_json,
+            repo_root=args.repo_root,
         )
     if args.command == "render":
         return render(
