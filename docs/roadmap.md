@@ -434,14 +434,14 @@ cases. The expanded terminal-neighborhood audit at
 finds 6 nearby alternate-lane recovery candidates and 4 directional gaps. The
 expanded replay gate at
 `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_expanded.md`
-accepts 3 of those 5 recovery candidates under deterministic perturbations,
+accepts 3 of those 6 recovery candidates under deterministic perturbations,
 and the expanded selector experiment at
 `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md`
 promotes 1 candidate with 0 false promotions and 2 false holds. The initial
 expanded selector calibration at
 `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md`
 sweeps 30 gate candidates and recommends a provisional 40 m route-extension
-gate that reaches 5/5 replay-label agreement with 0 false promotions on the
+gate that reaches 6/6 replay-label agreement with 0 false promotions on the
 current queue while leaving the default selector unchanged. The initial
 topology gap audit at
 `docs/reports/waymo_lane_continuation_topology_gap_audit.md` then shows that

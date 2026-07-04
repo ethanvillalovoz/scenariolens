@@ -12,7 +12,7 @@ The replay is intentionally narrow: it does not change the default ScenarioLens 
 - Ready: True
 - Max scenarios per source: 25
 - Max lane-link hops: 2
-- Selected candidates: 5
+- Selected candidates: 6
 - Minimum stable gain: 1.000 m
 - Acceptance gate: Accept a terminal-neighborhood recovery candidate only when the forced alternate lane improves selected-lane FDE by at least 1.0 m nominally and every valid perturbation preserves the alternate chain with the same minimum gain.
 - Raw scenario data committed: no
@@ -22,17 +22,17 @@ The replay is intentionally narrow: it does not change the default ScenarioLens 
 
 | Metric | Value |
 | --- | ---: |
-| Cases analyzed | 5 |
-| Replayed cases | 5 |
+| Cases analyzed | 6 |
+| Replayed cases | 6 |
 | Accepted recovery candidates | 3 |
-| Held candidates | 2 |
+| Held candidates | 3 |
 | Nominal improvement cases | 3 |
-| Nominal regression cases | 2 |
-| Perturbation trials | 20 |
-| Chain-preserving trials | 20 |
+| Nominal regression cases | 3 |
+| Perturbation trials | 24 |
+| Chain-preserving trials | 24 |
 | Stable-gain trials | 12 |
-| Mean nominal gain | +32.240 m |
-| Mean perturbed gain | +31.378 m |
+| Mean nominal gain | +26.867 m |
+| Mean perturbed gain | +26.148 m |
 | Min perturbed gain | -18.328 m |
 | Max perturbed gain | +125.481 m |
 
@@ -52,6 +52,7 @@ The replay is intentionally narrow: it does not change the default ScenarioLens 
 | 27 | `fe4a6425278fbd5b` | `816` | 155 | 344 -> 346 -> 353 | 41.649 m | 4.544 m | +37.105 m | 4/4 | `accept_for_selector_experiment` | Promote this alternate-lane recovery into the next bounded selector experiment. |
 | 28 | `2f035a284480e981` | `732` | 265 | 264 -> 262 -> 332 | 33.227 m | 10.362 m | +22.865 m | 4/4 | `accept_for_selector_experiment` | Promote this alternate-lane recovery into the next bounded selector experiment. |
 | 29 | `d30e6448f14e4c75` | `150` | 269 | 268 -> 265 -> 263 | 28.584 m | 37.671 m | -9.087 m | 0/4 | `hold_recovery_regressed` | Do not promote this alternate; inspect selected-lane quality and local topology manually. |
+| 30 | `d508bc55d1510865` | `2283` | 191 | 186 -> 191 | 16.082 m | 16.082 m | 0.000 m | 0/4 | `hold_recovery_regressed` | Do not promote this alternate; inspect selected-lane quality and local topology manually. |
 
 ## `2f366a31ab03f8b` / track `1061`
 
@@ -212,6 +213,38 @@ Perturbation trials:
 | `speed_plus_10pct` | 269 | 268 -> 265 -> 263 | -9.087 m | True | False | `alternate_regressed` |
 | `heading_left_5deg` | 269 | 268 -> 265 -> 263 | -9.087 m | True | False | `alternate_regressed` |
 | `heading_right_5deg` | 269 | 268 -> 265 -> 263 | -9.087 m | True | False | `alternate_regressed` |
+
+## `d508bc55d1510865` / track `2283`
+
+- Source: `validation.tfrecord-00009-of-00150`
+- Ready: True
+- Decision: **hold_recovery_regressed**
+- Reason: The alternate lane does not beat the selected terminal-lane replay on this open-loop check.
+- Recommended next action: Do not promote this alternate; inspect selected-lane quality and local topology manually.
+- Selected feature: `191`
+- Alternate feature: `186`
+- Selected chain: 191
+- Alternate chain: 186 -> 191
+- Selected route status/count: `no_exit_lanes` / 0
+- Alternate route status/count: `no_exit_lanes` / 1
+- Selected/alternate lane distance: 0.252 m / 5.548 m
+- Selected/alternate heading alignment: 0.992 / 0.992
+- Selected/alternate route remaining: 33.604 m / 39.146 m
+- Selected/alternate FDE: 16.082 m / 16.082 m
+- Nominal gain: 0.000 m
+- Stable trials: 0/4
+- Chain-preserving trials: 4/4
+- Worst trial: `speed_minus_10pct`
+- Min/mean/max perturbed gain: 0.000 m / 0.000 m / 0.000 m
+
+Perturbation trials:
+
+| Trial | Selected chain | Alternate chain | Gain | Chain preserved | Stable gain | Verdict |
+| --- | --- | --- | ---: | --- | --- | --- |
+| `speed_minus_10pct` | 191 | 186 -> 191 | 0.000 m | True | False | `alternate_regressed` |
+| `speed_plus_10pct` | 191 | 186 -> 191 | 0.000 m | True | False | `alternate_regressed` |
+| `heading_left_5deg` | 191 | 186 -> 191 | 0.000 m | True | False | `alternate_regressed` |
+| `heading_right_5deg` | 191 | 186 -> 191 | 0.000 m | True | False | `alternate_regressed` |
 
 ## Interpretation
 

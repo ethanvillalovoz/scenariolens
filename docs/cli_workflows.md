@@ -630,6 +630,7 @@ scenariolens lane-continuation-terminal-neighborhood-audit \
 scenariolens lane-continuation-terminal-neighborhood-replay \
   --terminal-neighborhood-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_audit_expanded/manifest.json \
   --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_replay_expanded \
+  --top 6 \
   --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_expanded.md
 
 scenariolens lane-continuation-terminal-neighborhood-selector \
@@ -641,9 +642,10 @@ scenariolens lane-continuation-terminal-neighborhood-selector \
 This follows the expanded branch queue's 10 topology blockers. The checked-in
 public reports classify 0 cap-recoverable linked-target gaps and 10
 terminal/directional selected-lane cases, find 6 nearby recovery candidates,
-accept 3/5 ready candidates under deterministic replay perturbations, and promote 1 candidate
-under the bounded non-oracle selector with 0 false promotions. Treat these as
-diagnostic selector inputs, not default routing behavior.
+accept 3/6 ready candidates under deterministic replay perturbations, and
+promote 1 candidate under the bounded non-oracle selector with 0 false
+promotions. Treat these as diagnostic selector inputs, not default routing
+behavior.
 
 ## Lane-Continuation Topology Gap Audit
 
@@ -718,7 +720,7 @@ This sweep keeps the default selector unchanged while evaluating 30
 distance/heading/route-extension gate candidates against the expanded
 terminal-neighborhood replay labels. The checked-in report recommends a
 provisional 40 m route-extension gate, improving replay-label agreement from
-3/5 to 5/5 with 0 false promotions on the current queue. Treat it as a
+4/6 to 6/6 with 0 false promotions on the current queue. Treat it as a
 calibration target for broader evidence, not a production route selector.
 
 ## Baseline Ablation

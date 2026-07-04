@@ -10,11 +10,11 @@ The calibration is intentionally narrow. It is not a route planner, not a learne
 - Terminal-neighborhood audit manifest: `data/processed/waymo_lane_continuation_terminal_neighborhood_audit_expanded/manifest.json`
 - Topology manifest: `data/processed/waymo_lane_continuation_topology_gap_audit_expanded/manifest.json`
 - Ready for calibration: True
-- Replay cases: 5
-- Replayed cases: 5
+- Replay cases: 6
+- Replayed cases: 6
 - Replay-gate accepted cases: 3
-- Replay-gate held cases: 2
-- Perturbation trials behind replay labels: 20
+- Replay-gate held cases: 3
+- Perturbation trials behind replay labels: 24
 - Current max alternate distance: 5.000 m
 - Current minimum heading alignment: 0.950
 - Current minimum route extension: 50.000 m
@@ -32,8 +32,8 @@ The calibration is intentionally narrow. It is not a route planner, not a learne
 | Minimum heading alignment | 0.950 | 0.950 |
 | Minimum route extension | 50.000 m | 40.000 m |
 | Promoted candidates | 1 | 3 |
-| Held candidates | 4 | 2 |
-| Replay-gate matches | 3 | 5 |
+| Held candidates | 5 | 3 |
+| Replay-gate matches | 4 | 6 |
 | False promotions | 0 | 0 |
 | False holds | 2 | 0 |
 | Mean promoted replay gain | +125.481 m | +61.817 m |
@@ -46,36 +46,36 @@ Recommended action:
 
 | Max distance | Heading gate | Route gate | Promotes | Holds | Matches | False promotes | False holds | Mean promoted gain |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 3.000 m | 0.950 | 10.000 m | 3 | 2 | 3 | 1 | 1 | +16.961 m |
-| 3.000 m | 0.950 | 25.000 m | 2 | 3 | 4 | 0 | 1 | +29.985 m |
-| 3.000 m | 0.950 | 40.000 m | 2 | 3 | 4 | 0 | 1 | +29.985 m |
-| 3.000 m | 0.950 | 50.000 m | 0 | 5 | 2 | 0 | 3 | n/a |
-| 3.000 m | 0.950 | 75.000 m | 0 | 5 | 2 | 0 | 3 | n/a |
-| 3.000 m | 0.900 | 10.000 m | 3 | 2 | 3 | 1 | 1 | +16.961 m |
-| 3.000 m | 0.900 | 25.000 m | 2 | 3 | 4 | 0 | 1 | +29.985 m |
-| 3.000 m | 0.900 | 40.000 m | 2 | 3 | 4 | 0 | 1 | +29.985 m |
-| 3.000 m | 0.900 | 50.000 m | 0 | 5 | 2 | 0 | 3 | n/a |
-| 3.000 m | 0.900 | 75.000 m | 0 | 5 | 2 | 0 | 3 | n/a |
-| 3.000 m | 0.700 | 10.000 m | 3 | 2 | 3 | 1 | 1 | +16.961 m |
-| 3.000 m | 0.700 | 25.000 m | 2 | 3 | 4 | 0 | 1 | +29.985 m |
-| 3.000 m | 0.700 | 40.000 m | 2 | 3 | 4 | 0 | 1 | +29.985 m |
-| 3.000 m | 0.700 | 50.000 m | 0 | 5 | 2 | 0 | 3 | n/a |
-| 3.000 m | 0.700 | 75.000 m | 0 | 5 | 2 | 0 | 3 | n/a |
-| 5.000 m | 0.950 | 10.000 m | 4 | 1 | 4 | 1 | 0 | +44.091 m |
-| 5.000 m | 0.950 | 25.000 m | 3 | 2 | 5 | 0 | 0 | +61.817 m |
-| 5.000 m | 0.950 | 40.000 m | 3 | 2 | 5 | 0 | 0 | +61.817 m |
-| 5.000 m | 0.950 | 50.000 m | 1 | 4 | 3 | 0 | 2 | +125.481 m |
-| 5.000 m | 0.950 | 75.000 m | 1 | 4 | 3 | 0 | 2 | +125.481 m |
-| 5.000 m | 0.900 | 10.000 m | 4 | 1 | 4 | 1 | 0 | +44.091 m |
-| 5.000 m | 0.900 | 25.000 m | 3 | 2 | 5 | 0 | 0 | +61.817 m |
-| 5.000 m | 0.900 | 40.000 m | 3 | 2 | 5 | 0 | 0 | +61.817 m |
-| 5.000 m | 0.900 | 50.000 m | 1 | 4 | 3 | 0 | 2 | +125.481 m |
-| 5.000 m | 0.900 | 75.000 m | 1 | 4 | 3 | 0 | 2 | +125.481 m |
-| 5.000 m | 0.700 | 10.000 m | 4 | 1 | 4 | 1 | 0 | +44.091 m |
-| 5.000 m | 0.700 | 25.000 m | 3 | 2 | 5 | 0 | 0 | +61.817 m |
-| 5.000 m | 0.700 | 40.000 m | 3 | 2 | 5 | 0 | 0 | +61.817 m |
-| 5.000 m | 0.700 | 50.000 m | 1 | 4 | 3 | 0 | 2 | +125.481 m |
-| 5.000 m | 0.700 | 75.000 m | 1 | 4 | 3 | 0 | 2 | +125.481 m |
+| 3.000 m | 0.950 | 10.000 m | 3 | 3 | 4 | 1 | 1 | +16.961 m |
+| 3.000 m | 0.950 | 25.000 m | 2 | 4 | 5 | 0 | 1 | +29.985 m |
+| 3.000 m | 0.950 | 40.000 m | 2 | 4 | 5 | 0 | 1 | +29.985 m |
+| 3.000 m | 0.950 | 50.000 m | 0 | 6 | 3 | 0 | 3 | n/a |
+| 3.000 m | 0.950 | 75.000 m | 0 | 6 | 3 | 0 | 3 | n/a |
+| 3.000 m | 0.900 | 10.000 m | 3 | 3 | 4 | 1 | 1 | +16.961 m |
+| 3.000 m | 0.900 | 25.000 m | 2 | 4 | 5 | 0 | 1 | +29.985 m |
+| 3.000 m | 0.900 | 40.000 m | 2 | 4 | 5 | 0 | 1 | +29.985 m |
+| 3.000 m | 0.900 | 50.000 m | 0 | 6 | 3 | 0 | 3 | n/a |
+| 3.000 m | 0.900 | 75.000 m | 0 | 6 | 3 | 0 | 3 | n/a |
+| 3.000 m | 0.700 | 10.000 m | 3 | 3 | 4 | 1 | 1 | +16.961 m |
+| 3.000 m | 0.700 | 25.000 m | 2 | 4 | 5 | 0 | 1 | +29.985 m |
+| 3.000 m | 0.700 | 40.000 m | 2 | 4 | 5 | 0 | 1 | +29.985 m |
+| 3.000 m | 0.700 | 50.000 m | 0 | 6 | 3 | 0 | 3 | n/a |
+| 3.000 m | 0.700 | 75.000 m | 0 | 6 | 3 | 0 | 3 | n/a |
+| 5.000 m | 0.950 | 10.000 m | 4 | 2 | 5 | 1 | 0 | +44.091 m |
+| 5.000 m | 0.950 | 25.000 m | 3 | 3 | 6 | 0 | 0 | +61.817 m |
+| 5.000 m | 0.950 | 40.000 m | 3 | 3 | 6 | 0 | 0 | +61.817 m |
+| 5.000 m | 0.950 | 50.000 m | 1 | 5 | 4 | 0 | 2 | +125.481 m |
+| 5.000 m | 0.950 | 75.000 m | 1 | 5 | 4 | 0 | 2 | +125.481 m |
+| 5.000 m | 0.900 | 10.000 m | 4 | 2 | 5 | 1 | 0 | +44.091 m |
+| 5.000 m | 0.900 | 25.000 m | 3 | 3 | 6 | 0 | 0 | +61.817 m |
+| 5.000 m | 0.900 | 40.000 m | 3 | 3 | 6 | 0 | 0 | +61.817 m |
+| 5.000 m | 0.900 | 50.000 m | 1 | 5 | 4 | 0 | 2 | +125.481 m |
+| 5.000 m | 0.900 | 75.000 m | 1 | 5 | 4 | 0 | 2 | +125.481 m |
+| 5.000 m | 0.700 | 10.000 m | 4 | 2 | 5 | 1 | 0 | +44.091 m |
+| 5.000 m | 0.700 | 25.000 m | 3 | 3 | 6 | 0 | 0 | +61.817 m |
+| 5.000 m | 0.700 | 40.000 m | 3 | 3 | 6 | 0 | 0 | +61.817 m |
+| 5.000 m | 0.700 | 50.000 m | 1 | 5 | 4 | 0 | 2 | +125.481 m |
+| 5.000 m | 0.700 | 75.000 m | 1 | 5 | 4 | 0 | 2 | +125.481 m |
 
 ## Case Impact
 
@@ -86,10 +86,11 @@ Recommended action:
 | 27 | `fe4a6425278fbd5b` | `816` | `accept_for_selector_experiment` | 0.988 m | 0.984 | 48.036 m | `hold_for_terminal_neighborhood_context` | `promote_terminal_neighborhood_alternate` | True | +37.105 m |
 | 28 | `2f035a284480e981` | `732` | `accept_for_selector_experiment` | 1.659 m | 0.999 | 42.611 m | `hold_for_terminal_neighborhood_context` | `promote_terminal_neighborhood_alternate` | True | +22.865 m |
 | 29 | `d30e6448f14e4c75` | `150` | `hold_recovery_regressed` | 2.509 m | 0.974 | 16.421 m | `hold_for_terminal_neighborhood_context` | `hold_for_terminal_neighborhood_context` | False | -9.087 m |
+| 30 | `d508bc55d1510865` | `2283` | `hold_recovery_regressed` | 5.548 m | 0.992 | 5.542 m | `hold_for_terminal_neighborhood_context` | `hold_for_terminal_neighborhood_context` | False | 0.000 m |
 
 ## Interpretation
 
 - The current selector is intentionally conservative and creates 2 false holds on this queue.
 - The recommended selector gates are calibration candidates, not an automatic default-policy change.
-- The current queue includes 2 replay-held negative controls, so false-promotion counts are measured on this queue; broader safety still requires more terminal-neighborhood negatives across shards.
+- The current queue includes 3 replay-held negative controls, so false-promotion counts are measured on this queue; broader safety still requires more terminal-neighborhood negatives across shards.
 - The next stronger validation step is to rerun this sweep after broadening terminal-neighborhood replay cases across more shards.

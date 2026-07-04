@@ -294,10 +294,10 @@ gate, and selector experiment are checked in at
 and
 [`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md`](reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md).
 Those reports inspect 10 terminal/directional cases, find 6 nearby recovery
-candidates and 4 directional gaps, replay the 5 ready recovery candidates, accept 3
-under perturbation gates, and promote 1 candidate under a bounded non-oracle
-selector. Raw Waymo records, raw map geometry, and per-case local packets remain
-ignored.
+candidates and 4 directional gaps, replay the 6 ready recovery candidates,
+accept 3 under perturbation gates, and promote 1 candidate under a bounded
+non-oracle selector. Raw Waymo records, raw map geometry, and per-case local
+packets remain ignored.
 
 The topology gap audit is checked in at
 [`docs/reports/waymo_lane_continuation_topology_gap_audit.md`](reports/waymo_lane_continuation_topology_gap_audit.md).
@@ -332,9 +332,9 @@ after the policy decision; they are not selector inputs.
 
 The expanded terminal-neighborhood selector calibration is checked in at
 [`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md`](reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md).
-It sweeps 30 distance/heading/route-extension gate candidates over 5 derived
+It sweeps 30 distance/heading/route-extension gate candidates over 6 derived
 replay cases, recommends a provisional 40 m route-extension gate, and improves
-replay-label agreement from 3/5 to 5/5 with 0 false promotions on this queue.
+replay-label agreement from 4/6 to 6/6 with 0 false promotions on this queue.
 The default selector is unchanged, and raw Waymo records plus map geometry
 remain local and ignored.
 

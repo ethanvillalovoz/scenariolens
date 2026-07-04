@@ -294,16 +294,16 @@ smoke test. The prototype can:
 - audit those 10 expanded terminal/directional lane neighborhoods, finding 6
   nearby alternate-lane recovery candidates, 4 directional-link mismatches, and
   0 true terminal/map-boundary cases before promoting selector claims,
-- replay and gate the 5 ready expanded nearby recovery candidates, accepting 3
-  alternate lanes for bounded selector experiments and holding 2 regression
+- replay and gate the 6 expanded nearby recovery candidates, accepting 3
+  alternate lanes for bounded selector experiments and holding 3 regression
   cases,
 - run a bounded expanded terminal-neighborhood selector experiment that promotes
-  1 alternate lane, holds 4 cases for context, matches 3/5 replay labels, and
+  1 alternate lane, holds 5 cases for context, matches 4/6 replay labels, and
   records 0 false promotions plus 2 false holds,
 - calibrate that expanded selector across 30 distance/heading/route-extension
   gate candidates, recommending a provisional 40 m route-extension gate that
-  promotes 3 replay-accepted recoveries, holds 2 replay regressions, and reaches
-  5/5 replay-label agreement with 0 false promotions on this queue while leaving
+  promotes 3 replay-accepted recoveries, holds 3 replay regressions, and reaches
+  6/6 replay-label agreement with 0 false promotions on this queue while leaving
   the default selector unchanged,
 - audit the initial topology blockers by comparing capped ScenarioLens map
   features with raw parsed map-feature IDs, showing 0 blocker cases remain
@@ -329,8 +329,8 @@ smoke test. The prototype can:
 - run without external dependencies.
 
 The next milestone is to expand the calibrated terminal-neighborhood queue
-beyond the current 5 replay cases, add more replay-held negatives, and then
-rerun it beyond the current 100-scenario slice.
+beyond the current 6 replay cases and rerun it beyond the current 100-scenario
+slice.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).

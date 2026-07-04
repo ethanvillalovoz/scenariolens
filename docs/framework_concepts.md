@@ -166,9 +166,9 @@ holds and 0 false promotions on the expanded 2-case replay queue.
 The expanded topology follow-up turns those 10 topology probes into a sharper
 work queue. It finds no cap-recoverable linked-target materialization gaps and
 10 terminal/directional selected-lane cases. The terminal-neighborhood
-audit then finds 6 nearby recovery candidates, replay accepts 3 of 5 ready
+audit then finds 6 nearby recovery candidates, replay accepts 3 of 6 ready
 candidates under deterministic perturbation gates, and the bounded selector
-promotes 1 candidate while holding 4 for additional context.
+promotes 1 candidate while holding 5 for additional context.
 
 The topology gap audit now measures what remains after linked-lane closure
 materialization. The ingestion layer preserves the first 240 map features and
@@ -196,7 +196,7 @@ decisions while using replay labels only as validation after the selector
 decision.
 
 The expanded terminal-neighborhood selector calibration layer takes the larger
-5-case replay queue and sweeps 30 distance, heading, and route-extension gate
+6-case replay queue and sweeps 30 distance, heading, and route-extension gate
 candidates. It recommends a provisional 40 m route-extension gate that changes
 2 replay-accepted false holds into promotions, preserves 0 false promotions on
 the current queue, and keeps the default selector unchanged until broader

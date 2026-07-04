@@ -260,7 +260,7 @@ Testing and verification:
 - The expanded topology blocker follow-up reloads those 10 topology probes:
   0 are cap-recoverable linked-target materialization gaps and 10 are
   terminal/directional selected-lane cases. A bounded neighborhood audit finds
-  6 nearby recovery candidates, replay accepts 3 of 5 ready candidates under
+  6 nearby recovery candidates, replay accepts 3 of 6 ready candidates under
   perturbation gates, and the non-oracle selector promotes 1 while recording 0
   false promotions and 2 false holds.
 - A topology gap audit reloads those 5 topology blockers and compares capped
@@ -280,7 +280,7 @@ Testing and verification:
 - The expanded selector calibration sweeps 30 distance/heading/route-extension
   gate candidates and recommends a provisional 40 m route-extension gate that
   changes 2 false holds into accepted promotions while keeping 0 false
-  promotions on the current 5-case replay queue.
+  promotions on the current 6-case replay queue.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 

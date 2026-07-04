@@ -10,11 +10,11 @@ The result is intentionally narrow. It is not a route planner, not a default sco
 - Terminal-neighborhood audit manifest: `data/processed/waymo_lane_continuation_terminal_neighborhood_audit_expanded/manifest.json`
 - Topology manifest: `data/processed/waymo_lane_continuation_topology_gap_audit_expanded/manifest.json`
 - Ready for selector experiment: True
-- Replay cases: 5
-- Replayed cases: 5
+- Replay cases: 6
+- Replayed cases: 6
 - Replay-gate accepted cases: 3
-- Replay-gate held cases: 2
-- Perturbation trials behind replay labels: 20
+- Replay-gate held cases: 3
+- Perturbation trials behind replay labels: 24
 - Max alternate distance: 5.000 m
 - Minimum heading alignment: 0.95
 - Minimum route extension: 50.000 m
@@ -26,18 +26,18 @@ The result is intentionally narrow. It is not a route planner, not a default sco
 
 | Metric | Value |
 | --- | ---: |
-| Cases analyzed | 5 |
-| Ready cases | 5 |
+| Cases analyzed | 6 |
+| Ready cases | 6 |
 | Selector promotions | 1 |
-| Selector holds | 4 |
+| Selector holds | 5 |
 | Not evaluable | 0 |
 | Replay-gate accepted | 3 |
-| Replay-gate held | 2 |
-| Selector/replay-gate matches | 3 |
+| Replay-gate held | 3 |
+| Selector/replay-gate matches | 4 |
 | Selector false promotions | 0 |
 | Selector false holds | 2 |
 | Mean promoted replay gain | +125.481 m |
-| Mean held replay gain | +8.930 m |
+| Mean held replay gain | +7.144 m |
 | Mean promoted route extension | 228.779 m |
 
 ## Selector Decisions
@@ -49,6 +49,7 @@ The result is intentionally narrow. It is not a route planner, not a default sco
 | 27 | `fe4a6425278fbd5b` | `816` | `hold_for_terminal_neighborhood_context` | `accept_for_selector_experiment` | 0.988 m | 0.984 | 48.036 m | True | +37.105 m | Add richer route, heading, or map-neighborhood context before promotion. |
 | 28 | `2f035a284480e981` | `732` | `hold_for_terminal_neighborhood_context` | `accept_for_selector_experiment` | 1.659 m | 0.999 | 42.611 m | True | +22.865 m | Add richer route, heading, or map-neighborhood context before promotion. |
 | 29 | `d30e6448f14e4c75` | `150` | `hold_for_terminal_neighborhood_context` | `hold_recovery_regressed` | 2.509 m | 0.974 | 16.421 m | True | -9.087 m | Add richer route, heading, or map-neighborhood context before promotion. |
+| 30 | `d508bc55d1510865` | `2283` | `hold_for_terminal_neighborhood_context` | `hold_recovery_regressed` | 5.548 m | 0.992 | 5.542 m | True | 0.000 m | Add richer route, heading, or map-neighborhood context before promotion. |
 
 ## Promote Queue
 
@@ -60,6 +61,7 @@ The result is intentionally narrow. It is not a route planner, not a default sco
 - `fe4a6425278fbd5b` track `816`: `hold_for_terminal_neighborhood_context` because route_extension_below_gate. Replay label: `accept_for_selector_experiment`.
 - `2f035a284480e981` track `732`: `hold_for_terminal_neighborhood_context` because route_extension_below_gate. Replay label: `accept_for_selector_experiment`.
 - `d30e6448f14e4c75` track `150`: `hold_for_terminal_neighborhood_context` because route_extension_below_gate. Replay label: `hold_recovery_regressed`.
+- `d508bc55d1510865` track `2283`: `hold_for_terminal_neighborhood_context` because alternate_too_far, route_extension_below_gate. Replay label: `hold_recovery_regressed`.
 
 ## `2f366a31ab03f8b` / track `1061`
 
@@ -169,6 +171,28 @@ Selector checks:
 | Selected heading alignment | True | 0.975 | >= 0.95 |
 | Alternate heading alignment | True | 0.974 | >= 0.95 |
 | Route extension | False | 16.421 m | >= 50.000 m |
+| Chain extension | True | True | true |
+
+## `d508bc55d1510865` / track `2283`
+
+- Source: `validation.tfrecord-00009-of-00150`
+- Selector label: **hold_for_terminal_neighborhood_context**
+- Selector reason: The nearby alternate lane does not clear every bounded selector check, so it stays held for context before broader rollout.
+- Replay-gate label: **hold_recovery_regressed**
+- Selector matched replay gate: True
+- Selected chain: 191
+- Alternate chain: 186 -> 191
+- Selector-selected chain: 191
+- Hold flags: alternate_too_far, route_extension_below_gate
+
+Selector checks:
+
+| Check | Passed | Value | Gate |
+| --- | --- | ---: | ---: |
+| Alternate distance | False | 5.548 m | <= 5.000 m |
+| Selected heading alignment | True | 0.992 | >= 0.95 |
+| Alternate heading alignment | True | 0.992 | >= 0.95 |
+| Route extension | False | 5.542 m | >= 50.000 m |
 | Chain extension | True | True | true |
 
 ## Interpretation
