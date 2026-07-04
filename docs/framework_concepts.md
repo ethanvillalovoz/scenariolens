@@ -195,6 +195,13 @@ holds the low-heading regression case, and matches the replay gate on 2/2
 decisions while using replay labels only as validation after the selector
 decision.
 
+The expanded terminal-neighborhood selector calibration layer takes the larger
+5-case replay queue and sweeps 30 distance, heading, and route-extension gate
+candidates. It recommends a provisional 40 m route-extension gate that changes
+2 replay-accepted false holds into promotions, preserves 0 false promotions on
+the current queue, and keeps the default selector unchanged until broader
+negative coverage exists.
+
 ## Map-Match Audit
 
 The map-match audit handles cases that are not ready to be treated as replay
@@ -224,7 +231,8 @@ and links to the public reports.
 - Add a dataset adapter for another public motion dataset.
 - Add another prediction baseline or calibrate the lane-aware matcher on more
   public data.
-- Broaden the terminal-neighborhood selector experiment across more candidates.
+- Broaden the calibrated terminal-neighborhood selector queue across more
+  candidates.
 - Rerun the expanded closure-enabled branch queue across more validation shards.
 - Add more replay-held branch negatives.
 - Add richer map-match diagnostics for lane coverage, heading alignment, and

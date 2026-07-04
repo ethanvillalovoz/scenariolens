@@ -111,6 +111,7 @@ Then open `http://localhost:8000/demo/`.
 - [Expanded terminal neighborhood audit](docs/reports/waymo_lane_continuation_terminal_neighborhood_audit_expanded.md)
 - [Expanded terminal neighborhood replay gate](docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_expanded.md)
 - [Expanded terminal neighborhood selector experiment](docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md)
+- [Expanded terminal neighborhood selector calibration](docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md)
 - [Topology gap audit](docs/reports/waymo_lane_continuation_topology_gap_audit.md)
 - [Terminal neighborhood audit](docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md)
 - [Terminal neighborhood replay gate](docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md)
@@ -299,6 +300,11 @@ smoke test. The prototype can:
 - run a bounded expanded terminal-neighborhood selector experiment that promotes
   1 alternate lane, holds 4 cases for context, matches 3/5 replay labels, and
   records 0 false promotions plus 2 false holds,
+- calibrate that expanded selector across 30 distance/heading/route-extension
+  gate candidates, recommending a provisional 40 m route-extension gate that
+  promotes 3 replay-accepted recoveries, holds 2 replay regressions, and reaches
+  5/5 replay-label agreement with 0 false promotions on this queue while leaving
+  the default selector unchanged,
 - audit the initial topology blockers by comparing capped ScenarioLens map
   features with raw parsed map-feature IDs, showing 0 blocker cases remain
   cap-recoverable and 5 lanes are terminal or directional-link cases after
@@ -322,9 +328,9 @@ smoke test. The prototype can:
 - serve a static Scenario Explorer from the `docs/` entrypoint,
 - run without external dependencies.
 
-The next milestone is to broaden terminal-neighborhood selector candidates, add
-more replay-held negatives, and then expand beyond the current 100-scenario
-slice.
+The next milestone is to expand the calibrated terminal-neighborhood queue
+beyond the current 5 replay cases, add more replay-held negatives, and then
+rerun it beyond the current 100-scenario slice.
 
 See [docs/project_brief.md](docs/project_brief.md) and
 [docs/roadmap.md](docs/roadmap.md).

@@ -32,6 +32,7 @@ robotics, AI/ML, and software engineering internship conversations.
 - Expanded terminal neighborhood audit: `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit_expanded.md`
 - Expanded terminal neighborhood replay gate: `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay_expanded.md`
 - Expanded terminal neighborhood selector experiment: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md`
+- Expanded terminal neighborhood selector calibration: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md`
 - Topology gap audit: `docs/reports/waymo_lane_continuation_topology_gap_audit.md`
 - Terminal neighborhood audit: `docs/reports/waymo_lane_continuation_terminal_neighborhood_audit.md`
 - Terminal neighborhood replay gate: `docs/reports/waymo_lane_continuation_terminal_neighborhood_replay.md`
@@ -276,6 +277,10 @@ Testing and verification:
   geometry and route-extension policy, promoting 1 heading-aligned alternate
   lane, holding 1 low-heading case, and matching the replay gate on 2/2
   decisions.
+- The expanded selector calibration sweeps 30 distance/heading/route-extension
+  gate candidates and recommends a provisional 40 m route-extension gate that
+  changes 2 false holds into accepted promotions while keeping 0 false
+  promotions on the current 5-case replay queue.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
@@ -283,8 +288,8 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Broaden terminal-neighborhood selector candidates and add more replay-held
-   branch negatives.
+3. Broaden the calibrated terminal-neighborhood selector queue and add more
+   replay-held branch negatives.
 4. Expand the closure-enabled queue beyond the current 100-scenario slice.
 5. Create curated scenario collections for pedestrian, cyclist, merge, and
    unprotected-turn cases.

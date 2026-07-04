@@ -705,6 +705,22 @@ terminal-neighborhood replay candidates. The current real-data report promotes
 1 heading-aligned alternate lane, holds 1 low-heading case, and matches the
 replay gate on 2/2 decisions without changing default scorer behavior.
 
+## Lane-Continuation Terminal Neighborhood Selector Calibration
+
+```bash
+scenariolens lane-continuation-terminal-neighborhood-selector-calibration \
+  --terminal-neighborhood-replay-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_replay_expanded/manifest.json \
+  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded \
+  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md
+```
+
+This sweep keeps the default selector unchanged while evaluating 30
+distance/heading/route-extension gate candidates against the expanded
+terminal-neighborhood replay labels. The checked-in report recommends a
+provisional 40 m route-extension gate, improving replay-label agreement from
+3/5 to 5/5 with 0 false promotions on the current queue. Treat it as a
+calibration target for broader evidence, not a production route selector.
+
 ## Baseline Ablation
 
 ```bash

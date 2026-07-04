@@ -330,6 +330,14 @@ replay candidates, promoting 1 alternate lane, holding 1 low-heading case, and
 matching the replay gate on 2/2 decisions. Replay labels validate the selector
 after the policy decision; they are not selector inputs.
 
+The expanded terminal-neighborhood selector calibration is checked in at
+[`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md`](reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md).
+It sweeps 30 distance/heading/route-extension gate candidates over 5 derived
+replay cases, recommends a provisional 40 m route-extension gate, and improves
+replay-label agreement from 3/5 to 5/5 with 0 false promotions on this queue.
+The default selector is unchanged, and raw Waymo records plus map geometry
+remain local and ignored.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark

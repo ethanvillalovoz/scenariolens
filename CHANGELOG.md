@@ -6,6 +6,12 @@ All notable changes to ScenarioLens are documented here.
 
 ### Added
 
+- `scenariolens lane-continuation-terminal-neighborhood-selector-calibration`
+  workflow and
+  `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md`,
+  sweeping 30 selector gate candidates and recommending a provisional 40 m
+  route-extension gate that improves expanded replay-label agreement from 3/5
+  to 5/5 with 0 false promotions on the current queue.
 - Baseline ablation CLI/report comparing constant velocity, default lane-aware,
   and strict lane-aware variants without gated Waymo downloads.
 - `scenariolens baseline-compare-study` for repeated Waymo Motion or

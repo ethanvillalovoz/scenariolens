@@ -105,6 +105,9 @@ from scenariolens.lane_continuation_terminal_neighborhood_selector import (
     DEFAULT_MIN_ROUTE_EXTENSION_M,
     generate_lane_continuation_terminal_neighborhood_selector,
 )
+from scenariolens.lane_continuation_terminal_neighborhood_selector_calibration import (
+    generate_lane_continuation_terminal_neighborhood_selector_calibration,
+)
 from scenariolens.map_match_audit import (
     DEFAULT_AUDIT_THRESHOLDS_M,
     generate_map_match_audit,
@@ -1286,6 +1289,50 @@ def lane_continuation_terminal_neighborhood_selector_command(
         f"case(s): {result.promoted_case_count} promoted candidate(s), "
         f"{result.held_case_count} held candidate(s), "
         f"{result.replay_gate_match_count} replay-gate match(es)."
+    )
+    return 0
+
+
+def lane_continuation_terminal_neighborhood_selector_calibration_command(
+    terminal_neighborhood_replay_manifest: str,
+    output_dir: str,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_lane_continuation_terminal_neighborhood_selector_calibration(
+            terminal_neighborhood_replay_manifest_path=(
+                terminal_neighborhood_replay_manifest
+            ),
+            output_dir=output_dir,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(
+        "Wrote lane-continuation-terminal-neighborhood-selector-calibration "
+        f"manifest to {result.manifest_path}"
+    )
+    print(
+        "Wrote lane-continuation-terminal-neighborhood-selector-calibration "
+        f"report to {result.report_path}"
+    )
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print(
+            "Lane-continuation terminal-neighborhood selector calibration is "
+            "not ready. See manifest.json."
+        )
+        return 2
+    print(
+        "Generated terminal-neighborhood selector calibration for "
+        f"{result.case_count} case(s) across {result.policy_count} policy "
+        f"candidate(s): current false hold(s): "
+        f"{result.current_false_hold_count}, recommended false hold(s): "
+        f"{result.recommended_false_hold_count}, recommended false promote(s): "
+        f"{result.recommended_false_promote_count}."
     )
     return 0
 
@@ -2603,6 +2650,40 @@ def main() -> int:
             "selector report copy."
         ),
     )
+    lane_continuation_terminal_selector_calibration_parser = subparsers.add_parser(
+        "lane-continuation-terminal-neighborhood-selector-calibration",
+        help=(
+            "Sweep terminal-neighborhood selector thresholds against replay "
+            "labels and recommend a calibration target."
+        ),
+    )
+    lane_continuation_terminal_selector_calibration_parser.add_argument(
+        "--terminal-neighborhood-replay-manifest",
+        required=True,
+        help=(
+            "Manifest produced by scenariolens "
+            "lane-continuation-terminal-neighborhood-replay."
+        ),
+    )
+    lane_continuation_terminal_selector_calibration_parser.add_argument(
+        "--output-dir",
+        default=(
+            "data/processed/"
+            "waymo_lane_continuation_terminal_neighborhood_selector_calibration"
+        ),
+        help=(
+            "Directory for terminal-neighborhood selector calibration "
+            "manifest.json and report.md."
+        ),
+    )
+    lane_continuation_terminal_selector_calibration_parser.add_argument(
+        "--public-report",
+        default=None,
+        help=(
+            "Optional Markdown path for a public-safe terminal-neighborhood "
+            "selector calibration report copy."
+        ),
+    )
     heading_replay_parser = subparsers.add_parser(
         "heading-replay-prototype",
         help=(
@@ -3123,6 +3204,14 @@ def main() -> int:
             max_alternate_distance_m=args.max_alternate_distance_m,
             min_heading_alignment=args.min_heading_alignment,
             min_route_extension_m=args.min_route_extension_m,
+            public_report=args.public_report,
+        )
+    if args.command == "lane-continuation-terminal-neighborhood-selector-calibration":
+        return lane_continuation_terminal_neighborhood_selector_calibration_command(
+            terminal_neighborhood_replay_manifest=(
+                args.terminal_neighborhood_replay_manifest
+            ),
+            output_dir=args.output_dir,
             public_report=args.public_report,
         )
     if args.command == "heading-replay-prototype":

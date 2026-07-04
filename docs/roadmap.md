@@ -438,6 +438,11 @@ accepts 3 of those 5 recovery candidates under deterministic perturbations,
 and the expanded selector experiment at
 `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_expanded.md`
 promotes 1 candidate with 0 false promotions and 2 false holds. The initial
+expanded selector calibration at
+`docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md`
+sweeps 30 gate candidates and recommends a provisional 40 m route-extension
+gate that reaches 5/5 replay-label agreement with 0 false promotions on the
+current queue while leaving the default selector unchanged. The initial
 topology gap audit at
 `docs/reports/waymo_lane_continuation_topology_gap_audit.md` then shows that
 0 blocker cases remain cap-recoverable and 5 are terminal/directional. The
@@ -452,7 +457,7 @@ terminal-neighborhood selector experiment at
 `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector.md` then
 promotes 1 heading-aligned alternate lane, holds 1 low-heading case, and
 matches the replay gate on 2/2 decisions. Next work should broaden the
-terminal-neighborhood selector experiment, add more replay-held branch
+calibrated terminal-neighborhood selector queue, add more replay-held branch
 negatives, and run the closure-enabled queue beyond the current 100-scenario
 slice before claiming broader selector readiness.
 
