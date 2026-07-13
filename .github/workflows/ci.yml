@@ -125,6 +125,34 @@ jobs:
           assert len(state["stages"]) == 9
           PY
 
+      - name: Run clean-package release check
+        run: |
+          scenariolens release-check \
+            --repo-root . \
+            --output-dir /tmp/scenariolens-release-check
+          python -m json.tool /tmp/scenariolens-release-check/manifest.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path("/tmp/scenariolens-release-check")
+          manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
+          assert manifest["format"] == "scenariolens.release_check.v1"
+          assert manifest["ready"] is True
+          assert manifest["aggregate"] == {
+              "check_count": 15,
+              "passed_count": 15,
+              "failed_count": 0,
+          }
+          assert (root / "report.md").is_file()
+          wheel = root / manifest["outputs"]["wheel"]
+          assert wheel.is_file()
+          assert (
+              manifest["evidence"]["wheel_sha256"]
+              == manifest["evidence"]["rebuild_wheel_sha256"]
+          )
+          PY
+
       - name: Run Explorer browser tests
         run: npm run test:browser
 

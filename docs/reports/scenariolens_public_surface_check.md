@@ -21,7 +21,7 @@ It is intentionally scoped to repository health. It is not a Waymo benchmark cla
 | Local link integrity | pass | All checked local links resolve to files in the repository. |
 | Demo asset integrity | pass | All checked SVG assets referenced by demo JSON exist. |
 | Raw-data boundary | pass | No raw Waymo or TFRecord-like files are tracked. |
-| CI surface | pass | CI covers unit tests, deterministic run integration, static demo syntax, evidence JSON, and public-surface checks. |
+| CI surface | pass | CI covers unit tests, deterministic run integration, clean-package release validation, static demo syntax, evidence JSON, and public-surface checks. |
 | Public-safety language | pass | Core provenance/evidence docs state the non-benchmark and raw-data boundaries. |
 
 ## Details
@@ -71,14 +71,14 @@ It is intentionally scoped to repository health. It is not a Waymo benchmark cla
 - Status: pass
 - Files: `.gitignore`, `docs/data_provenance.md`
 - Summary: No raw Waymo or TFRecord-like files are tracked.
-- Tracked files inspected: 282
+- Tracked files inspected: 285
 - Tracked raw Waymo/TFRecord-like files: 0
 
 ### CI surface
 
 - Status: pass
 - Files: `.github/workflows/ci.yml`
-- Summary: CI covers unit tests, deterministic run integration, static demo syntax, evidence JSON, and public-surface checks.
+- Summary: CI covers unit tests, deterministic run integration, clean-package release validation, static demo syntax, evidence JSON, and public-surface checks.
 - `python -m unittest discover` present: True
 - `node --check docs/demo/app.js` present: True
 - `python -m json.tool docs/demo/run.json` present: True
@@ -86,6 +86,7 @@ It is intentionally scoped to repository health. It is not a Waymo benchmark cla
 - `npm run test:browser` present: True
 - `scenariolens run` present: True
 - `scenariolens run-verify` present: True
+- `scenariolens release-check` present: True
 - `scenariolens evidence-index` present: True
 - `scenariolens public-surface-check` present: True
 

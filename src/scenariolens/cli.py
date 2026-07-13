@@ -139,6 +139,10 @@ from scenariolens.map_match_audit import (
 )
 from scenariolens.portfolio import generate_portfolio_report
 from scenariolens.public_surface_check import generate_public_surface_check
+from scenariolens.release_check import (
+    DEFAULT_RELEASE_CHECK_TIMEOUT_SECONDS,
+    generate_release_check,
+)
 from scenariolens.report import json_report, markdown_report, ranked_scores
 from scenariolens.replay_candidates import generate_replay_candidate_plan
 from scenariolens.replay_prototype import generate_replay_prototype
@@ -279,6 +283,43 @@ def run_validation_command(
         f"Run validation ready: {result.run_count} run(s), "
         f"{result.passed_count}/{result.check_count} checks passed, "
         f"digest {str(result.analysis_digest)[:12]}."
+    )
+    return 0
+
+
+def release_check_command(
+    repo_root: str,
+    output_dir: str,
+    public_report: str | None,
+    timeout_seconds: float,
+) -> int:
+    try:
+        result = generate_release_check(
+            repo_root=repo_root,
+            output_dir=output_dir,
+            public_report_path=public_report,
+            timeout_seconds=timeout_seconds,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError, OSError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote release-check manifest to {result.manifest_path}")
+    print(f"Wrote release-check report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if result.wheel_path is not None:
+        print(f"Built release-check wheel at {result.wheel_path}")
+    if not result.ready:
+        print(
+            f"Release check failed: {result.passed_count}/{result.check_count} "
+            "checks passed."
+        )
+        return 2
+    print(
+        f"Release check ready: {result.passed_count}/{result.check_count} "
+        f"checks passed in {result.duration_seconds:.3f} s, "
+        f"digest {result.analysis_digest[:12]}."
     )
     return 0
 
@@ -2226,6 +2267,34 @@ def main() -> int:
         default=None,
         help="Optional public-safe Markdown report copy.",
     )
+    release_check_parser = subparsers.add_parser(
+        "release-check",
+        help=(
+            "Build and install a wheel, run the product outside the checkout, "
+            "and validate v1 failure and resume paths."
+        ),
+    )
+    release_check_parser.add_argument(
+        "--repo-root",
+        default=".",
+        help="ScenarioLens repository root containing pyproject.toml.",
+    )
+    release_check_parser.add_argument(
+        "--output-dir",
+        default="data/processed/scenariolens_v1_release_check",
+        help="Directory for the validation packet and built wheel.",
+    )
+    release_check_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional public-safe Markdown report copy.",
+    )
+    release_check_parser.add_argument(
+        "--timeout-seconds",
+        type=float,
+        default=DEFAULT_RELEASE_CHECK_TIMEOUT_SECONDS,
+        help="Per-command timeout for build, install, and runtime probes.",
+    )
     export_parser = subparsers.add_parser(
         "export-synthetic",
         help="Export built-in synthetic scenarios as ScenarioLens JSON.",
@@ -4051,6 +4120,13 @@ def main() -> int:
             max_duration_seconds=args.max_duration_seconds,
             max_peak_memory_gb=args.max_peak_memory_gb,
             public_report=args.public_report,
+        )
+    if args.command == "release-check":
+        return release_check_command(
+            repo_root=args.repo_root,
+            output_dir=args.output_dir,
+            public_report=args.public_report,
+            timeout_seconds=args.timeout_seconds,
         )
     if args.command == "export-synthetic":
         return export_synthetic(output_path=args.output)

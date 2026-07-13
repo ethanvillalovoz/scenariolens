@@ -156,6 +156,26 @@ scope, and compliance with both execution budgets. Timestamps, output paths,
 and timings are intentionally excluded from the analysis digest; source
 hashes, configuration, stage formats, counts, and aggregate metrics are not.
 
+## Clean-Package Release Check
+
+Build and exercise ScenarioLens as an installed package rather than importing
+from the repository checkout:
+
+```bash
+scenariolens release-check \
+  --repo-root . \
+  --output-dir data/processed/scenariolens_v1_release_check
+```
+
+The command builds the wheel twice under a fixed `SOURCE_DATE_EPOCH` and
+requires identical filenames and SHA-256 hashes. It then installs the wheel in
+a clean virtual environment, changes to a temporary directory outside the
+checkout, and runs the installed console entrypoint. The 15 checks cover the
+one-command bundle contract, missing-map fallback, empty/missing/unsupported/
+truncated inputs, atomic interruption state, and a hash-verified resume whose
+nine-stage digest must match an uninterrupted run. The resulting directory
+contains `manifest.json`, `report.md`, and the exact wheel under `dist/`.
+
 Browser-test both the public demo and a newly generated local run:
 
 ```bash

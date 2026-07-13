@@ -1004,6 +1004,15 @@ PYTHONPATH=src python3 -m scenariolens.cli public-surface-check \
   --repo-root .
 ```
 
+Exercise the exact wheel, installed entrypoint, failure paths, and resumable
+nine-stage workflow in an isolated environment:
+
+```bash
+PYTHONPATH=src python3 -m scenariolens.cli release-check \
+  --repo-root . \
+  --output-dir data/processed/scenariolens_v1_release_check
+```
+
 Run tests with only the Python standard library:
 
 ```bash

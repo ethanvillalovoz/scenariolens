@@ -235,6 +235,7 @@ def _write_public_surface_repo(root: Path) -> Path:
                 "npm run test:browser",
                 "scenariolens run",
                 "scenariolens run-verify",
+                "scenariolens release-check",
                 "scenariolens evidence-index",
                 "scenariolens public-surface-check",
             ]

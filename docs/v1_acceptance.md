@@ -105,6 +105,7 @@ in 182.55 seconds with approximately 1.91 GB maximum resident memory.
 ### Installation And Failure Paths
 
 - A built wheel installs into clean supported Python environments.
+- Two builds under the release environment produce byte-identical wheels.
 - The installed console entrypoint runs outside the repository checkout.
 - Empty input, missing input, unsupported input, truncated TFRecord, missing
   map context, interrupted output, and resumed output paths are tested.
@@ -117,6 +118,12 @@ reuses only a verified contiguous stage prefix; changed inputs and tampered
 artifacts are rejected. Unit coverage simulates interruption after three stages,
 and an integration run executes and then reuses the actual nine-stage pipeline
 with an identical analysis digest.
+
+Clean-package status: implemented as `scenariolens release-check`. The gate
+builds the package twice, compares wheel SHA-256 hashes, installs the artifact
+into an isolated virtual environment, executes the product outside the source
+checkout, and probes every required failure path. The current implementation
+passes 15/15 checks locally; CI reruns the same command from a fresh checkout.
 
 ### Explorer
 

@@ -364,6 +364,7 @@ def _ci_surface_check(root: Path) -> dict[str, object]:
         "npm run test:browser",
         "scenariolens run",
         "scenariolens run-verify",
+        "scenariolens release-check",
         "scenariolens evidence-index",
         "scenariolens public-surface-check",
     ]
@@ -374,7 +375,9 @@ def _ci_surface_check(root: Path) -> dict[str, object]:
         "CI surface",
         "fail" if missing else "pass",
         [path],
-        "CI covers unit tests, deterministic run integration, static demo syntax, evidence JSON, and public-surface checks."
+        "CI covers unit tests, deterministic run integration, clean-package "
+        "release validation, static demo syntax, evidence JSON, and "
+        "public-surface checks."
         if not missing
         else "CI is missing one or more required integration or public-surface commands.",
         details,

@@ -21,6 +21,11 @@ All notable changes to ScenarioLens are documented here.
   checkpoints preserve interruption diagnostics and completed-stage hashes;
   resume reuses only a verified contiguous prefix and rejects changed inputs,
   changed configuration, missing files, or tampered artifacts.
+- `scenariolens release-check`, a 15-check clean-package gate that builds a
+  byte-identical wheel twice, installs it into an isolated environment, runs
+  the product outside the checkout, verifies explicit bad-input diagnostics,
+  injects an actual nine-stage interruption, and proves resumed output matches
+  uninterrupted output.
 
 - `scenariolens run`, a one-command product workflow that expands native input
   directories, hashes source files, executes baseline-comparison,

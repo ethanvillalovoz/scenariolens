@@ -537,9 +537,11 @@ memory. That larger holdout invalidated the candidate for adoption: agreement
 improved from 33/78 to 52/78, but 12 false promotions remain. The default
 selector stays unchanged. The run-backed Explorer is also live on the portfolio
 route, and the nine-stage holdout now supports fingerprinted, hash-verified
-interruption recovery through `state.json` and `--resume`. The remaining v1 work
-is the consolidated clean-install/failure-path packet and release-candidate
-gate.
+interruption recovery through `state.json` and `--resume`. The consolidated
+`release-check` gate now rebuilds a byte-identical wheel, installs it in an
+isolated environment, executes outside the checkout, and passes all 15 product,
+failure-path, and resume checks. The remaining v1 work is the release-candidate
+packet, exact-commit CI verification, and final release.
 
 ## Stretch Goals
 
