@@ -90,6 +90,35 @@ class LaneContinuationTerminalNeighborhoodSelectorRouteContextAuditTest(
             self.assertIn("Raw map geometry published: no", markdown)
             self.assertIn("not a route planner", markdown)
 
+    def test_zero_false_holds_is_a_ready_noop_audit(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            transfer_path = _write_transfer_manifest(root)
+            transfer = json.loads(transfer_path.read_text(encoding="utf-8"))
+            transfer_result = transfer["transfer_policy_result"]
+            transfer_result["cases"] = [transfer_result["cases"][0]]
+            transfer_result["aggregate"]["case_count"] = 1
+            transfer_result["aggregate"]["selector_false_hold_count"] = 0
+            transfer["validation_scope"]["validation_case_count"] = 1
+            transfer_path.write_text(
+                json.dumps(transfer, indent=2) + "\n",
+                encoding="utf-8",
+            )
+
+            payload = (
+                lane_continuation_terminal_neighborhood_selector_route_context_audit_payload(
+                    selector_transfer_manifest_path=transfer_path,
+                    terminal_neighborhood_replay_manifest_path=_write_replay_manifest(
+                        root
+                    ),
+                    output_dir=root / "audit",
+                )
+            )
+
+            self.assertTrue(payload["ready"])
+            self.assertEqual(payload["aggregate"]["false_hold_count"], 0)
+            self.assertEqual(payload["cases"], [])
+
     def test_generate_route_context_audit_writes_manifest_and_public_report(
         self,
     ) -> None:

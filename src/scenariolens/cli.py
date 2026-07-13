@@ -152,6 +152,13 @@ from scenariolens.run_validation import (
     DEFAULT_MAX_PEAK_MEMORY_GB,
     generate_run_validation,
 )
+from scenariolens.selector_holdout import (
+    DEFAULT_EXPECTED_SCENARIOS as DEFAULT_SELECTOR_HOLDOUT_SCENARIOS,
+    DEFAULT_SCENARIO_OFFSET as DEFAULT_SELECTOR_HOLDOUT_OFFSET,
+    DEFAULT_TOP as DEFAULT_SELECTOR_HOLDOUT_TOP,
+    SELECTOR_HOLDOUT_INPUT_FORMATS,
+    generate_selector_holdout_study,
+)
 from scenariolens.samples import synthetic_scenarios
 from scenariolens.schema import Scenario
 from scenariolens.slice_validation import validate_waymo_motion_slice
@@ -1007,6 +1014,52 @@ def lane_continuation_study_command(
         f"Scanned {result.source_count} source(s) across "
         f"{result.scenario_count} scenario(s) and "
         f"{result.candidate_track_count} lane-continuation candidate target(s)."
+    )
+    return 0
+
+
+def selector_holdout_study_command(
+    input_paths: list[str],
+    output_dir: str,
+    input_format: str,
+    scenario_offset: int,
+    max_scenarios: int | None,
+    expected_scenarios: int,
+    top: int,
+    calibration_manifest: str | None,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_selector_holdout_study(
+            input_paths=tuple(input_paths),
+            output_dir=output_dir,
+            input_format=input_format,
+            scenario_offset=scenario_offset,
+            max_scenarios=max_scenarios,
+            expected_scenarios=expected_scenarios,
+            top=top,
+            calibration_manifest_path=calibration_manifest,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote selector-holdout-study manifest to {result.manifest_path}")
+    print(f"Wrote selector-holdout-study report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print(
+            "Frozen selector holdout is not release-ready: "
+            f"{result.passed_check_count}/{result.check_count} checks passed."
+        )
+        return 2
+    print(
+        "Frozen selector holdout ready across "
+        f"{result.scenario_count} scenario(s) and "
+        f"{result.selector_decision_count} selector decision(s): "
+        f"{result.passed_check_count}/{result.check_count} checks passed."
     )
     return 0
 
@@ -2813,6 +2866,73 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe lane-continuation study copy.",
     )
+    selector_holdout_parser = subparsers.add_parser(
+        "selector-holdout-study",
+        help=(
+            "Evaluate the frozen terminal selector on a disjoint scenario "
+            "window and enforce v1 evidence gates."
+        ),
+    )
+    selector_holdout_parser.add_argument(
+        "--input",
+        action="append",
+        required=True,
+        help=(
+            "Input Waymo Motion file/directory or ScenarioLens JSON file. "
+            "Repeat for multiple sources."
+        ),
+    )
+    selector_holdout_parser.add_argument(
+        "--format",
+        choices=SELECTOR_HOLDOUT_INPUT_FORMATS,
+        default="native",
+        help="Input representation.",
+    )
+    selector_holdout_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_selector_holdout_993",
+        help="Directory for the holdout manifest, report, and stage artifacts.",
+    )
+    selector_holdout_parser.add_argument(
+        "--scenario-offset",
+        type=int,
+        default=DEFAULT_SELECTOR_HOLDOUT_OFFSET,
+        help="Leading scenarios excluded from every input as development data.",
+    )
+    selector_holdout_parser.add_argument(
+        "--max-scenarios",
+        type=int,
+        default=None,
+        help="Optional maximum holdout scenarios to evaluate per input.",
+    )
+    selector_holdout_parser.add_argument(
+        "--expected-scenarios",
+        type=int,
+        default=DEFAULT_SELECTOR_HOLDOUT_SCENARIOS,
+        help="Exact aggregate holdout size required by the release gate.",
+    )
+    selector_holdout_parser.add_argument(
+        "--top",
+        type=int,
+        default=DEFAULT_SELECTOR_HOLDOUT_TOP,
+        help=(
+            "Per-bucket evidence cap. Coverage gates fail if this omits a "
+            "surfaced topology or replay case."
+        ),
+    )
+    selector_holdout_parser.add_argument(
+        "--calibration-manifest",
+        default=None,
+        help=(
+            "Optional compatible calibration manifest. The packaged policy "
+            "frozen at commit ba0b37e is used by default."
+        ),
+    )
+    selector_holdout_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe holdout report copy.",
+    )
     lane_continuation_candidates_parser = subparsers.add_parser(
         "lane-continuation-candidates",
         help=(
@@ -4060,6 +4180,18 @@ def main() -> int:
             scenario_offset=args.scenario_offset,
             top=args.top,
             input_format=args.format,
+            public_report=args.public_report,
+        )
+    if args.command == "selector-holdout-study":
+        return selector_holdout_study_command(
+            input_paths=args.input,
+            output_dir=args.output_dir,
+            input_format=args.format,
+            scenario_offset=args.scenario_offset,
+            max_scenarios=args.max_scenarios,
+            expected_scenarios=args.expected_scenarios,
+            top=args.top,
+            calibration_manifest=args.calibration_manifest,
             public_report=args.public_report,
         )
     if args.command == "lane-continuation-candidates":

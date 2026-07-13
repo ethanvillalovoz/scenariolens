@@ -166,7 +166,7 @@ def lane_continuation_terminal_neighborhood_selector_route_context_audit_payload
         "output_dir": str(output_dir),
         "ready": bool(transfer.get("ready"))
         and bool(replay.get("ready"))
-        and bool(audited_cases),
+        and bool(transfer_cases),
         "diagnostic_heading_gate": round(diagnostic_heading_gate, 3),
         "transfer_policy": transfer_policy,
         "source_scope": {
