@@ -42,12 +42,15 @@ class RunBundleTest(unittest.TestCase):
             self.assertEqual(first.stage_count, 3)
             self.assertEqual(first.scenario_count, 11)
             self.assertEqual(first.analysis_digest, second.analysis_digest)
+            self.assertIsNotNone(first.peak_rss_bytes)
+            self.assertGreater(first.peak_rss_bytes or 0, 0)
 
             payload = json.loads(first.manifest_path.read_text(encoding="utf-8"))
             self.assertEqual(payload["format"], RUN_BUNDLE_FORMAT)
             self.assertTrue(payload["ready"])
             self.assertEqual(payload["source_count"], 1)
             self.assertEqual(payload["scenario_count"], 11)
+            self.assertGreater(payload["peak_rss_bytes"], 0)
             self.assertEqual(len(payload["inputs"][0]["sha256"]), 64)
             self.assertEqual(
                 [stage["stage_id"] for stage in payload["stages"]],

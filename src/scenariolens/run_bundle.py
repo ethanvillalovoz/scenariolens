@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import platform
+import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -18,6 +19,11 @@ from scenariolens.ingest.waymo_motion import is_native_motion_file
 from scenariolens.lane_continuation import generate_lane_continuation_study
 from scenariolens.lane_selection_study import generate_lane_selection_study
 
+try:
+    import resource
+except ImportError:  # pragma: no cover - resource is available on CI and macOS.
+    resource = None  # type: ignore[assignment]
+
 RUN_BUNDLE_FORMAT = "scenariolens.run.v1"
 RUN_BUNDLE_INPUT_FORMATS = BASELINE_COMPARISON_STUDY_INPUT_FORMATS
 
@@ -32,6 +38,7 @@ class RunBundleResult:
     stage_count: int
     analysis_digest: str
     duration_seconds: float
+    peak_rss_bytes: int | None
     output_dir: Path
     manifest_path: Path
     report_path: Path
@@ -144,6 +151,7 @@ def generate_run_bundle(
         ).encode("utf-8")
     ).hexdigest()
     duration_seconds = perf_counter() - started
+    peak_rss_bytes = _peak_rss_bytes()
     payload: dict[str, object] = {
         "format": RUN_BUNDLE_FORMAT,
         "ready": ready,
@@ -163,6 +171,7 @@ def generate_run_bundle(
         "scenario_count": scenario_count,
         "stage_count": len(stages),
         "duration_seconds": round(duration_seconds, 3),
+        "peak_rss_bytes": peak_rss_bytes,
         "analysis_digest": analysis_digest,
         "inputs": input_provenance,
         "stages": stages,
@@ -190,6 +199,7 @@ def generate_run_bundle(
         stage_count=len(stages),
         analysis_digest=analysis_digest,
         duration_seconds=round(duration_seconds, 3),
+        peak_rss_bytes=peak_rss_bytes,
         output_dir=target,
         manifest_path=manifest_path,
         report_path=report_path,
@@ -259,6 +269,7 @@ def run_bundle_markdown(payload: dict[str, object]) -> str:
         f"- Scenarios: {payload.get('scenario_count')}",
         f"- Stages: {payload.get('stage_count')}",
         f"- Duration: {float(payload.get('duration_seconds', 0.0)):.3f} seconds",
+        f"- Peak process memory: {_optional_bytes(payload.get('peak_rss_bytes'))}",
         f"- Analysis digest: `{payload.get('analysis_digest')}`",
         f"- Input format: `{configuration.get('input_format')}`",
         f"- Maximum scenarios per input: {configuration.get('max_scenarios_per_input')}",
@@ -505,3 +516,18 @@ def _format_bytes(value: int) -> str:
             return f"{amount:.2f} {unit}"
         amount /= 1000
     return f"{value} B"
+
+
+def _optional_bytes(value: object) -> str:
+    if value is None:
+        return "not available"
+    return _format_bytes(int(value))
+
+
+def _peak_rss_bytes() -> int | None:
+    if resource is None:
+        return None
+    peak = int(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
+    if sys.platform != "darwin":
+        peak *= 1024
+    return peak

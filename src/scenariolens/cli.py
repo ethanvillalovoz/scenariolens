@@ -142,6 +142,11 @@ from scenariolens.run_bundle import (
     RUN_BUNDLE_INPUT_FORMATS,
     generate_run_bundle,
 )
+from scenariolens.run_validation import (
+    DEFAULT_MAX_DURATION_SECONDS,
+    DEFAULT_MAX_PEAK_MEMORY_GB,
+    generate_run_validation,
+)
 from scenariolens.samples import synthetic_scenarios
 from scenariolens.schema import Scenario
 from scenariolens.slice_validation import validate_waymo_motion_slice
@@ -187,7 +192,45 @@ def run_bundle_command(
     print(
         f"ScenarioLens run ready: {result.source_count} source(s), "
         f"{result.scenario_count} scenario(s), {result.stage_count} stage(s), "
-        f"digest {result.analysis_digest[:12]}."
+        f"digest {result.analysis_digest[:12]}, "
+        f"peak memory {_format_bytes(result.peak_rss_bytes or 0)}."
+    )
+    return 0
+
+
+def run_validation_command(
+    run_manifests: list[str],
+    output_dir: str,
+    max_duration_seconds: float,
+    max_peak_memory_gb: float,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_run_validation(
+            run_manifest_paths=tuple(run_manifests),
+            output_dir=output_dir,
+            max_duration_seconds=max_duration_seconds,
+            max_peak_memory_gb=max_peak_memory_gb,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote run-validation manifest to {result.manifest_path}")
+    print(f"Wrote run-validation report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print(
+            f"Run validation failed: {result.passed_count}/{result.check_count} "
+            "checks passed."
+        )
+        return 2
+    print(
+        f"Run validation ready: {result.run_count} run(s), "
+        f"{result.passed_count}/{result.check_count} checks passed, "
+        f"digest {str(result.analysis_digest)[:12]}."
     )
     return 0
 
@@ -2009,6 +2052,41 @@ def main() -> int:
         action="store_true",
         help="Skip SHA-256 input hashing for this local run.",
     )
+    run_verify_parser = subparsers.add_parser(
+        "run-verify",
+        help=(
+            "Verify repeated ScenarioLens run bundles for determinism, "
+            "readiness, duration, and peak memory."
+        ),
+    )
+    run_verify_parser.add_argument(
+        "--manifest",
+        action="append",
+        required=True,
+        help="Run-bundle manifest path. Repeat at least twice.",
+    )
+    run_verify_parser.add_argument(
+        "--output-dir",
+        default="data/processed/scenariolens_run_validation",
+        help="Directory for the validation manifest and report.",
+    )
+    run_verify_parser.add_argument(
+        "--max-duration-seconds",
+        type=float,
+        default=DEFAULT_MAX_DURATION_SECONDS,
+        help="Maximum allowed duration for every run.",
+    )
+    run_verify_parser.add_argument(
+        "--max-peak-memory-gb",
+        type=float,
+        default=DEFAULT_MAX_PEAK_MEMORY_GB,
+        help="Maximum allowed peak process memory for every run.",
+    )
+    run_verify_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional public-safe Markdown report copy.",
+    )
     export_parser = subparsers.add_parser(
         "export-synthetic",
         help="Export built-in synthetic scenarios as ScenarioLens JSON.",
@@ -3735,6 +3813,14 @@ def main() -> int:
             top=args.top,
             input_format=args.format,
             hash_inputs=not args.no_input_hash,
+        )
+    if args.command == "run-verify":
+        return run_validation_command(
+            run_manifests=args.manifest,
+            output_dir=args.output_dir,
+            max_duration_seconds=args.max_duration_seconds,
+            max_peak_memory_gb=args.max_peak_memory_gb,
+            public_report=args.public_report,
         )
     if args.command == "export-synthetic":
         return export_synthetic(output_path=args.output)

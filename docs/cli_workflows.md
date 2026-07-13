@@ -59,6 +59,24 @@ continuation studies. It writes a top-level `manifest.json`, concise
 specialist artifacts under `studies/`. Use `--no-input-hash` only for a local
 iteration where provenance is not required.
 
+Validate two independent runs against the v1 determinism and laptop budgets:
+
+```bash
+scenariolens run-verify \
+  --manifest runs/waymo-validation-01/manifest.json \
+  --manifest runs/waymo-validation-02/manifest.json \
+  --output-dir data/processed/scenariolens_v1_run_validation \
+  --max-duration-seconds 900 \
+  --max-peak-memory-gb 8 \
+  --public-report docs/reports/scenariolens_v1_run_validation.md
+```
+
+The validator requires every run and stage to be ready, identical input and
+stage fingerprints, one shared analysis digest, matching source/scenario
+scope, and compliance with both execution budgets. Timestamps, output paths,
+and timings are intentionally excluded from the analysis digest; source
+hashes, configuration, stage formats, counts, and aggregate metrics are not.
+
 ## Synthetic Demo
 
 ```bash

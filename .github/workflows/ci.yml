@@ -45,8 +45,20 @@ jobs:
             --output /tmp/scenariolens-run \
             --max-scenarios 11 \
             --top 6
+          scenariolens run \
+            --input /tmp/scenariolens-synthetic.json \
+            --format scenariolens-json \
+            --output /tmp/scenariolens-run-repeat \
+            --max-scenarios 11 \
+            --top 6
+          scenariolens run-verify \
+            --manifest /tmp/scenariolens-run/manifest.json \
+            --manifest /tmp/scenariolens-run-repeat/manifest.json \
+            --output-dir /tmp/scenariolens-run-validation
           python -m json.tool /tmp/scenariolens-run/manifest.json
+          python -m json.tool /tmp/scenariolens-run-validation/manifest.json
           test -f /tmp/scenariolens-run/report.md
+          test -f /tmp/scenariolens-run-validation/report.md
           test -f /tmp/scenariolens-run/studies/baseline_comparison/manifest.json
           test -f /tmp/scenariolens-run/studies/lane_selection/manifest.json
           test -f /tmp/scenariolens-run/studies/lane_continuation/manifest.json

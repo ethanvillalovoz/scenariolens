@@ -71,7 +71,9 @@ scenariolens run \
 
 The run writes one top-level `manifest.json` and `report.md` plus baseline,
 lane-selection, and lane-continuation study artifacts under
-`runs/quickstart/studies/`.
+`runs/quickstart/studies/`. Repeated runs can be checked with
+`scenariolens run-verify` for matching analytical digests and laptop execution
+budgets.
 
 Preview the explorer locally:
 
