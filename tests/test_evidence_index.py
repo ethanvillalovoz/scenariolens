@@ -30,6 +30,7 @@ class EvidenceIndexTest(unittest.TestCase):
         self.assertIn("selector_validation", aggregate["stage_counts"])
 
         artifact_ids = {artifact["id"] for artifact in payload["artifacts"]}
+        self.assertIn("explorer_run_contract", artifact_ids)
         self.assertIn("terminal_selector_decision_atlas_200", artifact_ids)
         self.assertIn("v1_run_validation", artifact_ids)
         self.assertIn("ci_workflow", artifact_ids)

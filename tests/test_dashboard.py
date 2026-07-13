@@ -24,6 +24,7 @@ class DashboardDataTest(unittest.TestCase):
         landing = (docs_root / "index.html").read_text(encoding="utf-8")
         html = (root / "index.html").read_text(encoding="utf-8")
         payload = json.loads((root / "scenarios.json").read_text(encoding="utf-8"))
+        run_payload = json.loads((root / "run.json").read_text(encoding="utf-8"))
         selector_atlas = json.loads(
             (root / "selector_decisions.json").read_text(encoding="utf-8")
         )
@@ -32,16 +33,14 @@ class DashboardDataTest(unittest.TestCase):
         self.assertTrue((docs_root / ".nojekyll").exists())
         self.assertIn('href="styles.css"', html)
         self.assertIn('src="app.js"', html)
-        self.assertIn('../data_provenance.md', html)
         self.assertIn('id="heroScenarioCount"', html)
         self.assertIn('id="heroMaxFde"', html)
+        self.assertIn('id="stageSummary"', html)
+        self.assertIn('id="reportLinks"', html)
         self.assertIn('id="baselineCard"', html)
         self.assertIn('id="diagnosticRows"', html)
         self.assertIn('id="selectorAtlasCards"', html)
-        self.assertIn('../reports/waymo_motion_failure_stability.md', html)
-        self.assertIn('../reports/waymo_motion_shard_plan.md', html)
-        self.assertIn('../reports/waymo_heading_aware_lane_selection_study.md', html)
-        self.assertIn('../reports/waymo_heading_aware_debug_casebook.md', html)
+        self.assertIn('./run.json', html)
         self.assertIn(
             '../reports/waymo_lane_continuation_terminal_neighborhood_selector_decision_atlas_200.md',
             html,
@@ -51,6 +50,10 @@ class DashboardDataTest(unittest.TestCase):
         self.assertTrue((docs_root / "reports" / "waymo_motion_shard_plan.md").exists())
         self.assertTrue((root / "assets" / "scenariolens-explorer.png").exists())
         self.assertEqual(payload["format"], DASHBOARD_FORMAT)
+        self.assertEqual(run_payload["format"], "scenariolens.explorer_run.v1")
+        self.assertTrue(run_payload["ready"])
+        self.assertEqual(run_payload["summary"]["scenario_count"], 1193)
+        self.assertEqual(len(run_payload["stages"]), 3)
         self.assertIn("case_diagnostics", payload)
         self.assertEqual(
             payload["case_diagnostics"]["format"],

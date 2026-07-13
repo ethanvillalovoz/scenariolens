@@ -523,13 +523,14 @@ experience with a finite release contract.
 - clean wheel installation and failure-path checks,
 - concise public documentation and a verified `v1.0.0` release.
 
-Status: the acceptance contract, one-command run bundle, CI-safe integration
-path, and `run-verify` release gate are implemented. Two independent full-corpus
+Status: the acceptance contract, one-command run bundle, generated Explorer,
+desktop/mobile browser suite, CI-safe integration path, and `run-verify`
+release gate are implemented. Two independent full-corpus
 runs each processed 1,193 scenarios from four local Waymo Motion validation
 shards, produced the same analysis digest, passed 7/7 reproducibility and
 resource checks, completed in at most 459.495 seconds, and used at most
-1.915 GB peak memory. The next product milestone is generating and serving the
-Explorer directly from this run bundle.
+1.915 GB peak memory. The next product milestone is the `--open` serving path,
+separate frozen-policy validation cohort, and complete failure-path gate.
 
 ## Stretch Goals
 

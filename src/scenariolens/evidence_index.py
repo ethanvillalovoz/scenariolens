@@ -71,6 +71,30 @@ DEFAULT_EVIDENCE_CATALOG: tuple[EvidenceCatalogItem, ...] = (
         ),
     ),
     EvidenceCatalogItem(
+        identifier="explorer_run_contract",
+        title="Explorer Run Contract",
+        stage="product_surface",
+        stage_label="Product surface",
+        proof_type="versioned product payload",
+        scope="Aggregate metadata from the reproducible 1,193-scenario run",
+        path="docs/demo/run.json",
+        command="scenariolens run --input <path> --output runs/<name>",
+        data_status="aggregate run metrics and portable report links only",
+        why_it_matters=(
+            "Connects the visible Explorer to the same provenance, stage "
+            "metrics, digest, and resource evidence emitted by the CLI."
+        ),
+        limitation=(
+            "The public payload joins aggregate real-run evidence to separately "
+            "checked-in fixture trajectories; it does not publish raw records."
+        ),
+        metrics=(
+            EvidenceMetric("Analyzed scenarios", "1,193"),
+            EvidenceMetric("Analysis stages", "3"),
+            EvidenceMetric("Payload format", "scenariolens.explorer_run.v1"),
+        ),
+    ),
+    EvidenceCatalogItem(
         identifier="data_provenance",
         title="Data Provenance Boundary",
         stage="data_boundary",

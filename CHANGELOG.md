@@ -19,6 +19,11 @@ All notable changes to ScenarioLens are documented here.
   versioned `explorer/run.json`, ranked `explorer/scenarios.json`, and rendered
   trajectory assets. Explorer case IDs participate in the deterministic
   analysis digest, and the static frontend is included in built packages.
+- The Scenario Explorer now reads `scenariolens.explorer_run.v1` provenance and
+  stage metrics, uses a compact operational layout instead of a report-card
+  wall, and shares the same frontend between the public demo and local runs.
+  Three Playwright tests cover the public workflow, generated-run assets and
+  report links, console errors, and desktop/mobile overflow in CI.
 - `docs/reports/scenariolens_v1_run_validation.md`, generated from two complete
   1,193-scenario runs over four local Waymo Motion validation shards. All 7
   readiness, digest, input, stage, duration, and memory checks pass; the slower

@@ -7,17 +7,17 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 ## Readiness
 
 - Ready: yes
-- Required artifacts present: 17 / 17
+- Required artifacts present: 18 / 18
 - Missing required artifacts: 0
 - Evidence stages: 8
-- Public-safe artifacts indexed: 17
+- Public-safe artifacts indexed: 18
 - Local real-data/Waymo-derived artifacts indexed: 14
 
 ## Stage Summary
 
 | Stage | Present | Artifacts | Why it matters |
 | --- | ---: | ---: | --- |
-| Product surface | 2 | 2 | Makes the repo understandable quickly through static public artifacts. |
+| Product surface | 3 | 3 | Makes the repo understandable quickly through static public artifacts. |
 | Data boundary | 1 | 1 | Documents what data is trusted, derived, local, and excluded from git. |
 | Scenario mining | 2 | 2 | Shows ScenarioLens can rank and explain real motion scenarios. |
 | Baseline models | 2 | 2 | Compares lightweight prediction baselines with honest wins and regressions. |
@@ -31,6 +31,7 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 | Artifact | Stage | Scope | Key metrics | Present |
 | --- | --- | --- | --- | ---: |
 | [Static Scenario Explorer](../demo/index.html) | Product surface | 14 public demo scenarios plus real-data evidence links | Explorer scenarios: 14; Live route: GitHub Pages/portfolio friendly | yes |
+| [Explorer Run Contract](../demo/run.json) | Product surface | Aggregate metadata from the reproducible 1,193-scenario run | Analyzed scenarios: 1,193; Analysis stages: 3; Payload format: scenariolens.explorer_run.v1 | yes |
 | [Data Provenance Boundary](../data_provenance.md) | Data boundary | Public-safe data handling and raw-data exclusion policy | Raw TFRecords in git: 0 | yes |
 | [Cross-Shard Failure Stability](waymo_motion_failure_stability_cross_shard.md) | Scenario mining | 100 scenarios across 4 local Waymo Motion validation shards | Scenarios: 100; Validation shards: 4 | yes |
 | [Context-Joined Failure Study](waymo_context_failure_study_cross_shard.md) | Scenario mining | Map, route, signal, and failure metrics over the 100-scenario slice | Scenarios: 100 | yes |
@@ -58,6 +59,15 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 - Data status: public fixtures plus aggregate/derived real-data links
 - Why it matters: Gives a reviewer a zero-install first look at ranking, filtering, trajectory previews, failure cards, and selector diagnostics.
 - Limitation: The explorer is static and does not expose raw Waymo data.
+
+### Explorer Run Contract
+
+- Path: `docs/demo/run.json`
+- Proof type: versioned product payload
+- Command: `scenariolens run --input <path> --output runs/<name>`
+- Data status: aggregate run metrics and portable report links only
+- Why it matters: Connects the visible Explorer to the same provenance, stage metrics, digest, and resource evidence emitted by the CLI.
+- Limitation: The public payload joins aggregate real-run evidence to separately checked-in fixture trajectories; it does not publish raw records.
 
 ### Data Provenance Boundary
 

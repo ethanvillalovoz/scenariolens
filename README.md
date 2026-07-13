@@ -49,8 +49,8 @@ ScenarioLens builds a small but polished pipeline that can:
 | Working framework | Python package, installable CLI, schema, metrics, reports, rendering, dashboard exporter |
 | Real-data path | Native Waymo Motion JSON/proto/TFRecord slice reader with local preflight and validation |
 | Baseline evidence | Constant-velocity ADE/FDE, miss rate, lane-aware comparison, map/signal context coverage, map-match audit, tag studies, and stability studies |
-| Public demo | Static Scenario Explorer with filters, SVG trajectories, score components, failure cards, real-data diagnostic cases, and selector decision cards |
-| Evidence index | Generated v1 artifact map verifying 17 public reports, payloads, provenance docs, and CI files |
+| Public demo | Run-backed Scenario Explorer with provenance, stage metrics, filters, SVG trajectories, baseline cards, diagnostics, and responsive browser tests |
+| Evidence index | Generated v1 artifact map verifying 18 public reports, payloads, provenance docs, and CI files |
 | Repo quality | MIT license, contributor docs, changelog, citation, issue templates, CI, and release checklist |
 
 ## Quick Start
@@ -988,6 +988,10 @@ Run tests with only the Python standard library:
 
 ```bash
 PYTHONPATH=src python3 -m unittest discover
+node --check docs/demo/app.js
+npm ci
+npx playwright install chromium
+npm run test:browser
 ```
 
 ## Scenario Categories

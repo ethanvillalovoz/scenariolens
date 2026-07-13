@@ -80,6 +80,18 @@ scope, and compliance with both execution budgets. Timestamps, output paths,
 and timings are intentionally excluded from the analysis digest; source
 hashes, configuration, stage formats, counts, and aggregate metrics are not.
 
+Browser-test both the public demo and a newly generated local run:
+
+```bash
+npm ci
+npx playwright install chromium
+npm run test:browser
+```
+
+The suite exercises run metadata, stage summaries, filtering, sorting, case
+selection, trajectory loading, report links, desktop layout, and mobile
+overflow while failing on browser console errors.
+
 ## Synthetic Demo
 
 ```bash

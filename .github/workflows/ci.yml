@@ -17,8 +17,19 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
       - name: Install package
         run: python -m pip install -e ".[dev]"
+
+      - name: Install browser test dependencies
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
 
       - name: Check CLI entrypoint
         run: scenariolens --help
@@ -34,6 +45,7 @@ jobs:
       - name: Check dashboard JSON
         run: |
           python -m json.tool docs/demo/scenarios.json
+          python -m json.tool docs/demo/run.json
           python -m json.tool docs/demo/evidence_index.json
 
       - name: Run CLI integration workflow
@@ -86,6 +98,9 @@ jobs:
           scenariolens replay-prototype --candidate-manifest /tmp/scenariolens-replay-candidates/manifest.json --output-dir /tmp/scenariolens-replay-prototype --top 2
           scenariolens map-match-audit --debug-manifest /tmp/scenariolens-debug/manifest.json --output-dir /tmp/scenariolens-map-match-audit --case-count 3
           scenariolens lane-selection-study --input /tmp/scenariolens-synthetic.json --format scenariolens-json --output-dir /tmp/scenariolens-lane-selection --max-scenarios 11 --top 6
+
+      - name: Run Explorer browser tests
+        run: npm run test:browser
 
       - name: Smoke test CSV ingestion
         run: |

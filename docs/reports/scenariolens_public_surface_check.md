@@ -10,7 +10,7 @@ It is intentionally scoped to repository health. It is not a Waymo benchmark cla
 - Checks passed: 7 / 7
 - Failed checks: 0
 - Warnings: 0
-- Files checked: 16
+- Files checked: 17
 
 ## Checks
 
@@ -33,15 +33,16 @@ It is intentionally scoped to repository health. It is not a Waymo benchmark cla
 - Summary: Evidence index is ready with no missing required artifacts.
 - Format: `scenariolens.evidence_index.v1`
 - Ready flag: True
-- Artifact count: 17
+- Artifact count: 18
 - Missing required artifacts: 0
 
 ### Demo payload contracts
 
 - Status: pass
-- Files: `docs/demo/scenarios.json`, `docs/demo/selector_decisions.json`, `docs/demo/evidence_index.json`
+- Files: `docs/demo/scenarios.json`, `docs/demo/run.json`, `docs/demo/selector_decisions.json`, `docs/demo/evidence_index.json`
 - Summary: Static demo JSON payloads parse and expose expected format versions.
 - `docs/demo/scenarios.json` format `scenariolens.dashboard.v1`
+- `docs/demo/run.json` format `scenariolens.explorer_run.v1`
 - `docs/demo/selector_decisions.json` format `scenariolens.lane_continuation_terminal_neighborhood_selector_decision_atlas.v1`
 - `docs/demo/evidence_index.json` format `scenariolens.evidence_index.v1`
 
@@ -51,11 +52,11 @@ It is intentionally scoped to repository health. It is not a Waymo benchmark cla
 - Files: `README.md`, `docs/demo/index.html`, `docs/demo/README.md`, `docs/reports/scenariolens_evidence_index.md`, `docs/reports/scenariolens_public_surface_check.md`
 - Summary: All checked local links resolve to files in the repository.
 - `README.md` links scanned: 112
-- `docs/demo/index.html` links scanned: 71
-- `docs/demo/README.md` links scanned: 4
-- `docs/reports/scenariolens_evidence_index.md` links scanned: 17
+- `docs/demo/index.html` links scanned: 11
+- `docs/demo/README.md` links scanned: 1
+- `docs/reports/scenariolens_evidence_index.md` links scanned: 18
 - `docs/reports/scenariolens_public_surface_check.md` links scanned: 0
-- Local links checked: 196
+- Local links checked: 134
 - External links skipped: 6
 
 ### Demo asset integrity
@@ -70,7 +71,7 @@ It is intentionally scoped to repository health. It is not a Waymo benchmark cla
 - Status: pass
 - Files: `.gitignore`, `docs/data_provenance.md`
 - Summary: No raw Waymo or TFRecord-like files are tracked.
-- Tracked files inspected: 269
+- Tracked files inspected: 277
 - Tracked raw Waymo/TFRecord-like files: 0
 
 ### CI surface
@@ -80,7 +81,9 @@ It is intentionally scoped to repository health. It is not a Waymo benchmark cla
 - Summary: CI covers unit tests, deterministic run integration, static demo syntax, evidence JSON, and public-surface checks.
 - `python -m unittest discover` present: True
 - `node --check docs/demo/app.js` present: True
+- `python -m json.tool docs/demo/run.json` present: True
 - `python -m json.tool docs/demo/evidence_index.json` present: True
+- `npm run test:browser` present: True
 - `scenariolens run` present: True
 - `scenariolens run-verify` present: True
 - `scenariolens evidence-index` present: True

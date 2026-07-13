@@ -4,13 +4,14 @@
   "generated_by": "scenariolens evidence-index",
   "scope_note": "This evidence index is generated from a curated public artifact catalog and verifies that required reports, payloads, and CI files exist in the repository. It is a recruiter-facing map of evidence, not a Waymo benchmark claim.",
   "aggregate": {
-    "artifact_count": 17,
-    "present_count": 17,
+    "artifact_count": 18,
+    "present_count": 18,
     "missing_count": 0,
-    "required_count": 17,
+    "required_count": 18,
     "stage_count": 8,
     "proof_type_counts": {
       "interactive demo": 1,
+      "versioned product payload": 1,
       "provenance": 1,
       "real-data aggregate study": 1,
       "context diagnostic": 1,
@@ -28,7 +29,7 @@
       "readiness gate": 1
     },
     "stage_counts": {
-      "product_surface": 2,
+      "product_surface": 3,
       "data_boundary": 1,
       "scenario_mining": 2,
       "baseline_models": 2,
@@ -37,17 +38,18 @@
       "selector_validation": 4,
       "release_readiness": 3
     },
-    "public_safe_artifact_count": 17,
+    "public_safe_artifact_count": 18,
     "local_real_data_artifact_count": 14
   },
   "stages": [
     {
       "stage": "product_surface",
       "label": "Product surface",
-      "artifact_count": 2,
-      "present_count": 2,
+      "artifact_count": 3,
+      "present_count": 3,
       "artifact_ids": [
         "live_explorer",
+        "explorer_run_contract",
         "selector_demo_payload"
       ],
       "summary": "Makes the repo understandable quickly through static public artifacts."
@@ -143,7 +145,7 @@
       "link_path": "../demo/index.html",
       "present": true,
       "required": true,
-      "size_bytes": 21485,
+      "size_bytes": 10131,
       "command": "scenariolens dashboard-data --output docs/demo/scenarios.json",
       "data_status": "public fixtures plus aggregate/derived real-data links",
       "why_it_matters": "Gives a reviewer a zero-install first look at ranking, filtering, trajectory previews, failure cards, and selector diagnostics.",
@@ -156,6 +158,37 @@
         {
           "label": "Live route",
           "value": "GitHub Pages/portfolio friendly"
+        }
+      ]
+    },
+    {
+      "id": "explorer_run_contract",
+      "title": "Explorer Run Contract",
+      "stage": "product_surface",
+      "stage_label": "Product surface",
+      "proof_type": "versioned product payload",
+      "scope": "Aggregate metadata from the reproducible 1,193-scenario run",
+      "path": "docs/demo/run.json",
+      "link_path": "../demo/run.json",
+      "present": true,
+      "required": true,
+      "size_bytes": 5193,
+      "command": "scenariolens run --input <path> --output runs/<name>",
+      "data_status": "aggregate run metrics and portable report links only",
+      "why_it_matters": "Connects the visible Explorer to the same provenance, stage metrics, digest, and resource evidence emitted by the CLI.",
+      "limitation": "The public payload joins aggregate real-run evidence to separately checked-in fixture trajectories; it does not publish raw records.",
+      "metrics": [
+        {
+          "label": "Analyzed scenarios",
+          "value": "1,193"
+        },
+        {
+          "label": "Analysis stages",
+          "value": "3"
+        },
+        {
+          "label": "Payload format",
+          "value": "scenariolens.explorer_run.v1"
         }
       ]
     },
@@ -540,7 +573,7 @@
       "link_path": "../../.github/workflows/ci.yml",
       "present": true,
       "required": true,
-      "size_bytes": 5138,
+      "size_bytes": 5934,
       "command": "python -m unittest discover; scenariolens run; scenariolens run-verify",
       "data_status": "CI-safe fixtures only",
       "why_it_matters": "Shows the framework is maintained as software, not just a set of static reports.",
@@ -563,7 +596,7 @@
       "link_path": "scenariolens_public_surface_check.md",
       "present": true,
       "required": true,
-      "size_bytes": 4573,
+      "size_bytes": 4752,
       "command": "scenariolens public-surface-check --repo-root .",
       "data_status": "CI-safe repository metadata and derived public artifacts only",
       "why_it_matters": "Turns the public repo surface into a testable release gate instead of relying on manual README/demo inspection.",

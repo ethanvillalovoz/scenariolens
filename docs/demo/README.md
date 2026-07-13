@@ -1,106 +1,51 @@
 # Scenario Explorer Demo
 
-This directory contains the static Scenario Explorer dashboard and its data
-contract.
+This directory contains the static ScenarioLens Explorer and the checked-in
+public payloads used by GitHub Pages and the portfolio route.
 
-Open locally with:
+Run it locally:
 
 ```bash
 python3 -m http.server 8000 --directory docs
 ```
 
-Then visit `http://localhost:8000`. The `docs/index.html` entrypoint redirects
-to this explorer.
+Open `http://localhost:8000/demo/`.
 
-The production copy is embedded in Ethan's personal portfolio site at
-`https://ethanvillalovoz.com/scenariolens/`.
+The public demo joins two deliberately separate evidence layers:
 
-The demo data is intentionally small: synthetic scenarios plus tiny
-Waymo Motion-shaped fixtures. Each scenario includes interaction-risk metrics,
-a constant-velocity prediction baseline, and lane-aware comparison fields when
-map context is available so the explorer can surface cases where a simple
-forecast fails. See
-[`docs/data_provenance.md`](../data_provenance.md) for the exact data status.
-See [`docs/project_strategy.md`](../project_strategy.md) for the product goal
-and [`docs/architecture.md`](../architecture.md) for the data-flow map.
-The Explorer also embeds a public-safe case-diagnostics slice from the local
-100-scenario heading-aware lane-selection study: top improvements, regressions,
-and fallback-heavy cases, with raw Waymo records and derived packets excluded.
-The diagnostics panel links to the public heading-aware debug casebook, while
-local SVG overlays and per-case manifests remain ignored under `data/processed/`.
-The report rail also links to the heading-aware replay candidate plan,
-heading-aware replay prototype, expanded lane-continuation topology gap audit,
-expanded terminal-neighborhood audit, expanded terminal replay gate, and
-expanded terminal selector experiment, calibration, and visual casebook,
-plus the generated v1 evidence index and public-surface check, 200-scenario
-continuation/terminal-selector scale-up, and selector
-transfer/error/route-context/candidate validation and visual decision atlas,
-connecting those cases to public-safe selector stability, topology coverage,
-and repo-readiness checks.
+- `run.json` contains aggregate metrics from two reproducible 1,193-scenario
+  local runs over four Waymo Motion validation shards.
+- `scenarios.json` contains 14 checked-in synthetic and Waymo-shaped fixture
+  cases whose trajectories are safe to publish and inspect in a browser.
 
-Generated files:
+The interface labels that boundary directly. Raw Waymo TFRecords and local
+per-scenario packets remain outside git. See
+[`docs/data_provenance.md`](../data_provenance.md) for the complete trust model.
 
-- `index.html`: static dashboard shell.
-- `styles.css`: dashboard visual system.
-- `app.js`: filtering, sorting, and detail-panel interactions.
-- `scenarios.json`: ranked dashboard payload.
-- `evidence_index.json`: generated v1 public evidence spine used to verify
-  the demo, reports, provenance docs, and CI artifacts.
-- `selector_decisions.json`: public-safe terminal-selector decision atlas
-  payload joined to the 200-scenario candidate-validation labels.
-- `assets/*.svg`: trajectory views referenced by `scenarios.json`.
-- `assets/terminal_selector_casebook_200_*.svg`: derived selector decision
-  cards referenced by `selector_decisions.json`.
-- `assets/scenariolens-explorer.png`: README screenshot of the dashboard.
-- `assets/scenariolens-demo.gif`: short README demo loop showing filtering,
-  trajectory inspection, and baseline comparison.
-- The evidence band, baseline-failure card, heading-aware case diagnostics, and
-  terminal-selector decision atlas are code-native UI backed by checked-in JSON.
+## Files
 
-The explorer also links to
-[`docs/reports/waymo_motion_case_study.md`](../reports/waymo_motion_case_study.md)
-as the public-safe summary of the local real Waymo Motion smoke test.
-The first viewport links to the failure study, cross-shard stability study,
-v1 evidence index, public-surface check, shard expansion plan, map/signal context study, real lane-aware cross-shard
-diagnostic, context-joined failure study, context evaluation set,
-context eval debug casebook, context replay candidate plan, context open-loop
-replay prototype, context route/intent audit, lane-link continuation prototype,
-lane-continuation validation study, lane-continuation candidate plan,
-lane-continuation replay prototype, lane-continuation route diagnostics,
-lane-continuation branch-selection diagnostic, motion-context branch replay,
-branch rollout gate, route-context guard, guard calibration, branch coverage
-audit, expanded branch coverage and guard validation, expanded topology gap
-audit, expanded terminal neighborhood audit, expanded terminal replay gate,
-expanded terminal selector, expanded terminal selector calibration, expanded
-terminal selector visual casebook, the 200-scenario continuation study,
-200-scenario topology audit, 200-scenario selector calibration, 200-scenario
-selector transfer validation, 200-scenario selector error audit, 200-scenario
-selector route/context audit, 200-scenario selector candidate validation,
-200-scenario selector decision atlas, 200-scenario selector visual casebook, topology
-gap audit, terminal neighborhood audit, terminal replay gate, terminal
-selector, baseline-debug casebook,
-replay candidate plan, open-loop
-replay prototype, map-match audit, heading-aware lane-selection study,
-heading-aware debug casebook,
-heading-aware replay candidate plan, heading-aware replay prototype, and
-portfolio packet plus data provenance so reviewers can jump from the product
-surface to the evidence behind it.
+- `index.html`: compact operational shell shared by public and generated runs.
+- `styles.css`: responsive Explorer visual system.
+- `app.js`: run summary, filtering, sorting, diagnostics, and case inspection.
+- `run.json`: `scenariolens.explorer_run.v1` aggregate run contract.
+- `scenarios.json`: `scenariolens.dashboard.v1` ranked case contract.
+- `selector_decisions.json`: public-safe terminal-selector decision atlas.
+- `evidence_index.json`: generated v1 public evidence catalog.
+- `assets/*.svg`: trajectory and selector-decision visuals.
 
-Regenerate with:
+`scenariolens run` copies the same HTML, CSS, and JavaScript into
+`<output>/explorer/`, writes a run-specific `run.json` and `scenarios.json`, and
+renders selected trajectories under `<output>/assets/`. The public demo and a
+local run therefore use the same versioned payload contracts and interaction
+code.
+
+## Regeneration
 
 ```bash
 scenariolens dashboard-data \
   --output docs/demo/scenarios.json \
   --assets-dir docs/demo/assets \
   --lane-selection-manifest data/processed/waymo_lane_selection_study/manifest.json
-
-scenariolens lane-continuation-terminal-neighborhood-selector-decision-atlas \
-  --casebook-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_casebook_200/manifest.json \
-  --candidate-validation-manifest data/processed/waymo_lane_continuation_terminal_neighborhood_selector_candidate_validation_200/manifest.json \
-  --output-dir data/processed/waymo_lane_continuation_terminal_neighborhood_selector_decision_atlas_200 \
-  --public-report docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_decision_atlas_200.md \
-  --demo-json docs/demo/selector_decisions.json \
-  --demo-assets-dir docs/demo/assets
 
 scenariolens evidence-index \
   --output-dir data/processed/scenariolens_evidence_index \
@@ -114,39 +59,21 @@ scenariolens public-surface-check \
   --repo-root .
 ```
 
-## Payload Shape
+The hand-curated public `run.json` mirrors fields from the checked-in
+full-corpus reproducibility report. Update it only when a new public-safe run
+validation packet is published.
 
-`scenarios.json` uses format `scenariolens.dashboard.v1` and includes:
+## Browser Contract
 
-- dataset summaries,
-- available filter values,
-- ranked scenarios,
-- score totals and component scores,
-- raw and scored-context metrics used in ranking,
-- constant-velocity baseline ADE/FDE, miss rate, target source, and failure score,
-- lane-aware ADE/FDE, miss rate, FDE improvement, map-used count, and fallback count,
-- lane-aware fallback reason summaries,
-- public-safe heading-aware lane-selection case diagnostics when a study
-  manifest is available,
-- public report and debug-casebook links for the heading-aware diagnostics,
-- Waymo metadata credibility fields such as SDC presence, prediction targets,
-  and objects of interest when available,
-- taxonomy tags,
-- explanation reasons,
-- SVG asset paths,
-- basic track metadata.
+The Explorer must load without relevant console errors and support:
 
-`selector_decisions.json` uses format
-`scenariolens.lane_continuation_terminal_neighborhood_selector_decision_atlas.v1`
-and includes the 7 public-safe selector cards, candidate-validation categories,
-agreement counts, recovered false-hold count, negative controls, and copied SVG
-asset paths. It does not include raw Waymo records, raw trajectories, or raw map
-geometry.
+- run readiness, digest, timing, memory, and stage summaries,
+- report navigation using portable relative paths,
+- dataset, tag, score, and component filters,
+- sorting and keyboard-selectable scenario rows,
+- trajectory rendering and previous/next case navigation,
+- baseline comparison cards and public-safe diagnostics,
+- mobile layouts without page-level horizontal overflow.
 
-`evidence_index.json` uses format `scenariolens.evidence_index.v1` and includes
-the generated v1 artifact catalog, stage summaries, required-file readiness,
-proof types, commands, public-safe data status notes, and limitations. It
-verifies repository artifacts only; it does not require local raw Waymo shards.
-
-The payload is deterministic and does not include timestamps, so it can be
-checked into git and reviewed in pull requests.
+The payloads are deterministic and contain no generated timestamps, so changes
+remain reviewable in pull requests.

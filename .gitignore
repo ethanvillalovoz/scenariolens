@@ -26,3 +26,5 @@ data/processed/*
 
 # Local browser verification
 .playwright-cli/
+node_modules/
+output/playwright/
