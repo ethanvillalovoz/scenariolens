@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import platform
+import shutil
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
@@ -51,6 +52,7 @@ except ImportError:  # pragma: no cover - available on CI and macOS.
 
 
 SELECTOR_HOLDOUT_STUDY_FORMAT = "scenariolens.selector_holdout_study.v1"
+SELECTOR_HOLDOUT_STATE_FORMAT = "scenariolens.selector_holdout_state.v1"
 SELECTOR_HOLDOUT_INPUT_FORMATS = LANE_CONTINUATION_STUDY_INPUT_FORMATS
 FROZEN_SELECTOR_COMMIT = "ba0b37e"
 FROZEN_MAX_ALTERNATE_DISTANCE_M = 5.0
@@ -61,6 +63,17 @@ DEFAULT_SCENARIO_OFFSET = 50
 DEFAULT_EXPECTED_SCENARIOS = 993
 DEFAULT_TOP = 150
 MINIMUM_SELECTOR_DECISIONS = 30
+_HOLDOUT_STAGE_IDS = (
+    "continuation_study",
+    "candidate_plan",
+    "replay_prototype",
+    "topology_gap_audit",
+    "terminal_neighborhood_audit",
+    "terminal_neighborhood_replay",
+    "selector_transfer",
+    "route_context_audit",
+    "candidate_validation",
+)
 
 
 @dataclass(frozen=True)
@@ -80,6 +93,9 @@ class SelectorHoldoutStudyResult:
     manifest_path: Path
     report_path: Path
     public_report_path: Path | None
+    state_path: Path
+    reused_stage_count: int
+    executed_stage_count: int
 
 
 @dataclass(frozen=True)
@@ -87,6 +103,21 @@ class _Stage:
     stage_id: str
     label: str
     generator: Callable[..., object]
+
+
+@dataclass(frozen=True)
+class _CompletedStageResult:
+    manifest_path: Path
+    report_path: Path
+
+
+@dataclass
+class _ResumeSession:
+    path: Path
+    payload: dict[str, object]
+    requested: bool
+    reused_stage_count: int = 0
+    executed_stage_count: int = 0
 
 
 def default_frozen_selector_policy_path() -> Path:
@@ -106,6 +137,7 @@ def generate_selector_holdout_study(
     minimum_selector_decisions: int = MINIMUM_SELECTOR_DECISIONS,
     calibration_manifest_path: str | Path | None = None,
     public_report_path: str | Path | None = None,
+    resume: bool = False,
 ) -> SelectorHoldoutStudyResult:
     """Run the frozen terminal selector on a disjoint scenario window."""
 
@@ -135,6 +167,21 @@ def generate_selector_holdout_study(
     calibration_provenance = _file_provenance(calibration_path, index=1)
     calibration_provenance["frozen_at_commit"] = FROZEN_SELECTOR_COMMIT
     calibration_provenance["policy"] = _frozen_policy(calibration)
+    configuration = {
+        "input_format": input_format,
+        "scenario_offset_per_input": scenario_offset,
+        "max_scenarios_per_input": max_scenarios,
+        "expected_scenarios": expected_scenarios,
+        "top": top,
+        "minimum_selector_decisions": minimum_selector_decisions,
+    }
+    resume_session = _prepare_resume_session(
+        target=target,
+        configuration=configuration,
+        inputs=input_provenance,
+        calibration=calibration_provenance,
+        resume=resume,
+    )
     stages: list[dict[str, object]] = []
 
     study_result, study = _execute_stage(
@@ -146,6 +193,7 @@ def generate_selector_holdout_study(
         output_dir=stages_dir / "01_continuation_study",
         bundle_dir=target,
         stages=stages,
+        resume_session=resume_session,
         kwargs={
             "input_paths": sources,
             "max_scenarios": max_scenarios,
@@ -163,6 +211,7 @@ def generate_selector_holdout_study(
         output_dir=stages_dir / "02_candidate_plan",
         bundle_dir=target,
         stages=stages,
+        resume_session=resume_session,
         kwargs={
             "study_manifest_path": study_result.manifest_path,
             "top_per_bucket": top,
@@ -177,6 +226,7 @@ def generate_selector_holdout_study(
         output_dir=stages_dir / "03_replay_prototype",
         bundle_dir=target,
         stages=stages,
+        resume_session=resume_session,
         kwargs={
             "candidate_manifest_path": candidate_result.manifest_path,
             "top_per_bucket": top,
@@ -193,6 +243,7 @@ def generate_selector_holdout_study(
         output_dir=stages_dir / "04_topology_gap_audit",
         bundle_dir=target,
         stages=stages,
+        resume_session=resume_session,
         kwargs={"replay_manifest_path": replay_result.manifest_path},
     )
     terminal_result, terminal = _execute_stage(
@@ -204,6 +255,7 @@ def generate_selector_holdout_study(
         output_dir=stages_dir / "05_terminal_neighborhood_audit",
         bundle_dir=target,
         stages=stages,
+        resume_session=resume_session,
         kwargs={"topology_manifest_path": topology_result.manifest_path},
     )
     terminal_replay_result, terminal_replay = _execute_stage(
@@ -215,6 +267,7 @@ def generate_selector_holdout_study(
         output_dir=stages_dir / "06_terminal_neighborhood_replay",
         bundle_dir=target,
         stages=stages,
+        resume_session=resume_session,
         kwargs={
             "terminal_neighborhood_manifest_path": terminal_result.manifest_path,
             "top": top,
@@ -230,6 +283,7 @@ def generate_selector_holdout_study(
         output_dir=stages_dir / "07_selector_transfer",
         bundle_dir=target,
         stages=stages,
+        resume_session=resume_session,
         kwargs={
             "selector_calibration_manifest_path": calibration_path,
             "terminal_neighborhood_replay_manifest_path": (
@@ -247,6 +301,7 @@ def generate_selector_holdout_study(
         output_dir=stages_dir / "08_route_context_audit",
         bundle_dir=target,
         stages=stages,
+        resume_session=resume_session,
         kwargs={
             "selector_transfer_manifest_path": transfer_result.manifest_path,
             "terminal_neighborhood_replay_manifest_path": (
@@ -264,6 +319,7 @@ def generate_selector_holdout_study(
         output_dir=stages_dir / "09_candidate_validation",
         bundle_dir=target,
         stages=stages,
+        resume_session=resume_session,
         kwargs={
             "selector_transfer_manifest_path": transfer_result.manifest_path,
             "selector_route_context_manifest_path": context_result.manifest_path,
@@ -294,14 +350,7 @@ def generate_selector_holdout_study(
     ready = all(bool(check["passed"]) for check in checks)
     stable_payload = {
         "format": SELECTOR_HOLDOUT_STUDY_FORMAT,
-        "configuration": {
-            "input_format": input_format,
-            "scenario_offset_per_input": scenario_offset,
-            "max_scenarios_per_input": max_scenarios,
-            "expected_scenarios": expected_scenarios,
-            "top": top,
-            "minimum_selector_decisions": minimum_selector_decisions,
-        },
+        "configuration": configuration,
         "inputs": [
             {
                 "index": item["index"],
@@ -355,6 +404,17 @@ def generate_selector_holdout_study(
         "duration_seconds": duration_seconds,
         "peak_rss_bytes": peak_rss_bytes,
         "analysis_digest": analysis_digest,
+        "execution": {
+            "resume_requested": resume,
+            "attempt_count": resume_session.payload["attempt_count"],
+            "reused_stage_count": resume_session.reused_stage_count,
+            "executed_stage_count": resume_session.executed_stage_count,
+            "recorded_stage_duration_seconds": round(
+                sum(float(stage["duration_seconds"]) for stage in stages),
+                3,
+            ),
+            "state": "state.json",
+        },
         "inputs": input_provenance,
         "frozen_policy": calibration_provenance,
         "stages": stages,
@@ -371,6 +431,7 @@ def generate_selector_holdout_study(
             "manifest": "manifest.json",
             "report": "report.md",
             "stages": "stages/",
+            "state": "state.json",
         },
         "scope_note": (
             "This is a same-shard scenario-window holdout of a policy frozen "
@@ -382,18 +443,27 @@ def generate_selector_holdout_study(
     manifest_path = target / "manifest.json"
     report_path = target / "report.md"
     copied_report_path = Path(public_report_path) if public_report_path else None
-    manifest_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-    report = selector_holdout_markdown(payload, include_local_stage_links=True)
-    report_path.write_text(report, encoding="utf-8")
-    if copied_report_path is not None:
-        copied_report_path.parent.mkdir(parents=True, exist_ok=True)
-        copied_report_path.write_text(
-            selector_holdout_markdown(
-                payload,
-                include_local_stage_links=False,
-            ),
-            encoding="utf-8",
-        )
+    try:
+        _write_json_atomic(manifest_path, payload)
+        report = selector_holdout_markdown(payload, include_local_stage_links=True)
+        _write_text_atomic(report_path, report)
+        if copied_report_path is not None:
+            copied_report_path.parent.mkdir(parents=True, exist_ok=True)
+            _write_text_atomic(
+                copied_report_path,
+                selector_holdout_markdown(
+                    payload,
+                    include_local_stage_links=False,
+                ),
+            )
+    except BaseException as exc:
+        _record_resume_failure(resume_session, "finalize", exc)
+        raise
+    _complete_resume_session(
+        resume_session,
+        analysis_digest=analysis_digest,
+        manifest_path=manifest_path,
+    )
 
     return SelectorHoldoutStudyResult(
         ready=ready,
@@ -409,6 +479,9 @@ def generate_selector_holdout_study(
         manifest_path=manifest_path,
         report_path=report_path,
         public_report_path=copied_report_path,
+        state_path=resume_session.path,
+        reused_stage_count=resume_session.reused_stage_count,
+        executed_stage_count=resume_session.executed_stage_count,
     )
 
 
@@ -425,6 +498,7 @@ def selector_holdout_markdown(
     checks = _list(payload, "checks")
     stages = _list(payload, "stages")
     inputs = _list(payload, "inputs")
+    execution = _mapping(payload, "execution")
     status = "PASS" if payload.get("ready") else "NOT READY"
     lines = [
         "# ScenarioLens Frozen Selector Holdout",
@@ -451,8 +525,11 @@ def selector_holdout_markdown(
         f"- Frozen minimum route extension: {float(policy['min_route_extension_m']):.3f} m",
         f"- Frozen diagnostic heading gate: {FROZEN_DIAGNOSTIC_HEADING_GATE:.3f}",
         f"- Analysis digest: `{payload['analysis_digest']}`",
-        f"- Runtime: {float(payload['duration_seconds']):.3f} s",
+        f"- Runtime for this attempt: {float(payload['duration_seconds']):.3f} s",
         f"- Peak process memory: {_memory_text(payload.get('peak_rss_bytes'))}",
+        f"- Stages executed this attempt: {execution['executed_stage_count']}",
+        f"- Verified stages reused: {execution['reused_stage_count']}",
+        f"- Attempts recorded: {execution['attempt_count']}",
         "- Raw Waymo records committed: no",
         "",
         "## Release Gates",
@@ -556,14 +633,60 @@ def _execute_stage(
     output_dir: Path,
     bundle_dir: Path,
     stages: list[dict[str, object]],
+    resume_session: _ResumeSession,
     kwargs: dict[str, object],
 ) -> tuple[object, dict[str, object]]:
-    started = perf_counter()
-    result = stage.generator(output_dir=output_dir, **kwargs)
-    duration_seconds = round(perf_counter() - started, 3)
+    stage_index = len(stages)
+    completed_entries = _resume_stage_entries(resume_session.payload)
+    execution = "executed"
+    if resume_session.requested and stage_index < len(completed_entries):
+        entry = completed_entries[stage_index]
+        try:
+            result, payload, duration_seconds = _load_reusable_stage(
+                stage=stage,
+                entry=entry,
+                output_dir=output_dir,
+                bundle_dir=bundle_dir,
+            )
+        except BaseException as exc:
+            _record_resume_failure(resume_session, stage.stage_id, exc)
+            raise
+        resume_session.reused_stage_count += 1
+        execution = "reused"
+    else:
+        _prepare_stage_output(output_dir)
+        resume_session.payload["status"] = "running"
+        resume_session.payload["active_stage"] = stage.stage_id
+        resume_session.payload["updated_at_utc"] = _utc_now()
+        _write_json_atomic(resume_session.path, resume_session.payload)
+        started = perf_counter()
+        try:
+            result = stage.generator(output_dir=output_dir, **kwargs)
+            duration_seconds = round(perf_counter() - started, 3)
+            manifest_path = Path(getattr(result, "manifest_path"))
+            report_path = Path(getattr(result, "report_path"))
+            payload = _load_stage_payload(manifest_path, stage.stage_id)
+            entry = {
+                "stage_id": stage.stage_id,
+                "format": payload.get("format"),
+                "ready": bool(payload.get("ready")),
+                "duration_seconds": duration_seconds,
+                "manifest": manifest_path.relative_to(bundle_dir).as_posix(),
+                "manifest_sha256": _sha256_file(manifest_path),
+                "report": report_path.relative_to(bundle_dir).as_posix(),
+                "report_sha256": _sha256_file(report_path),
+            }
+            completed_entries.append(entry)
+            resume_session.payload["active_stage"] = None
+            resume_session.payload["updated_at_utc"] = _utc_now()
+            _write_json_atomic(resume_session.path, resume_session.payload)
+            resume_session.executed_stage_count += 1
+        except BaseException as exc:
+            _record_resume_failure(resume_session, stage.stage_id, exc)
+            raise
+
     manifest_path = Path(getattr(result, "manifest_path"))
     report_path = Path(getattr(result, "report_path"))
-    payload = json.loads(manifest_path.read_text(encoding="utf-8"))
     stages.append(
         {
             "stage_id": stage.stage_id,
@@ -571,11 +694,263 @@ def _execute_stage(
             "format": payload.get("format"),
             "ready": bool(payload.get("ready")),
             "duration_seconds": duration_seconds,
+            "execution": execution,
             "manifest": manifest_path.relative_to(bundle_dir).as_posix(),
             "report": report_path.relative_to(bundle_dir).as_posix(),
         }
     )
     return result, payload
+
+
+def _prepare_resume_session(
+    *,
+    target: Path,
+    configuration: dict[str, object],
+    inputs: list[dict[str, object]],
+    calibration: dict[str, object],
+    resume: bool,
+) -> _ResumeSession:
+    state_path = target / "state.json"
+    fingerprint_payload = {
+        "format": SELECTOR_HOLDOUT_STATE_FORMAT,
+        "scenariolens_version": __version__,
+        "configuration": configuration,
+        "inputs": [
+            {
+                "index": item["index"],
+                "path": str(Path(str(item["path"])).resolve()),
+                "size_bytes": item["size_bytes"],
+                "sha256": item["sha256"],
+            }
+            for item in inputs
+        ],
+        "calibration": {
+            "path": str(Path(str(calibration["path"])).resolve()),
+            "size_bytes": calibration["size_bytes"],
+            "sha256": calibration["sha256"],
+            "frozen_at_commit": FROZEN_SELECTOR_COMMIT,
+        },
+        "stage_ids": list(_HOLDOUT_STAGE_IDS),
+    }
+    fingerprint = _canonical_digest(fingerprint_payload)
+    now = _utc_now()
+
+    if resume:
+        if not state_path.exists():
+            raise ValueError(
+                f"Cannot resume selector holdout: state file does not exist: "
+                f"{state_path}"
+            )
+        try:
+            state = json.loads(state_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise ValueError(
+                f"Cannot resume selector holdout: invalid state file: {state_path}"
+            ) from exc
+        if not isinstance(state, dict) or state.get("format") != (
+            SELECTOR_HOLDOUT_STATE_FORMAT
+        ):
+            raise ValueError(
+                "Cannot resume selector holdout: state format is unsupported."
+            )
+        if state.get("fingerprint") != fingerprint:
+            raise ValueError(
+                "Cannot resume selector holdout: input, policy, version, or "
+                "configuration fingerprint does not match the saved run."
+            )
+        _validate_resume_stage_prefix(state)
+        state["attempt_count"] = _integer(state.get("attempt_count")) + 1
+        state["resume_count"] = _integer(state.get("resume_count")) + 1
+        state["status"] = "running"
+        state["active_stage"] = None
+        state["updated_at_utc"] = now
+    else:
+        for stale_output in (target / "manifest.json", target / "report.md"):
+            if stale_output.exists() or stale_output.is_symlink():
+                stale_output.unlink()
+        state = {
+            "format": SELECTOR_HOLDOUT_STATE_FORMAT,
+            "status": "running",
+            "created_at_utc": now,
+            "updated_at_utc": now,
+            "scenariolens_version": __version__,
+            "fingerprint": fingerprint,
+            "fingerprint_payload": fingerprint_payload,
+            "attempt_count": 1,
+            "resume_count": 0,
+            "active_stage": None,
+            "stages": [],
+            "failures": [],
+        }
+
+    _write_json_atomic(state_path, state)
+    return _ResumeSession(path=state_path, payload=state, requested=resume)
+
+
+def _validate_resume_stage_prefix(state: dict[str, object]) -> None:
+    entries = _resume_stage_entries(state)
+    stage_ids = [str(entry.get("stage_id")) for entry in entries]
+    expected = list(_HOLDOUT_STAGE_IDS[: len(stage_ids)])
+    if len(stage_ids) > len(_HOLDOUT_STAGE_IDS) or stage_ids != expected:
+        raise ValueError(
+            "Cannot resume selector holdout: completed stages are not a valid "
+            "pipeline prefix."
+        )
+
+
+def _resume_stage_entries(state: dict[str, object]) -> list[dict[str, object]]:
+    value = state.get("stages")
+    if not isinstance(value, list) or any(not isinstance(item, dict) for item in value):
+        raise ValueError(
+            "Cannot resume selector holdout: state stages must be a list of objects."
+        )
+    return value  # type: ignore[return-value]
+
+
+def _load_reusable_stage(
+    *,
+    stage: _Stage,
+    entry: dict[str, object],
+    output_dir: Path,
+    bundle_dir: Path,
+) -> tuple[_CompletedStageResult, dict[str, object], float]:
+    if entry.get("stage_id") != stage.stage_id:
+        raise ValueError(
+            f"Cannot resume selector holdout: expected stage {stage.stage_id}, "
+            f"found {entry.get('stage_id')}."
+        )
+    manifest_path = output_dir / "manifest.json"
+    report_path = output_dir / "report.md"
+    expected_manifest = manifest_path.relative_to(bundle_dir).as_posix()
+    expected_report = report_path.relative_to(bundle_dir).as_posix()
+    if entry.get("manifest") != expected_manifest or entry.get("report") != (
+        expected_report
+    ):
+        raise ValueError(
+            f"Cannot resume selector holdout: saved paths for {stage.stage_id} "
+            "do not match the pipeline layout."
+        )
+    for artifact_path, hash_key in (
+        (manifest_path, "manifest_sha256"),
+        (report_path, "report_sha256"),
+    ):
+        if not artifact_path.is_file():
+            raise ValueError(
+                f"Cannot resume selector holdout: {stage.stage_id} artifact is "
+                f"missing: {artifact_path}"
+            )
+        if _sha256_file(artifact_path) != entry.get(hash_key):
+            raise ValueError(
+                f"Cannot resume selector holdout: {stage.stage_id} artifact "
+                f"hash mismatch: {artifact_path}"
+            )
+    payload = _load_stage_payload(manifest_path, stage.stage_id)
+    if payload.get("format") != entry.get("format") or bool(
+        payload.get("ready")
+    ) != bool(entry.get("ready")):
+        raise ValueError(
+            f"Cannot resume selector holdout: saved metadata for {stage.stage_id} "
+            "does not match its manifest."
+        )
+    duration_seconds = float(entry.get("duration_seconds", 0.0))
+    return (
+        _CompletedStageResult(
+            manifest_path=manifest_path,
+            report_path=report_path,
+        ),
+        payload,
+        duration_seconds,
+    )
+
+
+def _load_stage_payload(path: Path, stage_id: str) -> dict[str, object]:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"Stage {stage_id} has an invalid manifest: {path}") from exc
+    if not isinstance(payload, dict):
+        raise ValueError(f"Stage {stage_id} manifest must contain a JSON object.")
+    return payload
+
+
+def _prepare_stage_output(output_dir: Path) -> None:
+    if output_dir.is_symlink():
+        output_dir.unlink()
+    elif output_dir.exists():
+        shutil.rmtree(output_dir)
+
+
+def _record_resume_failure(
+    session: _ResumeSession,
+    stage_id: str,
+    exc: BaseException,
+) -> None:
+    status = "interrupted" if isinstance(exc, KeyboardInterrupt) else "failed"
+    message = str(exc).strip() or (
+        "Execution interrupted." if status == "interrupted" else "Execution failed."
+    )
+    failures = session.payload.get("failures")
+    if not isinstance(failures, list):
+        failures = []
+        session.payload["failures"] = failures
+    failures.append(
+        {
+            "stage_id": stage_id,
+            "error_type": type(exc).__name__,
+            "message": message,
+            "recorded_at_utc": _utc_now(),
+        }
+    )
+    session.payload["status"] = status
+    session.payload["active_stage"] = stage_id
+    session.payload["updated_at_utc"] = _utc_now()
+    try:
+        _write_json_atomic(session.path, session.payload)
+    except OSError:
+        pass
+
+
+def _complete_resume_session(
+    session: _ResumeSession,
+    *,
+    analysis_digest: str,
+    manifest_path: Path,
+) -> None:
+    session.payload["status"] = "complete"
+    session.payload["active_stage"] = None
+    session.payload["analysis_digest"] = analysis_digest
+    session.payload["manifest_sha256"] = _sha256_file(manifest_path)
+    session.payload["completed_at_utc"] = _utc_now()
+    session.payload["updated_at_utc"] = session.payload["completed_at_utc"]
+    _write_json_atomic(session.path, session.payload)
+
+
+def _write_json_atomic(path: Path, payload: dict[str, object]) -> None:
+    _write_text_atomic(path, json.dumps(payload, indent=2) + "\n")
+
+
+def _write_text_atomic(path: Path, value: str) -> None:
+    temporary_path = path.with_name(f"{path.name}.tmp")
+    temporary_path.write_text(value, encoding="utf-8")
+    temporary_path.replace(path)
+
+
+def _canonical_digest(payload: dict[str, object]) -> str:
+    return hashlib.sha256(
+        json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+
+
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat()
 
 
 def _holdout_aggregate(

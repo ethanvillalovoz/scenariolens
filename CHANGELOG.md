@@ -17,6 +17,10 @@ All notable changes to ScenarioLens are documented here.
   after measuring 12 false promotions.
 - Batched topology-audit source reads: 124 holdout topology cases now require
   four raw-source passes instead of rescanning a TFRecord for every case.
+- Fingerprinted `selector-holdout-study --resume` recovery. Atomic `state.json`
+  checkpoints preserve interruption diagnostics and completed-stage hashes;
+  resume reuses only a verified contiguous prefix and rejects changed inputs,
+  changed configuration, missing files, or tampered artifacts.
 
 - `scenariolens run`, a one-command product workflow that expands native input
   directories, hashes source files, executes baseline-comparison,

@@ -535,8 +535,10 @@ resource checks, completed in at most 459.495 seconds, and used at most
 coverage, and minimum-evidence gates in 783.537 seconds with 3.614 GB peak
 memory. That larger holdout invalidated the candidate for adoption: agreement
 improved from 33/78 to 52/78, but 12 false promotions remain. The default
-selector stays unchanged. The remaining v1 work is the complete installation,
-failure-path, interrupted/resumed-output, public-surface, and release-candidate
+selector stays unchanged. The run-backed Explorer is also live on the portfolio
+route, and the nine-stage holdout now supports fingerprinted, hash-verified
+interruption recovery through `state.json` and `--resume`. The remaining v1 work
+is the consolidated clean-install/failure-path packet and release-candidate
 gate.
 
 ## Stretch Goals

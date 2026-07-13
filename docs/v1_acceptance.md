@@ -110,6 +110,14 @@ in 182.55 seconds with approximately 1.91 GB maximum resident memory.
   map context, interrupted output, and resumed output paths are tested.
 - Failures return non-zero exit codes and preserve useful diagnostics.
 
+Interruption/resume status: implemented for the nine-stage frozen selector
+holdout. The atomic `state.json` records input/policy/configuration fingerprints,
+completed-artifact hashes, the active stage, and failure history. `--resume`
+reuses only a verified contiguous stage prefix; changed inputs and tampered
+artifacts are rejected. Unit coverage simulates interruption after three stages,
+and an integration run executes and then reuses the actual nine-stage pipeline
+with an identical analysis digest.
+
 ### Explorer
 
 - The generated Explorer loads the run bundle rather than hard-coded metrics.

@@ -217,7 +217,7 @@ def run_bundle_command(
             input_format=input_format,
             hash_inputs=hash_inputs,
         )
-    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+    except (RuntimeError, ValueError, FileNotFoundError, OSError) as exc:
         print(str(exc), file=sys.stderr)
         return 2
 
@@ -1028,6 +1028,7 @@ def selector_holdout_study_command(
     top: int,
     calibration_manifest: str | None,
     public_report: str | None,
+    resume: bool,
 ) -> int:
     try:
         result = generate_selector_holdout_study(
@@ -1040,8 +1041,9 @@ def selector_holdout_study_command(
             top=top,
             calibration_manifest_path=calibration_manifest,
             public_report_path=public_report,
+            resume=resume,
         )
-    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+    except (RuntimeError, ValueError, FileNotFoundError, OSError) as exc:
         print(str(exc), file=sys.stderr)
         return 2
 
@@ -1049,6 +1051,12 @@ def selector_holdout_study_command(
     print(f"Wrote selector-holdout-study report to {result.report_path}")
     if result.public_report_path is not None:
         print(f"Wrote public report copy to {result.public_report_path}")
+    if resume:
+        print(
+            "Resume verification reused "
+            f"{result.reused_stage_count} stage(s) and executed "
+            f"{result.executed_stage_count} stage(s)."
+        )
     if not result.ready:
         print(
             "Frozen selector holdout is not release-ready: "
@@ -2933,6 +2941,14 @@ def main() -> int:
         default=None,
         help="Optional Markdown path for a public-safe holdout report copy.",
     )
+    selector_holdout_parser.add_argument(
+        "--resume",
+        action="store_true",
+        help=(
+            "Resume from a verified state.json in the output directory. "
+            "Inputs, policy, configuration, and completed artifacts must match."
+        ),
+    )
     lane_continuation_candidates_parser = subparsers.add_parser(
         "lane-continuation-candidates",
         help=(
@@ -4193,6 +4209,7 @@ def main() -> int:
             top=args.top,
             calibration_manifest=args.calibration_manifest,
             public_report=args.public_report,
+            resume=args.resume,
         )
     if args.command == "lane-continuation-candidates":
         return lane_continuation_candidates_command(

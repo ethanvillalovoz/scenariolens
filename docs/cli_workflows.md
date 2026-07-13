@@ -117,6 +117,27 @@ provenance and coverage gates in 783.537 seconds with 3.614 GB peak memory, and
 found 12 false promotions. The evaluation packet passes; the selector candidate
 does not, so ScenarioLens keeps it disabled and does not retune on the holdout.
 
+Every holdout attempt writes `state.json` atomically after each completed stage.
+If the process is interrupted, rerun the exact command with `--resume`:
+
+```bash
+scenariolens selector-holdout-study \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00007-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00008-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00009-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00010-of-00150 \
+  --output-dir data/processed/waymo_selector_holdout_993 \
+  --public-report docs/reports/waymo_selector_holdout_993.md \
+  --resume
+```
+
+Resume is deliberately strict. ScenarioLens re-hashes the ordered inputs and
+frozen policy, verifies the complete configuration, and checks the saved SHA-256
+for every reusable stage manifest and report. Changed inputs, changed options,
+missing artifacts, tampering, or a non-contiguous stage history fail closed with
+a diagnostic in `state.json`; the interrupted stage is rebuilt from a clean
+stage directory.
+
 Validate two independent runs against the v1 determinism and laptop budgets:
 
 ```bash

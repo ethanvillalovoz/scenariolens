@@ -98,6 +98,32 @@ jobs:
           scenariolens replay-prototype --candidate-manifest /tmp/scenariolens-replay-candidates/manifest.json --output-dir /tmp/scenariolens-replay-prototype --top 2
           scenariolens map-match-audit --debug-manifest /tmp/scenariolens-debug/manifest.json --output-dir /tmp/scenariolens-map-match-audit --case-count 3
           scenariolens lane-selection-study --input /tmp/scenariolens-synthetic.json --format scenariolens-json --output-dir /tmp/scenariolens-lane-selection --max-scenarios 11 --top 6
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from scenariolens.selector_holdout import generate_selector_holdout_study
+
+          input_path = Path("/tmp/scenariolens-synthetic.json")
+          output_dir = Path("/tmp/scenariolens-selector-holdout")
+          kwargs = {
+              "input_paths": (input_path,),
+              "output_dir": output_dir,
+              "input_format": "scenariolens-json",
+              "scenario_offset": 0,
+              "max_scenarios": 11,
+              "expected_scenarios": 11,
+              "top": 20,
+              "minimum_selector_decisions": 1,
+          }
+          fresh = generate_selector_holdout_study(**kwargs)
+          resumed = generate_selector_holdout_study(resume=True, **kwargs)
+          state = json.loads(resumed.state_path.read_text(encoding="utf-8"))
+          assert fresh.analysis_digest == resumed.analysis_digest
+          assert resumed.reused_stage_count == 9
+          assert resumed.executed_stage_count == 0
+          assert state["status"] == "complete"
+          assert len(state["stages"]) == 9
+          PY
 
       - name: Run Explorer browser tests
         run: npm run test:browser

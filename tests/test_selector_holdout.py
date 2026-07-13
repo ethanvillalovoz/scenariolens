@@ -12,6 +12,7 @@ from unittest.mock import patch
 from scenariolens import cli
 from scenariolens.selector_holdout import (
     FROZEN_SELECTOR_COMMIT,
+    SELECTOR_HOLDOUT_STATE_FORMAT,
     SELECTOR_HOLDOUT_STUDY_FORMAT,
     default_frozen_selector_policy_path,
     generate_selector_holdout_study,
@@ -55,6 +56,13 @@ class SelectorHoldoutStudyTest(unittest.TestCase):
             self.assertEqual(manifest["frozen_policy"]["frozen_at_commit"], FROZEN_SELECTOR_COMMIT)
             self.assertEqual(len(manifest["stages"]), 9)
             self.assertEqual(manifest["cohort"]["independent_shard_benchmark"], False)
+            self.assertEqual(manifest["execution"]["executed_stage_count"], 9)
+            self.assertEqual(manifest["execution"]["reused_stage_count"], 0)
+            state = json.loads(first.state_path.read_text(encoding="utf-8"))
+            self.assertEqual(state["format"], SELECTOR_HOLDOUT_STATE_FORMAT)
+            self.assertEqual(state["status"], "complete")
+            self.assertEqual(len(state["stages"]), 9)
+            self.assertEqual(state["analysis_digest"], first.analysis_digest)
             report = first.report_path.read_text(encoding="utf-8")
             self.assertIn("Release-gate status: PASS", report)
             self.assertIn("same-shard scenario-window validation", report)
@@ -76,6 +84,165 @@ class SelectorHoldoutStudyTest(unittest.TestCase):
             public_text = public_report.read_text(encoding="utf-8")
             self.assertNotIn("](stages/", public_text)
             self.assertIn("local run bundle", public_text)
+
+    def test_interrupted_run_resumes_verified_stage_prefix(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            input_path = root / "fixture.json"
+            input_path.write_text("[]\n", encoding="utf-8")
+            payloads = _stage_payloads(scenario_index=51, decision_count=2)
+            arguments = {
+                "input_paths": (input_path,),
+                "input_format": "scenariolens-json",
+                "scenario_offset": 50,
+                "expected_scenarios": 2,
+                "top": 3,
+                "minimum_selector_decisions": 2,
+            }
+
+            with _patched_pipeline(payloads):
+                uninterrupted = generate_selector_holdout_study(
+                    output_dir=root / "uninterrupted",
+                    **arguments,
+                )
+
+            interrupted_dir = root / "interrupted"
+            with _patched_pipeline(payloads):
+                with patch(
+                    "scenariolens.selector_holdout."
+                    "generate_lane_continuation_topology_gap_audit",
+                    side_effect=KeyboardInterrupt("planned test interruption"),
+                ):
+                    with self.assertRaisesRegex(
+                        KeyboardInterrupt,
+                        "planned test interruption",
+                    ):
+                        generate_selector_holdout_study(
+                            output_dir=interrupted_dir,
+                            **arguments,
+                        )
+
+            interrupted_state = json.loads(
+                (interrupted_dir / "state.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(interrupted_state["status"], "interrupted")
+            self.assertEqual(interrupted_state["active_stage"], "topology_gap_audit")
+            self.assertEqual(len(interrupted_state["stages"]), 3)
+            self.assertEqual(
+                interrupted_state["failures"][0]["error_type"],
+                "KeyboardInterrupt",
+            )
+
+            with _patched_pipeline(payloads) as resumed_pipeline:
+                resumed = generate_selector_holdout_study(
+                    output_dir=interrupted_dir,
+                    resume=True,
+                    **arguments,
+                )
+
+            for stage_name in (
+                "generate_lane_continuation_study",
+                "generate_lane_continuation_candidate_plan",
+                "generate_lane_continuation_replay_prototype",
+            ):
+                resumed_pipeline.mocks[stage_name].assert_not_called()
+            resumed_pipeline.mocks[
+                "generate_lane_continuation_topology_gap_audit"
+            ].assert_called_once()
+            self.assertTrue(resumed.ready)
+            self.assertEqual(resumed.reused_stage_count, 3)
+            self.assertEqual(resumed.executed_stage_count, 6)
+            self.assertEqual(resumed.analysis_digest, uninterrupted.analysis_digest)
+
+            final_state = json.loads(resumed.state_path.read_text(encoding="utf-8"))
+            self.assertEqual(final_state["status"], "complete")
+            self.assertEqual(final_state["attempt_count"], 2)
+            self.assertEqual(final_state["resume_count"], 1)
+            self.assertEqual(len(final_state["stages"]), 9)
+            self.assertEqual(len(final_state["failures"]), 1)
+            manifest = json.loads(resumed.manifest_path.read_text(encoding="utf-8"))
+            self.assertEqual(manifest["execution"]["reused_stage_count"], 3)
+            self.assertEqual(manifest["execution"]["executed_stage_count"], 6)
+            self.assertEqual(
+                [stage["execution"] for stage in manifest["stages"][:3]],
+                ["reused", "reused", "reused"],
+            )
+
+    def test_resume_rejects_changed_input_fingerprint(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            input_path = root / "fixture.json"
+            input_path.write_text("[]\n", encoding="utf-8")
+            payloads = _stage_payloads(scenario_index=51, decision_count=2)
+            output_dir = root / "interrupted"
+            arguments = {
+                "input_paths": (input_path,),
+                "output_dir": output_dir,
+                "input_format": "scenariolens-json",
+                "scenario_offset": 50,
+                "expected_scenarios": 2,
+                "top": 3,
+                "minimum_selector_decisions": 2,
+            }
+
+            with _patched_pipeline(payloads):
+                with patch(
+                    "scenariolens.selector_holdout."
+                    "generate_lane_continuation_candidate_plan",
+                    side_effect=RuntimeError("planned failure"),
+                ):
+                    with self.assertRaisesRegex(RuntimeError, "planned failure"):
+                        generate_selector_holdout_study(**arguments)
+
+            input_path.write_text("[{}]\n", encoding="utf-8")
+            with _patched_pipeline(payloads):
+                with self.assertRaisesRegex(
+                    ValueError,
+                    "fingerprint does not match",
+                ):
+                    generate_selector_holdout_study(resume=True, **arguments)
+
+    def test_resume_rejects_tampered_completed_stage(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            input_path = root / "fixture.json"
+            input_path.write_text("[]\n", encoding="utf-8")
+            payloads = _stage_payloads(scenario_index=51, decision_count=2)
+            output_dir = root / "interrupted"
+            arguments = {
+                "input_paths": (input_path,),
+                "output_dir": output_dir,
+                "input_format": "scenariolens-json",
+                "scenario_offset": 50,
+                "expected_scenarios": 2,
+                "top": 3,
+                "minimum_selector_decisions": 2,
+            }
+
+            with _patched_pipeline(payloads):
+                with patch(
+                    "scenariolens.selector_holdout."
+                    "generate_lane_continuation_candidate_plan",
+                    side_effect=RuntimeError("planned failure"),
+                ):
+                    with self.assertRaisesRegex(RuntimeError, "planned failure"):
+                        generate_selector_holdout_study(**arguments)
+
+            stage_report = (
+                output_dir / "stages" / "01_continuation_study" / "report.md"
+            )
+            stage_report.write_text("tampered\n", encoding="utf-8")
+            with _patched_pipeline(payloads) as resumed_pipeline:
+                with self.assertRaisesRegex(ValueError, "artifact hash mismatch"):
+                    generate_selector_holdout_study(resume=True, **arguments)
+            resumed_pipeline.mocks[
+                "generate_lane_continuation_study"
+            ].assert_not_called()
+            state = json.loads(
+                (output_dir / "state.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(state["status"], "failed")
+            self.assertIn("hash mismatch", state["failures"][-1]["message"])
 
     def test_holdout_fails_when_development_index_leaks(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -147,6 +314,8 @@ class SelectorHoldoutStudyTest(unittest.TestCase):
             manifest_path=Path("manifest.json"),
             report_path=Path("report.md"),
             public_report_path=None,
+            reused_stage_count=3,
+            executed_stage_count=6,
         )
         stdout = StringIO()
         argv = [
@@ -154,6 +323,7 @@ class SelectorHoldoutStudyTest(unittest.TestCase):
             "selector-holdout-study",
             "--input",
             "fixture.json",
+            "--resume",
         ]
         with patch.object(cli, "generate_selector_holdout_study", return_value=result):
             with patch("sys.argv", argv), redirect_stdout(stdout):
@@ -161,6 +331,7 @@ class SelectorHoldoutStudyTest(unittest.TestCase):
 
         self.assertEqual(exit_code, 2)
         self.assertIn("7/8 checks passed", stdout.getvalue())
+        self.assertIn("reused 3 stage(s)", stdout.getvalue())
 
 
 def _check(manifest: dict[str, object], check_id: str) -> dict[str, object]:
@@ -298,9 +469,12 @@ def _patched_pipeline(payloads: dict[str, dict[str, object]]):
     patches = []
     for name, payload in payloads.items():
         patches.append(
-            patch(
-                f"scenariolens.selector_holdout.{name}",
-                side_effect=_writer(payload),
+            (
+                name,
+                patch(
+                    f"scenariolens.selector_holdout.{name}",
+                    side_effect=_writer(payload),
+                ),
             )
         )
     return _PatchStack(patches)
@@ -320,16 +494,20 @@ def _writer(payload: dict[str, object]):
 
 
 class _PatchStack:
-    def __init__(self, patches: list[unittest.mock._patch]) -> None:  # type: ignore[name-defined]
+    def __init__(
+        self,
+        patches: list[tuple[str, unittest.mock._patch]],  # type: ignore[name-defined]
+    ) -> None:
         self.patches = patches
+        self.mocks: dict[str, unittest.mock.Mock] = {}
 
     def __enter__(self) -> "_PatchStack":
-        for item in self.patches:
-            item.start()
+        for name, item in self.patches:
+            self.mocks[name] = item.start()
         return self
 
     def __exit__(self, *exc: object) -> None:
-        for item in reversed(self.patches):
+        for _, item in reversed(self.patches):
             item.stop()
 
 
