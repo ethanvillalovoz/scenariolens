@@ -221,6 +221,8 @@ def _write_public_surface_repo(root: Path) -> Path:
                 "python -m unittest discover",
                 "node --check docs/demo/app.js",
                 "python -m json.tool docs/demo/evidence_index.json",
+                "scenariolens run",
+                "scenariolens run-verify",
                 "scenariolens evidence-index",
                 "scenariolens public-surface-check",
             ]

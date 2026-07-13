@@ -359,6 +359,8 @@ def _ci_surface_check(root: Path) -> dict[str, object]:
         "python -m unittest discover",
         "node --check docs/demo/app.js",
         "python -m json.tool docs/demo/evidence_index.json",
+        "scenariolens run",
+        "scenariolens run-verify",
         "scenariolens evidence-index",
         "scenariolens public-surface-check",
     ]
@@ -369,9 +371,9 @@ def _ci_surface_check(root: Path) -> dict[str, object]:
         "CI surface",
         "fail" if missing else "pass",
         [path],
-        "CI covers unit tests, static demo syntax, evidence JSON, and public-surface smoke."
+        "CI covers unit tests, deterministic run integration, static demo syntax, evidence JSON, and public-surface checks."
         if not missing
-        else "CI is missing one or more public-surface smoke commands.",
+        else "CI is missing one or more required integration or public-surface commands.",
         details,
     )
 

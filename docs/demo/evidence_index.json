@@ -4,10 +4,10 @@
   "generated_by": "scenariolens evidence-index",
   "scope_note": "This evidence index is generated from a curated public artifact catalog and verifies that required reports, payloads, and CI files exist in the repository. It is a recruiter-facing map of evidence, not a Waymo benchmark claim.",
   "aggregate": {
-    "artifact_count": 16,
-    "present_count": 16,
+    "artifact_count": 17,
+    "present_count": 17,
     "missing_count": 0,
-    "required_count": 16,
+    "required_count": 17,
     "stage_count": 8,
     "proof_type_counts": {
       "interactive demo": 1,
@@ -23,6 +23,7 @@
       "candidate validation": 1,
       "visual decision atlas": 1,
       "static data contract": 1,
+      "real-data execution validation": 1,
       "automation": 1,
       "readiness gate": 1
     },
@@ -34,10 +35,10 @@
       "replay_bridge": 1,
       "lane_continuation": 2,
       "selector_validation": 4,
-      "release_readiness": 2
+      "release_readiness": 3
     },
-    "public_safe_artifact_count": 16,
-    "local_real_data_artifact_count": 13
+    "public_safe_artifact_count": 17,
+    "local_real_data_artifact_count": 14
   },
   "stages": [
     {
@@ -120,9 +121,10 @@
     {
       "stage": "release_readiness",
       "label": "Release readiness",
-      "artifact_count": 2,
-      "present_count": 2,
+      "artifact_count": 3,
+      "present_count": 3,
       "artifact_ids": [
+        "v1_run_validation",
         "ci_workflow",
         "public_surface_check"
       ],
@@ -141,7 +143,7 @@
       "link_path": "../demo/index.html",
       "present": true,
       "required": true,
-      "size_bytes": 21298,
+      "size_bytes": 21485,
       "command": "scenariolens dashboard-data --output docs/demo/scenarios.json",
       "data_status": "public fixtures plus aggregate/derived real-data links",
       "why_it_matters": "Gives a reviewer a zero-install first look at ranking, filtering, trajectory previews, failure cards, and selector diagnostics.",
@@ -493,18 +495,53 @@
       ]
     },
     {
+      "id": "v1_run_validation",
+      "title": "Full-Corpus Run Reproducibility",
+      "stage": "release_readiness",
+      "stage_label": "Release readiness",
+      "proof_type": "real-data execution validation",
+      "scope": "Two complete analysis runs over 1,193 scenarios from four local validation shards",
+      "path": "docs/reports/scenariolens_v1_run_validation.md",
+      "link_path": "scenariolens_v1_run_validation.md",
+      "present": true,
+      "required": true,
+      "size_bytes": 1889,
+      "command": "scenariolens run; scenariolens run-verify ...",
+      "data_status": "aggregate digest, timing, memory, and readiness checks only",
+      "why_it_matters": "Proves the one-command product path completes deterministically on the full local corpus within the declared laptop budgets.",
+      "limitation": "The local corpus is not a Waymo benchmark and raw records remain outside git.",
+      "metrics": [
+        {
+          "label": "Scenarios per run",
+          "value": "1,193"
+        },
+        {
+          "label": "Reproducibility checks",
+          "value": "7/7"
+        },
+        {
+          "label": "Maximum duration",
+          "value": "459.495 s"
+        },
+        {
+          "label": "Maximum peak memory",
+          "value": "1.915 GB"
+        }
+      ]
+    },
+    {
       "id": "ci_workflow",
       "title": "CI Validation Workflow",
       "stage": "release_readiness",
       "stage_label": "Release readiness",
       "proof_type": "automation",
-      "scope": "Unit tests plus CLI smoke workflows on every push",
+      "scope": "Unit tests plus deterministic run-bundle integration on every push",
       "path": ".github/workflows/ci.yml",
       "link_path": "../../.github/workflows/ci.yml",
       "present": true,
       "required": true,
-      "size_bytes": 3978,
-      "command": "python -m unittest discover; CLI smoke commands",
+      "size_bytes": 5138,
+      "command": "python -m unittest discover; scenariolens run; scenariolens run-verify",
       "data_status": "CI-safe fixtures only",
       "why_it_matters": "Shows the framework is maintained as software, not just a set of static reports.",
       "limitation": "Live Waymo shards remain local and are not required in CI.",
@@ -526,7 +563,7 @@
       "link_path": "scenariolens_public_surface_check.md",
       "present": true,
       "required": true,
-      "size_bytes": 4432,
+      "size_bytes": 4573,
       "command": "scenariolens public-surface-check --repo-root .",
       "data_status": "CI-safe repository metadata and derived public artifacts only",
       "why_it_matters": "Turns the public repo surface into a testable release gate instead of relying on manual README/demo inspection.",

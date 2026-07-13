@@ -31,6 +31,7 @@ class EvidenceIndexTest(unittest.TestCase):
 
         artifact_ids = {artifact["id"] for artifact in payload["artifacts"]}
         self.assertIn("terminal_selector_decision_atlas_200", artifact_ids)
+        self.assertIn("v1_run_validation", artifact_ids)
         self.assertIn("ci_workflow", artifact_ids)
 
     def test_payload_marks_missing_required_artifacts(self) -> None:
@@ -54,6 +55,7 @@ class EvidenceIndexTest(unittest.TestCase):
         self.assertIn("ScenarioLens V1 Evidence Index", markdown)
         self.assertIn("Ready: yes", markdown)
         self.assertIn("Terminal Selector Decision Atlas", markdown)
+        self.assertIn("Full-Corpus Run Reproducibility", markdown)
         self.assertIn("Public-Safety Boundary", markdown)
 
     def test_generator_writes_manifest_report_public_report_and_demo_json(self) -> None:

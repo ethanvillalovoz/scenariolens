@@ -511,6 +511,26 @@ calibrated terminal-neighborhood selector queue, add more replay-held branch
 negatives, and run the closure-enabled queue beyond the current 100-scenario
 slice before claiming broader selector readiness.
 
+## Milestone 6: V1 Product Loop
+
+Goal: turn the specialist research workflows into one reproducible product
+experience with a finite release contract.
+
+- one `scenariolens run` command for the core baseline and map diagnostics,
+- deterministic input provenance and analysis digests,
+- two-run duration and peak-memory validation,
+- generated Explorer artifacts from the same run bundle,
+- clean wheel installation and failure-path checks,
+- concise public documentation and a verified `v1.0.0` release.
+
+Status: the acceptance contract, one-command run bundle, CI-safe integration
+path, and `run-verify` release gate are implemented. Two independent full-corpus
+runs each processed 1,193 scenarios from four local Waymo Motion validation
+shards, produced the same analysis digest, passed 7/7 reproducibility and
+resource checks, completed in at most 459.495 seconds, and used at most
+1.915 GB peak memory. The next product milestone is generating and serving the
+Explorer directly from this run bundle.
+
 ## Stretch Goals
 
 - open-vocabulary scenario search,

@@ -15,6 +15,10 @@ All notable changes to ScenarioLens are documented here.
   bundles, verifies input and stage fingerprints, enforces matching analysis
   digests, and checks the 15-minute and 8 GB laptop budgets. Run manifests now
   record cross-platform peak process memory.
+- `docs/reports/scenariolens_v1_run_validation.md`, generated from two complete
+  1,193-scenario runs over four local Waymo Motion validation shards. All 7
+  readiness, digest, input, stage, duration, and memory checks pass; the slower
+  run completed in 459.495 seconds and peak memory remained at 1.915 GB.
 - `docs/v1_acceptance.md`, freezing the one-command product contract, complete
   1,193-scenario local-corpus gate, separate 993-scenario frozen-policy
   validation cohort, clean-package and browser requirements, performance

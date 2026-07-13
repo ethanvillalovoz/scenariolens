@@ -21,7 +21,7 @@ It is intentionally scoped to repository health. It is not a Waymo benchmark cla
 | Local link integrity | pass | All checked local links resolve to files in the repository. |
 | Demo asset integrity | pass | All checked SVG assets referenced by demo JSON exist. |
 | Raw-data boundary | pass | No raw Waymo or TFRecord-like files are tracked. |
-| CI surface | pass | CI covers unit tests, static demo syntax, evidence JSON, and public-surface smoke. |
+| CI surface | pass | CI covers unit tests, deterministic run integration, static demo syntax, evidence JSON, and public-surface checks. |
 | Public-safety language | pass | Core provenance/evidence docs state the non-benchmark and raw-data boundaries. |
 
 ## Details
@@ -33,7 +33,7 @@ It is intentionally scoped to repository health. It is not a Waymo benchmark cla
 - Summary: Evidence index is ready with no missing required artifacts.
 - Format: `scenariolens.evidence_index.v1`
 - Ready flag: True
-- Artifact count: 16
+- Artifact count: 17
 - Missing required artifacts: 0
 
 ### Demo payload contracts
@@ -50,12 +50,12 @@ It is intentionally scoped to repository health. It is not a Waymo benchmark cla
 - Status: pass
 - Files: `README.md`, `docs/demo/index.html`, `docs/demo/README.md`, `docs/reports/scenariolens_evidence_index.md`, `docs/reports/scenariolens_public_surface_check.md`
 - Summary: All checked local links resolve to files in the repository.
-- `README.md` links scanned: 111
-- `docs/demo/index.html` links scanned: 70
+- `README.md` links scanned: 112
+- `docs/demo/index.html` links scanned: 71
 - `docs/demo/README.md` links scanned: 4
-- `docs/reports/scenariolens_evidence_index.md` links scanned: 16
+- `docs/reports/scenariolens_evidence_index.md` links scanned: 17
 - `docs/reports/scenariolens_public_surface_check.md` links scanned: 0
-- Local links checked: 193
+- Local links checked: 196
 - External links skipped: 6
 
 ### Demo asset integrity
@@ -77,10 +77,12 @@ It is intentionally scoped to repository health. It is not a Waymo benchmark cla
 
 - Status: pass
 - Files: `.github/workflows/ci.yml`
-- Summary: CI covers unit tests, static demo syntax, evidence JSON, and public-surface smoke.
+- Summary: CI covers unit tests, deterministic run integration, static demo syntax, evidence JSON, and public-surface checks.
 - `python -m unittest discover` present: True
 - `node --check docs/demo/app.js` present: True
 - `python -m json.tool docs/demo/evidence_index.json` present: True
+- `scenariolens run` present: True
+- `scenariolens run-verify` present: True
 - `scenariolens evidence-index` present: True
 - `scenariolens public-surface-check` present: True
 

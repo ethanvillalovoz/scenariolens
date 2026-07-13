@@ -7,11 +7,11 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 ## Readiness
 
 - Ready: yes
-- Required artifacts present: 16 / 16
+- Required artifacts present: 17 / 17
 - Missing required artifacts: 0
 - Evidence stages: 8
-- Public-safe artifacts indexed: 16
-- Local real-data/Waymo-derived artifacts indexed: 13
+- Public-safe artifacts indexed: 17
+- Local real-data/Waymo-derived artifacts indexed: 14
 
 ## Stage Summary
 
@@ -24,7 +24,7 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 | Replay bridge | 1 | 1 | Connects mined cases to laptop-safe open-loop replay diagnostics. |
 | Lane continuation | 2 | 2 | Audits map-link and lane-continuation failure modes at larger scale. |
 | Selector validation | 4 | 4 | Validates conservative selector gates before changing default behavior. |
-| Release readiness | 2 | 2 | Keeps the public repo tested and contribution-ready. |
+| Release readiness | 3 | 3 | Keeps the public repo tested and contribution-ready. |
 
 ## Evidence Artifacts
 
@@ -44,7 +44,8 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 | [Context-Aware Selector Candidate Validation](waymo_lane_continuation_terminal_neighborhood_selector_candidate_validation_200.md) | Selector validation | Candidate policy joined to transfer and route/context audits | Agreement: 6/7; False promotions: 0 | yes |
 | [Terminal Selector Decision Atlas](waymo_lane_continuation_terminal_neighborhood_selector_decision_atlas_200.md) | Selector validation | 7 derived selector cards joined to candidate-validation labels | Visual cards: 7; Candidate agreement: 6/7 | yes |
 | [Selector Atlas Demo Payload](../demo/selector_decisions.json) | Product surface | Public-safe selector decision cards loaded by the static Explorer | Cards: 7 | yes |
-| [CI Validation Workflow](../../.github/workflows/ci.yml) | Release readiness | Unit tests plus CLI smoke workflows on every push | CI raw Waymo dependency: none | yes |
+| [Full-Corpus Run Reproducibility](scenariolens_v1_run_validation.md) | Release readiness | Two complete analysis runs over 1,193 scenarios from four local validation shards | Scenarios per run: 1,193; Reproducibility checks: 7/7; Maximum duration: 459.495 s; Maximum peak memory: 1.915 GB | yes |
+| [CI Validation Workflow](../../.github/workflows/ci.yml) | Release readiness | Unit tests plus deterministic run-bundle integration on every push | CI raw Waymo dependency: none | yes |
 | [Public Surface Check](scenariolens_public_surface_check.md) | Release readiness | Offline check for public links, payload contracts, raw-data boundary, and CI smoke coverage | Offline checks: 7; Raw-data guard: yes | yes |
 
 ## Artifact Notes
@@ -175,11 +176,20 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 - Why it matters: Keeps the Explorer a thin presentation layer over generated, tested artifacts.
 - Limitation: The payload mirrors selected public report fields only.
 
+### Full-Corpus Run Reproducibility
+
+- Path: `docs/reports/scenariolens_v1_run_validation.md`
+- Proof type: real-data execution validation
+- Command: `scenariolens run; scenariolens run-verify ...`
+- Data status: aggregate digest, timing, memory, and readiness checks only
+- Why it matters: Proves the one-command product path completes deterministically on the full local corpus within the declared laptop budgets.
+- Limitation: The local corpus is not a Waymo benchmark and raw records remain outside git.
+
 ### CI Validation Workflow
 
 - Path: `.github/workflows/ci.yml`
 - Proof type: automation
-- Command: `python -m unittest discover; CLI smoke commands`
+- Command: `python -m unittest discover; scenariolens run; scenariolens run-verify`
 - Data status: CI-safe fixtures only
 - Why it matters: Shows the framework is maintained as software, not just a set of static reports.
 - Limitation: Live Waymo shards remain local and are not required in CI.

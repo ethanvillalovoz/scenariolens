@@ -319,14 +319,39 @@ DEFAULT_EVIDENCE_CATALOG: tuple[EvidenceCatalogItem, ...] = (
         metrics=(EvidenceMetric("Cards", "7"),),
     ),
     EvidenceCatalogItem(
+        identifier="v1_run_validation",
+        title="Full-Corpus Run Reproducibility",
+        stage="release_readiness",
+        stage_label="Release readiness",
+        proof_type="real-data execution validation",
+        scope="Two complete analysis runs over 1,193 scenarios from four local validation shards",
+        path="docs/reports/scenariolens_v1_run_validation.md",
+        command="scenariolens run; scenariolens run-verify ...",
+        data_status="aggregate digest, timing, memory, and readiness checks only",
+        why_it_matters=(
+            "Proves the one-command product path completes deterministically on "
+            "the full local corpus within the declared laptop budgets."
+        ),
+        limitation=(
+            "The local corpus is not a Waymo benchmark and raw records remain "
+            "outside git."
+        ),
+        metrics=(
+            EvidenceMetric("Scenarios per run", "1,193"),
+            EvidenceMetric("Reproducibility checks", "7/7"),
+            EvidenceMetric("Maximum duration", "459.495 s"),
+            EvidenceMetric("Maximum peak memory", "1.915 GB"),
+        ),
+    ),
+    EvidenceCatalogItem(
         identifier="ci_workflow",
         title="CI Validation Workflow",
         stage="release_readiness",
         stage_label="Release readiness",
         proof_type="automation",
-        scope="Unit tests plus CLI smoke workflows on every push",
+        scope="Unit tests plus deterministic run-bundle integration on every push",
         path=".github/workflows/ci.yml",
-        command="python -m unittest discover; CLI smoke commands",
+        command="python -m unittest discover; scenariolens run; scenariolens run-verify",
         data_status="CI-safe fixtures only",
         why_it_matters=(
             "Shows the framework is maintained as software, not just a set of "
