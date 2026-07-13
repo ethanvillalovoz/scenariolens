@@ -24,6 +24,11 @@ All notable changes to ScenarioLens are documented here.
   wall, and shares the same frontend between the public demo and local runs.
   Three Playwright tests cover the public workflow, generated-run assets and
   report links, console errors, and desktop/mobile overflow in CI.
+- `scenariolens demo --open` and `scenariolens run ... --open` now validate and
+  serve generated run bundles through a loopback HTTP server, print the exact
+  Explorer URL, launch the system browser, and stop cleanly on Ctrl+C. Host,
+  port, ephemeral-port, and headless-browser controls are available without
+  changing the existing non-interactive command behavior.
 - `docs/reports/scenariolens_v1_run_validation.md`, generated from two complete
   1,193-scenario runs over four local Waymo Motion validation shards. All 7
   readiness, digest, input, stage, duration, and memory checks pass; the slower

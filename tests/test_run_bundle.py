@@ -1,12 +1,16 @@
 from __future__ import annotations
 
+import contextlib
+import io
 import json
 import subprocess
 import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
+from scenariolens import cli
 from scenariolens.io import save_scenarios
 from scenariolens.run_bundle import (
     RUN_BUNDLE_FORMAT,
@@ -137,6 +141,42 @@ class RunBundleTest(unittest.TestCase):
             self.assertTrue((output_dir / "explorer" / "scenarios.json").exists())
             self.assertTrue((output_dir / "explorer" / "run.json").exists())
             self.assertTrue(any((output_dir / "assets").glob("*.svg")))
+
+    def test_demo_open_builds_and_serves_complete_synthetic_run(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_dir = Path(tmpdir) / "demo"
+            with mock.patch("scenariolens.cli.serve_explorer") as serve:
+                with contextlib.redirect_stdout(io.StringIO()):
+                    result = cli.demo(
+                        open_explorer=True,
+                        output_dir=str(output_dir),
+                        port=0,
+                        launch_browser=False,
+                    )
+
+            self.assertEqual(result, 0)
+            self.assertTrue((output_dir / "inputs" / "synthetic.json").exists())
+            self.assertTrue((output_dir / "manifest.json").exists())
+            self.assertTrue((output_dir / "explorer" / "index.html").exists())
+            serve.assert_called_once_with(
+                run_dir=output_dir,
+                host="127.0.0.1",
+                port=0,
+                launch_browser=False,
+            )
+
+    def test_run_help_documents_local_explorer_options(self) -> None:
+        result = subprocess.run(
+            [sys.executable, "-m", "scenariolens.cli", "run", "--help"],
+            check=True,
+            env={"PYTHONPATH": "src"},
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertIn("--open", result.stdout)
+        self.assertIn("--no-browser", result.stdout)
+        self.assertIn("--port", result.stdout)
 
 
 if __name__ == "__main__":

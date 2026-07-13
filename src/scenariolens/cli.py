@@ -128,6 +128,11 @@ from scenariolens.lane_continuation_terminal_neighborhood_casebook import (
 from scenariolens.lane_continuation_terminal_neighborhood_selector_decision_atlas import (
     generate_lane_continuation_terminal_neighborhood_selector_decision_atlas,
 )
+from scenariolens.local_server import (
+    DEFAULT_EXPLORER_HOST,
+    DEFAULT_EXPLORER_PORT,
+    serve_explorer,
+)
 from scenariolens.map_match_audit import (
     DEFAULT_AUDIT_THRESHOLDS_M,
     generate_map_match_audit,
@@ -158,7 +163,28 @@ from scenariolens.waymo_readiness import (
 from scenariolens.waymo_shards import generate_waymo_motion_shard_plan
 
 
-def demo() -> int:
+def demo(
+    open_explorer: bool = False,
+    output_dir: str = "runs/demo",
+    host: str = DEFAULT_EXPLORER_HOST,
+    port: int = DEFAULT_EXPLORER_PORT,
+    launch_browser: bool = True,
+) -> int:
+    if open_explorer:
+        synthetic_path = Path(output_dir) / "inputs" / "synthetic.json"
+        save_scenarios(synthetic_path, synthetic_scenarios())
+        return run_bundle_command(
+            input_paths=[str(synthetic_path)],
+            output_dir=output_dir,
+            max_scenarios=11,
+            top=11,
+            input_format="scenariolens-json",
+            hash_inputs=True,
+            open_explorer=True,
+            host=host,
+            port=port,
+            launch_browser=launch_browser,
+        )
     print(json_report(synthetic_scenarios()))
     return 0
 
@@ -170,6 +196,10 @@ def run_bundle_command(
     top: int,
     input_format: str,
     hash_inputs: bool,
+    open_explorer: bool = False,
+    host: str = DEFAULT_EXPLORER_HOST,
+    port: int = DEFAULT_EXPLORER_PORT,
+    launch_browser: bool = True,
 ) -> int:
     try:
         result = generate_run_bundle(
@@ -195,6 +225,17 @@ def run_bundle_command(
         f"digest {result.analysis_digest[:12]}, "
         f"peak memory {_format_bytes(result.peak_rss_bytes or 0)}."
     )
+    if open_explorer:
+        try:
+            serve_explorer(
+                run_dir=result.output_dir,
+                host=host,
+                port=port,
+                launch_browser=launch_browser,
+            )
+        except (RuntimeError, ValueError, FileNotFoundError) as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
     return 0
 
 
@@ -2001,13 +2042,47 @@ def _select_scenario(
     raise SystemExit(f"Unknown scenario id: {scenario_id}. Valid ids: {valid_ids}")
 
 
+def _add_explorer_server_arguments(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--open",
+        dest="open_explorer",
+        action="store_true",
+        help="Serve the generated Explorer locally and open it in a browser.",
+    )
+    parser.add_argument(
+        "--host",
+        default=DEFAULT_EXPLORER_HOST,
+        help="Local Explorer bind host used with --open.",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=DEFAULT_EXPLORER_PORT,
+        help="Local Explorer port used with --open. Use 0 to choose a free port.",
+    )
+    parser.add_argument(
+        "--no-browser",
+        action="store_true",
+        help="Serve the Explorer without launching the system browser.",
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         prog="scenariolens",
         description="Long-tail autonomous-driving scenario discovery utilities.",
     )
     subparsers = parser.add_subparsers(dest="command")
-    subparsers.add_parser("demo", help="Score built-in synthetic scenarios.")
+    demo_parser = subparsers.add_parser(
+        "demo",
+        help="Score built-in synthetic scenarios or launch a complete demo run.",
+    )
+    demo_parser.add_argument(
+        "--output",
+        default="runs/demo",
+        help="Output directory for the generated bundle used with --open.",
+    )
+    _add_explorer_server_arguments(demo_parser)
     run_parser = subparsers.add_parser(
         "run",
         help=(
@@ -2052,6 +2127,7 @@ def main() -> int:
         action="store_true",
         help="Skip SHA-256 input hashing for this local run.",
     )
+    _add_explorer_server_arguments(run_parser)
     run_verify_parser = subparsers.add_parser(
         "run-verify",
         help=(
@@ -3804,7 +3880,13 @@ def main() -> int:
     args = parser.parse_args()
 
     if args.command == "demo":
-        return demo()
+        return demo(
+            open_explorer=args.open_explorer,
+            output_dir=args.output,
+            host=args.host,
+            port=args.port,
+            launch_browser=not args.no_browser,
+        )
     if args.command == "run":
         return run_bundle_command(
             input_paths=args.input,
@@ -3813,6 +3895,10 @@ def main() -> int:
             top=args.top,
             input_format=args.format,
             hash_inputs=not args.no_input_hash,
+            open_explorer=args.open_explorer,
+            host=args.host,
+            port=args.port,
+            launch_browser=not args.no_browser,
         )
     if args.command == "run-verify":
         return run_validation_command(

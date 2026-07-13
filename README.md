@@ -61,12 +61,23 @@ cd scenariolens
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e .
+scenariolens demo --open
+```
+
+That command builds a complete deterministic run under `runs/demo/`, starts a
+local server, and opens the generated Explorer. Press Ctrl+C when you are done.
+No Waymo download or cloud service is required.
+
+Run the same product loop on your own ScenarioLens JSON:
+
+```bash
 scenariolens export-synthetic --output /tmp/scenariolens-synthetic.json
 scenariolens run \
   --input /tmp/scenariolens-synthetic.json \
   --format scenariolens-json \
   --output runs/quickstart \
-  --max-scenarios 11
+  --max-scenarios 11 \
+  --open
 ```
 
 The run writes one top-level `manifest.json` and `report.md`, specialist study
@@ -76,13 +87,12 @@ generated from the same input. Repeated runs can be checked with
 `scenariolens run-verify` for matching analytical digests and laptop execution
 budgets.
 
-Preview the explorer locally:
+For a headless machine or an occupied default port, keep the server local and
+choose any free port:
 
 ```bash
-python3 -m http.server 8000 --directory runs/quickstart
+scenariolens demo --open --no-browser --port 0
 ```
-
-Then open `http://localhost:8000/explorer/`.
 
 ## Supported Inputs
 

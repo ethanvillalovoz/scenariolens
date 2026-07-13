@@ -27,7 +27,18 @@ PYTHONPATH=src python -m unittest discover
 
 ## One-Command Analysis Bundle
 
-Run the complete core analysis path on the built-in synthetic corpus:
+Launch the complete core analysis path on the built-in synthetic corpus:
+
+```bash
+scenariolens demo --open
+```
+
+This writes a deterministic bundle under `runs/demo/`, serves the bundle on
+`127.0.0.1:8000`, and opens the system browser. Press Ctrl+C to stop it. Use
+`--no-browser` on a headless machine and `--port 0` to select an available
+ephemeral port.
+
+Generate and open the same product path from an explicit input file:
 
 ```bash
 scenariolens export-synthetic --output /tmp/scenariolens-synthetic.json
@@ -36,7 +47,8 @@ scenariolens run \
   --format scenariolens-json \
   --output runs/synthetic \
   --max-scenarios 11 \
-  --top 10
+  --top 10 \
+  --open
 ```
 
 Run the same product path over every supported native file in a local Waymo
@@ -48,7 +60,8 @@ scenariolens run \
   --format native \
   --output runs/waymo-validation \
   --max-scenarios 400 \
-  --top 50
+  --top 50 \
+  --open
 ```
 
 Native directories expand into deterministic per-file sources, so
@@ -61,6 +74,11 @@ trajectory SVGs under `assets/`, and writes a self-contained static Explorer
 under `explorer/`. The Explorer payload records run provenance, stage metrics,
 case IDs, and portable report links. Use `--no-input-hash` only for a local
 iteration where provenance is not required.
+
+Without `--open`, `scenariolens run` remains non-interactive and returns as
+soon as the artifacts are written. With `--open`, the command validates the
+generated Explorer files before serving the entire run directory, so report
+and trajectory links remain portable.
 
 Validate two independent runs against the v1 determinism and laptop budgets:
 
@@ -96,6 +114,7 @@ overflow while failing on browser console errors.
 
 ```bash
 scenariolens demo
+scenariolens demo --open
 scenariolens report --format markdown --limit 5
 scenariolens render --top 3 --output-dir /tmp/scenariolens-gallery
 ```

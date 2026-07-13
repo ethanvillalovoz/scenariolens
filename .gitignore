@@ -9,6 +9,7 @@ venv/
 dist/
 build/
 *.egg-info/
+runs/
 
 # Local data
 data/raw/*
