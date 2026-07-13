@@ -113,6 +113,7 @@ and links back to reports and provenance.
 
 ## Current Proof
 
+- V1 acceptance contract: [`docs/v1_acceptance.md`](v1_acceptance.md)
 - V1 evidence index:
   [`docs/reports/scenariolens_evidence_index.md`](reports/scenariolens_evidence_index.md)
 - Public surface check:

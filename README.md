@@ -11,6 +11,7 @@ prediction baselines fail.
 - **Live demo:** [ethanvillalovoz.com/scenariolens](https://ethanvillalovoz.com/scenariolens/)
 - **Evidence index:** [v1 public evidence spine](docs/reports/scenariolens_evidence_index.md)
 - **Case study:** [Finding baseline failures in Waymo Motion scenarios](docs/case_studies/waymo_baseline_failures.md)
+- **v1 contract:** [definition of done and release gates](docs/v1_acceptance.md)
 - **Latest release:** [v0.2.0 notes](docs/releases/v0.2.0.md)
 
 ScenarioLens is designed as a Waymo-targeted portfolio artifact, but the shape

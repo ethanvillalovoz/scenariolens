@@ -6,6 +6,10 @@ All notable changes to ScenarioLens are documented here.
 
 ### Added
 
+- `docs/v1_acceptance.md`, freezing the one-command product contract, complete
+  1,193-scenario local-corpus gate, separate 993-scenario frozen-policy
+  validation cohort, clean-package and browser requirements, performance
+  budget, honest non-goals, and terminal `v1.0.0` release criteria.
 - `scenariolens evidence-index` workflow,
   `docs/reports/scenariolens_evidence_index.md`, and
   `docs/demo/evidence_index.json`, generating a v1 public evidence spine that
