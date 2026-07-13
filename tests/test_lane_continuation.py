@@ -3,6 +3,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from dataclasses import replace
 from pathlib import Path
 
 from scenariolens.ingest.waymo_motion import MAX_MAP_FEATURES_PER_SCENARIO
@@ -153,6 +154,43 @@ class LaneContinuationTest(unittest.TestCase):
             self.assertEqual(manifest["format"], LANE_CONTINUATION_STUDY_FORMAT)
             self.assertIn("Validation Study", public_report.read_text())
 
+    def test_lane_continuation_study_preserves_holdout_window_indices(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            input_path = root / "window.json"
+            development = replace(
+                _linked_lane_scenario(),
+                scenario_id="development_case",
+            )
+            holdout = replace(
+                _linked_lane_scenario(),
+                scenario_id="holdout_case",
+            )
+            save_scenarios(input_path, (development, holdout))
+
+            payload = lane_continuation_study_payload(
+                input_paths=(input_path,),
+                output_dir=root / "study",
+                max_scenarios=1,
+                top=3,
+                input_format="scenariolens-json",
+                scenario_offset=1,
+            )
+
+            self.assertEqual(payload["scenario_offset_per_input"], 1)
+            self.assertEqual(payload["scenario_count"], 1)
+            self.assertEqual(payload["sources"][0]["scenario_offset"], 1)
+            self.assertEqual(payload["cases"][0]["scenario_id"], "holdout_case")
+            self.assertEqual(payload["cases"][0]["scenario_index"], 2)
+            self.assertEqual(
+                payload["top_improvements"][0]["scenario_id"],
+                "holdout_case",
+            )
+            self.assertIn(
+                "Scenario offset per input: 1",
+                lane_continuation_study_markdown(payload),
+            )
+
     def test_lane_continuation_cli_writes_run_packet(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
@@ -208,6 +246,8 @@ class LaneContinuationTest(unittest.TestCase):
                     str(output_dir),
                     "--max-scenarios",
                     "10",
+                    "--scenario-offset",
+                    "0",
                     "--top",
                     "3",
                     "--public-report",

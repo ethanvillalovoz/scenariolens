@@ -936,6 +936,31 @@ class WaymoMotionIngestTest(unittest.TestCase):
         self.assertEqual(len(scenarios), 1)
         self.assertEqual(scenarios[0].scenario_id, "waymo_native_001")
 
+    def test_load_waymo_motion_applies_offset_before_limit_across_files(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            (root / "01-first.json").write_text(
+                NATIVE_JSON_FIXTURE,
+                encoding="utf-8",
+            )
+            (root / "02-second.json").write_text(
+                NATIVE_SNAKE_CASE_FIXTURE,
+                encoding="utf-8",
+            )
+
+            scenarios = load_waymo_motion(
+                root,
+                max_scenarios=1,
+                scenario_offset=1,
+            )
+
+        self.assertEqual(len(scenarios), 1)
+        self.assertEqual(scenarios[0].scenario_id, "waymo_native_002")
+
+    def test_load_waymo_motion_rejects_negative_offset(self) -> None:
+        with self.assertRaisesRegex(ValueError, "scenario-offset"):
+            load_waymo_motion("unused.json", scenario_offset=-1)
+
     def test_ingest_waymo_motion_writes_scenariolens_json(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             input_path = Path(tmpdir) / "scenario.json"

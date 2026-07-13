@@ -29,6 +29,10 @@ All notable changes to ScenarioLens are documented here.
   Explorer URL, launch the system browser, and stop cleanly on Ctrl+C. Host,
   port, ephemeral-port, and headless-browser controls are available without
   changing the existing non-interactive command behavior.
+- `lane-continuation-study --scenario-offset` now selects deterministic
+  per-input scenario windows before applying `--max-scenarios`, records the
+  boundary in source and top-level manifests, and preserves original
+  within-source indices for leakage-auditable holdout studies.
 - `docs/reports/scenariolens_v1_run_validation.md`, generated from two complete
   1,193-scenario runs over four local Waymo Motion validation shards. All 7
   readiness, digest, input, stage, duration, and memory checks pass; the slower

@@ -977,6 +977,7 @@ def lane_continuation_study_command(
     input_paths: list[str],
     output_dir: str,
     max_scenarios: int | None,
+    scenario_offset: int,
     top: int,
     input_format: str,
     public_report: str | None,
@@ -986,6 +987,7 @@ def lane_continuation_study_command(
             input_paths=tuple(input_paths),
             output_dir=output_dir,
             max_scenarios=max_scenarios,
+            scenario_offset=scenario_offset,
             top=top,
             input_format=input_format,
             public_report_path=public_report,
@@ -2795,6 +2797,12 @@ def main() -> int:
         help="Maximum scenarios to load per input.",
     )
     lane_continuation_study_parser.add_argument(
+        "--scenario-offset",
+        type=int,
+        default=0,
+        help="Number of leading scenarios to exclude from every input.",
+    )
+    lane_continuation_study_parser.add_argument(
         "--top",
         type=int,
         default=10,
@@ -4049,6 +4057,7 @@ def main() -> int:
             input_paths=args.input,
             output_dir=args.output_dir,
             max_scenarios=args.max_scenarios,
+            scenario_offset=args.scenario_offset,
             top=args.top,
             input_format=args.format,
             public_report=args.public_report,

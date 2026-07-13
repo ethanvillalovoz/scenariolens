@@ -80,6 +80,23 @@ soon as the artifacts are written. With `--open`, the command validates the
 generated Explorer files before serving the entire run directory, so report
 and trajectory links remain portable.
 
+For a frozen per-shard validation window, `lane-continuation-study` can exclude
+the same leading development rows from every repeated input:
+
+```bash
+scenariolens lane-continuation-study \
+  --input validation-00007.tfrecord \
+  --input validation-00008.tfrecord \
+  --scenario-offset 50 \
+  --max-scenarios 250 \
+  --top 100 \
+  --output-dir data/processed/selector-holdout-study
+```
+
+The offset is applied before the limit and independently to each input. Study
+cases retain their original one-based within-source indices, which makes the
+development/holdout boundary auditable in downstream manifests.
+
 Validate two independent runs against the v1 determinism and laptop budgets:
 
 ```bash
