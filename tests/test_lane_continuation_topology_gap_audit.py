@@ -5,6 +5,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from scenariolens.ingest.waymo_motion import MAX_MAP_FEATURES_PER_SCENARIO
 from scenariolens.lane_continuation_replay import LANE_CONTINUATION_REPLAY_FORMAT
@@ -13,6 +14,8 @@ from scenariolens.lane_continuation_topology_gap_audit import (
     generate_lane_continuation_topology_gap_audit,
     lane_continuation_topology_gap_audit_markdown,
     lane_continuation_topology_gap_audit_payload,
+    _raw_inventory_cache,
+    _raw_scenario_mappings,
 )
 
 
@@ -39,6 +42,8 @@ class LaneContinuationTopologyGapAuditTest(unittest.TestCase):
             self.assertEqual(aggregate["cap_recoverable_case_count"], 0)
             self.assertEqual(aggregate["terminal_confirmed_case_count"], 1)
             self.assertEqual(aggregate["capped_map_at_limit_count"], 1)
+            self.assertEqual(aggregate["raw_source_pass_count"], 1)
+            self.assertEqual(aggregate["raw_scenario_inventory_count"], 2)
 
             cap_case, terminal_case = payload["cases"]
             self.assertEqual(cap_case["diagnosis_label"], "cap_recovered_link_target")
@@ -74,6 +79,7 @@ class LaneContinuationTopologyGapAuditTest(unittest.TestCase):
             self.assertIn("cap_recovered_link_target", markdown)
             self.assertIn("terminal_lane_confirmed", markdown)
             self.assertIn("Raw scenario data committed: no", markdown)
+            self.assertIn("Batched raw-source passes", markdown)
             self.assertIn("not a Waymo benchmark claim", markdown)
 
     def test_generate_writes_manifest_and_public_report(self) -> None:
@@ -103,6 +109,32 @@ class LaneContinuationTopologyGapAuditTest(unittest.TestCase):
             )
             self.assertTrue(result.report_path.exists())
             self.assertTrue(public_report.exists())
+
+    def test_raw_inventory_batches_cases_from_one_source(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            source = _write_native_json_source(root)
+            replay = json.loads(
+                _write_replay_manifest(root, source).read_text(encoding="utf-8")
+            )
+
+            with patch(
+                "scenariolens.lane_continuation_topology_gap_audit._raw_scenario_mappings",
+                wraps=_raw_scenario_mappings,
+            ) as scan:
+                cache = _raw_inventory_cache(
+                    replay_cases=replay["cases"],
+                    max_scenarios=None,
+                )
+
+            self.assertEqual(scan.call_count, 1)
+            self.assertEqual(len(cache), 2)
+            self.assertTrue(
+                cache[(str(source), "native", "cap_gap_case", None)]["ready"]
+            )
+            self.assertTrue(
+                cache[(str(source), "native", "terminal_case", None)]["ready"]
+            )
 
     def test_topology_gap_audit_cli_writes_run_packet(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
