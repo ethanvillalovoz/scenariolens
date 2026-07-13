@@ -50,12 +50,12 @@ It is intentionally scoped to repository health. It is not a Waymo benchmark cla
 - Status: pass
 - Files: `README.md`, `docs/demo/index.html`, `docs/demo/README.md`, `docs/reports/scenariolens_evidence_index.md`, `docs/reports/scenariolens_public_surface_check.md`
 - Summary: All checked local links resolve to files in the repository.
-- `README.md` links scanned: 110
+- `README.md` links scanned: 111
 - `docs/demo/index.html` links scanned: 70
 - `docs/demo/README.md` links scanned: 4
 - `docs/reports/scenariolens_evidence_index.md` links scanned: 16
 - `docs/reports/scenariolens_public_surface_check.md` links scanned: 0
-- Local links checked: 192
+- Local links checked: 193
 - External links skipped: 6
 
 ### Demo asset integrity
@@ -70,7 +70,7 @@ It is intentionally scoped to repository health. It is not a Waymo benchmark cla
 - Status: pass
 - Files: `.gitignore`, `docs/data_provenance.md`
 - Summary: No raw Waymo or TFRecord-like files are tracked.
-- Tracked files inspected: 261
+- Tracked files inspected: 267
 - Tracked raw Waymo/TFRecord-like files: 0
 
 ### CI surface

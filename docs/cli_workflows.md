@@ -25,6 +25,40 @@ python -m pip install -e ".[dev]"
 PYTHONPATH=src python -m unittest discover
 ```
 
+## One-Command Analysis Bundle
+
+Run the complete core analysis path on the built-in synthetic corpus:
+
+```bash
+scenariolens export-synthetic --output /tmp/scenariolens-synthetic.json
+scenariolens run \
+  --input /tmp/scenariolens-synthetic.json \
+  --format scenariolens-json \
+  --output runs/synthetic \
+  --max-scenarios 11 \
+  --top 10
+```
+
+Run the same product path over every supported native file in a local Waymo
+Motion directory:
+
+```bash
+scenariolens run \
+  --input data/raw/waymo/motion/validation \
+  --format native \
+  --output runs/waymo-validation \
+  --max-scenarios 400 \
+  --top 50
+```
+
+Native directories expand into deterministic per-file sources, so
+`--max-scenarios` applies to each shard. The command hashes every input and
+runs the baseline-comparison, heading-aware lane-selection, and linked-lane
+continuation studies. It writes a top-level `manifest.json`, concise
+`report.md`, stage timings, aggregate metrics, stable analysis digest, and all
+specialist artifacts under `studies/`. Use `--no-input-hash` only for a local
+iteration where provenance is not required.
+
 ## Synthetic Demo
 
 ```bash

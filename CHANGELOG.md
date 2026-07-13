@@ -6,6 +6,11 @@ All notable changes to ScenarioLens are documented here.
 
 ### Added
 
+- `scenariolens run`, a one-command product workflow that expands native input
+  directories, hashes source files, executes baseline-comparison,
+  heading-aware lane-selection, and linked-lane continuation studies, and
+  writes one versioned run manifest/report with stage timings and a stable
+  analysis digest.
 - `docs/v1_acceptance.md`, freezing the one-command product contract, complete
   1,193-scenario local-corpus gate, separate 993-scenario frozen-policy
   validation cohort, clean-package and browser requirements, performance

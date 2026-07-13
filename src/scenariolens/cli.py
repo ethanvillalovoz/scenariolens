@@ -138,6 +138,10 @@ from scenariolens.report import json_report, markdown_report, ranked_scores
 from scenariolens.replay_candidates import generate_replay_candidate_plan
 from scenariolens.replay_prototype import generate_replay_prototype
 from scenariolens.route_intent_audit import generate_route_intent_audit
+from scenariolens.run_bundle import (
+    RUN_BUNDLE_INPUT_FORMATS,
+    generate_run_bundle,
+)
 from scenariolens.samples import synthetic_scenarios
 from scenariolens.schema import Scenario
 from scenariolens.slice_validation import validate_waymo_motion_slice
@@ -151,6 +155,40 @@ from scenariolens.waymo_shards import generate_waymo_motion_shard_plan
 
 def demo() -> int:
     print(json_report(synthetic_scenarios()))
+    return 0
+
+
+def run_bundle_command(
+    input_paths: list[str],
+    output_dir: str,
+    max_scenarios: int | None,
+    top: int,
+    input_format: str,
+    hash_inputs: bool,
+) -> int:
+    try:
+        result = generate_run_bundle(
+            input_paths=tuple(input_paths),
+            output_dir=output_dir,
+            max_scenarios=max_scenarios,
+            top=top,
+            input_format=input_format,
+            hash_inputs=hash_inputs,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote ScenarioLens run manifest to {result.manifest_path}")
+    print(f"Wrote ScenarioLens run report to {result.report_path}")
+    if not result.ready:
+        print("ScenarioLens run is not ready. Inspect the stage reports.")
+        return 2
+    print(
+        f"ScenarioLens run ready: {result.source_count} source(s), "
+        f"{result.scenario_count} scenario(s), {result.stage_count} stage(s), "
+        f"digest {result.analysis_digest[:12]}."
+    )
     return 0
 
 
@@ -1927,6 +1965,50 @@ def main() -> int:
     )
     subparsers = parser.add_subparsers(dest="command")
     subparsers.add_parser("demo", help="Score built-in synthetic scenarios.")
+    run_parser = subparsers.add_parser(
+        "run",
+        help=(
+            "Run the core baseline, lane-selection, and lane-continuation "
+            "studies as one reproducible analysis bundle."
+        ),
+    )
+    run_parser.add_argument(
+        "--input",
+        action="append",
+        required=True,
+        help=(
+            "ScenarioLens JSON file, Waymo Motion file, or native input "
+            "directory. Repeat for multiple sources."
+        ),
+    )
+    run_parser.add_argument(
+        "--format",
+        choices=RUN_BUNDLE_INPUT_FORMATS,
+        default="native",
+        help="Input representation.",
+    )
+    run_parser.add_argument(
+        "--output",
+        default="runs/scenariolens",
+        help="Output directory for the top-level run bundle.",
+    )
+    run_parser.add_argument(
+        "--max-scenarios",
+        type=int,
+        default=25,
+        help="Maximum scenarios to analyze per expanded input file.",
+    )
+    run_parser.add_argument(
+        "--top",
+        type=int,
+        default=10,
+        help="Number of ranked rows retained by each study.",
+    )
+    run_parser.add_argument(
+        "--no-input-hash",
+        action="store_true",
+        help="Skip SHA-256 input hashing for this local run.",
+    )
     export_parser = subparsers.add_parser(
         "export-synthetic",
         help="Export built-in synthetic scenarios as ScenarioLens JSON.",
@@ -3645,6 +3727,15 @@ def main() -> int:
 
     if args.command == "demo":
         return demo()
+    if args.command == "run":
+        return run_bundle_command(
+            input_paths=args.input,
+            output_dir=args.output,
+            max_scenarios=args.max_scenarios,
+            top=args.top,
+            input_format=args.format,
+            hash_inputs=not args.no_input_hash,
+        )
     if args.command == "export-synthetic":
         return export_synthetic(output_path=args.output)
     if args.command == "ingest-csv":

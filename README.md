@@ -61,8 +61,17 @@ cd scenariolens
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e .
-scenariolens report --format markdown --limit 5
+scenariolens export-synthetic --output /tmp/scenariolens-synthetic.json
+scenariolens run \
+  --input /tmp/scenariolens-synthetic.json \
+  --format scenariolens-json \
+  --output runs/quickstart \
+  --max-scenarios 11
 ```
+
+The run writes one top-level `manifest.json` and `report.md` plus baseline,
+lane-selection, and lane-continuation study artifacts under
+`runs/quickstart/studies/`.
 
 Preview the explorer locally:
 
