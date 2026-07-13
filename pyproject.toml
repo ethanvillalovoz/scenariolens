@@ -46,3 +46,10 @@ scenariolens = "scenariolens.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.data-files]
+"share/scenariolens/explorer" = [
+  "docs/demo/index.html",
+  "docs/demo/app.js",
+  "docs/demo/styles.css",
+]

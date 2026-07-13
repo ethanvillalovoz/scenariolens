@@ -15,6 +15,10 @@ All notable changes to ScenarioLens are documented here.
   bundles, verifies input and stage fingerprints, enforces matching analysis
   digests, and checks the 15-minute and 8 GB laptop budgets. Run manifests now
   record cross-platform peak process memory.
+- Every `scenariolens run` bundle now generates `explorer/index.html`, a
+  versioned `explorer/run.json`, ranked `explorer/scenarios.json`, and rendered
+  trajectory assets. Explorer case IDs participate in the deterministic
+  analysis digest, and the static frontend is included in built packages.
 - `docs/reports/scenariolens_v1_run_validation.md`, generated from two complete
   1,193-scenario runs over four local Waymo Motion validation shards. All 7
   readiness, digest, input, stage, duration, and memory checks pass; the slower

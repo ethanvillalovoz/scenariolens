@@ -69,19 +69,20 @@ scenariolens run \
   --max-scenarios 11
 ```
 
-The run writes one top-level `manifest.json` and `report.md` plus baseline,
-lane-selection, and lane-continuation study artifacts under
-`runs/quickstart/studies/`. Repeated runs can be checked with
+The run writes one top-level `manifest.json` and `report.md`, specialist study
+artifacts under `runs/quickstart/studies/`, and a self-contained Explorer at
+`runs/quickstart/explorer/index.html` with ranked cases and trajectory assets
+generated from the same input. Repeated runs can be checked with
 `scenariolens run-verify` for matching analytical digests and laptop execution
 budgets.
 
 Preview the explorer locally:
 
 ```bash
-python3 -m http.server 8000 --directory docs
+python3 -m http.server 8000 --directory runs/quickstart
 ```
 
-Then open `http://localhost:8000/demo/`.
+Then open `http://localhost:8000/explorer/`.
 
 ## Supported Inputs
 

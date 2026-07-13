@@ -97,20 +97,40 @@ def generate_dashboard_data(
 ) -> None:
     """Generate static dashboard JSON and SVG assets."""
 
-    target = Path(output_path)
-    assets = Path(assets_dir)
     scenario_sets = default_dashboard_scenario_sets(
         waymo_normalized_path=waymo_normalized_path,
         waymo_native_path=waymo_native_path,
     )
-
-    assets.mkdir(parents=True, exist_ok=True)
-    payload = dashboard_payload(
+    write_dashboard_data(
         scenario_sets=scenario_sets,
-        asset_prefix=Path(os.path.relpath(assets, start=target.parent)),
+        output_path=output_path,
+        assets_dir=assets_dir,
         case_diagnostics=load_lane_selection_case_diagnostics(
             lane_selection_manifest_path,
         ),
+        limit=limit,
+    )
+
+
+def write_dashboard_data(
+    scenario_sets: tuple[DashboardScenarioSet, ...],
+    output_path: str | Path,
+    assets_dir: str | Path,
+    case_diagnostics: dict[str, object] | None = None,
+    limit: int | None = None,
+) -> dict[str, object]:
+    """Write a dashboard payload and its ranked trajectory assets."""
+
+    target = Path(output_path)
+    assets = Path(assets_dir)
+    assets.mkdir(parents=True, exist_ok=True)
+    for stale_asset in assets.glob("*.svg"):
+        stale_asset.unlink()
+
+    payload = dashboard_payload(
+        scenario_sets=scenario_sets,
+        asset_prefix=Path(os.path.relpath(assets, start=target.parent)),
+        case_diagnostics=case_diagnostics,
         limit=limit,
     )
 
@@ -124,6 +144,7 @@ def generate_dashboard_data(
 
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    return payload
 
 
 def dashboard_payload(

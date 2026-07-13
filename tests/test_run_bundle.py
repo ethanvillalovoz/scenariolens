@@ -44,6 +44,7 @@ class RunBundleTest(unittest.TestCase):
             self.assertEqual(first.analysis_digest, second.analysis_digest)
             self.assertIsNotNone(first.peak_rss_bytes)
             self.assertGreater(first.peak_rss_bytes or 0, 0)
+            self.assertTrue(first.explorer_index_path.exists())
 
             payload = json.loads(first.manifest_path.read_text(encoding="utf-8"))
             self.assertEqual(payload["format"], RUN_BUNDLE_FORMAT)
@@ -56,6 +57,9 @@ class RunBundleTest(unittest.TestCase):
                 [stage["stage_id"] for stage in payload["stages"]],
                 ["baseline_comparison", "lane_selection", "lane_continuation"],
             )
+            self.assertTrue(payload["explorer"]["ready"])
+            self.assertEqual(payload["explorer"]["reported_count"], 4)
+            self.assertEqual(len(payload["explorer"]["scenario_ids"]), 4)
             for stage in payload["stages"]:
                 self.assertTrue((first.output_dir / stage["manifest"]).exists())
                 self.assertTrue((first.output_dir / stage["report"]).exists())
@@ -65,6 +69,7 @@ class RunBundleTest(unittest.TestCase):
             self.assertIn("Baseline Comparison", report)
             self.assertIn("Heading-Aware Lane Selection", report)
             self.assertIn("Lane Continuation", report)
+            self.assertIn("Open the generated Scenario Explorer", report)
             self.assertIn("not a Waymo benchmark", report)
 
     def test_resolve_run_inputs_expands_native_directory_and_deduplicates(self) -> None:
@@ -128,6 +133,10 @@ class RunBundleTest(unittest.TestCase):
             self.assertTrue((output_dir / "manifest.json").exists())
             self.assertTrue((output_dir / "report.md").exists())
             self.assertTrue((output_dir / "studies" / "lane_continuation").exists())
+            self.assertTrue((output_dir / "explorer" / "index.html").exists())
+            self.assertTrue((output_dir / "explorer" / "scenarios.json").exists())
+            self.assertTrue((output_dir / "explorer" / "run.json").exists())
+            self.assertTrue(any((output_dir / "assets").glob("*.svg")))
 
 
 if __name__ == "__main__":

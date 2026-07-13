@@ -21,7 +21,7 @@ flowchart LR
     X --> Y["Context evaluation set"]
     Y --> Q
     P --> U["Heading-aware lane-selection study"]
-    U --> V["Explorer case diagnostics"]
+    U --> V["Generated Explorer run contract"]
     U --> W["Heading-aware debug casebook"]
     P --> Q["Baseline-debug casebook"]
     H --> Q
@@ -49,7 +49,7 @@ flowchart LR
     F --> I["Static dashboard payload"]
     V --> I
     AP --> I
-    I --> J["Scenario Explorer"]
+    I --> J["Scenario Explorer + trajectory assets"]
     G --> K["Public-safe case studies"]
     Q --> K
     R --> K

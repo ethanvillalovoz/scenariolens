@@ -15,6 +15,8 @@ from scenariolens.baseline_compare_study import (
     BASELINE_COMPARISON_STUDY_INPUT_FORMATS,
     generate_baseline_comparison_study,
 )
+from scenariolens.dashboard import DASHBOARD_FORMAT
+from scenariolens.explorer import generate_run_explorer, write_explorer_run_payload
 from scenariolens.ingest.waymo_motion import is_native_motion_file
 from scenariolens.lane_continuation import generate_lane_continuation_study
 from scenariolens.lane_selection_study import generate_lane_selection_study
@@ -42,6 +44,7 @@ class RunBundleResult:
     output_dir: Path
     manifest_path: Path
     report_path: Path
+    explorer_index_path: Path
 
 
 @dataclass(frozen=True)
@@ -135,13 +138,40 @@ def generate_run_bundle(
             "Study scenario counts differ; inspect stage manifests before using this run."
         )
     scenario_count = max(scenario_counts, default=0)
-    ready = all(bool(stage["ready"]) for stage in stages) and not warnings
+    explorer = generate_run_explorer(
+        input_paths=sources,
+        input_format=input_format,
+        output_dir=target,
+        max_scenarios=max_scenarios,
+        limit=top,
+        lane_selection_manifest_path=(
+            studies_dir / "lane_selection" / "manifest.json"
+        ),
+    )
+    if explorer.scenario_count != scenario_count:
+        warnings.append(
+            "Explorer scenario count differs from the study scenario count; "
+            "inspect the generated payload before using this run."
+        )
+    if not explorer.ready:
+        warnings.append("Explorer generation did not produce a complete case bundle.")
+    ready = (
+        all(bool(stage["ready"]) for stage in stages)
+        and explorer.ready
+        and not warnings
+    )
     stable_payload = _stable_analysis_payload(
         input_format=input_format,
         max_scenarios=max_scenarios,
         top=top,
         inputs=input_provenance,
         stages=stages,
+        explorer={
+            "format": DASHBOARD_FORMAT,
+            "scenario_count": explorer.scenario_count,
+            "reported_count": explorer.rendered_case_count,
+            "scenario_ids": list(explorer.scenario_ids),
+        },
     )
     analysis_digest = hashlib.sha256(
         json.dumps(
@@ -175,11 +205,24 @@ def generate_run_bundle(
         "analysis_digest": analysis_digest,
         "inputs": input_provenance,
         "stages": stages,
+        "explorer": {
+            "format": DASHBOARD_FORMAT,
+            "ready": explorer.ready,
+            "scenario_count": explorer.scenario_count,
+            "reported_count": explorer.rendered_case_count,
+            "scenario_ids": list(explorer.scenario_ids),
+            "index": "explorer/index.html",
+            "scenario_payload": "explorer/scenarios.json",
+            "run_payload": "explorer/run.json",
+            "assets": "assets/",
+        },
         "warnings": warnings,
         "outputs": {
             "manifest": "manifest.json",
             "report": "report.md",
             "studies": "studies/",
+            "explorer": "explorer/index.html",
+            "assets": "assets/",
         },
         "scope_note": (
             "This run is a local scenario-mining and baseline diagnostic. It is "
@@ -191,6 +234,7 @@ def generate_run_bundle(
     report_path = target / "report.md"
     manifest_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     report_path.write_text(run_bundle_markdown(payload), encoding="utf-8")
+    write_explorer_run_payload(payload, explorer.run_payload_path)
 
     return RunBundleResult(
         ready=ready,
@@ -203,6 +247,7 @@ def generate_run_bundle(
         output_dir=target,
         manifest_path=manifest_path,
         report_path=report_path,
+        explorer_index_path=explorer.index_path,
     )
 
 
@@ -273,6 +318,7 @@ def run_bundle_markdown(payload: dict[str, object]) -> str:
         f"- Analysis digest: `{payload.get('analysis_digest')}`",
         f"- Input format: `{configuration.get('input_format')}`",
         f"- Maximum scenarios per input: {configuration.get('max_scenarios_per_input')}",
+        f"- Rendered Explorer cases: {_required_mapping(payload, 'explorer').get('reported_count')}",
         "",
         "## Input Provenance",
         "",
@@ -316,6 +362,12 @@ def run_bundle_markdown(payload: dict[str, object]) -> str:
     lines.extend(_lane_continuation_findings(stage_lookup.get("lane_continuation")))
     lines.extend(
         [
+            "",
+            "## Explorer",
+            "",
+            "- [Open the generated Scenario Explorer](explorer/index.html)",
+            "- Ranked trajectory assets and run provenance are generated from "
+            "the same inputs and configuration as the studies above.",
             "",
             "## Interpretation Boundary",
             "",
@@ -398,6 +450,7 @@ def _stable_analysis_payload(
     top: int,
     inputs: list[dict[str, object]],
     stages: list[dict[str, object]],
+    explorer: dict[str, object],
 ) -> dict[str, object]:
     return {
         "format": RUN_BUNDLE_FORMAT,
@@ -427,6 +480,7 @@ def _stable_analysis_payload(
             }
             for stage in stages
         ],
+        "explorer": explorer,
     }
 
 

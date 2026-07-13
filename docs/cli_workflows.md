@@ -56,7 +56,10 @@ Native directories expand into deterministic per-file sources, so
 runs the baseline-comparison, heading-aware lane-selection, and linked-lane
 continuation studies. It writes a top-level `manifest.json`, concise
 `report.md`, stage timings, aggregate metrics, stable analysis digest, and all
-specialist artifacts under `studies/`. Use `--no-input-hash` only for a local
+specialist artifacts under `studies/`. It also ranks the input cases, renders
+trajectory SVGs under `assets/`, and writes a self-contained static Explorer
+under `explorer/`. The Explorer payload records run provenance, stage metrics,
+case IDs, and portable report links. Use `--no-input-hash` only for a local
 iteration where provenance is not required.
 
 Validate two independent runs against the v1 determinism and laptop budgets:

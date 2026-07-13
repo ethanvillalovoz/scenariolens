@@ -56,8 +56,14 @@ jobs:
             --manifest /tmp/scenariolens-run-repeat/manifest.json \
             --output-dir /tmp/scenariolens-run-validation
           python -m json.tool /tmp/scenariolens-run/manifest.json
+          python -m json.tool /tmp/scenariolens-run/explorer/run.json
+          python -m json.tool /tmp/scenariolens-run/explorer/scenarios.json
           python -m json.tool /tmp/scenariolens-run-validation/manifest.json
           test -f /tmp/scenariolens-run/report.md
+          test -f /tmp/scenariolens-run/explorer/index.html
+          test -f /tmp/scenariolens-run/explorer/app.js
+          test -f /tmp/scenariolens-run/explorer/styles.css
+          test -n "$(find /tmp/scenariolens-run/assets -name '*.svg' -print -quit)"
           test -f /tmp/scenariolens-run-validation/report.md
           test -f /tmp/scenariolens-run/studies/baseline_comparison/manifest.json
           test -f /tmp/scenariolens-run/studies/lane_selection/manifest.json
