@@ -6,6 +6,18 @@ All notable changes to ScenarioLens are documented here.
 
 ### Added
 
+- `scenariolens selector-holdout-study`, a one-command frozen-policy
+  validation chain spanning continuation mining, replay, topology audit,
+  terminal-neighborhood replay, selector transfer, and context-aware candidate
+  validation.
+- A packaged public-safe selector policy frozen at commit `ba0b37e`, plus the
+  993-scenario holdout report at
+  `docs/reports/waymo_selector_holdout_993.md`. The run reaches 78 selector
+  decisions and passes 8/8 evaluation gates while rejecting candidate adoption
+  after measuring 12 false promotions.
+- Batched topology-audit source reads: 124 holdout topology cases now require
+  four raw-source passes instead of rescanning a TFRecord for every case.
+
 - `scenariolens run`, a one-command product workflow that expands native input
   directories, hashes source files, executes baseline-comparison,
   heading-aware lane-selection, and linked-lane continuation studies, and

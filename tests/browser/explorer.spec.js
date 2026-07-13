@@ -52,7 +52,10 @@ test("public Explorer exposes run evidence and the complete case workflow", asyn
   await expectSelectedTrajectory(page, "synthetic_cyclist_close_pass");
 
   await page.getByText("Reports", { exact: true }).click();
-  await expect(page.locator("#reportLinks a")).toHaveCount(6);
+  await expect(page.locator("#reportLinks a")).toHaveCount(7);
+  await expect(
+    page.getByRole("link", { name: /Frozen selector holdout/ }),
+  ).toHaveAttribute("href", "../reports/waymo_selector_holdout_993.md");
   await expectLinksResolve(page, "#primaryReportLink, #reportLinks a, .stage-card a");
   await expectNoHorizontalOverflow(page);
   expect(errors).toEqual([]);

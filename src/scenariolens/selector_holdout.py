@@ -383,11 +383,17 @@ def generate_selector_holdout_study(
     report_path = target / "report.md"
     copied_report_path = Path(public_report_path) if public_report_path else None
     manifest_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-    report = selector_holdout_markdown(payload)
+    report = selector_holdout_markdown(payload, include_local_stage_links=True)
     report_path.write_text(report, encoding="utf-8")
     if copied_report_path is not None:
         copied_report_path.parent.mkdir(parents=True, exist_ok=True)
-        copied_report_path.write_text(report, encoding="utf-8")
+        copied_report_path.write_text(
+            selector_holdout_markdown(
+                payload,
+                include_local_stage_links=False,
+            ),
+            encoding="utf-8",
+        )
 
     return SelectorHoldoutStudyResult(
         ready=ready,
@@ -406,7 +412,10 @@ def generate_selector_holdout_study(
     )
 
 
-def selector_holdout_markdown(payload: dict[str, object]) -> str:
+def selector_holdout_markdown(
+    payload: dict[str, object],
+    include_local_stage_links: bool = True,
+) -> str:
     """Return the public-safe frozen selector holdout report."""
 
     aggregate = _mapping(payload, "aggregate")
@@ -496,10 +505,15 @@ def selector_holdout_markdown(payload: dict[str, object]) -> str:
     )
     for stage in stages:
         assert isinstance(stage, dict)
+        report_cell = (
+            f"[{stage['stage_id']}]({stage['report']})"
+            if include_local_stage_links
+            else "local run bundle"
+        )
         lines.append(
             f"| {stage['label']} | {stage['ready']} | "
             f"{float(stage['duration_seconds']):.3f} s | "
-            f"[{stage['stage_id']}]({stage['report']}) |"
+            f"{report_cell} |"
         )
     lines.extend(
         [

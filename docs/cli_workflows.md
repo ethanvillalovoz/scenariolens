@@ -97,6 +97,26 @@ The offset is applied before the limit and independently to each input. Study
 cases retain their original one-based within-source indices, which makes the
 development/holdout boundary auditable in downstream manifests.
 
+Run the complete frozen-policy v1 holdout over the four local validation shards:
+
+```bash
+scenariolens selector-holdout-study \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00007-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00008-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00009-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00010-of-00150 \
+  --output-dir data/processed/waymo_selector_holdout_993 \
+  --public-report docs/reports/waymo_selector_holdout_993.md
+```
+
+The command uses the packaged selector policy frozen at commit `ba0b37e`,
+excludes the first 50 scenarios from every shard, and runs the complete
+continuation-to-selector chain without exposing threshold controls. The public
+run evaluated 993 withheld scenarios and 78 selector decisions, passed all 8
+provenance and coverage gates in 783.537 seconds with 3.614 GB peak memory, and
+found 12 false promotions. The evaluation packet passes; the selector candidate
+does not, so ScenarioLens keeps it disabled and does not retune on the holdout.
+
 Validate two independent runs against the v1 determinism and laptop budgets:
 
 ```bash

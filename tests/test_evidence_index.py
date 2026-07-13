@@ -32,6 +32,7 @@ class EvidenceIndexTest(unittest.TestCase):
         artifact_ids = {artifact["id"] for artifact in payload["artifacts"]}
         self.assertIn("explorer_run_contract", artifact_ids)
         self.assertIn("terminal_selector_decision_atlas_200", artifact_ids)
+        self.assertIn("selector_holdout_993", artifact_ids)
         self.assertIn("v1_run_validation", artifact_ids)
         self.assertIn("ci_workflow", artifact_ids)
 
@@ -56,6 +57,7 @@ class EvidenceIndexTest(unittest.TestCase):
         self.assertIn("ScenarioLens V1 Evidence Index", markdown)
         self.assertIn("Ready: yes", markdown)
         self.assertIn("Terminal Selector Decision Atlas", markdown)
+        self.assertIn("993-Scenario Frozen Selector Holdout", markdown)
         self.assertIn("Full-Corpus Run Reproducibility", markdown)
         self.assertIn("Public-Safety Boundary", markdown)
 

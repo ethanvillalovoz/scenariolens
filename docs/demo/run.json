@@ -118,6 +118,12 @@
       "path": "../reports/scenariolens_v1_run_validation.md"
     },
     {
+      "report_id": "selector_holdout_993",
+      "label": "Frozen selector holdout",
+      "description": "993 withheld scenarios and 78 decisions; the candidate remains disabled after 12 false promotions.",
+      "path": "../reports/waymo_selector_holdout_993.md"
+    },
+    {
       "report_id": "evidence_index",
       "label": "V1 evidence index",
       "description": "The generated map of public reports, payloads, provenance, and CI evidence.",

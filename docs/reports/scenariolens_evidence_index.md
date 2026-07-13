@@ -7,11 +7,11 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 ## Readiness
 
 - Ready: yes
-- Required artifacts present: 18 / 18
+- Required artifacts present: 19 / 19
 - Missing required artifacts: 0
 - Evidence stages: 8
-- Public-safe artifacts indexed: 18
-- Local real-data/Waymo-derived artifacts indexed: 14
+- Public-safe artifacts indexed: 19
+- Local real-data/Waymo-derived artifacts indexed: 15
 
 ## Stage Summary
 
@@ -23,7 +23,7 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 | Baseline models | 2 | 2 | Compares lightweight prediction baselines with honest wins and regressions. |
 | Replay bridge | 1 | 1 | Connects mined cases to laptop-safe open-loop replay diagnostics. |
 | Lane continuation | 2 | 2 | Audits map-link and lane-continuation failure modes at larger scale. |
-| Selector validation | 4 | 4 | Validates conservative selector gates before changing default behavior. |
+| Selector validation | 5 | 5 | Validates conservative selector gates before changing default behavior. |
 | Release readiness | 3 | 3 | Keeps the public repo tested and contribution-ready. |
 
 ## Evidence Artifacts
@@ -43,6 +43,7 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 | [200-Scenario Terminal Selector Calibration](waymo_lane_continuation_terminal_neighborhood_selector_calibration_200.md) | Selector validation | Zero-false-promotion gate sweep over terminal-neighborhood cases | False promotions: 0; Default selector changed: no | yes |
 | [Terminal Selector Transfer Validation](waymo_lane_continuation_terminal_neighborhood_selector_transfer_200.md) | Selector validation | 7-case validation queue, including 4 novel transfer cases | Validation cases: 7; Novel cases: 4 | yes |
 | [Context-Aware Selector Candidate Validation](waymo_lane_continuation_terminal_neighborhood_selector_candidate_validation_200.md) | Selector validation | Candidate policy joined to transfer and route/context audits | Agreement: 6/7; False promotions: 0 | yes |
+| [993-Scenario Frozen Selector Holdout](waymo_selector_holdout_993.md) | Selector validation | 78 perturbation-replayed selector decisions from 993 withheld scenarios across four local validation shards | Holdout scenarios: 993; Selector decisions: 78; Evaluation gates: 8/8; Candidate false promotions: 12 | yes |
 | [Terminal Selector Decision Atlas](waymo_lane_continuation_terminal_neighborhood_selector_decision_atlas_200.md) | Selector validation | 7 derived selector cards joined to candidate-validation labels | Visual cards: 7; Candidate agreement: 6/7 | yes |
 | [Selector Atlas Demo Payload](../demo/selector_decisions.json) | Product surface | Public-safe selector decision cards loaded by the static Explorer | Cards: 7 | yes |
 | [Full-Corpus Run Reproducibility](scenariolens_v1_run_validation.md) | Release readiness | Two complete analysis runs over 1,193 scenarios from four local validation shards | Scenarios per run: 1,193; Reproducibility checks: 7/7; Maximum duration: 459.495 s; Maximum peak memory: 1.915 GB | yes |
@@ -167,6 +168,15 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 - Data status: public-safe candidate labels and rationale
 - Why it matters: Shows one narrow improvement path: recover a false hold while preserving negative controls.
 - Limitation: The default selector remains unchanged pending broader validation.
+
+### 993-Scenario Frozen Selector Holdout
+
+- Path: `docs/reports/waymo_selector_holdout_993.md`
+- Proof type: frozen-policy holdout
+- Command: `scenariolens selector-holdout-study --input ...`
+- Data status: aggregate metrics, policy outcomes, hashes, and release gates
+- Why it matters: Tests a promising small-cohort selector without retuning and rejects adoption when the larger holdout reveals false promotions.
+- Limitation: This is same-shard scenario-window validation, not an independent-shard benchmark; the candidate creates 12 false promotions and remains disabled.
 
 ### Terminal Selector Decision Atlas
 

@@ -4,10 +4,10 @@
   "generated_by": "scenariolens evidence-index",
   "scope_note": "This evidence index is generated from a curated public artifact catalog and verifies that required reports, payloads, and CI files exist in the repository. It is a recruiter-facing map of evidence, not a Waymo benchmark claim.",
   "aggregate": {
-    "artifact_count": 18,
-    "present_count": 18,
+    "artifact_count": 19,
+    "present_count": 19,
     "missing_count": 0,
-    "required_count": 18,
+    "required_count": 19,
     "stage_count": 8,
     "proof_type_counts": {
       "interactive demo": 1,
@@ -22,6 +22,7 @@
       "policy calibration": 1,
       "transfer validation": 1,
       "candidate validation": 1,
+      "frozen-policy holdout": 1,
       "visual decision atlas": 1,
       "static data contract": 1,
       "real-data execution validation": 1,
@@ -35,11 +36,11 @@
       "baseline_models": 2,
       "replay_bridge": 1,
       "lane_continuation": 2,
-      "selector_validation": 4,
+      "selector_validation": 5,
       "release_readiness": 3
     },
-    "public_safe_artifact_count": 18,
-    "local_real_data_artifact_count": 14
+    "public_safe_artifact_count": 19,
+    "local_real_data_artifact_count": 15
   },
   "stages": [
     {
@@ -110,12 +111,13 @@
     {
       "stage": "selector_validation",
       "label": "Selector validation",
-      "artifact_count": 4,
-      "present_count": 4,
+      "artifact_count": 5,
+      "present_count": 5,
       "artifact_ids": [
         "terminal_selector_calibration_200",
         "terminal_selector_transfer_200",
         "terminal_selector_candidate_validation_200",
+        "selector_holdout_993",
         "terminal_selector_decision_atlas_200"
       ],
       "summary": "Validates conservative selector gates before changing default behavior."
@@ -172,7 +174,7 @@
       "link_path": "../demo/run.json",
       "present": true,
       "required": true,
-      "size_bytes": 5193,
+      "size_bytes": 5471,
       "command": "scenariolens run --input <path> --output runs/<name>",
       "data_status": "aggregate run metrics and portable report links only",
       "why_it_matters": "Connects the visible Explorer to the same provenance, stage metrics, digest, and resource evidence emitted by the CLI.",
@@ -203,7 +205,7 @@
       "link_path": "../data_provenance.md",
       "present": true,
       "required": true,
-      "size_bytes": 26097,
+      "size_bytes": 27171,
       "command": "documented local Waymo Motion workflow",
       "data_status": "raw Waymo files ignored; public artifacts are derived",
       "why_it_matters": "Makes the project credible without implying private-data access or publishing restricted raw records.",
@@ -474,6 +476,41 @@
         {
           "label": "False promotions",
           "value": "0"
+        }
+      ]
+    },
+    {
+      "id": "selector_holdout_993",
+      "title": "993-Scenario Frozen Selector Holdout",
+      "stage": "selector_validation",
+      "stage_label": "Selector validation",
+      "proof_type": "frozen-policy holdout",
+      "scope": "78 perturbation-replayed selector decisions from 993 withheld scenarios across four local validation shards",
+      "path": "docs/reports/waymo_selector_holdout_993.md",
+      "link_path": "waymo_selector_holdout_993.md",
+      "present": true,
+      "required": true,
+      "size_bytes": 4293,
+      "command": "scenariolens selector-holdout-study --input ...",
+      "data_status": "aggregate metrics, policy outcomes, hashes, and release gates",
+      "why_it_matters": "Tests a promising small-cohort selector without retuning and rejects adoption when the larger holdout reveals false promotions.",
+      "limitation": "This is same-shard scenario-window validation, not an independent-shard benchmark; the candidate creates 12 false promotions and remains disabled.",
+      "metrics": [
+        {
+          "label": "Holdout scenarios",
+          "value": "993"
+        },
+        {
+          "label": "Selector decisions",
+          "value": "78"
+        },
+        {
+          "label": "Evaluation gates",
+          "value": "8/8"
+        },
+        {
+          "label": "Candidate false promotions",
+          "value": "12"
         }
       ]
     },

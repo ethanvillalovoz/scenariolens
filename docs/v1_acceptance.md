@@ -65,6 +65,14 @@ the selector. If the validation cohort yields fewer than 30 selector decisions,
 new untouched shards may be added only after preserving the frozen policy and
 documenting the new-shard boundary.
 
+Validation result: the frozen run evaluated all 993 holdout scenarios and 78
+selector decisions, with zero overlap against the calibration identities and
+8/8 release-integrity checks passing. It completed in 783.537 seconds with
+3.614 GB peak process memory. The context-aware candidate improved agreement
+from 33/78 to 52/78 but produced 12 false promotions, so the evaluation packet
+passes while the candidate remains disabled. See
+[`docs/reports/waymo_selector_holdout_993.md`](reports/waymo_selector_holdout_993.md).
+
 ## Release Gates
 
 ### Functional

@@ -306,6 +306,35 @@ DEFAULT_EVIDENCE_CATALOG: tuple[EvidenceCatalogItem, ...] = (
         ),
     ),
     EvidenceCatalogItem(
+        identifier="selector_holdout_993",
+        title="993-Scenario Frozen Selector Holdout",
+        stage="selector_validation",
+        stage_label="Selector validation",
+        proof_type="frozen-policy holdout",
+        scope=(
+            "78 perturbation-replayed selector decisions from 993 withheld "
+            "scenarios across four local validation shards"
+        ),
+        path="docs/reports/waymo_selector_holdout_993.md",
+        command="scenariolens selector-holdout-study --input ...",
+        data_status="aggregate metrics, policy outcomes, hashes, and release gates",
+        why_it_matters=(
+            "Tests a promising small-cohort selector without retuning and "
+            "rejects adoption when the larger holdout reveals false promotions."
+        ),
+        limitation=(
+            "This is same-shard scenario-window validation, not an independent-"
+            "shard benchmark; the candidate creates 12 false promotions and "
+            "remains disabled."
+        ),
+        metrics=(
+            EvidenceMetric("Holdout scenarios", "993"),
+            EvidenceMetric("Selector decisions", "78"),
+            EvidenceMetric("Evaluation gates", "8/8"),
+            EvidenceMetric("Candidate false promotions", "12"),
+        ),
+    ),
+    EvidenceCatalogItem(
         identifier="terminal_selector_decision_atlas_200",
         title="Terminal Selector Decision Atlas",
         stage="selector_validation",

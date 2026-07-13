@@ -59,6 +59,23 @@ class SelectorHoldoutStudyTest(unittest.TestCase):
             self.assertIn("Release-gate status: PASS", report)
             self.assertIn("same-shard scenario-window validation", report)
             self.assertIn("No selector threshold is tuned here", report)
+            self.assertIn("](stages/", report)
+
+            public_report = root / "public.md"
+            with _patched_pipeline(payloads):
+                generate_selector_holdout_study(
+                    input_paths=(input_path,),
+                    output_dir=root / "public-run",
+                    input_format="scenariolens-json",
+                    scenario_offset=50,
+                    expected_scenarios=2,
+                    top=3,
+                    minimum_selector_decisions=2,
+                    public_report_path=public_report,
+                )
+            public_text = public_report.read_text(encoding="utf-8")
+            self.assertNotIn("](stages/", public_text)
+            self.assertIn("local run bundle", public_text)
 
     def test_holdout_fails_when_development_index_leaks(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
