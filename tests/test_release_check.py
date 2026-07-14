@@ -24,7 +24,7 @@ class ReleaseCheckTest(unittest.TestCase):
             _check("installed_product_run", True),
         ]
         evidence = {
-            "wheel_name": "scenariolens-1.0.0-py3-none-any.whl",
+            "wheel_name": "scenariolens-1.0.1-py3-none-any.whl",
             "wheel_sha256": "a" * 64,
             "rebuild_wheel_sha256": "a" * 64,
             "product_analysis_digest": "b" * 64,

@@ -47,4 +47,4 @@ Use this checklist for `v1.0.0-rc.1` and the final `v1.0.0` promotion.
       `docs/releases/v1.0.0-rc.1.md`.
 - [x] Verify tag CI and the public release assets.
 - [x] Promote the validated code to `v1.0.0` and rerun the clean-package packet.
-- [ ] Publish the annotated `v1.0.0` tag, final wheel, and GitHub Release.
+- [x] Publish the annotated `v1.0.0` tag, final wheel, and GitHub Release.

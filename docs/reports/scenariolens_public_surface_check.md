@@ -71,7 +71,7 @@ It is intentionally scoped to repository health. It is not a Waymo benchmark cla
 - Status: pass
 - Files: `.gitignore`, `docs/data_provenance.md`
 - Summary: No raw Waymo or TFRecord-like files are tracked.
-- Tracked files inspected: 288
+- Tracked files inspected: 289
 - Tracked raw Waymo/TFRecord-like files: 0
 
 ### CI surface
