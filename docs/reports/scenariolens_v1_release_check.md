@@ -10,10 +10,10 @@ It uses checked-in synthetic fixtures for packaging and failure-path validation.
 
 - ScenarioLens version: `1.0.1`
 - Checks passed: 15 / 15
-- Duration: 4.131 s
-- Release-check digest: `239e6c7fbcdedaee3d185a8a4f5ff2e4082028a9f5debb9e865c0bc8670bbdea`
+- Duration: 4.064 s
+- Release-check digest: `2e5c503849cae46c76cbb9670c0f8acba63b3210b2382bccebe4e9dd9305c1dd`
 - Wheel: `scenariolens-1.0.1-py3-none-any.whl`
-- Wheel SHA-256: `7d6c99b7605176e7f5f8ae524addf5a5f30f3a9649bd46d9c81362a676b4afff`
+- Wheel SHA-256: `ec827e15060575bd8cbdad729159602bef1571240fd7bca7cf185d952bea6812`
 - Product-run digest: `063ddef1268c616a3e14ec6c62f81abcf61653c3f9f938fae4e2bfe374596a99`
 - Resume digest: `4676bca8d60bf5f1377ee196b5ad3ff164c9c9668e0f6a353fced9f8dc124171`
 
@@ -42,12 +42,12 @@ It uses checked-in synthetic fixtures for packaging and failure-path validation.
 ### Wheel build
 
 - Result: pass
-- Command output: `... dependencies: finished with status 'done' / Getting requirements to build wheel: started / Getting requirements to build wheel: finished with status 'done' / Preparing metadata (pyproject.toml): started / Preparing metadata (pyproject.toml): finished with status 'done' / Building wheels for collected packages: scenariolens / Building wheel for scenariolens (pyproject.toml): started / Building wheel for scenariolens (pyproject.toml): finished with status 'done' / Created wheel for scenariolens: filename=scenariolens-1.0.1-py3-none-any.whl size=384717 sha256=7d6c99b7605176e7f5f8ae524addf5a5f30f3a9649bd46d9c81362a676b4afff / Stored in directory: <system-temp>/pip-ephem-wheel-cache-a6zwssas/wheels/72/c5/d1/3648a127c49d116380ae790a07196c84b2abd9685f88625594 / Successfully built scenariolens`
+- Command output: `... dependencies: finished with status 'done' / Getting requirements to build wheel: started / Getting requirements to build wheel: finished with status 'done' / Preparing metadata (pyproject.toml): started / Preparing metadata (pyproject.toml): finished with status 'done' / Building wheels for collected packages: scenariolens / Building wheel for scenariolens (pyproject.toml): started / Building wheel for scenariolens (pyproject.toml): finished with status 'done' / Created wheel for scenariolens: filename=scenariolens-1.0.1-py3-none-any.whl size=384727 sha256=ec827e15060575bd8cbdad729159602bef1571240fd7bca7cf185d952bea6812 / Stored in directory: <system-temp>/pip-ephem-wheel-cache-j96cwain/wheels/72/c5/d1/3648a127c49d116380ae790a07196c84b2abd9685f88625594 / Successfully built scenariolens`
 
 ### Reproducible wheel rebuild
 
 - Result: pass
-- Command output: `... dependencies: finished with status 'done' / Getting requirements to build wheel: started / Getting requirements to build wheel: finished with status 'done' / Preparing metadata (pyproject.toml): started / Preparing metadata (pyproject.toml): finished with status 'done' / Building wheels for collected packages: scenariolens / Building wheel for scenariolens (pyproject.toml): started / Building wheel for scenariolens (pyproject.toml): finished with status 'done' / Created wheel for scenariolens: filename=scenariolens-1.0.1-py3-none-any.whl size=384717 sha256=7d6c99b7605176e7f5f8ae524addf5a5f30f3a9649bd46d9c81362a676b4afff / Stored in directory: <system-temp>/pip-ephem-wheel-cache-y6ozdqk3/wheels/72/c5/d1/3648a127c49d116380ae790a07196c84b2abd9685f88625594 / Successfully built scenariolens`
+- Command output: `... dependencies: finished with status 'done' / Getting requirements to build wheel: started / Getting requirements to build wheel: finished with status 'done' / Preparing metadata (pyproject.toml): started / Preparing metadata (pyproject.toml): finished with status 'done' / Building wheels for collected packages: scenariolens / Building wheel for scenariolens (pyproject.toml): started / Building wheel for scenariolens (pyproject.toml): finished with status 'done' / Created wheel for scenariolens: filename=scenariolens-1.0.1-py3-none-any.whl size=384727 sha256=ec827e15060575bd8cbdad729159602bef1571240fd7bca7cf185d952bea6812 / Stored in directory: <system-temp>/pip-ephem-wheel-cache-b2lp2pdm/wheels/72/c5/d1/3648a127c49d116380ae790a07196c84b2abd9685f88625594 / Successfully built scenariolens`
 
 ### Clean wheel installation
 
@@ -73,7 +73,7 @@ It uses checked-in synthetic fixtures for packaging and failure-path validation.
 ### Installed one-command product run
 
 - Result: pass
-- Command output: `Wrote ScenarioLens run manifest to <temp>/product-run/manifest.json / Wrote ScenarioLens run report to <temp>/product-run/report.md / ScenarioLens run ready: 1 source(s), 11 scenario(s), 3 stage(s), digest 063ddef1268c, peak memory 35.77 MB.`
+- Command output: `Wrote ScenarioLens run manifest to <temp>/product-run/manifest.json / Wrote ScenarioLens run report to <temp>/product-run/report.md / ScenarioLens run ready: 1 source(s), 11 scenario(s), 3 stage(s), digest 063ddef1268c, peak memory 35.50 MB.`
 
 ### Installed run-bundle contract
 

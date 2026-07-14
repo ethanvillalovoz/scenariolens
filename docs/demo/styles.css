@@ -1340,6 +1340,7 @@ a {
   .topnav {
     width: 100%;
     order: 3;
+    flex-wrap: wrap;
     overflow-x: visible;
     margin-left: 0;
     position: relative;
@@ -1355,6 +1356,7 @@ a {
 
   .report-menu-panel {
     width: auto;
+    top: calc(100% + 6px);
     right: 0;
     left: 0;
   }
