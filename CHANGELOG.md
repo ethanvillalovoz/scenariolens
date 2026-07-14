@@ -4,6 +4,23 @@ All notable changes to ScenarioLens are documented here.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-07-13
+
+### Changed
+
+- Promoted the validated `v1.0.0-rc.1` code to the first stable ScenarioLens
+  release with no analytical behavior changes.
+- Published final package metadata, release notes, and a fresh clean-package
+  validation packet while retaining the exact RC version in full-corpus run
+  provenance.
+
+### Verified
+
+- The RC merge commit passed main-branch and annotated-tag GitHub Actions,
+  including unit, CLI integration, clean-package, and browser workflows.
+- The RC release wheel was uploaded with the same SHA-256 digest produced by
+  the local reproducible-build gate.
+
 ## [1.0.0-rc.1] - 2026-07-13
 
 ### Added

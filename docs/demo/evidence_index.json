@@ -612,7 +612,7 @@
       "link_path": "scenariolens_v1_release_check.md",
       "present": true,
       "required": true,
-      "size_bytes": 8630,
+      "size_bytes": 8611,
       "command": "scenariolens release-check --repo-root .",
       "data_status": "CI-safe synthetic fixtures and package metadata only",
       "why_it_matters": "Proves that the shipped artifact works outside the source checkout and that its critical recovery and failure contracts are executable.",

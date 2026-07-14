@@ -13,7 +13,7 @@ prediction baselines fail.
 - **Frozen holdout:** [993 withheld scenarios and 78 selector decisions](docs/reports/waymo_selector_holdout_993.md)
 - **Case study:** [Finding baseline failures in Waymo Motion scenarios](docs/case_studies/waymo_baseline_failures.md)
 - **v1 contract:** [definition of done and release gates](docs/v1_acceptance.md)
-- **Release candidate:** [v1.0.0-rc.1 notes](docs/releases/v1.0.0-rc.1.md)
+- **Latest release:** [v1.0.0 notes](docs/releases/v1.0.0.md)
 
 ScenarioLens is designed as a Waymo-targeted portfolio artifact, but the shape
 is an engineering product: a reproducible scenario-triage pipeline, real-data
