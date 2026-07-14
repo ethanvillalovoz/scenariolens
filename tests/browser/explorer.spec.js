@@ -19,6 +19,16 @@ async function expectNoHorizontalOverflow(page) {
   expect(dimensions.body).toBe(dimensions.viewport);
 }
 
+async function expectElementWithinViewport(page, selector) {
+  const element = page.locator(selector);
+  const box = await element.boundingBox();
+  const viewport = page.viewportSize();
+  expect(box).not.toBeNull();
+  expect(viewport).not.toBeNull();
+  expect(box.x).toBeGreaterThanOrEqual(0);
+  expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
+}
+
 async function expectSelectedTrajectory(page, scenarioId) {
   const image = page.locator("#scenarioImage");
   await expect(image).toHaveAttribute("src", new RegExp(`${scenarioId}\\.svg$`));
@@ -72,6 +82,13 @@ test("public Explorer remains contained on a mobile viewport", async ({ page }) 
   await expect(page.locator("#runStatus")).toHaveText("Run ready");
   await expect(page.locator("#heroPeakMemory")).toHaveText("3.64 GB");
   await expect(page.locator(".stage-card")).toHaveCount(3);
+  await page.getByText("Reports", { exact: true }).click();
+  await expect(page.locator("#reportLinks a")).toHaveCount(8);
+  await expectElementWithinViewport(page, "#reportLinks");
+  await expectNoHorizontalOverflow(page);
+
+  await page.setViewportSize({ width: 320, height: 760 });
+  await expectElementWithinViewport(page, "#reportLinks");
   await expectNoHorizontalOverflow(page);
   expect(errors).toEqual([]);
 });

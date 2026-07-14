@@ -1340,16 +1340,22 @@ a {
   .topnav {
     width: 100%;
     order: 3;
-    overflow-x: auto;
+    overflow-x: visible;
     margin-left: 0;
+    position: relative;
   }
 
   .repo-link {
     display: none;
   }
 
+  .report-menu {
+    position: static;
+  }
+
   .report-menu-panel {
-    right: auto;
+    width: auto;
+    right: 0;
     left: 0;
   }
 
