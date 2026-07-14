@@ -8,13 +8,13 @@ It uses checked-in synthetic fixtures for packaging and failure-path validation.
 
 ## Summary
 
-- ScenarioLens version: `1.0.0rc1`
+- ScenarioLens version: `1.0.0`
 - Checks passed: 15 / 15
-- Duration: 4.252 s
-- Release-check digest: `944eeb24776141e247eaf6dfea047cfe44e665bb50408103a1d5106d168e330c`
-- Wheel: `scenariolens-1.0.0rc1-py3-none-any.whl`
-- Wheel SHA-256: `7b7a845bb8570618beaa08b9e7ff33269f522e276e155e7a825b8a20f8830674`
-- Product-run digest: `f0cd58523939bf45a883b7f3bcb855fee2ebeb4928623ded28266e4a1db995f1`
+- Duration: 4.110 s
+- Release-check digest: `517b0e830a58871bda3db34bd064d36c381947cfc20f692ba3fc07c4b7d8c9a6`
+- Wheel: `scenariolens-1.0.0-py3-none-any.whl`
+- Wheel SHA-256: `b09911f6aab3f310fa505931d52f924c9cfe528a3c4eec453130311397067e2c`
+- Product-run digest: `b7d46bc602b8b7df7c31a61c8519be790ae22e4722e0f5620072372d87f71f6f`
 - Resume digest: `4676bca8d60bf5f1377ee196b5ad3ff164c9c9668e0f6a353fced9f8dc124171`
 
 ## Checks
@@ -24,7 +24,7 @@ It uses checked-in synthetic fixtures for packaging and failure-path validation.
 | Wheel build | pass | exit 0; 1 wheel(s) | exit 0; exactly 1 wheel |
 | Reproducible wheel rebuild | pass | exit 0; name match True; hash match True | exit 0; wheel names and SHA-256 hashes match |
 | Clean wheel installation | pass | venv exit 0; install exit 0 | both exit 0; console script present |
-| Installed import provenance | pass | version 1.0.0rc1; outside checkout True | version 1.0.0rc1; outside checkout true |
+| Installed import provenance | pass | version 1.0.0; outside checkout True | version 1.0.0; outside checkout true |
 | Installed console entrypoint | pass | exit 0; command list present True | exit 0; ScenarioLens commands listed |
 | Installed synthetic fixture export | pass | exit 0; file present True | exit 0; fixture present |
 | Installed one-command product run | pass | exit 0; ready True; scenarios 11 | exit 0; ready true; 11 scenarios; 3 stages |
@@ -42,23 +42,23 @@ It uses checked-in synthetic fixtures for packaging and failure-path validation.
 ### Wheel build
 
 - Result: pass
-- Command output: `...pendencies: finished with status 'done' / Getting requirements to build wheel: started / Getting requirements to build wheel: finished with status 'done' / Preparing metadata (pyproject.toml): started / Preparing metadata (pyproject.toml): finished with status 'done' / Building wheels for collected packages: scenariolens / Building wheel for scenariolens (pyproject.toml): started / Building wheel for scenariolens (pyproject.toml): finished with status 'done' / Created wheel for scenariolens: filename=scenariolens-1.0.0rc1-py3-none-any.whl size=384765 sha256=7b7a845bb8570618beaa08b9e7ff33269f522e276e155e7a825b8a20f8830674 / Stored in directory: <system-temp>/pip-ephem-wheel-cache-2tfaffjs/wheels/72/c5/d1/3648a127c49d116380ae790a07196c84b2abd9685f88625594 / Successfully built scenariolens`
+- Command output: `... dependencies: finished with status 'done' / Getting requirements to build wheel: started / Getting requirements to build wheel: finished with status 'done' / Preparing metadata (pyproject.toml): started / Preparing metadata (pyproject.toml): finished with status 'done' / Building wheels for collected packages: scenariolens / Building wheel for scenariolens (pyproject.toml): started / Building wheel for scenariolens (pyproject.toml): finished with status 'done' / Created wheel for scenariolens: filename=scenariolens-1.0.0-py3-none-any.whl size=384699 sha256=b09911f6aab3f310fa505931d52f924c9cfe528a3c4eec453130311397067e2c / Stored in directory: <system-temp>/pip-ephem-wheel-cache-zfw0o86m/wheels/72/c5/d1/3648a127c49d116380ae790a07196c84b2abd9685f88625594 / Successfully built scenariolens`
 
 ### Reproducible wheel rebuild
 
 - Result: pass
-- Command output: `...pendencies: finished with status 'done' / Getting requirements to build wheel: started / Getting requirements to build wheel: finished with status 'done' / Preparing metadata (pyproject.toml): started / Preparing metadata (pyproject.toml): finished with status 'done' / Building wheels for collected packages: scenariolens / Building wheel for scenariolens (pyproject.toml): started / Building wheel for scenariolens (pyproject.toml): finished with status 'done' / Created wheel for scenariolens: filename=scenariolens-1.0.0rc1-py3-none-any.whl size=384765 sha256=7b7a845bb8570618beaa08b9e7ff33269f522e276e155e7a825b8a20f8830674 / Stored in directory: <system-temp>/pip-ephem-wheel-cache-d_7o9jnx/wheels/72/c5/d1/3648a127c49d116380ae790a07196c84b2abd9685f88625594 / Successfully built scenariolens`
+- Command output: `... dependencies: finished with status 'done' / Getting requirements to build wheel: started / Getting requirements to build wheel: finished with status 'done' / Preparing metadata (pyproject.toml): started / Preparing metadata (pyproject.toml): finished with status 'done' / Building wheels for collected packages: scenariolens / Building wheel for scenariolens (pyproject.toml): started / Building wheel for scenariolens (pyproject.toml): finished with status 'done' / Created wheel for scenariolens: filename=scenariolens-1.0.0-py3-none-any.whl size=384699 sha256=b09911f6aab3f310fa505931d52f924c9cfe528a3c4eec453130311397067e2c / Stored in directory: <system-temp>/pip-ephem-wheel-cache-7_2orkmg/wheels/72/c5/d1/3648a127c49d116380ae790a07196c84b2abd9685f88625594 / Successfully built scenariolens`
 
 ### Clean wheel installation
 
 - Result: pass
 - No command output.
-- Command output: `Processing <repo>/data/processed/scenariolens_v1_release_check_rc1/dist/scenariolens-1.0.0rc1-py3-none-any.whl / Installing collected packages: scenariolens / Successfully installed scenariolens-1.0.0rc1`
+- Command output: `Processing <repo>/data/processed/scenariolens_v1_release_check_final/dist/scenariolens-1.0.0-py3-none-any.whl / Installing collected packages: scenariolens / Successfully installed scenariolens-1.0.0`
 
 ### Installed import provenance
 
 - Result: pass
-- Command output: `{"version": "1.0.0rc1", "path": "<temp>/venv/lib/python3.14/site-packages/scenariolens/__init__.py"}`
+- Command output: `{"version": "1.0.0", "path": "<temp>/venv/lib/python3.14/site-packages/scenariolens/__init__.py"}`
 
 ### Installed console entrypoint
 
@@ -73,7 +73,7 @@ It uses checked-in synthetic fixtures for packaging and failure-path validation.
 ### Installed one-command product run
 
 - Result: pass
-- Command output: `Wrote ScenarioLens run manifest to <temp>/product-run/manifest.json / Wrote ScenarioLens run report to <temp>/product-run/report.md / ScenarioLens run ready: 1 source(s), 11 scenario(s), 3 stage(s), digest f0cd58523939, peak memory 35.64 MB.`
+- Command output: `Wrote ScenarioLens run manifest to <temp>/product-run/manifest.json / Wrote ScenarioLens run report to <temp>/product-run/report.md / ScenarioLens run ready: 1 source(s), 11 scenario(s), 3 stage(s), digest b7d46bc602b8, peak memory 35.77 MB.`
 
 ### Installed run-bundle contract
 

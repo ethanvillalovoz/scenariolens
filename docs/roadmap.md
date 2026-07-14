@@ -541,8 +541,10 @@ route, and the nine-stage holdout now supports fingerprinted, hash-verified
 interruption recovery through `state.json` and `--resume`. The consolidated
 `release-check` gate now rebuilds a byte-identical wheel, installs it in an
 isolated environment, executes outside the checkout, and passes all 15 product,
-failure-path, and resume checks. The remaining v1 work is the release-candidate
-packet, exact-commit CI verification, and final release.
+failure-path, and resume checks. The exact release candidate passed main and
+tag CI, its uploaded wheel matched the locally verified SHA-256 digest, and the
+final `v1.0.0` promotion passed a fresh 15/15 clean-package packet. Milestone 6
+is complete; future work belongs to the post-v1 stretch goals below.
 
 ## Stretch Goals
 

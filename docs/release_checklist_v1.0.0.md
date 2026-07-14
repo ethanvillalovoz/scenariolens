@@ -7,7 +7,7 @@ Use this checklist for `v1.0.0-rc.1` and the final `v1.0.0` promotion.
 - [x] `pyproject.toml`, `scenariolens.__version__`, `CITATION.cff`, changelog,
       and release notes agree on the release version.
 - [x] Two clean builds produce byte-identical wheels.
-- [ ] The wheel installs without project dependencies into Python 3.11 and the
+- [x] The wheel installs without project dependencies into Python 3.11 and the
       target laptop runtime.
 - [x] The installed `scenariolens` entrypoint runs outside the checkout.
 
@@ -35,16 +35,16 @@ Use this checklist for `v1.0.0-rc.1` and the final `v1.0.0` promotion.
 - [x] The evidence index and public-surface check are ready with no missing
       required artifacts.
 - [x] Unit, compile, static JSON/JavaScript, and Playwright checks pass.
-- [ ] The portfolio route is synced from `docs/demo/` and verified on desktop
+- [x] The portfolio route is synced from `docs/demo/` and verified on desktop
       and mobile without relevant console errors or horizontal overflow.
 - [x] README, release notes, reports, and local demo links resolve.
 
 ## Publish
 
-- [ ] The exact release-candidate commit passes GitHub Actions on Python 3.11.
-- [ ] Merge the reviewed release candidate to `main`.
-- [ ] Create annotated tag `v1.0.0-rc.1` and a GitHub prerelease from
+- [x] The exact release-candidate commit passes GitHub Actions on Python 3.11.
+- [x] Merge the reviewed release candidate to `main`.
+- [x] Create annotated tag `v1.0.0-rc.1` and a GitHub prerelease from
       `docs/releases/v1.0.0-rc.1.md`.
-- [ ] Verify tag CI and the public release assets.
-- [ ] Promote the validated code to `v1.0.0`, rerun the clean-package packet,
-      and publish the final GitHub Release.
+- [x] Verify tag CI and the public release assets.
+- [x] Promote the validated code to `v1.0.0` and rerun the clean-package packet.
+- [ ] Publish the annotated `v1.0.0` tag, final wheel, and GitHub Release.
