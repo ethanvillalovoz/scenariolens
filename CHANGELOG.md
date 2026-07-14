@@ -4,6 +4,17 @@ All notable changes to ScenarioLens are documented here.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-07-13
+
+### Fixed
+
+- Keep the open Reports menu inside 390 px and 320 px mobile viewports by
+  anchoring the panel to the full navigation row and wrapping that row when
+  platform font metrics exceed the available width.
+- Extend the Playwright mobile workflow to open the report menu and assert its
+  complete bounding box is visible, covering positioned overflow that document
+  scroll-width checks do not detect.
+
 ## [1.0.0] - 2026-07-13
 
 ### Changed
