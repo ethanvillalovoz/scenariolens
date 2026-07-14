@@ -71,6 +71,30 @@ DEFAULT_EVIDENCE_CATALOG: tuple[EvidenceCatalogItem, ...] = (
         ),
     ),
     EvidenceCatalogItem(
+        identifier="explorer_run_contract",
+        title="Explorer Run Contract",
+        stage="product_surface",
+        stage_label="Product surface",
+        proof_type="versioned product payload",
+        scope="Aggregate metadata from the reproducible 1,193-scenario run",
+        path="docs/demo/run.json",
+        command="scenariolens run --input <path> --output runs/<name>",
+        data_status="aggregate run metrics and portable report links only",
+        why_it_matters=(
+            "Connects the visible Explorer to the same provenance, stage "
+            "metrics, digest, and resource evidence emitted by the CLI."
+        ),
+        limitation=(
+            "The public payload joins aggregate real-run evidence to separately "
+            "checked-in fixture trajectories; it does not publish raw records."
+        ),
+        metrics=(
+            EvidenceMetric("Analyzed scenarios", "1,193"),
+            EvidenceMetric("Analysis stages", "3"),
+            EvidenceMetric("Payload format", "scenariolens.explorer_run.v1"),
+        ),
+    ),
+    EvidenceCatalogItem(
         identifier="data_provenance",
         title="Data Provenance Boundary",
         stage="data_boundary",
@@ -282,6 +306,35 @@ DEFAULT_EVIDENCE_CATALOG: tuple[EvidenceCatalogItem, ...] = (
         ),
     ),
     EvidenceCatalogItem(
+        identifier="selector_holdout_993",
+        title="993-Scenario Frozen Selector Holdout",
+        stage="selector_validation",
+        stage_label="Selector validation",
+        proof_type="frozen-policy holdout",
+        scope=(
+            "78 perturbation-replayed selector decisions from 993 withheld "
+            "scenarios across four local validation shards"
+        ),
+        path="docs/reports/waymo_selector_holdout_993.md",
+        command="scenariolens selector-holdout-study --input ...",
+        data_status="aggregate metrics, policy outcomes, hashes, and release gates",
+        why_it_matters=(
+            "Tests a promising small-cohort selector without retuning and "
+            "rejects adoption when the larger holdout reveals false promotions."
+        ),
+        limitation=(
+            "This is same-shard scenario-window validation, not an independent-"
+            "shard benchmark; the candidate creates 12 false promotions and "
+            "remains disabled."
+        ),
+        metrics=(
+            EvidenceMetric("Holdout scenarios", "993"),
+            EvidenceMetric("Selector decisions", "78"),
+            EvidenceMetric("Evaluation gates", "8/8"),
+            EvidenceMetric("Candidate false promotions", "12"),
+        ),
+    ),
+    EvidenceCatalogItem(
         identifier="terminal_selector_decision_atlas_200",
         title="Terminal Selector Decision Atlas",
         stage="selector_validation",
@@ -319,14 +372,69 @@ DEFAULT_EVIDENCE_CATALOG: tuple[EvidenceCatalogItem, ...] = (
         metrics=(EvidenceMetric("Cards", "7"),),
     ),
     EvidenceCatalogItem(
+        identifier="v1_run_validation",
+        title="Full-Corpus Run Reproducibility",
+        stage="release_readiness",
+        stage_label="Release readiness",
+        proof_type="real-data execution validation",
+        scope="Two complete analysis runs over 1,193 scenarios from four local validation shards",
+        path="docs/reports/scenariolens_v1_run_validation.md",
+        command="scenariolens run; scenariolens run-verify ...",
+        data_status="aggregate digest, timing, memory, and readiness checks only",
+        why_it_matters=(
+            "Proves the one-command product path completes deterministically on "
+            "the full local corpus within the declared laptop budgets."
+        ),
+        limitation=(
+            "The local corpus is not a Waymo benchmark and raw records remain "
+            "outside git."
+        ),
+        metrics=(
+            EvidenceMetric("Scenarios per run", "1,193"),
+            EvidenceMetric("Reproducibility checks", "7/7"),
+            EvidenceMetric("Maximum duration", "601.447 s"),
+            EvidenceMetric("Maximum peak memory", "3.642 GB"),
+        ),
+    ),
+    EvidenceCatalogItem(
+        identifier="v1_release_check",
+        title="V1 Clean-Package Release Check",
+        stage="release_readiness",
+        stage_label="Release readiness",
+        proof_type="clean-package validation",
+        scope=(
+            "Reproducible wheel build, isolated install, installed product, "
+            "failure diagnostics, and interruption/resume probes"
+        ),
+        path="docs/reports/scenariolens_v1_release_check.md",
+        command="scenariolens release-check --repo-root .",
+        data_status="CI-safe synthetic fixtures and package metadata only",
+        why_it_matters=(
+            "Proves that the shipped artifact works outside the source checkout "
+            "and that its critical recovery and failure contracts are executable."
+        ),
+        limitation=(
+            "The installed probes use public synthetic fixtures and complement, "
+            "rather than replace, the separate real-data reports."
+        ),
+        metrics=(
+            EvidenceMetric("Release checks", "15/15"),
+            EvidenceMetric("Wheel SHA-256 match", "yes"),
+            EvidenceMetric("Resume digest match", "yes"),
+        ),
+    ),
+    EvidenceCatalogItem(
         identifier="ci_workflow",
         title="CI Validation Workflow",
         stage="release_readiness",
         stage_label="Release readiness",
         proof_type="automation",
-        scope="Unit tests plus CLI smoke workflows on every push",
+        scope="Unit tests plus deterministic run-bundle integration on every push",
         path=".github/workflows/ci.yml",
-        command="python -m unittest discover; CLI smoke commands",
+        command=(
+            "python -m unittest discover; scenariolens run; "
+            "scenariolens run-verify; scenariolens release-check"
+        ),
         data_status="CI-safe fixtures only",
         why_it_matters=(
             "Shows the framework is maintained as software, not just a set of "

@@ -1,4 +1,5 @@
 import unittest
+from math import hypot
 
 from scenariolens.metrics import (
     closing_time_to_collision,
@@ -50,6 +51,35 @@ class MetricsTest(unittest.TestCase):
             min_path_distance(scenarios["synthetic_unprotected_left_turn"]),
             min_pairwise_distance(scenarios["synthetic_unprotected_left_turn"]),
         )
+
+    def test_path_distance_spatial_index_matches_exhaustive_search(self) -> None:
+        left = _track(
+            "left",
+            "vehicle",
+            tuple(
+                (float(index), index * 0.7, (index % 9) * 1.3, 0.0, 0.0)
+                for index in range(121)
+            ),
+        )
+        right = _track(
+            "right",
+            "cyclist",
+            tuple(
+                (float(index), 80.0 - index * 0.41, (index % 7) * 1.1, 0.0, 0.0)
+                for index in range(113)
+            ),
+        )
+        expected = min(
+            hypot(left_state.x - right_state.x, left_state.y - right_state.y)
+            for left_state in left.states
+            for right_state in right.states
+        )
+
+        actual = min_path_distance(
+            Scenario(scenario_id="indexed_path_distance", tracks=(left, right))
+        )
+
+        self.assertEqual(actual, expected)
 
     def test_max_deceleration_detects_hard_braking(self) -> None:
         scenarios = {scenario.scenario_id: scenario for scenario in synthetic_scenarios()}

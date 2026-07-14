@@ -93,6 +93,7 @@ def load_failure_study_input(
     source: str | Path,
     input_format: str,
     max_scenarios: int | None,
+    scenario_offset: int = 0,
 ) -> tuple[bool, dict[str, object] | None, tuple[Scenario, ...]]:
     """Load scenarios for failure-study workflows."""
 
@@ -100,6 +101,7 @@ def load_failure_study_input(
         source=Path(source),
         input_format=input_format,
         max_scenarios=max_scenarios,
+        scenario_offset=scenario_offset,
     )
 
 
@@ -290,17 +292,24 @@ def _load_input_scenarios(
     source: Path,
     input_format: str,
     max_scenarios: int | None,
+    scenario_offset: int = 0,
 ) -> tuple[bool, dict[str, object] | None, tuple[Scenario, ...]]:
+    if scenario_offset < 0:
+        raise ValueError("scenario-offset must be non-negative.")
     if input_format == "scenariolens-json":
         scenarios = load_scenarios(source)
-        if max_scenarios is not None:
-            scenarios = scenarios[:max_scenarios]
+        end = None if max_scenarios is None else scenario_offset + max_scenarios
+        scenarios = scenarios[scenario_offset:end]
         return True, None, scenarios
 
     preflight = inspect_waymo_motion_slice(source)
     if not waymo_motion_slice_ready(preflight):
         return False, asdict(preflight), ()
-    return True, asdict(preflight), load_waymo_motion(source, max_scenarios=max_scenarios)
+    return True, asdict(preflight), load_waymo_motion(
+        source,
+        max_scenarios=max_scenarios,
+        scenario_offset=scenario_offset,
+    )
 
 
 def _aggregate(scores: tuple[ScenarioScore, ...]) -> dict[str, object]:

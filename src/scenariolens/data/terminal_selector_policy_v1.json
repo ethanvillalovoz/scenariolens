@@ -1,0 +1,50 @@
+{
+  "format": "scenariolens.lane_continuation_terminal_neighborhood_selector_calibration.v1",
+  "ready": true,
+  "frozen_at_commit": "ba0b37e",
+  "source_report": "docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_calibration_expanded.md",
+  "source_scope": {
+    "cohort": "development",
+    "scenario_count": 200,
+    "source_count": 4,
+    "replay_case_count": 6
+  },
+  "current_policy": {
+    "max_alternate_distance_m": 5.0,
+    "min_heading_alignment": 0.95,
+    "min_route_extension_m": 50.0,
+    "require_chain_extension": true
+  },
+  "recommended_policy": {
+    "max_alternate_distance_m": 5.0,
+    "min_heading_alignment": 0.95,
+    "min_route_extension_m": 40.0,
+    "require_chain_extension": true,
+    "false_promote_count": 0,
+    "false_hold_count": 0
+  },
+  "current_policy_result": {
+    "false_promote_count": 0,
+    "false_hold_count": 2
+  },
+  "aggregate": {
+    "case_count": 6,
+    "ready_case_count": 6,
+    "policy_count": 30,
+    "replay_gate_accepted_count": 3,
+    "replay_gate_held_count": 3,
+    "current_false_promote_count": 0,
+    "current_false_hold_count": 2,
+    "recommended_false_promote_count": 0,
+    "recommended_false_hold_count": 0
+  },
+  "cases": [
+    {"scenario_id": "2f366a31ab03f8b", "track_id": "1061"},
+    {"scenario_id": "74a5b3325a534a87", "track_id": "3178"},
+    {"scenario_id": "fe4a6425278fbd5b", "track_id": "816"},
+    {"scenario_id": "2f035a284480e981", "track_id": "732"},
+    {"scenario_id": "d30e6448f14e4c75", "track_id": "150"},
+    {"scenario_id": "d508bc55d1510865", "track_id": "2283"}
+  ],
+  "scope_note": "Public-safe frozen selector policy artifact. It contains thresholds and development-case identities only; no trajectories, map polylines, or raw Waymo records are included."
+}

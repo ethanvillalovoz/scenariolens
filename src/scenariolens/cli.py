@@ -128,16 +128,41 @@ from scenariolens.lane_continuation_terminal_neighborhood_casebook import (
 from scenariolens.lane_continuation_terminal_neighborhood_selector_decision_atlas import (
     generate_lane_continuation_terminal_neighborhood_selector_decision_atlas,
 )
+from scenariolens.local_server import (
+    DEFAULT_EXPLORER_HOST,
+    DEFAULT_EXPLORER_PORT,
+    serve_explorer,
+)
 from scenariolens.map_match_audit import (
     DEFAULT_AUDIT_THRESHOLDS_M,
     generate_map_match_audit,
 )
 from scenariolens.portfolio import generate_portfolio_report
 from scenariolens.public_surface_check import generate_public_surface_check
+from scenariolens.release_check import (
+    DEFAULT_RELEASE_CHECK_TIMEOUT_SECONDS,
+    generate_release_check,
+)
 from scenariolens.report import json_report, markdown_report, ranked_scores
 from scenariolens.replay_candidates import generate_replay_candidate_plan
 from scenariolens.replay_prototype import generate_replay_prototype
 from scenariolens.route_intent_audit import generate_route_intent_audit
+from scenariolens.run_bundle import (
+    RUN_BUNDLE_INPUT_FORMATS,
+    generate_run_bundle,
+)
+from scenariolens.run_validation import (
+    DEFAULT_MAX_DURATION_SECONDS,
+    DEFAULT_MAX_PEAK_MEMORY_GB,
+    generate_run_validation,
+)
+from scenariolens.selector_holdout import (
+    DEFAULT_EXPECTED_SCENARIOS as DEFAULT_SELECTOR_HOLDOUT_SCENARIOS,
+    DEFAULT_SCENARIO_OFFSET as DEFAULT_SELECTOR_HOLDOUT_OFFSET,
+    DEFAULT_TOP as DEFAULT_SELECTOR_HOLDOUT_TOP,
+    SELECTOR_HOLDOUT_INPUT_FORMATS,
+    generate_selector_holdout_study,
+)
 from scenariolens.samples import synthetic_scenarios
 from scenariolens.schema import Scenario
 from scenariolens.slice_validation import validate_waymo_motion_slice
@@ -149,8 +174,153 @@ from scenariolens.waymo_readiness import (
 from scenariolens.waymo_shards import generate_waymo_motion_shard_plan
 
 
-def demo() -> int:
+def demo(
+    open_explorer: bool = False,
+    output_dir: str = "runs/demo",
+    host: str = DEFAULT_EXPLORER_HOST,
+    port: int = DEFAULT_EXPLORER_PORT,
+    launch_browser: bool = True,
+) -> int:
+    if open_explorer:
+        synthetic_path = Path(output_dir) / "inputs" / "synthetic.json"
+        save_scenarios(synthetic_path, synthetic_scenarios())
+        return run_bundle_command(
+            input_paths=[str(synthetic_path)],
+            output_dir=output_dir,
+            max_scenarios=11,
+            top=11,
+            input_format="scenariolens-json",
+            hash_inputs=True,
+            open_explorer=True,
+            host=host,
+            port=port,
+            launch_browser=launch_browser,
+        )
     print(json_report(synthetic_scenarios()))
+    return 0
+
+
+def run_bundle_command(
+    input_paths: list[str],
+    output_dir: str,
+    max_scenarios: int | None,
+    top: int,
+    input_format: str,
+    hash_inputs: bool,
+    open_explorer: bool = False,
+    host: str = DEFAULT_EXPLORER_HOST,
+    port: int = DEFAULT_EXPLORER_PORT,
+    launch_browser: bool = True,
+) -> int:
+    try:
+        result = generate_run_bundle(
+            input_paths=tuple(input_paths),
+            output_dir=output_dir,
+            max_scenarios=max_scenarios,
+            top=top,
+            input_format=input_format,
+            hash_inputs=hash_inputs,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError, OSError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote ScenarioLens run manifest to {result.manifest_path}")
+    print(f"Wrote ScenarioLens run report to {result.report_path}")
+    if not result.ready:
+        print("ScenarioLens run is not ready. Inspect the stage reports.")
+        return 2
+    print(
+        f"ScenarioLens run ready: {result.source_count} source(s), "
+        f"{result.scenario_count} scenario(s), {result.stage_count} stage(s), "
+        f"digest {result.analysis_digest[:12]}, "
+        f"peak memory {_format_bytes(result.peak_rss_bytes or 0)}."
+    )
+    if open_explorer:
+        try:
+            serve_explorer(
+                run_dir=result.output_dir,
+                host=host,
+                port=port,
+                launch_browser=launch_browser,
+            )
+        except (RuntimeError, ValueError, FileNotFoundError) as exc:
+            print(str(exc), file=sys.stderr)
+            return 2
+    return 0
+
+
+def run_validation_command(
+    run_manifests: list[str],
+    output_dir: str,
+    max_duration_seconds: float,
+    max_peak_memory_gb: float,
+    public_report: str | None,
+) -> int:
+    try:
+        result = generate_run_validation(
+            run_manifest_paths=tuple(run_manifests),
+            output_dir=output_dir,
+            max_duration_seconds=max_duration_seconds,
+            max_peak_memory_gb=max_peak_memory_gb,
+            public_report_path=public_report,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote run-validation manifest to {result.manifest_path}")
+    print(f"Wrote run-validation report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if not result.ready:
+        print(
+            f"Run validation failed: {result.passed_count}/{result.check_count} "
+            "checks passed."
+        )
+        return 2
+    print(
+        f"Run validation ready: {result.run_count} run(s), "
+        f"{result.passed_count}/{result.check_count} checks passed, "
+        f"digest {str(result.analysis_digest)[:12]}."
+    )
+    return 0
+
+
+def release_check_command(
+    repo_root: str,
+    output_dir: str,
+    public_report: str | None,
+    timeout_seconds: float,
+) -> int:
+    try:
+        result = generate_release_check(
+            repo_root=repo_root,
+            output_dir=output_dir,
+            public_report_path=public_report,
+            timeout_seconds=timeout_seconds,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError, OSError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote release-check manifest to {result.manifest_path}")
+    print(f"Wrote release-check report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if result.wheel_path is not None:
+        print(f"Built release-check wheel at {result.wheel_path}")
+    if not result.ready:
+        print(
+            f"Release check failed: {result.passed_count}/{result.check_count} "
+            "checks passed."
+        )
+        return 2
+    print(
+        f"Release check ready: {result.passed_count}/{result.check_count} "
+        f"checks passed in {result.duration_seconds:.3f} s, "
+        f"digest {result.analysis_digest[:12]}."
+    )
     return 0
 
 
@@ -855,6 +1025,7 @@ def lane_continuation_study_command(
     input_paths: list[str],
     output_dir: str,
     max_scenarios: int | None,
+    scenario_offset: int,
     top: int,
     input_format: str,
     public_report: str | None,
@@ -864,6 +1035,7 @@ def lane_continuation_study_command(
             input_paths=tuple(input_paths),
             output_dir=output_dir,
             max_scenarios=max_scenarios,
+            scenario_offset=scenario_offset,
             top=top,
             input_format=input_format,
             public_report_path=public_report,
@@ -883,6 +1055,60 @@ def lane_continuation_study_command(
         f"Scanned {result.source_count} source(s) across "
         f"{result.scenario_count} scenario(s) and "
         f"{result.candidate_track_count} lane-continuation candidate target(s)."
+    )
+    return 0
+
+
+def selector_holdout_study_command(
+    input_paths: list[str],
+    output_dir: str,
+    input_format: str,
+    scenario_offset: int,
+    max_scenarios: int | None,
+    expected_scenarios: int,
+    top: int,
+    calibration_manifest: str | None,
+    public_report: str | None,
+    resume: bool,
+) -> int:
+    try:
+        result = generate_selector_holdout_study(
+            input_paths=tuple(input_paths),
+            output_dir=output_dir,
+            input_format=input_format,
+            scenario_offset=scenario_offset,
+            max_scenarios=max_scenarios,
+            expected_scenarios=expected_scenarios,
+            top=top,
+            calibration_manifest_path=calibration_manifest,
+            public_report_path=public_report,
+            resume=resume,
+        )
+    except (RuntimeError, ValueError, FileNotFoundError, OSError) as exc:
+        print(str(exc), file=sys.stderr)
+        return 2
+
+    print(f"Wrote selector-holdout-study manifest to {result.manifest_path}")
+    print(f"Wrote selector-holdout-study report to {result.report_path}")
+    if result.public_report_path is not None:
+        print(f"Wrote public report copy to {result.public_report_path}")
+    if resume:
+        print(
+            "Resume verification reused "
+            f"{result.reused_stage_count} stage(s) and executed "
+            f"{result.executed_stage_count} stage(s)."
+        )
+    if not result.ready:
+        print(
+            "Frozen selector holdout is not release-ready: "
+            f"{result.passed_check_count}/{result.check_count} checks passed."
+        )
+        return 2
+    print(
+        "Frozen selector holdout ready across "
+        f"{result.scenario_count} scenario(s) and "
+        f"{result.selector_decision_count} selector decision(s): "
+        f"{result.passed_check_count}/{result.check_count} checks passed."
     )
     return 0
 
@@ -1920,13 +2146,155 @@ def _select_scenario(
     raise SystemExit(f"Unknown scenario id: {scenario_id}. Valid ids: {valid_ids}")
 
 
+def _add_explorer_server_arguments(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--open",
+        dest="open_explorer",
+        action="store_true",
+        help="Serve the generated Explorer locally and open it in a browser.",
+    )
+    parser.add_argument(
+        "--host",
+        default=DEFAULT_EXPLORER_HOST,
+        help="Local Explorer bind host used with --open.",
+    )
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=DEFAULT_EXPLORER_PORT,
+        help="Local Explorer port used with --open. Use 0 to choose a free port.",
+    )
+    parser.add_argument(
+        "--no-browser",
+        action="store_true",
+        help="Serve the Explorer without launching the system browser.",
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         prog="scenariolens",
         description="Long-tail autonomous-driving scenario discovery utilities.",
     )
     subparsers = parser.add_subparsers(dest="command")
-    subparsers.add_parser("demo", help="Score built-in synthetic scenarios.")
+    demo_parser = subparsers.add_parser(
+        "demo",
+        help="Score built-in synthetic scenarios or launch a complete demo run.",
+    )
+    demo_parser.add_argument(
+        "--output",
+        default="runs/demo",
+        help="Output directory for the generated bundle used with --open.",
+    )
+    _add_explorer_server_arguments(demo_parser)
+    run_parser = subparsers.add_parser(
+        "run",
+        help=(
+            "Run the core baseline, lane-selection, and lane-continuation "
+            "studies as one reproducible analysis bundle."
+        ),
+    )
+    run_parser.add_argument(
+        "--input",
+        action="append",
+        required=True,
+        help=(
+            "ScenarioLens JSON file, Waymo Motion file, or native input "
+            "directory. Repeat for multiple sources."
+        ),
+    )
+    run_parser.add_argument(
+        "--format",
+        choices=RUN_BUNDLE_INPUT_FORMATS,
+        default="native",
+        help="Input representation.",
+    )
+    run_parser.add_argument(
+        "--output",
+        default="runs/scenariolens",
+        help="Output directory for the top-level run bundle.",
+    )
+    run_parser.add_argument(
+        "--max-scenarios",
+        type=int,
+        default=25,
+        help="Maximum scenarios to analyze per expanded input file.",
+    )
+    run_parser.add_argument(
+        "--top",
+        type=int,
+        default=10,
+        help="Number of ranked rows retained by each study.",
+    )
+    run_parser.add_argument(
+        "--no-input-hash",
+        action="store_true",
+        help="Skip SHA-256 input hashing for this local run.",
+    )
+    _add_explorer_server_arguments(run_parser)
+    run_verify_parser = subparsers.add_parser(
+        "run-verify",
+        help=(
+            "Verify repeated ScenarioLens run bundles for determinism, "
+            "readiness, duration, and peak memory."
+        ),
+    )
+    run_verify_parser.add_argument(
+        "--manifest",
+        action="append",
+        required=True,
+        help="Run-bundle manifest path. Repeat at least twice.",
+    )
+    run_verify_parser.add_argument(
+        "--output-dir",
+        default="data/processed/scenariolens_run_validation",
+        help="Directory for the validation manifest and report.",
+    )
+    run_verify_parser.add_argument(
+        "--max-duration-seconds",
+        type=float,
+        default=DEFAULT_MAX_DURATION_SECONDS,
+        help="Maximum allowed duration for every run.",
+    )
+    run_verify_parser.add_argument(
+        "--max-peak-memory-gb",
+        type=float,
+        default=DEFAULT_MAX_PEAK_MEMORY_GB,
+        help="Maximum allowed peak process memory for every run.",
+    )
+    run_verify_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional public-safe Markdown report copy.",
+    )
+    release_check_parser = subparsers.add_parser(
+        "release-check",
+        help=(
+            "Build and install a wheel, run the product outside the checkout, "
+            "and validate v1 failure and resume paths."
+        ),
+    )
+    release_check_parser.add_argument(
+        "--repo-root",
+        default=".",
+        help="ScenarioLens repository root containing pyproject.toml.",
+    )
+    release_check_parser.add_argument(
+        "--output-dir",
+        default="data/processed/scenariolens_v1_release_check",
+        help="Directory for the validation packet and built wheel.",
+    )
+    release_check_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional public-safe Markdown report copy.",
+    )
+    release_check_parser.add_argument(
+        "--timeout-seconds",
+        type=float,
+        default=DEFAULT_RELEASE_CHECK_TIMEOUT_SECONDS,
+        help="Per-command timeout for build, install, and runtime probes.",
+    )
     export_parser = subparsers.add_parser(
         "export-synthetic",
         help="Export built-in synthetic scenarios as ScenarioLens JSON.",
@@ -2559,6 +2927,12 @@ def main() -> int:
         help="Maximum scenarios to load per input.",
     )
     lane_continuation_study_parser.add_argument(
+        "--scenario-offset",
+        type=int,
+        default=0,
+        help="Number of leading scenarios to exclude from every input.",
+    )
+    lane_continuation_study_parser.add_argument(
         "--top",
         type=int,
         default=10,
@@ -2568,6 +2942,81 @@ def main() -> int:
         "--public-report",
         default=None,
         help="Optional Markdown path for a public-safe lane-continuation study copy.",
+    )
+    selector_holdout_parser = subparsers.add_parser(
+        "selector-holdout-study",
+        help=(
+            "Evaluate the frozen terminal selector on a disjoint scenario "
+            "window and enforce v1 evidence gates."
+        ),
+    )
+    selector_holdout_parser.add_argument(
+        "--input",
+        action="append",
+        required=True,
+        help=(
+            "Input Waymo Motion file/directory or ScenarioLens JSON file. "
+            "Repeat for multiple sources."
+        ),
+    )
+    selector_holdout_parser.add_argument(
+        "--format",
+        choices=SELECTOR_HOLDOUT_INPUT_FORMATS,
+        default="native",
+        help="Input representation.",
+    )
+    selector_holdout_parser.add_argument(
+        "--output-dir",
+        default="data/processed/waymo_selector_holdout_993",
+        help="Directory for the holdout manifest, report, and stage artifacts.",
+    )
+    selector_holdout_parser.add_argument(
+        "--scenario-offset",
+        type=int,
+        default=DEFAULT_SELECTOR_HOLDOUT_OFFSET,
+        help="Leading scenarios excluded from every input as development data.",
+    )
+    selector_holdout_parser.add_argument(
+        "--max-scenarios",
+        type=int,
+        default=None,
+        help="Optional maximum holdout scenarios to evaluate per input.",
+    )
+    selector_holdout_parser.add_argument(
+        "--expected-scenarios",
+        type=int,
+        default=DEFAULT_SELECTOR_HOLDOUT_SCENARIOS,
+        help="Exact aggregate holdout size required by the release gate.",
+    )
+    selector_holdout_parser.add_argument(
+        "--top",
+        type=int,
+        default=DEFAULT_SELECTOR_HOLDOUT_TOP,
+        help=(
+            "Per-bucket evidence cap. Coverage gates fail if this omits a "
+            "surfaced topology or replay case."
+        ),
+    )
+    selector_holdout_parser.add_argument(
+        "--calibration-manifest",
+        default=None,
+        help=(
+            "Optional compatible calibration manifest. The packaged policy "
+            "frozen at commit ba0b37e is used by default."
+        ),
+    )
+    selector_holdout_parser.add_argument(
+        "--public-report",
+        default=None,
+        help="Optional Markdown path for a public-safe holdout report copy.",
+    )
+    selector_holdout_parser.add_argument(
+        "--resume",
+        action="store_true",
+        help=(
+            "Resume from a verified state.json in the output directory. "
+            "Inputs, policy, configuration, and completed artifacts must match."
+        ),
     )
     lane_continuation_candidates_parser = subparsers.add_parser(
         "lane-continuation-candidates",
@@ -3644,7 +4093,41 @@ def main() -> int:
     args = parser.parse_args()
 
     if args.command == "demo":
-        return demo()
+        return demo(
+            open_explorer=args.open_explorer,
+            output_dir=args.output,
+            host=args.host,
+            port=args.port,
+            launch_browser=not args.no_browser,
+        )
+    if args.command == "run":
+        return run_bundle_command(
+            input_paths=args.input,
+            output_dir=args.output,
+            max_scenarios=args.max_scenarios,
+            top=args.top,
+            input_format=args.format,
+            hash_inputs=not args.no_input_hash,
+            open_explorer=args.open_explorer,
+            host=args.host,
+            port=args.port,
+            launch_browser=not args.no_browser,
+        )
+    if args.command == "run-verify":
+        return run_validation_command(
+            run_manifests=args.manifest,
+            output_dir=args.output_dir,
+            max_duration_seconds=args.max_duration_seconds,
+            max_peak_memory_gb=args.max_peak_memory_gb,
+            public_report=args.public_report,
+        )
+    if args.command == "release-check":
+        return release_check_command(
+            repo_root=args.repo_root,
+            output_dir=args.output_dir,
+            public_report=args.public_report,
+            timeout_seconds=args.timeout_seconds,
+        )
     if args.command == "export-synthetic":
         return export_synthetic(output_path=args.output)
     if args.command == "ingest-csv":
@@ -3786,9 +4269,23 @@ def main() -> int:
             input_paths=args.input,
             output_dir=args.output_dir,
             max_scenarios=args.max_scenarios,
+            scenario_offset=args.scenario_offset,
             top=args.top,
             input_format=args.format,
             public_report=args.public_report,
+        )
+    if args.command == "selector-holdout-study":
+        return selector_holdout_study_command(
+            input_paths=args.input,
+            output_dir=args.output_dir,
+            input_format=args.format,
+            scenario_offset=args.scenario_offset,
+            max_scenarios=args.max_scenarios,
+            expected_scenarios=args.expected_scenarios,
+            top=args.top,
+            calibration_manifest=args.calibration_manifest,
+            public_report=args.public_report,
+            resume=args.resume,
         )
     if args.command == "lane-continuation-candidates":
         return lane_continuation_candidates_command(

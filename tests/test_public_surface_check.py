@@ -175,6 +175,16 @@ def _write_public_surface_repo(root: Path) -> Path:
         },
     )
     _write_json(
+        root / "docs" / "demo" / "run.json",
+        {
+            "format": "scenariolens.explorer_run.v1",
+            "ready": True,
+            "summary": {"scenario_count": 1},
+            "stages": [],
+            "reports": [],
+        },
+    )
+    _write_json(
         root / "docs" / "demo" / "selector_decisions.json",
         {
             "format": (
@@ -220,7 +230,12 @@ def _write_public_surface_repo(root: Path) -> Path:
             [
                 "python -m unittest discover",
                 "node --check docs/demo/app.js",
+                "python -m json.tool docs/demo/run.json",
                 "python -m json.tool docs/demo/evidence_index.json",
+                "npm run test:browser",
+                "scenariolens run",
+                "scenariolens run-verify",
+                "scenariolens release-check",
                 "scenariolens evidence-index",
                 "scenariolens public-surface-check",
             ]

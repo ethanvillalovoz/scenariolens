@@ -7,30 +7,31 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 ## Readiness
 
 - Ready: yes
-- Required artifacts present: 16 / 16
+- Required artifacts present: 20 / 20
 - Missing required artifacts: 0
 - Evidence stages: 8
-- Public-safe artifacts indexed: 16
-- Local real-data/Waymo-derived artifacts indexed: 13
+- Public-safe artifacts indexed: 20
+- Local real-data/Waymo-derived artifacts indexed: 15
 
 ## Stage Summary
 
 | Stage | Present | Artifacts | Why it matters |
 | --- | ---: | ---: | --- |
-| Product surface | 2 | 2 | Makes the repo understandable quickly through static public artifacts. |
+| Product surface | 3 | 3 | Makes the repo understandable quickly through static public artifacts. |
 | Data boundary | 1 | 1 | Documents what data is trusted, derived, local, and excluded from git. |
 | Scenario mining | 2 | 2 | Shows ScenarioLens can rank and explain real motion scenarios. |
 | Baseline models | 2 | 2 | Compares lightweight prediction baselines with honest wins and regressions. |
 | Replay bridge | 1 | 1 | Connects mined cases to laptop-safe open-loop replay diagnostics. |
 | Lane continuation | 2 | 2 | Audits map-link and lane-continuation failure modes at larger scale. |
-| Selector validation | 4 | 4 | Validates conservative selector gates before changing default behavior. |
-| Release readiness | 2 | 2 | Keeps the public repo tested and contribution-ready. |
+| Selector validation | 5 | 5 | Validates conservative selector gates before changing default behavior. |
+| Release readiness | 4 | 4 | Keeps the public repo tested and contribution-ready. |
 
 ## Evidence Artifacts
 
 | Artifact | Stage | Scope | Key metrics | Present |
 | --- | --- | --- | --- | ---: |
 | [Static Scenario Explorer](../demo/index.html) | Product surface | 14 public demo scenarios plus real-data evidence links | Explorer scenarios: 14; Live route: GitHub Pages/portfolio friendly | yes |
+| [Explorer Run Contract](../demo/run.json) | Product surface | Aggregate metadata from the reproducible 1,193-scenario run | Analyzed scenarios: 1,193; Analysis stages: 3; Payload format: scenariolens.explorer_run.v1 | yes |
 | [Data Provenance Boundary](../data_provenance.md) | Data boundary | Public-safe data handling and raw-data exclusion policy | Raw TFRecords in git: 0 | yes |
 | [Cross-Shard Failure Stability](waymo_motion_failure_stability_cross_shard.md) | Scenario mining | 100 scenarios across 4 local Waymo Motion validation shards | Scenarios: 100; Validation shards: 4 | yes |
 | [Context-Joined Failure Study](waymo_context_failure_study_cross_shard.md) | Scenario mining | Map, route, signal, and failure metrics over the 100-scenario slice | Scenarios: 100 | yes |
@@ -42,9 +43,12 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 | [200-Scenario Terminal Selector Calibration](waymo_lane_continuation_terminal_neighborhood_selector_calibration_200.md) | Selector validation | Zero-false-promotion gate sweep over terminal-neighborhood cases | False promotions: 0; Default selector changed: no | yes |
 | [Terminal Selector Transfer Validation](waymo_lane_continuation_terminal_neighborhood_selector_transfer_200.md) | Selector validation | 7-case validation queue, including 4 novel transfer cases | Validation cases: 7; Novel cases: 4 | yes |
 | [Context-Aware Selector Candidate Validation](waymo_lane_continuation_terminal_neighborhood_selector_candidate_validation_200.md) | Selector validation | Candidate policy joined to transfer and route/context audits | Agreement: 6/7; False promotions: 0 | yes |
+| [993-Scenario Frozen Selector Holdout](waymo_selector_holdout_993.md) | Selector validation | 78 perturbation-replayed selector decisions from 993 withheld scenarios across four local validation shards | Holdout scenarios: 993; Selector decisions: 78; Evaluation gates: 8/8; Candidate false promotions: 12 | yes |
 | [Terminal Selector Decision Atlas](waymo_lane_continuation_terminal_neighborhood_selector_decision_atlas_200.md) | Selector validation | 7 derived selector cards joined to candidate-validation labels | Visual cards: 7; Candidate agreement: 6/7 | yes |
 | [Selector Atlas Demo Payload](../demo/selector_decisions.json) | Product surface | Public-safe selector decision cards loaded by the static Explorer | Cards: 7 | yes |
-| [CI Validation Workflow](../../.github/workflows/ci.yml) | Release readiness | Unit tests plus CLI smoke workflows on every push | CI raw Waymo dependency: none | yes |
+| [Full-Corpus Run Reproducibility](scenariolens_v1_run_validation.md) | Release readiness | Two complete analysis runs over 1,193 scenarios from four local validation shards | Scenarios per run: 1,193; Reproducibility checks: 7/7; Maximum duration: 601.447 s; Maximum peak memory: 3.642 GB | yes |
+| [V1 Clean-Package Release Check](scenariolens_v1_release_check.md) | Release readiness | Reproducible wheel build, isolated install, installed product, failure diagnostics, and interruption/resume probes | Release checks: 15/15; Wheel SHA-256 match: yes; Resume digest match: yes | yes |
+| [CI Validation Workflow](../../.github/workflows/ci.yml) | Release readiness | Unit tests plus deterministic run-bundle integration on every push | CI raw Waymo dependency: none | yes |
 | [Public Surface Check](scenariolens_public_surface_check.md) | Release readiness | Offline check for public links, payload contracts, raw-data boundary, and CI smoke coverage | Offline checks: 7; Raw-data guard: yes | yes |
 
 ## Artifact Notes
@@ -57,6 +61,15 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 - Data status: public fixtures plus aggregate/derived real-data links
 - Why it matters: Gives a reviewer a zero-install first look at ranking, filtering, trajectory previews, failure cards, and selector diagnostics.
 - Limitation: The explorer is static and does not expose raw Waymo data.
+
+### Explorer Run Contract
+
+- Path: `docs/demo/run.json`
+- Proof type: versioned product payload
+- Command: `scenariolens run --input <path> --output runs/<name>`
+- Data status: aggregate run metrics and portable report links only
+- Why it matters: Connects the visible Explorer to the same provenance, stage metrics, digest, and resource evidence emitted by the CLI.
+- Limitation: The public payload joins aggregate real-run evidence to separately checked-in fixture trajectories; it does not publish raw records.
 
 ### Data Provenance Boundary
 
@@ -157,6 +170,15 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 - Why it matters: Shows one narrow improvement path: recover a false hold while preserving negative controls.
 - Limitation: The default selector remains unchanged pending broader validation.
 
+### 993-Scenario Frozen Selector Holdout
+
+- Path: `docs/reports/waymo_selector_holdout_993.md`
+- Proof type: frozen-policy holdout
+- Command: `scenariolens selector-holdout-study --input ...`
+- Data status: aggregate metrics, policy outcomes, hashes, and release gates
+- Why it matters: Tests a promising small-cohort selector without retuning and rejects adoption when the larger holdout reveals false promotions.
+- Limitation: This is same-shard scenario-window validation, not an independent-shard benchmark; the candidate creates 12 false promotions and remains disabled.
+
 ### Terminal Selector Decision Atlas
 
 - Path: `docs/reports/waymo_lane_continuation_terminal_neighborhood_selector_decision_atlas_200.md`
@@ -175,11 +197,29 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 - Why it matters: Keeps the Explorer a thin presentation layer over generated, tested artifacts.
 - Limitation: The payload mirrors selected public report fields only.
 
+### Full-Corpus Run Reproducibility
+
+- Path: `docs/reports/scenariolens_v1_run_validation.md`
+- Proof type: real-data execution validation
+- Command: `scenariolens run; scenariolens run-verify ...`
+- Data status: aggregate digest, timing, memory, and readiness checks only
+- Why it matters: Proves the one-command product path completes deterministically on the full local corpus within the declared laptop budgets.
+- Limitation: The local corpus is not a Waymo benchmark and raw records remain outside git.
+
+### V1 Clean-Package Release Check
+
+- Path: `docs/reports/scenariolens_v1_release_check.md`
+- Proof type: clean-package validation
+- Command: `scenariolens release-check --repo-root .`
+- Data status: CI-safe synthetic fixtures and package metadata only
+- Why it matters: Proves that the shipped artifact works outside the source checkout and that its critical recovery and failure contracts are executable.
+- Limitation: The installed probes use public synthetic fixtures and complement, rather than replace, the separate real-data reports.
+
 ### CI Validation Workflow
 
 - Path: `.github/workflows/ci.yml`
 - Proof type: automation
-- Command: `python -m unittest discover; CLI smoke commands`
+- Command: `python -m unittest discover; scenariolens run; scenariolens run-verify; scenariolens release-check`
 - Data status: CI-safe fixtures only
 - Why it matters: Shows the framework is maintained as software, not just a set of static reports.
 - Limitation: Live Waymo shards remain local and are not required in CI.

@@ -231,15 +231,24 @@ def ingest_waymo_motion(
     input_path: str | Path,
     output_path: str | Path,
     max_scenarios: int | None = None,
+    scenario_offset: int = 0,
 ) -> None:
     """Convert native Waymo Motion records into ScenarioLens JSON."""
 
-    save_scenarios(output_path, load_waymo_motion(input_path, max_scenarios))
+    save_scenarios(
+        output_path,
+        load_waymo_motion(
+            input_path,
+            max_scenarios=max_scenarios,
+            scenario_offset=scenario_offset,
+        ),
+    )
 
 
 def load_waymo_motion(
     input_path: str | Path,
     max_scenarios: int | None = None,
+    scenario_offset: int = 0,
 ) -> tuple[Scenario, ...]:
     """Load a small native Waymo Motion slice.
 
@@ -248,13 +257,25 @@ def load_waymo_motion(
     TFRecord shard files.
     """
 
+    if scenario_offset < 0:
+        raise ValueError("scenario-offset must be non-negative.")
+
     path = Path(input_path)
     scenarios: list[Scenario] = []
+    remaining_offset = scenario_offset
     for file_path in _native_input_files(path):
         remaining = None if max_scenarios is None else max_scenarios - len(scenarios)
         if remaining is not None and remaining <= 0:
             return tuple(scenarios)
-        scenarios.extend(_load_native_motion_file(file_path, max_scenarios=remaining))
+        load_limit = (
+            None if remaining is None else remaining + remaining_offset
+        )
+        loaded = _load_native_motion_file(file_path, max_scenarios=load_limit)
+        if remaining_offset:
+            skipped = min(remaining_offset, len(loaded))
+            loaded = loaded[skipped:]
+            remaining_offset -= skipped
+        scenarios.extend(loaded if remaining is None else loaded[:remaining])
     return tuple(scenarios)
 
 
@@ -262,8 +283,16 @@ def save_waymo_motion_as_scenarios(
     input_path: str | Path,
     output_path: str | Path,
     max_scenarios: int | None = None,
+    scenario_offset: int = 0,
 ) -> None:
-    save_scenarios(output_path, load_waymo_motion(input_path, max_scenarios))
+    save_scenarios(
+        output_path,
+        load_waymo_motion(
+            input_path,
+            max_scenarios=max_scenarios,
+            scenario_offset=scenario_offset,
+        ),
+    )
 
 
 def load_normalized_motion_csv(

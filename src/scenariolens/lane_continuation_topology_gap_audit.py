@@ -124,11 +124,11 @@ def lane_continuation_topology_gap_audit_payload(
         tuple[str, str, int | None],
         tuple[bool, dict[str, object] | None, tuple[Scenario, ...]],
     ] = {}
-    raw_cache: dict[
-        tuple[str, str, str, int | None],
-        dict[str, object],
-    ] = {}
     max_scenarios = _optional_int(replay.get("max_scenarios_per_source"))
+    raw_cache = _raw_inventory_cache(
+        replay_cases=selected,
+        max_scenarios=max_scenarios,
+    )
     cases = [
         _audit_case(
             replay_case=case,
@@ -139,6 +139,16 @@ def lane_continuation_topology_gap_audit_payload(
         for case in selected
     ]
     aggregate = _aggregate_cases(cases)
+    aggregate["raw_source_pass_count"] = len(
+        {
+            (
+                str(case.get("source_input", "")),
+                str(case.get("input_format", "native")),
+            )
+            for case in selected
+        }
+    )
+    aggregate["raw_scenario_inventory_count"] = len(raw_cache)
     return {
         "format": LANE_CONTINUATION_TOPOLOGY_GAP_AUDIT_FORMAT,
         "replay_manifest": str(replay_manifest_path),
@@ -158,7 +168,7 @@ def lane_continuation_topology_gap_audit_payload(
             "report": "report.md",
         },
         "scope_note": (
-            "The topology gap audit reloads local source slices only to compare "
+            "The topology gap audit reloads each local source once to compare "
             "capped ScenarioLens map features with raw parsed map-feature ids. "
             "It publishes derived link-presence summaries, not raw Waymo map "
             "geometry, not a route planner, and not a benchmark claim."
@@ -210,6 +220,8 @@ def lane_continuation_topology_gap_audit_markdown(
         f"| Raw target still missing | {aggregate['raw_target_missing_case_count']} |",
         f"| Selected feature missing in capped map | {aggregate['selected_feature_missing_case_count']} |",
         f"| Capped maps at feature cap | {aggregate['capped_map_at_limit_count']} |",
+        f"| Batched raw-source passes | {aggregate['raw_source_pass_count']} |",
+        f"| Raw scenario inventories requested | {aggregate['raw_scenario_inventory_count']} |",
         f"| Mean route gap to horizon | {_signed_meter_text(aggregate['mean_route_gap_to_horizon_m'])} |",
         "",
         "## Decisions",
@@ -289,6 +301,7 @@ def lane_continuation_topology_gap_audit_markdown(
             "- Cap-recoverable cases mean the referenced lane target exists in the raw parsed map but was not available inside the capped ScenarioLens map feature set.",
             "- Terminal-lane confirmations mean the selected lane has no parsed continuation in either the capped or raw parsed map; these need selected-lane or topology-neighborhood work rather than a simple cap increase.",
             "- Raw-missing targets stay parser/proto-source audits until the referenced id can be found.",
+            "- Raw map inventories are collected in one sequential pass per source rather than rescanning a shard for every case.",
             "- This audit turns topology blockers into engineering tasks before expanding branch-selection and route-context guard claims.",
         ]
     )
@@ -379,14 +392,10 @@ def _audit_case(
     )
 
     raw_key = (str(source_input), input_format, scenario_id, replay_max_scenarios)
-    if raw_key not in raw_cache:
-        raw_cache[raw_key] = _raw_map_inventory(
-            source=source_input,
-            input_format=input_format,
-            scenario_id=scenario_id,
-            max_scenarios=replay_max_scenarios,
-        )
-    raw_inventory = raw_cache[raw_key]
+    raw_inventory = raw_cache.get(
+        raw_key,
+        _empty_raw_inventory("scenario_not_requested_in_raw_inventory_batch"),
+    )
     raw_by_id = raw_inventory.get("features_by_id", {})
     raw_index_by_id = raw_inventory.get("feature_index_by_id", {})
     raw_selected = raw_by_id.get(selected_feature_id) if isinstance(raw_by_id, dict) else None
@@ -436,25 +445,145 @@ def _audit_case(
     return base
 
 
-def _raw_map_inventory(
+def _raw_inventory_cache(
+    replay_cases: list[dict[str, object]],
+    max_scenarios: int | None,
+) -> dict[tuple[str, str, str, int | None], dict[str, object]]:
+    requested: dict[tuple[str, str], set[str]] = {}
+    for case in replay_cases:
+        source = str(case.get("source_input", ""))
+        input_format = str(case.get("input_format", "native"))
+        scenario_id = str(case.get("scenario_id", ""))
+        requested.setdefault((source, input_format), set()).add(scenario_id)
+
+    cache: dict[tuple[str, str, str, int | None], dict[str, object]] = {}
+    for (source, input_format), scenario_ids in requested.items():
+        inventories = _raw_map_inventories(
+            source=Path(source),
+            input_format=input_format,
+            scenario_ids=scenario_ids,
+            max_scenarios=max_scenarios,
+        )
+        for scenario_id in scenario_ids:
+            cache[(source, input_format, scenario_id, max_scenarios)] = inventories[
+                scenario_id
+            ]
+    return cache
+
+
+def _raw_map_inventories(
     source: Path,
     input_format: str,
-    scenario_id: str,
+    scenario_ids: set[str],
     max_scenarios: int | None,
-) -> dict[str, object]:
+) -> dict[str, dict[str, object]]:
     if input_format != "native":
-        return _empty_raw_inventory("unsupported_input_format_for_raw_map_audit")
+        return {
+            scenario_id: _empty_raw_inventory(
+                "unsupported_input_format_for_raw_map_audit"
+            )
+            for scenario_id in scenario_ids
+        }
     try:
-        mapping = _raw_scenario_mapping(
+        mappings = _raw_scenario_mappings(
             source=source,
-            scenario_id=scenario_id,
+            scenario_ids=scenario_ids,
             max_scenarios=max_scenarios,
         )
     except (OSError, ValueError) as exc:
-        return _empty_raw_inventory(f"raw_source_read_failed: {exc}")
-    if mapping is None:
-        return _empty_raw_inventory("scenario_not_found_in_raw_source")
+        return {
+            scenario_id: _empty_raw_inventory(f"raw_source_read_failed: {exc}")
+            for scenario_id in scenario_ids
+        }
+    return {
+        scenario_id: (
+            _raw_map_inventory_from_mapping(mappings[scenario_id])
+            if scenario_id in mappings
+            else _empty_raw_inventory("scenario_not_found_in_raw_source")
+        )
+        for scenario_id in scenario_ids
+    }
 
+
+def _raw_scenario_mappings(
+    source: Path,
+    scenario_ids: set[str],
+    max_scenarios: int | None,
+) -> dict[str, dict[str, Any]]:
+    if not scenario_ids:
+        return {}
+    label = native_motion_format_label(source)
+    if label in NATIVE_JSON_SUFFIXES:
+        payload = json.loads(source.read_text(encoding="utf-8"))
+        mappings = _scenario_mappings_from_payload(payload, source)
+        return _requested_mappings(mappings[:max_scenarios], scenario_ids)
+    if label in NATIVE_JSONL_SUFFIXES:
+        return _jsonl_requested_mappings(
+            source=source,
+            scenario_ids=scenario_ids,
+            max_scenarios=max_scenarios,
+        )
+    if label in NATIVE_PROTO_SUFFIXES:
+        mapping = _scenario_mapping_from_proto_bytes(source.read_bytes())
+        return _requested_mappings([mapping], scenario_ids)
+    if label in NATIVE_TFRECORD_SUFFIXES:
+        found: dict[str, dict[str, Any]] = {}
+        for index, record in enumerate(_iter_tfrecord_records(source), start=1):
+            if max_scenarios is not None and index > max_scenarios:
+                break
+            mapping = _scenario_mapping_from_proto_bytes(record)
+            scenario_id = _mapping_scenario_id(mapping)
+            if scenario_id in scenario_ids:
+                found[scenario_id] = mapping
+                if len(found) == len(scenario_ids):
+                    break
+        return found
+    return {}
+
+
+def _jsonl_requested_mappings(
+    source: Path,
+    scenario_ids: set[str],
+    max_scenarios: int | None,
+) -> dict[str, dict[str, Any]]:
+    loaded = 0
+    found: dict[str, dict[str, Any]] = {}
+    with source.open(encoding="utf-8") as handle:
+        for line in handle:
+            stripped = line.strip()
+            if not stripped:
+                continue
+            payload = json.loads(stripped)
+            for mapping in _scenario_mappings_from_payload(payload, source):
+                loaded += 1
+                scenario_id = _mapping_scenario_id(mapping)
+                if scenario_id in scenario_ids:
+                    found[scenario_id] = mapping
+                    if len(found) == len(scenario_ids):
+                        return found
+                if max_scenarios is not None and loaded >= max_scenarios:
+                    return found
+    return found
+
+
+def _requested_mappings(
+    mappings: list[dict[str, Any]],
+    scenario_ids: set[str],
+) -> dict[str, dict[str, Any]]:
+    return {
+        scenario_id: mapping
+        for mapping in mappings
+        if (scenario_id := _mapping_scenario_id(mapping)) in scenario_ids
+    }
+
+
+def _mapping_scenario_id(mapping: dict[str, Any]) -> str:
+    return str(mapping.get("scenario_id", mapping.get("scenarioId", "")))
+
+
+def _raw_map_inventory_from_mapping(
+    mapping: dict[str, Any],
+) -> dict[str, object]:
     raw_payload = mapping.get("map_features")
     if raw_payload is None:
         raw_payload = mapping.get("mapFeatures")
@@ -489,62 +618,6 @@ def _raw_map_inventory(
         "features_by_id": by_id,
         "feature_index_by_id": index_by_id,
     }
-
-
-def _raw_scenario_mapping(
-    source: Path,
-    scenario_id: str,
-    max_scenarios: int | None,
-) -> dict[str, Any] | None:
-    label = native_motion_format_label(source)
-    if label in NATIVE_JSON_SUFFIXES:
-        payload = json.loads(source.read_text(encoding="utf-8"))
-        mappings = _scenario_mappings_from_payload(payload, source)
-        return _mapping_by_scenario_id(mappings[:max_scenarios], scenario_id)
-    if label in NATIVE_JSONL_SUFFIXES:
-        return _jsonl_mapping_by_scenario_id(source, scenario_id, max_scenarios)
-    if label in NATIVE_PROTO_SUFFIXES:
-        mapping = _scenario_mapping_from_proto_bytes(source.read_bytes())
-        return mapping if str(mapping.get("scenario_id", "")) == scenario_id else None
-    if label in NATIVE_TFRECORD_SUFFIXES:
-        for index, record in enumerate(_iter_tfrecord_records(source), start=1):
-            if max_scenarios is not None and index > max_scenarios:
-                break
-            mapping = _scenario_mapping_from_proto_bytes(record)
-            if str(mapping.get("scenario_id", "")) == scenario_id:
-                return mapping
-    return None
-
-
-def _jsonl_mapping_by_scenario_id(
-    source: Path,
-    scenario_id: str,
-    max_scenarios: int | None,
-) -> dict[str, Any] | None:
-    loaded = 0
-    with source.open(encoding="utf-8") as handle:
-        for line in handle:
-            stripped = line.strip()
-            if not stripped:
-                continue
-            payload = json.loads(stripped)
-            for mapping in _scenario_mappings_from_payload(payload, source):
-                loaded += 1
-                if str(mapping.get("scenario_id", mapping.get("scenarioId", ""))) == scenario_id:
-                    return mapping
-                if max_scenarios is not None and loaded >= max_scenarios:
-                    return None
-    return None
-
-
-def _mapping_by_scenario_id(
-    mappings: list[dict[str, Any]],
-    scenario_id: str,
-) -> dict[str, Any] | None:
-    for mapping in mappings:
-        if str(mapping.get("scenario_id", mapping.get("scenarioId", ""))) == scenario_id:
-            return mapping
-    return None
 
 
 def _empty_raw_inventory(error: str) -> dict[str, object]:

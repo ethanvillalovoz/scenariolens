@@ -384,6 +384,19 @@ decision atlas copies only derived SVG cards into the demo so reviewers can see
 retained route/context hold. All selector artifacts treat the remaining false
 holds as open limitations, not production-ready selector claims.
 
+The frozen selector holdout is checked in at
+[`docs/reports/waymo_selector_holdout_993.md`](reports/waymo_selector_holdout_993.md).
+It excludes the first 50 development scenarios from each of the same four local
+validation shards, evaluates all 993 remaining scenarios without selector
+retuning, and records input hashes plus the packaged policy frozen at commit
+`ba0b37e`. The run surfaces 124 topology gaps, replays all 78 nearby recovery
+candidates, and passes 8/8 provenance, leakage, coverage, and minimum-evidence
+gates in 783.537 seconds with 3.614 GB peak process memory. The context-aware
+candidate improves replay-label agreement from 33/78 to 52/78 but creates 12
+false promotions, so the report rejects adoption and leaves the default selector
+unchanged. This is same-shard scenario-window evidence, not an independent-shard
+benchmark. Raw TFRecords and all per-case replay packets remain local and ignored.
+
 ## Interpretation Rules
 
 - Checked-in metrics demonstrate the ScenarioLens pipeline, not Waymo benchmark
@@ -394,3 +407,5 @@ holds as open limitations, not production-ready selector claims.
   scale.
 - The checked-in validation and stability reports document small local
   real-data runs, not full Waymo benchmark submissions.
+- The 993-scenario selector holdout validates the evaluation workflow, not the
+  candidate policy: 12 false promotions are an explicit rejection signal.

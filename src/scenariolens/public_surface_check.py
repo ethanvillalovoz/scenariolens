@@ -209,6 +209,7 @@ def _evidence_index_check(root: Path) -> dict[str, object]:
 def _demo_payload_contract_check(root: Path) -> dict[str, object]:
     expected = {
         root / "docs/demo/scenarios.json": "scenariolens.dashboard.v1",
+        root / "docs/demo/run.json": "scenariolens.explorer_run.v1",
         root / "docs/demo/selector_decisions.json": (
             "scenariolens.lane_continuation_terminal_neighborhood_selector_decision_atlas.v1"
         ),
@@ -358,7 +359,12 @@ def _ci_surface_check(root: Path) -> dict[str, object]:
     required = [
         "python -m unittest discover",
         "node --check docs/demo/app.js",
+        "python -m json.tool docs/demo/run.json",
         "python -m json.tool docs/demo/evidence_index.json",
+        "npm run test:browser",
+        "scenariolens run",
+        "scenariolens run-verify",
+        "scenariolens release-check",
         "scenariolens evidence-index",
         "scenariolens public-surface-check",
     ]
@@ -369,9 +375,11 @@ def _ci_surface_check(root: Path) -> dict[str, object]:
         "CI surface",
         "fail" if missing else "pass",
         [path],
-        "CI covers unit tests, static demo syntax, evidence JSON, and public-surface smoke."
+        "CI covers unit tests, deterministic run integration, clean-package "
+        "release validation, static demo syntax, evidence JSON, and "
+        "public-surface checks."
         if not missing
-        else "CI is missing one or more public-surface smoke commands.",
+        else "CI is missing one or more required integration or public-surface commands.",
         details,
     )
 

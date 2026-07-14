@@ -511,6 +511,39 @@ calibrated terminal-neighborhood selector queue, add more replay-held branch
 negatives, and run the closure-enabled queue beyond the current 100-scenario
 slice before claiming broader selector readiness.
 
+## Milestone 6: V1 Product Loop
+
+Goal: turn the specialist research workflows into one reproducible product
+experience with a finite release contract.
+
+- one `scenariolens run` command for the core baseline and map diagnostics,
+- deterministic input provenance and analysis digests,
+- two-run duration and peak-memory validation,
+- generated Explorer artifacts from the same run bundle,
+- clean wheel installation and failure-path checks,
+- concise public documentation and a verified `v1.0.0` release.
+
+Status: the acceptance contract, one-command run bundle, generated Explorer,
+`demo --open` / `run --open` serving path, desktop/mobile browser suite,
+CI-safe integration path, and `run-verify` release gate are implemented. Two
+independent full-corpus
+runs each processed 1,193 scenarios from four local Waymo Motion validation
+shards, produced the same analysis digest, passed 7/7 reproducibility and
+resource checks, generated 50 ranked Explorer cases, completed in at most
+601.447 seconds, and used at most 3.642 GB peak memory. The separate
+frozen-policy validation then processed all
+993 withheld scenarios, reached 78 selector decisions, and passed 8/8 leakage,
+coverage, and minimum-evidence gates in 783.537 seconds with 3.614 GB peak
+memory. That larger holdout invalidated the candidate for adoption: agreement
+improved from 33/78 to 52/78, but 12 false promotions remain. The default
+selector stays unchanged. The run-backed Explorer is also live on the portfolio
+route, and the nine-stage holdout now supports fingerprinted, hash-verified
+interruption recovery through `state.json` and `--resume`. The consolidated
+`release-check` gate now rebuilds a byte-identical wheel, installs it in an
+isolated environment, executes outside the checkout, and passes all 15 product,
+failure-path, and resume checks. The remaining v1 work is the release-candidate
+packet, exact-commit CI verification, and final release.
+
 ## Stretch Goals
 
 - open-vocabulary scenario search,

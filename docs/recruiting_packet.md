@@ -7,6 +7,10 @@ robotics, AI/ML, and software engineering internship conversations.
 
 - Live demo: https://ethanvillalovoz.com/scenariolens/
 - Repository: https://github.com/ethanvillalovoz/scenariolens
+- V1 evidence index: `docs/reports/scenariolens_evidence_index.md`
+- Full-corpus product validation: `docs/reports/scenariolens_v1_run_validation.md`
+- Clean-package release check: `docs/reports/scenariolens_v1_release_check.md`
+- Frozen selector holdout: `docs/reports/waymo_selector_holdout_993.md`
 - Product strategy: `docs/project_strategy.md`
 - Architecture: `docs/architecture.md`
 - Portfolio report: `docs/reports/portfolio_report.md`
@@ -317,6 +321,11 @@ Testing and verification:
   SVG cards and the live Explorer, making the recovered false hold, accepted
   recoveries, negative controls, and retained route/context hold inspectable
   without exposing raw Waymo records.
+- A frozen-policy holdout then evaluates 993 withheld scenarios and 78 selector
+  decisions with no threshold retuning. It passes all 8 evaluation-integrity
+  gates but exposes 12 false promotions, so the candidate remains disabled.
+  This is the clearest example of the framework finding a real limitation
+  instead of manufacturing a positive result.
 - The public demo was browser-smoke-tested locally and deployed through the
   personal portfolio site.
 
@@ -324,9 +333,8 @@ What I would build next:
 
 1. Expand the Waymo Motion cross-shard stability run beyond four validation shards.
 2. Compare distribution stability across true shards and scenario tags.
-3. Broaden the calibrated terminal-neighborhood selector queue and add more
-   replay-held branch negatives.
-4. Expand the closure-enabled queue beyond the current 100-scenario slice.
+3. Inspect the frozen holdout false promotions without retuning the policy.
+4. Repeat the frozen packet on untouched shards for an independent-shard test.
 5. Create curated scenario collections for pedestrian, cyclist, merge, and
    unprotected-turn cases.
 

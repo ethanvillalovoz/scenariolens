@@ -139,6 +139,7 @@ def generate_lane_continuation_study(
     input_paths: tuple[str | Path, ...],
     output_dir: str | Path,
     max_scenarios: int | None = 25,
+    scenario_offset: int = 0,
     top: int = 10,
     input_format: str = "native",
     public_report_path: str | Path | None = None,
@@ -155,6 +156,7 @@ def generate_lane_continuation_study(
         input_paths=tuple(Path(path) for path in input_paths),
         output_dir=target,
         max_scenarios=max_scenarios,
+        scenario_offset=scenario_offset,
         top=top,
         input_format=input_format,
     )
@@ -244,6 +246,7 @@ def lane_continuation_study_payload(
     max_scenarios: int | None,
     top: int,
     input_format: str,
+    scenario_offset: int = 0,
 ) -> dict[str, object]:
     """Return deterministic public-safe lane-continuation validation metadata."""
 
@@ -257,6 +260,8 @@ def lane_continuation_study_payload(
         )
     if top < 1:
         raise ValueError("top must be at least 1.")
+    if scenario_offset < 0:
+        raise ValueError("scenario-offset must be non-negative.")
 
     ready = True
     sources: list[dict[str, object]] = []
@@ -269,6 +274,7 @@ def lane_continuation_study_payload(
             source=source,
             input_format=input_format,
             max_scenarios=max_scenarios,
+            scenario_offset=scenario_offset,
         )
         if not input_ready:
             ready = False
@@ -277,6 +283,7 @@ def lane_continuation_study_payload(
                     "input_path": str(source),
                     "source_name": _source_name(source),
                     "ready": False,
+                    "scenario_offset": scenario_offset,
                     "scenario_count": 0,
                     "candidate_case_count": 0,
                     "candidate_track_count": 0,
@@ -289,7 +296,10 @@ def lane_continuation_study_payload(
         scenario_count += len(scenarios)
         source_cases: list[dict[str, object]] = []
         source_tracks: list[dict[str, object]] = []
-        for scenario_index, scenario in enumerate(scenarios, start=1):
+        for scenario_index, scenario in enumerate(
+            scenarios,
+            start=scenario_offset + 1,
+        ):
             case = _study_case(
                 source=source,
                 source_index=source_index,
@@ -309,6 +319,7 @@ def lane_continuation_study_payload(
                 "input_path": str(source),
                 "source_name": _source_name(source),
                 "ready": True,
+                "scenario_offset": scenario_offset,
                 "scenario_count": len(scenarios),
                 "candidate_case_count": len(source_cases),
                 "candidate_track_count": len(source_tracks),
@@ -323,6 +334,7 @@ def lane_continuation_study_payload(
         "input_paths": [str(path) for path in input_paths],
         "output_dir": str(output_dir),
         "input_format": input_format,
+        "scenario_offset_per_input": scenario_offset,
         "max_scenarios_per_input": max_scenarios,
         "top": top,
         "ready": ready,
@@ -526,6 +538,7 @@ def lane_continuation_study_markdown(payload: dict[str, object]) -> str:
         f"- Scenarios scanned: {payload['scenario_count']}",
         f"- Candidate cases: {payload['candidate_case_count']}",
         f"- Candidate tracks: {payload['candidate_track_count']}",
+        f"- Scenario offset per input: {payload['scenario_offset_per_input']}",
         f"- Max scenarios per input: {payload['max_scenarios_per_input']}",
         f"- Max lane-link hops: {payload['max_lane_link_hops']}",
         f"- Lane-match threshold: {_meter_text(payload['lane_match_threshold_m'])}",

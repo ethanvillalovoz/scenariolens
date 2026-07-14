@@ -4,12 +4,75 @@ All notable changes to ScenarioLens are documented here.
 
 ## [Unreleased]
 
+## [1.0.0-rc.1] - 2026-07-13
+
 ### Added
 
+- `scenariolens selector-holdout-study`, a one-command frozen-policy
+  validation chain spanning continuation mining, replay, topology audit,
+  terminal-neighborhood replay, selector transfer, and context-aware candidate
+  validation.
+- A packaged public-safe selector policy frozen at commit `ba0b37e`, plus the
+  993-scenario holdout report at
+  `docs/reports/waymo_selector_holdout_993.md`. The run reaches 78 selector
+  decisions and passes 8/8 evaluation gates while rejecting candidate adoption
+  after measuring 12 false promotions.
+- Batched topology-audit source reads: 124 holdout topology cases now require
+  four raw-source passes instead of rescanning a TFRecord for every case.
+- Fingerprinted `selector-holdout-study --resume` recovery. Atomic `state.json`
+  checkpoints preserve interruption diagnostics and completed-stage hashes;
+  resume reuses only a verified contiguous prefix and rejects changed inputs,
+  changed configuration, missing files, or tampered artifacts.
+- `scenariolens release-check`, a 15-check clean-package gate that builds a
+  byte-identical wheel twice, installs it into an isolated environment, runs
+  the product outside the checkout, verifies explicit bad-input diagnostics,
+  injects an actual nine-stage interruption, and proves resumed output matches
+  uninterrupted output.
+
+- `scenariolens run`, a one-command product workflow that expands native input
+  directories, hashes source files, executes baseline-comparison,
+  heading-aware lane-selection, and linked-lane continuation studies, and
+  writes one versioned run manifest/report with stage timings and a stable
+  analysis digest.
+- `scenariolens run-verify`, a release gate that compares independent run
+  bundles, verifies input and stage fingerprints, enforces matching analysis
+  digests, and checks the 15-minute and 8 GB laptop budgets. Run manifests now
+  record cross-platform peak process memory.
+- Every `scenariolens run` bundle now generates `explorer/index.html`, a
+  versioned `explorer/run.json`, ranked `explorer/scenarios.json`, and rendered
+  trajectory assets. Explorer case IDs participate in the deterministic
+  analysis digest, and the static frontend is included in built packages.
+- The Scenario Explorer now reads `scenariolens.explorer_run.v1` provenance and
+  stage metrics, uses a compact operational layout instead of a report-card
+  wall, and shares the same frontend between the public demo and local runs.
+  Three Playwright tests cover the public workflow, generated-run assets and
+  report links, console errors, and desktop/mobile overflow in CI.
+- `scenariolens demo --open` and `scenariolens run ... --open` now validate and
+  serve generated run bundles through a loopback HTTP server, print the exact
+  Explorer URL, launch the system browser, and stop cleanly on Ctrl+C. Host,
+  port, ephemeral-port, and headless-browser controls are available without
+  changing the existing non-interactive command behavior.
+- `lane-continuation-study --scenario-offset` now selects deterministic
+  per-input scenario windows before applying `--max-scenarios`, records the
+  boundary in source and top-level manifests, and preserves original
+  within-source indices for leakage-auditable holdout studies.
+- `docs/reports/scenariolens_v1_run_validation.md`, generated from two complete
+  1,193-scenario runs over four local Waymo Motion validation shards. All 7
+  readiness, digest, input, stage, duration, and memory checks pass; the slower
+  exact-RC product run completed in 601.447 seconds with 3.642 GB peak memory,
+  including 50 rendered cases and the generated Explorer.
+- Exact x-sweep path-distance indexing for scenario ranking, replacing the
+  quadratic all-state Explorer bottleneck while preserving byte-identical
+  100-scenario dashboard output. The isolated 1,193-scenario Explorer pass
+  improved from 324.440 seconds to 134.859 seconds on the target laptop.
+- `docs/v1_acceptance.md`, freezing the one-command product contract, complete
+  1,193-scenario local-corpus gate, separate 993-scenario frozen-policy
+  validation cohort, clean-package and browser requirements, performance
+  budget, honest non-goals, and terminal `v1.0.0` release criteria.
 - `scenariolens evidence-index` workflow,
   `docs/reports/scenariolens_evidence_index.md`, and
   `docs/demo/evidence_index.json`, generating a v1 public evidence spine that
-  verifies 16 demo/report/provenance/selector/CI artifacts and makes the
+  verifies 20 demo/report/provenance/selector/CI artifacts and makes the
   project easier to review without publishing raw Waymo records.
 - `scenariolens public-surface-check` workflow and
   `docs/reports/scenariolens_public_surface_check.md`, adding an offline v1

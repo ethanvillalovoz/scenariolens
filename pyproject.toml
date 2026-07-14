@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "scenariolens"
-version = "0.2.0"
+version = "1.0.0rc1"
 description = "Long-tail autonomous-driving scenario discovery and evaluation tooling."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -21,7 +21,7 @@ keywords = [
   "safety-evaluation",
 ]
 classifiers = [
-  "Development Status :: 3 - Alpha",
+  "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
   "License :: OSI Approved :: MIT License",
@@ -46,3 +46,13 @@ scenariolens = "scenariolens.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+scenariolens = ["data/*.json"]
+
+[tool.setuptools.data-files]
+"share/scenariolens/explorer" = [
+  "docs/demo/index.html",
+  "docs/demo/app.js",
+  "docs/demo/styles.css",
+]

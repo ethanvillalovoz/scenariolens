@@ -25,10 +25,174 @@ python -m pip install -e ".[dev]"
 PYTHONPATH=src python -m unittest discover
 ```
 
+## One-Command Analysis Bundle
+
+Launch the complete core analysis path on the built-in synthetic corpus:
+
+```bash
+scenariolens demo --open
+```
+
+This writes a deterministic bundle under `runs/demo/`, serves the bundle on
+`127.0.0.1:8000`, and opens the system browser. Press Ctrl+C to stop it. Use
+`--no-browser` on a headless machine and `--port 0` to select an available
+ephemeral port.
+
+Generate and open the same product path from an explicit input file:
+
+```bash
+scenariolens export-synthetic --output /tmp/scenariolens-synthetic.json
+scenariolens run \
+  --input /tmp/scenariolens-synthetic.json \
+  --format scenariolens-json \
+  --output runs/synthetic \
+  --max-scenarios 11 \
+  --top 10 \
+  --open
+```
+
+Run the same product path over every supported native file in a local Waymo
+Motion directory:
+
+```bash
+scenariolens run \
+  --input data/raw/waymo/motion/validation \
+  --format native \
+  --output runs/waymo-validation \
+  --max-scenarios 400 \
+  --top 50 \
+  --open
+```
+
+Native directories expand into deterministic per-file sources, so
+`--max-scenarios` applies to each shard. The command hashes every input and
+runs the baseline-comparison, heading-aware lane-selection, and linked-lane
+continuation studies. It writes a top-level `manifest.json`, concise
+`report.md`, stage timings, aggregate metrics, stable analysis digest, and all
+specialist artifacts under `studies/`. It also ranks the input cases, renders
+trajectory SVGs under `assets/`, and writes a self-contained static Explorer
+under `explorer/`. The Explorer payload records run provenance, stage metrics,
+case IDs, and portable report links. Use `--no-input-hash` only for a local
+iteration where provenance is not required.
+
+Without `--open`, `scenariolens run` remains non-interactive and returns as
+soon as the artifacts are written. With `--open`, the command validates the
+generated Explorer files before serving the entire run directory, so report
+and trajectory links remain portable.
+
+For a frozen per-shard validation window, `lane-continuation-study` can exclude
+the same leading development rows from every repeated input:
+
+```bash
+scenariolens lane-continuation-study \
+  --input validation-00007.tfrecord \
+  --input validation-00008.tfrecord \
+  --scenario-offset 50 \
+  --max-scenarios 250 \
+  --top 100 \
+  --output-dir data/processed/selector-holdout-study
+```
+
+The offset is applied before the limit and independently to each input. Study
+cases retain their original one-based within-source indices, which makes the
+development/holdout boundary auditable in downstream manifests.
+
+Run the complete frozen-policy v1 holdout over the four local validation shards:
+
+```bash
+scenariolens selector-holdout-study \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00007-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00008-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00009-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00010-of-00150 \
+  --output-dir data/processed/waymo_selector_holdout_993 \
+  --public-report docs/reports/waymo_selector_holdout_993.md
+```
+
+The command uses the packaged selector policy frozen at commit `ba0b37e`,
+excludes the first 50 scenarios from every shard, and runs the complete
+continuation-to-selector chain without exposing threshold controls. The public
+run evaluated 993 withheld scenarios and 78 selector decisions, passed all 8
+provenance and coverage gates in 783.537 seconds with 3.614 GB peak memory, and
+found 12 false promotions. The evaluation packet passes; the selector candidate
+does not, so ScenarioLens keeps it disabled and does not retune on the holdout.
+
+Every holdout attempt writes `state.json` atomically after each completed stage.
+If the process is interrupted, rerun the exact command with `--resume`:
+
+```bash
+scenariolens selector-holdout-study \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00007-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00008-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00009-of-00150 \
+  --input data/raw/waymo/motion/validation/validation.tfrecord-00010-of-00150 \
+  --output-dir data/processed/waymo_selector_holdout_993 \
+  --public-report docs/reports/waymo_selector_holdout_993.md \
+  --resume
+```
+
+Resume is deliberately strict. ScenarioLens re-hashes the ordered inputs and
+frozen policy, verifies the complete configuration, and checks the saved SHA-256
+for every reusable stage manifest and report. Changed inputs, changed options,
+missing artifacts, tampering, or a non-contiguous stage history fail closed with
+a diagnostic in `state.json`; the interrupted stage is rebuilt from a clean
+stage directory.
+
+Validate two independent runs against the v1 determinism and laptop budgets:
+
+```bash
+scenariolens run-verify \
+  --manifest runs/waymo-validation-01/manifest.json \
+  --manifest runs/waymo-validation-02/manifest.json \
+  --output-dir data/processed/scenariolens_v1_run_validation \
+  --max-duration-seconds 900 \
+  --max-peak-memory-gb 8 \
+  --public-report docs/reports/scenariolens_v1_run_validation.md
+```
+
+The validator requires every run and stage to be ready, identical input and
+stage fingerprints, one shared analysis digest, matching source/scenario
+scope, and compliance with both execution budgets. Timestamps, output paths,
+and timings are intentionally excluded from the analysis digest; source
+hashes, configuration, stage formats, counts, and aggregate metrics are not.
+
+## Clean-Package Release Check
+
+Build and exercise ScenarioLens as an installed package rather than importing
+from the repository checkout:
+
+```bash
+scenariolens release-check \
+  --repo-root . \
+  --output-dir data/processed/scenariolens_v1_release_check
+```
+
+The command builds the wheel twice under a fixed `SOURCE_DATE_EPOCH` and
+requires identical filenames and SHA-256 hashes. It then installs the wheel in
+a clean virtual environment, changes to a temporary directory outside the
+checkout, and runs the installed console entrypoint. The 15 checks cover the
+one-command bundle contract, missing-map fallback, empty/missing/unsupported/
+truncated inputs, atomic interruption state, and a hash-verified resume whose
+nine-stage digest must match an uninterrupted run. The resulting directory
+contains `manifest.json`, `report.md`, and the exact wheel under `dist/`.
+
+Browser-test both the public demo and a newly generated local run:
+
+```bash
+npm ci
+npx playwright install chromium
+npm run test:browser
+```
+
+The suite exercises run metadata, stage summaries, filtering, sorting, case
+selection, trajectory loading, report links, desktop layout, and mobile
+overflow while failing on browser console errors.
+
 ## Synthetic Demo
 
 ```bash
 scenariolens demo
+scenariolens demo --open
 scenariolens report --format markdown --limit 5
 scenariolens render --top 3 --output-dir /tmp/scenariolens-gallery
 ```

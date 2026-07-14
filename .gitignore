@@ -9,6 +9,7 @@ venv/
 dist/
 build/
 *.egg-info/
+runs/
 
 # Local data
 data/raw/*
@@ -26,3 +27,5 @@ data/processed/*
 
 # Local browser verification
 .playwright-cli/
+node_modules/
+output/playwright/

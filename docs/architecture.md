@@ -21,7 +21,7 @@ flowchart LR
     X --> Y["Context evaluation set"]
     Y --> Q
     P --> U["Heading-aware lane-selection study"]
-    U --> V["Explorer case diagnostics"]
+    U --> V["Generated Explorer run contract"]
     U --> W["Heading-aware debug casebook"]
     P --> Q["Baseline-debug casebook"]
     H --> Q
@@ -49,7 +49,7 @@ flowchart LR
     F --> I["Static dashboard payload"]
     V --> I
     AP --> I
-    I --> J["Scenario Explorer"]
+    I --> J["Scenario Explorer + trajectory assets"]
     G --> K["Public-safe case studies"]
     Q --> K
     R --> K
@@ -75,6 +75,7 @@ flowchart LR
 
 | Layer | Files | Responsibility |
 | --- | --- | --- |
+| Run bundle | `src/scenariolens/run_bundle.py`, `src/scenariolens/run_validation.py` | Expands input directories, records public-safe input provenance, executes the core baseline/lane studies, writes one versioned top-level manifest and report, and validates repeated runs against deterministic digest, duration, and peak-memory gates. |
 | Schema | `src/scenariolens/schema.py` | Defines the compact scenario, agent, trajectory, and metadata objects used by the rest of the repo. |
 | Ingestion | `src/scenariolens/ingest/` | Converts CSV, Waymo Motion-shaped JSON, binary protos, and TFRecord slices into ScenarioLens scenarios, preserving a bounded linked-lane closure set beyond the base map-feature cap for continuation diagnostics. |
 | Readiness and validation | `src/scenariolens/waymo_readiness.py`, `src/scenariolens/slice_validation.py` | Checks local dataset setup and produces reproducible validation packets. |

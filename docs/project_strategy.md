@@ -113,6 +113,11 @@ and links back to reports and provenance.
 
 ## Current Proof
 
+- V1 acceptance contract: [`docs/v1_acceptance.md`](v1_acceptance.md)
+- Full-corpus run validation:
+  [`docs/reports/scenariolens_v1_run_validation.md`](reports/scenariolens_v1_run_validation.md)
+- Clean-package release check:
+  [`docs/reports/scenariolens_v1_release_check.md`](reports/scenariolens_v1_release_check.md)
 - V1 evidence index:
   [`docs/reports/scenariolens_evidence_index.md`](reports/scenariolens_evidence_index.md)
 - Public surface check:
