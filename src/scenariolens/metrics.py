@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from bisect import bisect_left, bisect_right
 from dataclasses import dataclass
 from itertools import combinations
 from math import hypot, inf, isfinite
@@ -29,6 +30,20 @@ class ScoringContext:
     sdc_track_present: bool
     prediction_target_count: int
     object_of_interest_count: int
+
+
+_Point = tuple[float, float]
+
+
+@dataclass(frozen=True, slots=True)
+class _TrackSpatialIndex:
+    agent_id: str
+    points_by_x: tuple[_Point, ...]
+    x_coordinates: tuple[float, ...]
+    min_x: float
+    max_x: float
+    min_y: float
+    max_y: float
 
 
 def distance(a: State, b: State) -> float:
@@ -63,11 +78,12 @@ def min_path_distance(scenario: Scenario) -> float | None:
 
 
 def _min_path_distance(tracks: tuple[AgentTrack, ...]) -> float | None:
+    indexes = tuple(_track_spatial_index(track) for track in tracks)
     best = inf
-    for left, right in combinations(tracks, 2):
-        for left_state in left.states:
-            for right_state in right.states:
-                best = min(best, distance(left_state, right_state))
+    for left, right in combinations(indexes, 2):
+        best = min(best, _spatial_index_distance(left, right, upper_bound=best))
+        if best == 0.0:
+            break
     return None if best == inf else best
 
 
@@ -192,6 +208,9 @@ def scoring_context(scenario: Scenario) -> ScoringContext:
     quality_tracks = tuple(track for track in scenario.tracks if _track_is_quality(track))
     low_quality_count = len(scenario.tracks) - len(quality_tracks)
     quality_by_id = {track.agent_id: track for track in quality_tracks}
+    spatial_by_id = {
+        track.agent_id: _track_spatial_index(track) for track in quality_tracks
+    }
     sdc_track_present = (
         scenario.ego_track_id is not None and scenario.ego_track_id in quality_by_id
     )
@@ -216,11 +235,19 @@ def scoring_context(scenario: Scenario) -> ScoringContext:
 
     if anchor_ids:
         anchors = tuple(quality_by_id[track_id] for track_id in dict.fromkeys(anchor_ids))
+        anchor_indexes = tuple(spatial_by_id[track.agent_id] for track in anchors)
         selected = tuple(
             track
             for track in quality_tracks
             if track.agent_id in anchor_ids
-            or _min_track_distance_to_any(track, anchors) <= SCORING_CONTEXT_RADIUS_M
+            or any(
+                _spatial_indexes_within_distance(
+                    spatial_by_id[track.agent_id],
+                    anchor,
+                    threshold=SCORING_CONTEXT_RADIUS_M,
+                )
+                for anchor in anchor_indexes
+            )
         )
     else:
         selected = quality_tracks
@@ -419,20 +446,129 @@ def _min_track_distance_to_any(
     track: AgentTrack,
     anchors: tuple[AgentTrack, ...],
 ) -> float:
+    return _min_spatial_distance_to_any(
+        _track_spatial_index(track),
+        tuple(_track_spatial_index(anchor) for anchor in anchors),
+    )
+
+
+def _min_spatial_distance_to_any(
+    track: _TrackSpatialIndex,
+    anchors: tuple[_TrackSpatialIndex, ...],
+) -> float:
     best = inf
     for anchor in anchors:
         if track.agent_id == anchor.agent_id:
             return 0.0
-        best = min(best, _min_track_distance(track, anchor))
+        best = min(best, _spatial_index_distance(track, anchor, upper_bound=best))
     return best
 
 
 def _min_track_distance(left: AgentTrack, right: AgentTrack) -> float:
-    best = inf
-    for left_state in left.states:
-        for right_state in right.states:
-            best = min(best, distance(left_state, right_state))
+    return _spatial_index_distance(
+        _track_spatial_index(left),
+        _track_spatial_index(right),
+    )
+
+
+def _track_spatial_index(track: AgentTrack) -> _TrackSpatialIndex:
+    points = tuple(sorted((state.x, state.y) for state in track.states))
+    if not points:
+        return _TrackSpatialIndex(
+            agent_id=track.agent_id,
+            points_by_x=(),
+            x_coordinates=(),
+            min_x=inf,
+            max_x=-inf,
+            min_y=inf,
+            max_y=-inf,
+        )
+    y_coordinates = tuple(point[1] for point in points)
+    return _TrackSpatialIndex(
+        agent_id=track.agent_id,
+        points_by_x=points,
+        x_coordinates=tuple(point[0] for point in points),
+        min_x=points[0][0],
+        max_x=points[-1][0],
+        min_y=min(y_coordinates),
+        max_y=max(y_coordinates),
+    )
+
+
+def _spatial_index_distance(
+    left: _TrackSpatialIndex,
+    right: _TrackSpatialIndex,
+    upper_bound: float = inf,
+) -> float:
+    if not left.points_by_x or not right.points_by_x:
+        return inf
+    if _bounding_box_distance(left, right) >= upper_bound:
+        return upper_bound
+    if len(left.points_by_x) <= len(right.points_by_x):
+        queries = left.points_by_x
+        target = right
+    else:
+        queries = right.points_by_x
+        target = left
+
+    best = upper_bound
+    for x, y in queries:
+        if best == inf:
+            position = bisect_left(target.x_coordinates, x)
+            for candidate_index in (position - 1, position):
+                if 0 <= candidate_index < len(target.points_by_x):
+                    candidate_x, candidate_y = target.points_by_x[candidate_index]
+                    best = min(best, hypot(x - candidate_x, y - candidate_y))
+        left_index = bisect_left(target.x_coordinates, x - best)
+        right_index = bisect_right(target.x_coordinates, x + best)
+        for candidate_index in range(left_index, right_index):
+            candidate_x, candidate_y = target.points_by_x[candidate_index]
+            delta_x = x - candidate_x
+            delta_y = y - candidate_y
+            if abs(delta_x) >= best or abs(delta_y) >= best:
+                continue
+            best = min(best, hypot(delta_x, delta_y))
+        if best == 0.0:
+            return 0.0
     return best
+
+
+def _spatial_indexes_within_distance(
+    left: _TrackSpatialIndex,
+    right: _TrackSpatialIndex,
+    *,
+    threshold: float,
+) -> bool:
+    if not left.points_by_x or not right.points_by_x:
+        return False
+    if _bounding_box_distance(left, right) > threshold:
+        return False
+    if len(left.points_by_x) <= len(right.points_by_x):
+        queries = left.points_by_x
+        target = right
+    else:
+        queries = right.points_by_x
+        target = left
+
+    for x, y in queries:
+        left_index = bisect_left(target.x_coordinates, x - threshold)
+        right_index = bisect_right(target.x_coordinates, x + threshold)
+        for candidate_index in range(left_index, right_index):
+            candidate_x, candidate_y = target.points_by_x[candidate_index]
+            if abs(y - candidate_y) > threshold:
+                continue
+            if hypot(x - candidate_x, y - candidate_y) <= threshold:
+                return True
+    return False
+
+
+def _bounding_box_distance(
+    left: _TrackSpatialIndex,
+    right: _TrackSpatialIndex,
+) -> float:
+    delta_x = max(left.min_x - right.max_x, right.min_x - left.max_x, 0.0)
+    delta_y = max(left.min_y - right.max_y, right.min_y - left.max_y, 0.0)
+    return hypot(delta_x, delta_y)
 
 
 def _percentile(sorted_values: tuple[float, ...], percentile: float) -> float:
