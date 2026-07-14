@@ -34,6 +34,7 @@ class EvidenceIndexTest(unittest.TestCase):
         self.assertIn("terminal_selector_decision_atlas_200", artifact_ids)
         self.assertIn("selector_holdout_993", artifact_ids)
         self.assertIn("v1_run_validation", artifact_ids)
+        self.assertIn("v1_release_check", artifact_ids)
         self.assertIn("ci_workflow", artifact_ids)
 
     def test_payload_marks_missing_required_artifacts(self) -> None:
@@ -59,6 +60,7 @@ class EvidenceIndexTest(unittest.TestCase):
         self.assertIn("Terminal Selector Decision Atlas", markdown)
         self.assertIn("993-Scenario Frozen Selector Holdout", markdown)
         self.assertIn("Full-Corpus Run Reproducibility", markdown)
+        self.assertIn("V1 Clean-Package Release Check", markdown)
         self.assertIn("Public-Safety Boundary", markdown)
 
     def test_generator_writes_manifest_report_public_report_and_demo_json(self) -> None:

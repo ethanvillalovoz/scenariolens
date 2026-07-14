@@ -529,8 +529,9 @@ CI-safe integration path, and `run-verify` release gate are implemented. Two
 independent full-corpus
 runs each processed 1,193 scenarios from four local Waymo Motion validation
 shards, produced the same analysis digest, passed 7/7 reproducibility and
-resource checks, completed in at most 459.495 seconds, and used at most
-1.915 GB peak memory. The separate frozen-policy validation then processed all
+resource checks, generated 50 ranked Explorer cases, completed in at most
+601.447 seconds, and used at most 3.642 GB peak memory. The separate
+frozen-policy validation then processed all
 993 withheld scenarios, reached 78 selector decisions, and passed 8/8 leakage,
 coverage, and minimum-evidence gates in 783.537 seconds with 3.614 GB peak
 memory. That larger holdout invalidated the candidate for adoption: agreement

@@ -392,8 +392,35 @@ DEFAULT_EVIDENCE_CATALOG: tuple[EvidenceCatalogItem, ...] = (
         metrics=(
             EvidenceMetric("Scenarios per run", "1,193"),
             EvidenceMetric("Reproducibility checks", "7/7"),
-            EvidenceMetric("Maximum duration", "459.495 s"),
-            EvidenceMetric("Maximum peak memory", "1.915 GB"),
+            EvidenceMetric("Maximum duration", "601.447 s"),
+            EvidenceMetric("Maximum peak memory", "3.642 GB"),
+        ),
+    ),
+    EvidenceCatalogItem(
+        identifier="v1_release_check",
+        title="V1 Clean-Package Release Check",
+        stage="release_readiness",
+        stage_label="Release readiness",
+        proof_type="clean-package validation",
+        scope=(
+            "Reproducible wheel build, isolated install, installed product, "
+            "failure diagnostics, and interruption/resume probes"
+        ),
+        path="docs/reports/scenariolens_v1_release_check.md",
+        command="scenariolens release-check --repo-root .",
+        data_status="CI-safe synthetic fixtures and package metadata only",
+        why_it_matters=(
+            "Proves that the shipped artifact works outside the source checkout "
+            "and that its critical recovery and failure contracts are executable."
+        ),
+        limitation=(
+            "The installed probes use public synthetic fixtures and complement, "
+            "rather than replace, the separate real-data reports."
+        ),
+        metrics=(
+            EvidenceMetric("Release checks", "15/15"),
+            EvidenceMetric("Wheel SHA-256 match", "yes"),
+            EvidenceMetric("Resume digest match", "yes"),
         ),
     ),
     EvidenceCatalogItem(
@@ -404,7 +431,10 @@ DEFAULT_EVIDENCE_CATALOG: tuple[EvidenceCatalogItem, ...] = (
         proof_type="automation",
         scope="Unit tests plus deterministic run-bundle integration on every push",
         path=".github/workflows/ci.yml",
-        command="python -m unittest discover; scenariolens run; scenariolens run-verify",
+        command=(
+            "python -m unittest discover; scenariolens run; "
+            "scenariolens run-verify; scenariolens release-check"
+        ),
         data_status="CI-safe fixtures only",
         why_it_matters=(
             "Shows the framework is maintained as software, not just a set of "

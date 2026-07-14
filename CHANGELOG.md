@@ -4,6 +4,8 @@ All notable changes to ScenarioLens are documented here.
 
 ## [Unreleased]
 
+## [1.0.0-rc.1] - 2026-07-13
+
 ### Added
 
 - `scenariolens selector-holdout-study`, a one-command frozen-policy
@@ -57,7 +59,12 @@ All notable changes to ScenarioLens are documented here.
 - `docs/reports/scenariolens_v1_run_validation.md`, generated from two complete
   1,193-scenario runs over four local Waymo Motion validation shards. All 7
   readiness, digest, input, stage, duration, and memory checks pass; the slower
-  run completed in 459.495 seconds and peak memory remained at 1.915 GB.
+  exact-RC product run completed in 601.447 seconds with 3.642 GB peak memory,
+  including 50 rendered cases and the generated Explorer.
+- Exact x-sweep path-distance indexing for scenario ranking, replacing the
+  quadratic all-state Explorer bottleneck while preserving byte-identical
+  100-scenario dashboard output. The isolated 1,193-scenario Explorer pass
+  improved from 324.440 seconds to 134.859 seconds on the target laptop.
 - `docs/v1_acceptance.md`, freezing the one-command product contract, complete
   1,193-scenario local-corpus gate, separate 993-scenario frozen-policy
   validation cohort, clean-package and browser requirements, performance
@@ -65,7 +72,7 @@ All notable changes to ScenarioLens are documented here.
 - `scenariolens evidence-index` workflow,
   `docs/reports/scenariolens_evidence_index.md`, and
   `docs/demo/evidence_index.json`, generating a v1 public evidence spine that
-  verifies 16 demo/report/provenance/selector/CI artifacts and makes the
+  verifies 20 demo/report/provenance/selector/CI artifacts and makes the
   project easier to review without publishing raw Waymo records.
 - `scenariolens public-surface-check` workflow and
   `docs/reports/scenariolens_public_surface_check.md`, adding an offline v1

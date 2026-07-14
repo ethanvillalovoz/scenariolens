@@ -7,10 +7,10 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 ## Readiness
 
 - Ready: yes
-- Required artifacts present: 19 / 19
+- Required artifacts present: 20 / 20
 - Missing required artifacts: 0
 - Evidence stages: 8
-- Public-safe artifacts indexed: 19
+- Public-safe artifacts indexed: 20
 - Local real-data/Waymo-derived artifacts indexed: 15
 
 ## Stage Summary
@@ -24,7 +24,7 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 | Replay bridge | 1 | 1 | Connects mined cases to laptop-safe open-loop replay diagnostics. |
 | Lane continuation | 2 | 2 | Audits map-link and lane-continuation failure modes at larger scale. |
 | Selector validation | 5 | 5 | Validates conservative selector gates before changing default behavior. |
-| Release readiness | 3 | 3 | Keeps the public repo tested and contribution-ready. |
+| Release readiness | 4 | 4 | Keeps the public repo tested and contribution-ready. |
 
 ## Evidence Artifacts
 
@@ -46,7 +46,8 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 | [993-Scenario Frozen Selector Holdout](waymo_selector_holdout_993.md) | Selector validation | 78 perturbation-replayed selector decisions from 993 withheld scenarios across four local validation shards | Holdout scenarios: 993; Selector decisions: 78; Evaluation gates: 8/8; Candidate false promotions: 12 | yes |
 | [Terminal Selector Decision Atlas](waymo_lane_continuation_terminal_neighborhood_selector_decision_atlas_200.md) | Selector validation | 7 derived selector cards joined to candidate-validation labels | Visual cards: 7; Candidate agreement: 6/7 | yes |
 | [Selector Atlas Demo Payload](../demo/selector_decisions.json) | Product surface | Public-safe selector decision cards loaded by the static Explorer | Cards: 7 | yes |
-| [Full-Corpus Run Reproducibility](scenariolens_v1_run_validation.md) | Release readiness | Two complete analysis runs over 1,193 scenarios from four local validation shards | Scenarios per run: 1,193; Reproducibility checks: 7/7; Maximum duration: 459.495 s; Maximum peak memory: 1.915 GB | yes |
+| [Full-Corpus Run Reproducibility](scenariolens_v1_run_validation.md) | Release readiness | Two complete analysis runs over 1,193 scenarios from four local validation shards | Scenarios per run: 1,193; Reproducibility checks: 7/7; Maximum duration: 601.447 s; Maximum peak memory: 3.642 GB | yes |
+| [V1 Clean-Package Release Check](scenariolens_v1_release_check.md) | Release readiness | Reproducible wheel build, isolated install, installed product, failure diagnostics, and interruption/resume probes | Release checks: 15/15; Wheel SHA-256 match: yes; Resume digest match: yes | yes |
 | [CI Validation Workflow](../../.github/workflows/ci.yml) | Release readiness | Unit tests plus deterministic run-bundle integration on every push | CI raw Waymo dependency: none | yes |
 | [Public Surface Check](scenariolens_public_surface_check.md) | Release readiness | Offline check for public links, payload contracts, raw-data boundary, and CI smoke coverage | Offline checks: 7; Raw-data guard: yes | yes |
 
@@ -205,11 +206,20 @@ It is intentionally honest: this is a scenario-mining and evaluation framework, 
 - Why it matters: Proves the one-command product path completes deterministically on the full local corpus within the declared laptop budgets.
 - Limitation: The local corpus is not a Waymo benchmark and raw records remain outside git.
 
+### V1 Clean-Package Release Check
+
+- Path: `docs/reports/scenariolens_v1_release_check.md`
+- Proof type: clean-package validation
+- Command: `scenariolens release-check --repo-root .`
+- Data status: CI-safe synthetic fixtures and package metadata only
+- Why it matters: Proves that the shipped artifact works outside the source checkout and that its critical recovery and failure contracts are executable.
+- Limitation: The installed probes use public synthetic fixtures and complement, rather than replace, the separate real-data reports.
+
 ### CI Validation Workflow
 
 - Path: `.github/workflows/ci.yml`
 - Proof type: automation
-- Command: `python -m unittest discover; scenariolens run; scenariolens run-verify`
+- Command: `python -m unittest discover; scenariolens run; scenariolens run-verify; scenariolens release-check`
 - Data status: CI-safe fixtures only
 - Why it matters: Shows the framework is maintained as software, not just a set of static reports.
 - Limitation: Live Waymo shards remain local and are not required in CI.

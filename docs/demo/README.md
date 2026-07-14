@@ -13,8 +13,8 @@ Open `http://localhost:8000/demo/`.
 
 The public demo joins two deliberately separate evidence layers:
 
-- `run.json` contains aggregate metrics from two reproducible 1,193-scenario
-  local runs over four Waymo Motion validation shards.
+- `run.json` contains aggregate metrics from two reproducible `1.0.0rc1`
+  product runs over 1,193 scenarios and four Waymo Motion validation shards.
 - `scenarios.json` contains 14 checked-in synthetic and Waymo-shaped fixture
   cases whose trajectories are safe to publish and inspect in a browser.
 

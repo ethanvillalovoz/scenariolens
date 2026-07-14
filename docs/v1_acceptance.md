@@ -102,6 +102,12 @@ passes while the candidate remains disabled. See
 The initial capacity baseline is 1,193 scenarios and 2,772 continuation targets
 in 182.55 seconds with approximately 1.91 GB maximum resident memory.
 
+The exact `1.0.0rc1` product validation includes all three studies, ranking,
+50 trajectory SVGs, and the generated Explorer. Two independent runs produced
+the same digest, passed 7/7 gates, and completed in 594.359 and 601.447 seconds
+with at most 3.642 GB peak memory. This supersedes the earlier pre-Explorer
+capacity timing as the v1 end-to-end release measurement.
+
 ### Installation And Failure Paths
 
 - A built wheel installs into clean supported Python environments.

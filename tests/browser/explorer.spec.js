@@ -52,7 +52,10 @@ test("public Explorer exposes run evidence and the complete case workflow", asyn
   await expectSelectedTrajectory(page, "synthetic_cyclist_close_pass");
 
   await page.getByText("Reports", { exact: true }).click();
-  await expect(page.locator("#reportLinks a")).toHaveCount(7);
+  await expect(page.locator("#reportLinks a")).toHaveCount(8);
+  await expect(
+    page.getByRole("link", { name: /Clean-package release check/ }),
+  ).toHaveAttribute("href", "../reports/scenariolens_v1_release_check.md");
   await expect(
     page.getByRole("link", { name: /Frozen selector holdout/ }),
   ).toHaveAttribute("href", "../reports/waymo_selector_holdout_993.md");
@@ -67,7 +70,7 @@ test("public Explorer remains contained on a mobile viewport", async ({ page }) 
   await page.goto("http://127.0.0.1:8131/demo/");
 
   await expect(page.locator("#runStatus")).toHaveText("Run ready");
-  await expect(page.locator("#heroPeakMemory")).toHaveText("1.92 GB");
+  await expect(page.locator("#heroPeakMemory")).toHaveText("3.64 GB");
   await expect(page.locator(".stage-card")).toHaveCount(3);
   await expectNoHorizontalOverflow(page);
   expect(errors).toEqual([]);

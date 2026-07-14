@@ -3,14 +3,14 @@
   "ready": true,
   "mode": "public_demo",
   "summary": {
-    "scenariolens_version": "0.2.0",
+    "scenariolens_version": "1.0.0rc1",
     "source_count": 4,
     "scenario_count": 1193,
     "rendered_case_count": 14,
     "stage_count": 3,
-    "duration_seconds": 459.495,
-    "peak_rss_bytes": 1915289600,
-    "analysis_digest": "ce156efea15a18b3b69c2b20c79c085c66da3c57b41f17dcf6844583d5ff9d8e"
+    "duration_seconds": 601.447,
+    "peak_rss_bytes": 3642146816,
+    "analysis_digest": "875060cf4e8fb9fca13e433f7581bb10026a05017769c62110a1b7ecc87cfa93"
   },
   "configuration": {
     "input_format": "native",
@@ -50,7 +50,7 @@
       "ready": true,
       "scenario_count": 1193,
       "evaluated_count": 5274,
-      "duration_seconds": 116.036,
+      "duration_seconds": 119.627,
       "aggregate": {
         "evaluated_target_count": 5274,
         "constant_velocity_ade_m": 9.143,
@@ -67,11 +67,11 @@
     },
     {
       "stage_id": "lane_selection",
-      "label": "Nearest-lane vs heading-aware selection",
+      "label": "Nearest-lane vs heading-aware lane selection",
       "ready": true,
       "scenario_count": 1193,
       "evaluated_count": 5274,
-      "duration_seconds": 149.201,
+      "duration_seconds": 151.451,
       "aggregate": {
         "evaluated_target_count": 5274,
         "constant_velocity_fde_m": 25.004,
@@ -95,7 +95,7 @@
       "ready": true,
       "scenario_count": 1193,
       "evaluated_count": 2772,
-      "duration_seconds": 193.859,
+      "duration_seconds": 189.157,
       "aggregate": {
         "evaluated_track_count": 2772,
         "linked_lane_track_count": 2618,
@@ -114,8 +114,14 @@
     {
       "report_id": "v1_run_validation",
       "label": "Full-corpus run validation",
-      "description": "Two complete 1,193-scenario runs with matching digest and 7/7 checks.",
+      "description": "Two complete 1,193-scenario RC product runs with matching digest, generated Explorers, and 7/7 checks.",
       "path": "../reports/scenariolens_v1_run_validation.md"
+    },
+    {
+      "report_id": "v1_release_check",
+      "label": "Clean-package release check",
+      "description": "15/15 checks for reproducible wheels, isolated install, failure diagnostics, and verified resume.",
+      "path": "../reports/scenariolens_v1_release_check.md"
     },
     {
       "report_id": "selector_holdout_993",

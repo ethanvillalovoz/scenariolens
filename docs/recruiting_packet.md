@@ -7,6 +7,9 @@ robotics, AI/ML, and software engineering internship conversations.
 
 - Live demo: https://ethanvillalovoz.com/scenariolens/
 - Repository: https://github.com/ethanvillalovoz/scenariolens
+- V1 evidence index: `docs/reports/scenariolens_evidence_index.md`
+- Full-corpus product validation: `docs/reports/scenariolens_v1_run_validation.md`
+- Clean-package release check: `docs/reports/scenariolens_v1_release_check.md`
 - Frozen selector holdout: `docs/reports/waymo_selector_holdout_993.md`
 - Product strategy: `docs/project_strategy.md`
 - Architecture: `docs/architecture.md`

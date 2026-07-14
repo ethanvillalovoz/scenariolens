@@ -13,7 +13,7 @@ prediction baselines fail.
 - **Frozen holdout:** [993 withheld scenarios and 78 selector decisions](docs/reports/waymo_selector_holdout_993.md)
 - **Case study:** [Finding baseline failures in Waymo Motion scenarios](docs/case_studies/waymo_baseline_failures.md)
 - **v1 contract:** [definition of done and release gates](docs/v1_acceptance.md)
-- **Latest release:** [v0.2.0 notes](docs/releases/v0.2.0.md)
+- **Release candidate:** [v1.0.0-rc.1 notes](docs/releases/v1.0.0-rc.1.md)
 
 ScenarioLens is designed as a Waymo-targeted portfolio artifact, but the shape
 is an engineering product: a reproducible scenario-triage pipeline, real-data
@@ -51,16 +51,17 @@ ScenarioLens builds a small but polished pipeline that can:
 | Real-data path | Native Waymo Motion JSON/proto/TFRecord reader validated on four local shards and 1,193 scenarios |
 | Baseline evidence | Constant-velocity ADE/FDE, miss rate, lane-aware comparison, map/signal context coverage, map-match audit, tag studies, and stability studies |
 | Public demo | Run-backed Scenario Explorer with provenance, stage metrics, filters, SVG trajectories, baseline cards, diagnostics, and responsive browser tests |
-| Evidence index | Generated v1 artifact map verifying 19 public reports, payloads, provenance docs, and CI files |
-| Repo quality | MIT license, contributor docs, changelog, citation, issue templates, CI, and release checklist |
+| Evidence index | Generated v1 artifact map verifying 20 public reports, payloads, provenance docs, and CI files |
+| Repo quality | MIT license, contributor docs, reproducible wheels, 15-check clean-package gate, CI, and release checklist |
 
 ## Flagship Results
 
 | Proof | Result | Honest conclusion |
 | --- | --- | --- |
-| Full-corpus product run | Two 1,193-scenario runs, matching digest, 7/7 checks, at most 459.495 s and 1.915 GB | The complete local corpus runs reproducibly on the target laptop. |
+| Full-corpus product run | Two 1,193-scenario RC runs, matching digest, 7/7 checks, at most 601.447 s and 3.642 GB | The complete product loop, including 50 rendered cases and the generated Explorer, runs reproducibly on the target laptop. |
 | Frozen selector holdout | 993 withheld scenarios, 78 perturbation-replayed decisions, 8/8 evaluation gates, 783.537 s and 3.614 GB | The evaluation succeeded, but the candidate did not: 12 false promotions mean it stays disabled. |
 | Interactive product surface | One generated Explorer contract shared by local runs and the live demo, with desktop/mobile browser coverage | Reviewers can inspect ranked cases, trajectories, provenance, and reports without raw Waymo data. |
+| Release integrity | 15/15 clean-package checks, byte-identical wheel rebuild, isolated install, explicit failure diagnostics, and verified resume | The published artifact is exercised outside the checkout, not inferred from editable-install tests. |
 
 ## Quick Start
 
@@ -119,6 +120,7 @@ scenariolens demo --open --no-browser --port 0
 - [ScenarioLens v1 evidence index](docs/reports/scenariolens_evidence_index.md)
 - [993-scenario frozen selector holdout](docs/reports/waymo_selector_holdout_993.md)
 - [Full-corpus run reproducibility validation](docs/reports/scenariolens_v1_run_validation.md)
+- [V1 clean-package release check](docs/reports/scenariolens_v1_release_check.md)
 - [Public surface check](docs/reports/scenariolens_public_surface_check.md)
 - [Portfolio report](docs/reports/portfolio_report.md)
 - [Waymo Motion validation summary](docs/reports/waymo_motion_validation_summary.md)
