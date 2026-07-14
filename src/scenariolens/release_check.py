@@ -54,7 +54,7 @@ def generate_release_check(
         raise FileNotFoundError(
             f"ScenarioLens repository root is missing pyproject.toml: {root}"
         )
-    target = Path(output_dir)
+    target = Path(output_dir).resolve()
     target.mkdir(parents=True, exist_ok=True)
     started = perf_counter()
     checks: list[dict[str, object]] = []

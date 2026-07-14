@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import tempfile
 import unittest
 from contextlib import redirect_stdout
@@ -106,6 +107,29 @@ class ReleaseCheckTest(unittest.TestCase):
                     output_dir=Path(tmpdir) / "output",
                     timeout_seconds=0,
                 )
+
+    def test_generator_resolves_relative_output_before_changing_cwd(self) -> None:
+        checks = [_check("wheel_build", True)]
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = _repo_root(Path(tmpdir) / "repo")
+            previous_cwd = Path.cwd()
+            os.chdir(tmpdir)
+            try:
+                with patch(
+                    "scenariolens.release_check._execute_release_checks",
+                    return_value=(checks, {}),
+                ) as execute:
+                    result = generate_release_check(
+                        repo_root=root,
+                        output_dir="relative-output",
+                    )
+            finally:
+                os.chdir(previous_cwd)
+
+            expected = (Path(tmpdir) / "relative-output").resolve()
+            self.assertEqual(result.output_dir, expected)
+            self.assertEqual(execute.call_args.kwargs["output_dir"], expected)
+            self.assertTrue((expected / "manifest.json").is_file())
 
     def test_cli_returns_nonzero_when_release_packet_fails(self) -> None:
         failed = ReleaseCheckResult(
